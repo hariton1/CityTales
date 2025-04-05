@@ -5,3 +5,9 @@ services:
     build: ./data-scraper
     ports:
       - 8080:8080
+
+  frontend:
+    build: ./frontend
+    image: frontend:latest
+    ports:
+      - '4200:4200'
