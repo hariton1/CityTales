@@ -1,0 +1,7 @@
+services:
+
+  data-scraper:
+    platform: linux/amd64
+    build: ./data-scraper
+    ports:
+      - 8080:8080
