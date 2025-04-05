@@ -21,12 +21,14 @@ services:
       - ./neo4j_db/plugins:/plugins
 
   data-scraper:
+    container_name: data-scraper
     platform: linux/amd64
     build: ./data-scraper
     ports:
       - 8080:8080
 
   frontend:
+    container_name: frontend
     build: ./frontend
     image: frontend:latest
     ports:

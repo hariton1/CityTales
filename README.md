@@ -32,4 +32,11 @@ Each sub-project has its own `Dockerfile`, which is then referenced in the `dock
 ### What should your local .env file include?
 NEO4J_PASSWORD=***
 
+### URLs for different components
+- Frontend: localhost:4200
+- DataScrapper: localhost:8080
+- Neo4J Web-UI: localhost:7474
+
+
+
 
