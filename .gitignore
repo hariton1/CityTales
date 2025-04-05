@@ -1,1 +1,5 @@
 .idea
+.env
+
+neo4j_db
+
