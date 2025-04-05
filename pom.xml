@@ -12,6 +12,7 @@
     <name>thread-of-time</name>
     <description>Parent project for multi-module Spring Boot apps</description>
 
+    <!--Add your new module here-->
     <modules>
         <module>data-scraper</module>
     </modules>
