@@ -34,7 +34,7 @@ NEO4J_PASSWORD=***
 
 ### URLs for different components
 - Frontend: localhost:4200
-- DataScrapper: localhost:8080
+- DataScraper: localhost:8080
 - Neo4J Web-UI: localhost:7474
 
 
