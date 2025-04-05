@@ -29,4 +29,7 @@ To integrate the new module, add a reference to it in the top-level `pom.xml`. T
 
 Each sub-project has its own `Dockerfile`, which is then referenced in the `docker-compose.yml`.
 
+### What should your local .env file include?
+NEO4J_PASSWORD=***
+
 
