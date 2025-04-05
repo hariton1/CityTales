@@ -17,3 +17,16 @@ DevOps coordinator - Simon Ripphausen, 12444081, e12444081@student.tuwien.ac.at`
 
 ---
 
+### Basic Project Setup
+
+All Maven/Spring projects can be initialized using the [Spring Initializr](https://start.spring.io/).
+
+- **Spring Boot**: 3.4.4 (latest stable release)
+- **Java**: 17
+- **Group**: `group-05.ase`
+
+To integrate the new module, add a reference to it in the top-level `pom.xml`. This allows you to run `mvn ...` from the top-level directory.
+
+Each sub-project has its own `Dockerfile`, which is then referenced in the `docker-compose.yml`.
+
+
