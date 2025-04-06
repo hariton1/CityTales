@@ -8,6 +8,7 @@ import org.wikidata.wdtk.datamodel.helpers.Datamodel;
 import org.wikidata.wdtk.datamodel.interfaces.EntityDocument;
 import org.wikidata.wdtk.datamodel.interfaces.ItemDocument;
 import org.wikidata.wdtk.datamodel.interfaces.Statement;
+import org.wikidata.wdtk.datamodel.interfaces.StatementGroup;
 import org.wikidata.wdtk.wikibaseapi.BasicApiConnection;
 import org.wikidata.wdtk.wikibaseapi.WikibaseDataFetcher;
 import org.wikidata.wdtk.wikibaseapi.apierrors.MediaWikiApiErrorException;
@@ -49,8 +50,21 @@ public class WikiDataService implements IWikiDataService {
             if(coord_Statement != null) {
                 dataObject.setLocation(coord_Statement.getValue().toString());
             }
+
+            StatementGroup instance_of = id.findStatementGroup("P31");
+            if(instance_of != null) {
+                for (Statement s:instance_of.getStatements()) {
+                    String instance_of_Id = extractIdFromUrl(s.getValue().toString());
+                    dataObject.addToInstanceOf(instance_of_Id);
+                }
+            }
         }
 
         return dataObject;
+    }
+
+    private String extractIdFromUrl(String url) {
+        String cleansed = url.split("\\s")[0];
+        return cleansed.substring(cleansed.lastIndexOf('/') + 1);
     }
 }
