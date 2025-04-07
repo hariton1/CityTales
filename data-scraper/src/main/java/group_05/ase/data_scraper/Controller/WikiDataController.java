@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class WikiDataController {
@@ -37,9 +38,24 @@ public class WikiDataController {
     @GetMapping("/api/run")
     public void run() {
         List<String> relatedPageNames = jwikiService.getPageNames();
+
         for (String pageName:relatedPageNames) {
             WikiDataObject wikiDO = wikiDataService.extractWikiDataObject(pageName);
             System.out.println(wikiDO.toString());
+        }
+    }
+
+    @GetMapping("/api/links")
+    public Map<String, String> getLinks() {
+        return jwikiService.startRecursiveSearch("Vienna");
+    }
+
+    @GetMapping("/api/analytics")
+    public void analytics() {
+
+        List<WikiDataObject> list = wikiDataService.findPlaces();
+        for (WikiDataObject wikiDataObject:list) {
+            System.out.println(wikiDataObject.toString());
         }
     }
 }
