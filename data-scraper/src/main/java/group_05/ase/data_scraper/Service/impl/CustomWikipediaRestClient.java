@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import group_05.ase.data_scraper.Entity.CustomRestAPIObjects.SearchResult;
 import group_05.ase.data_scraper.Entity.CustomRestAPIObjects.WikipediaResponse;
+import group_05.ase.data_scraper.Service.ICustomWikipediaRestClient;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class CustomWikipediaRestClient {
+public class CustomWikipediaRestClient implements ICustomWikipediaRestClient {
     private final String WIKIPEDIA_API_URL = "https://en.wikipedia.org/w/api.php";
     public WikipediaResponse searchOnce(String query, int offset) {
         try {
@@ -70,6 +71,7 @@ public class CustomWikipediaRestClient {
                 "&sroffset=" + offset;
 
         URL url = new URL(urlString);
+        System.out.println("url: " +url);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
         conn.setRequestMethod("GET");

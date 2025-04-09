@@ -2,7 +2,7 @@ package group_05.ase.data_scraper.Controller;
 
 import group_05.ase.data_scraper.Entity.CustomRestAPIObjects.SearchResult;
 import group_05.ase.data_scraper.Entity.CustomRestAPIObjects.WikipediaResponse;
-import group_05.ase.data_scraper.Entity.WikiDataObject;
+import group_05.ase.data_scraper.Service.impl.PrototypeService;
 import group_05.ase.data_scraper.Service.impl.CustomWikipediaRestClient;
 import group_05.ase.data_scraper.Service.impl.JWikiService;
 import group_05.ase.data_scraper.Service.impl.WikiDataService;
@@ -18,50 +18,29 @@ public class WikiDataController {
     private final JWikiService jwikiService;
     private final WikiDataService wikiDataService;
     private final CustomWikipediaRestClient customWikipediaApiClientService;
+    private final PrototypeService prototypeService;
 
-    public WikiDataController(JWikiService jwikiService, WikiDataService wikiDataService, CustomWikipediaRestClient customWikipediaApiClientService) {
+    public WikiDataController(JWikiService jwikiService, WikiDataService wikiDataService, CustomWikipediaRestClient customWikipediaApiClientService, PrototypeService prototypeService) {
         this.jwikiService = jwikiService;
         this.wikiDataService = wikiDataService;
         this.customWikipediaApiClientService = customWikipediaApiClientService;
+        this.prototypeService = prototypeService;
     }
 
-    @GetMapping("/api/basicTest")
-    public String basicTest() {
-        List<String> categories = jwikiService.getCategories("Vienna");
-        for (String s:categories) {
-            System.out.println(s);
-        }
-        return jwikiService.setUp();
-    }
+    @GetMapping("/api/prototype")
+    public void prototype() {
+        prototypeService.getAllLinksFromVienna();
 
-    @GetMapping("/api/allVienna")
-    public String getAllEventsRelatedToVienna() {
-        jwikiService.getPageNames();
-        return jwikiService.setUp();
-    }
+        // details: separate people and places
+        prototypeService.getWikiDataObjectsForList();
 
-    @GetMapping("/api/run")
-    public void run() {
-        List<String> relatedPageNames = jwikiService.getPageNames();
-
-        for (String pageName:relatedPageNames) {
-            WikiDataObject wikiDO = wikiDataService.extractWikiDataObject(pageName);
-            System.out.println(wikiDO.toString());
-        }
+        //links
+        //prototype.getWikiDataInterconnections();
     }
 
     @GetMapping("/api/links")
     public Map<String, String> getLinks() {
         return jwikiService.startRecursiveSearch("Vienna");
-    }
-
-    @GetMapping("/api/analytics")
-    public void analytics() {
-
-        List<WikiDataObject> list = wikiDataService.findPlaces();
-        for (WikiDataObject wikiDataObject:list) {
-            System.out.println(wikiDataObject.toString());
-        }
     }
 
     @GetMapping("/api/customRestClient/searchOnce")

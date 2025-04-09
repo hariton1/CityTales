@@ -2,17 +2,17 @@ package group_05.ase.data_scraper.Service.impl;
 
 import group_05.ase.data_scraper.Entity.WikiDataObject;
 import group_05.ase.data_scraper.Service.IWikiDataService;
+import group_05.ase.data_scraper.Service.WikiDataConsts.WikiDataConsts;
 import org.springframework.stereotype.Service;
 import org.wikidata.wdtk.datamodel.helpers.Datamodel;
 import org.wikidata.wdtk.datamodel.interfaces.*;
 import org.wikidata.wdtk.wikibaseapi.BasicApiConnection;
-import org.wikidata.wdtk.wikibaseapi.WbGetEntitiesSearchData;
-import org.wikidata.wdtk.wikibaseapi.WbSearchEntitiesResult;
 import org.wikidata.wdtk.wikibaseapi.WikibaseDataFetcher;
 import org.wikidata.wdtk.wikibaseapi.apierrors.MediaWikiApiErrorException;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -20,9 +20,6 @@ public class WikiDataService implements IWikiDataService {
 
     private static final String ENGLISH_WIKIPEDIA = "enwiki";
     private static final String DESCRIPTION_LANGUAGE = "en";
-    private static final String COORDINATE_PROPERTY_ID = "P625";
-    private static final String INSTANCE_OF_PROPERTY_ID = "P31";
-
     private final WikibaseDataFetcher dataFetcher;
 
     public WikiDataService() {
@@ -49,59 +46,15 @@ public class WikiDataService implements IWikiDataService {
             populateCoordinates(dataObject, itemDocument);
             populateInstanceOf(dataObject, itemDocument);
         }
-
         return dataObject;
-    }
-
-    public List<WikiDataObject> findPlaces() {
-        List<WikiDataObject> list = new ArrayList<>();
-        try {
-            List<WbSearchEntitiesResult> result = dataFetcher.searchEntities("");
-            WbGetEntitiesSearchData wbGetEntitiesSearchData = new WbGetEntitiesSearchData();
-            System.out.println("List size: " + result.size());
-            for (WbSearchEntitiesResult res:result) {
-                System.out.println(res.getUrl());
-                WikiDataObject dataObject = new WikiDataObject();
-
-                String label = res.getLabel();
-                String entityId = res.getEntityId();
-                System.out.println("Checking: " + label + "; Id: " + entityId);
-                /*
-
-                EntityDocument entityDocument = fetchEntityDocument(label);
-                if (entityDocument == null) {
-                    break;
-                }
-
-                if (entityDocument instanceof ItemDocument itemDocument) {
-                    if (!isPlace(itemDocument)) {
-                        break;
-                    }
-                    dataObject.setWikiDataId(entityId);
-                    dataObject.setWikiName(label);
-                    populateShortDescription(dataObject, itemDocument);
-                    populateCoordinates(dataObject, itemDocument);
-                    populateInstanceOf(dataObject, itemDocument);
-                    list.add(dataObject);
-                }*/
-            }
-        } catch (MediaWikiApiErrorException | IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        return list;
-    }
-
-    public boolean isPlace(ItemDocument itemDocument) {
-        Statement coordinateStatement = itemDocument.findStatement(COORDINATE_PROPERTY_ID);
-        return coordinateStatement != null && coordinateStatement.getValue() != null;
     }
 
     private EntityDocument fetchEntityDocument(String title) {
         try {
             return dataFetcher.getEntityDocumentByTitle(ENGLISH_WIKIPEDIA, title);
         } catch (MediaWikiApiErrorException | IOException e) {
-            throw new RuntimeException("Failed to fetch entity document for title: " + title, e);
+            System.err.println("Failed to fetch entity document for title: " + title);
+            return null;
         }
     }
 
@@ -111,14 +64,14 @@ public class WikiDataService implements IWikiDataService {
     }
 
     private void populateCoordinates(WikiDataObject dataObject, ItemDocument itemDocument) {
-        Statement coordinateStatement = itemDocument.findStatement(COORDINATE_PROPERTY_ID);
+        Statement coordinateStatement = itemDocument.findStatement(WikiDataConsts.COORDINATE_PROPERTY_ID);
         if (coordinateStatement != null && coordinateStatement.getValue() != null) {
             dataObject.setLocation(coordinateStatement.getValue().toString());
         }
     }
 
     private void populateInstanceOf(WikiDataObject dataObject, ItemDocument itemDocument) {
-        StatementGroup instanceOfGroup = itemDocument.findStatementGroup(INSTANCE_OF_PROPERTY_ID);
+        StatementGroup instanceOfGroup = itemDocument.findStatementGroup(WikiDataConsts.INSTANCE_OF_PROPERTY_ID);
         if (instanceOfGroup == null) {
             return;
         }
@@ -134,5 +87,44 @@ public class WikiDataService implements IWikiDataService {
     private String extractIdFromUrl(String url) {
         String cleanedUrl = url.split("\\s")[0];
         return cleanedUrl.substring(cleanedUrl.lastIndexOf('/') + 1);
+    }
+
+    public void extractWikiDataObjectList(List<String> names, List<WikiDataObject> people,List<WikiDataObject> places) {
+
+        int progress_counter = 0;
+        for (String pageName:names) {
+            WikiDataObject wikiDO = extractWikiDataObject(pageName);
+
+            boolean isPerson = wikiDO.getInstanceOf().stream().anyMatch(WikiDataConsts.PERSON_CODES::contains);
+            boolean isPlace = wikiDO.getInstanceOf().stream().anyMatch(WikiDataConsts.PLACE_CODES::contains);
+
+            if (isPerson) {
+                people.add(wikiDO);
+                // System.out.println("Person found!: " + wikiDO);
+                appendToFile("people.txt", wikiDO.toString());
+            } else if (isPlace) {
+                places.add(wikiDO);
+                // System.out.println("Place found!: " + wikiDO);
+                appendToFile("places.txt", wikiDO.toString());
+            }
+            //System.out.println("Status: " + progress_counter);
+            //progress_counter++;
+        }
+    }
+
+    private void appendToFile(String filePath, String content) {
+        try {
+            File file = new File(filePath);
+
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+
+            try (FileWriter fw = new FileWriter(file, true)) {
+                fw.write(content + System.lineSeparator());
+            }
+        } catch (IOException e) {
+            System.err.println("Error writing to " + filePath + ": " + e.getMessage());
+        }
     }
 }

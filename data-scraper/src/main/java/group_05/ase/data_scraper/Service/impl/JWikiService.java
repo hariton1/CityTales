@@ -9,15 +9,16 @@ import java.util.*;
 @Service
 public class JWikiService implements IJWikiDataService {
 
-    private final int searchDepth = 100;
+    private final int searchDepth = 100_000;
     private Wiki wiki;
 
-    // Just Testing
     public JWikiService() {
         this.wiki = new Wiki.Builder().build();
     }
 
-    public String setUp() {
+    // Just Trying different Methods
+
+    public String getPageText() {
         return wiki.getPageText("Vienna");
     }
 
@@ -25,7 +26,6 @@ public class JWikiService implements IJWikiDataService {
         return wiki.getCategoriesOnPage(page);
     }
 
-    // actual stuff i need
     public List<String> getPageNames() {
         return wiki.search("Vienna",searchDepth);
     }
