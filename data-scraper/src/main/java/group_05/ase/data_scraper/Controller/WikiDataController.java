@@ -1,6 +1,9 @@
 package group_05.ase.data_scraper.Controller;
 
+import group_05.ase.data_scraper.Entity.CustomRestAPIObjects.SearchResult;
+import group_05.ase.data_scraper.Entity.CustomRestAPIObjects.WikipediaResponse;
 import group_05.ase.data_scraper.Entity.WikiDataObject;
+import group_05.ase.data_scraper.Service.impl.CustomWikipediaRestClient;
 import group_05.ase.data_scraper.Service.impl.JWikiService;
 import group_05.ase.data_scraper.Service.impl.WikiDataService;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,10 +17,12 @@ public class WikiDataController {
 
     private final JWikiService jwikiService;
     private final WikiDataService wikiDataService;
+    private final CustomWikipediaRestClient customWikipediaApiClientService;
 
-    public WikiDataController(JWikiService jwikiService, WikiDataService wikiDataService) {
+    public WikiDataController(JWikiService jwikiService, WikiDataService wikiDataService, CustomWikipediaRestClient customWikipediaApiClientService) {
         this.jwikiService = jwikiService;
         this.wikiDataService = wikiDataService;
+        this.customWikipediaApiClientService = customWikipediaApiClientService;
     }
 
     @GetMapping("/api/basicTest")
@@ -56,6 +61,22 @@ public class WikiDataController {
         List<WikiDataObject> list = wikiDataService.findPlaces();
         for (WikiDataObject wikiDataObject:list) {
             System.out.println(wikiDataObject.toString());
+        }
+    }
+
+    @GetMapping("/api/customRestClient/searchOnce")
+    public void searchOnce() {
+        WikipediaResponse response = customWikipediaApiClientService.searchOnce("Vienna",0);
+        for (SearchResult result : response.query.search) {
+            System.out.println(result);
+        }
+    }
+
+    @GetMapping("/api/customRestClient/searchMultiples")
+    public void searchMultiples() {
+        List<SearchResult> results = customWikipediaApiClientService.searchBatch("Vienna",10,0);
+        for (SearchResult result : results) {
+            System.out.println(result);
         }
     }
 }
