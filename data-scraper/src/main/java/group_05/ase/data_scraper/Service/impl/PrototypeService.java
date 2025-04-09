@@ -1,7 +1,7 @@
 package group_05.ase.data_scraper.Service.impl;
 
 import group_05.ase.data_scraper.Entity.WikiDataObject;
-import group_05.ase.data_scraper.Service.WikiDataConsts.IPrototypeService;
+import group_05.ase.data_scraper.Service.IPrototypeService;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
