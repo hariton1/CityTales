@@ -1,12 +1,13 @@
-FROM maven:3.8.4-openjdk-11-slim AS build
+FROM maven:3.8.3-openjdk-17 AS builder
 WORKDIR /app
-COPY ../user-db/pom.xml .
-COPY ../user-db/src ./src
 
-RUN mvn clean package -DskipTests
-FROM openjdk:11-jre-slim
+COPY pom.xml .
+RUN mvn dependency:go-offline
 
-WORKDIR /app
-COPY --from=build /app/target/user-db.jar .
+COPY src/ ./src/
+RUN mvn package -DskipTests
+
+FROM maven:3.8.3-openjdk-17 AS build
+COPY --from=builder /app/target/user-db-*-SNAPSHOT.jar UserDB.jar
 EXPOSE 7575
-CMD ["java", "-jar", "user-db.jar"]
+CMD ["java", "-jar", "/UserDB.jar"]
