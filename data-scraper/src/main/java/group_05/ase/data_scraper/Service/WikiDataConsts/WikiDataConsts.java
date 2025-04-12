@@ -56,5 +56,7 @@ public class WikiDataConsts {
             POLITICIAN_CODE,
             ARTIST_CODE
     );
+
+    public static final String VIENNA_HISTORY_WIKI_ID = "P7842";
 }
 

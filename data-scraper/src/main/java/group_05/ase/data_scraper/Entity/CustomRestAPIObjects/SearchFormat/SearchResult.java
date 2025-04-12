@@ -1,4 +1,4 @@
-package group_05.ase.data_scraper.Entity.CustomRestAPIObjects;
+package group_05.ase.data_scraper.Entity.CustomRestAPIObjects.SearchFormat;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 

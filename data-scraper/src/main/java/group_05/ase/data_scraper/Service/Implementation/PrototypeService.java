@@ -1,7 +1,7 @@
-package group_05.ase.data_scraper.Service.impl;
+package group_05.ase.data_scraper.Service.Implementation;
 
 import group_05.ase.data_scraper.Entity.WikiDataObject;
-import group_05.ase.data_scraper.Service.IPrototypeService;
+import group_05.ase.data_scraper.Service.Interface.IPrototypeService;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -28,7 +28,7 @@ public class PrototypeService implements IPrototypeService {
     }
 
     public void getAllLinksFromVienna() {
-        links_From_Vienna =  jWikiService.getLinkedPagesNames("Vienna");
+        links_From_Vienna =  jWikiService.getLinkedPagesNames("Vienna History Wiki ID");
         System.out.println("Result Count: " + links_From_Vienna.size());
     }
 

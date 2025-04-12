@@ -1,15 +1,13 @@
 package group_05.ase.data_scraper.Controller;
 
-import group_05.ase.data_scraper.Entity.CustomRestAPIObjects.SearchResult;
-import group_05.ase.data_scraper.Entity.CustomRestAPIObjects.WikipediaResponse;
-import group_05.ase.data_scraper.Service.impl.PrototypeService;
-import group_05.ase.data_scraper.Service.impl.CustomWikipediaRestClient;
-import group_05.ase.data_scraper.Service.impl.JWikiService;
-import group_05.ase.data_scraper.Service.impl.WikiDataService;
+import group_05.ase.data_scraper.Entity.CustomRestAPIObjects.WhatLinksHereFormat.Page;
+import group_05.ase.data_scraper.Entity.CustomRestAPIObjects.WhatLinksHereFormat.Root;
+import group_05.ase.data_scraper.Entity.CustomRestAPIObjects.SearchFormat.SearchResult;
+import group_05.ase.data_scraper.Entity.CustomRestAPIObjects.SearchFormat.WikipediaResponse;
+import group_05.ase.data_scraper.Service.Implementation.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -27,7 +25,7 @@ public class WikiDataController {
         this.prototypeService = prototypeService;
     }
 
-    @GetMapping("/api/prototype")
+    @GetMapping("/api/prototype/v1")
     public void prototype() {
         prototypeService.getAllLinksFromVienna();
 
@@ -51,11 +49,20 @@ public class WikiDataController {
         }
     }
 
-    @GetMapping("/api/customRestClient/searchMultiples")
+    @GetMapping("/api/customRestClient/prototype/v2")
     public void searchMultiples() {
-        List<SearchResult> results = customWikipediaApiClientService.searchBatch("Vienna",10,0);
-        for (SearchResult result : results) {
-            System.out.println(result);
+        Root root = customWikipediaApiClientService.getWhatLinksHere(10);
+
+        if (root != null && root.query != null && root.query.pages != null) {
+            for (Map.Entry<String, Page> entry : root.query.pages.entrySet()) {
+                Page page = entry.getValue();
+                String wikidataId = page.title;
+                System.out.println("Checking id: " + wikidataId);
+                System.out.println(wikiDataService.extractWikiDataObjectFromEntityId(wikidataId).toString());
+
+            }
+        } else {
+            System.out.println("No pages found in response.");
         }
     }
 }

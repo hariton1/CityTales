@@ -1,6 +1,6 @@
-package group_05.ase.data_scraper.Service.impl;
+package group_05.ase.data_scraper.Service.Implementation;
 
-import group_05.ase.data_scraper.Service.IJWikiDataService;
+import group_05.ase.data_scraper.Service.Interface.IJWikiDataService;
 import io.github.fastily.jwiki.core.Wiki;
 import org.springframework.stereotype.Service;
 

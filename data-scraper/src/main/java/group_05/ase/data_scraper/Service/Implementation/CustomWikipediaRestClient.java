@@ -1,10 +1,12 @@
-package group_05.ase.data_scraper.Service.impl;
+package group_05.ase.data_scraper.Service.Implementation;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import group_05.ase.data_scraper.Entity.CustomRestAPIObjects.SearchResult;
-import group_05.ase.data_scraper.Entity.CustomRestAPIObjects.WikipediaResponse;
-import group_05.ase.data_scraper.Service.ICustomWikipediaRestClient;
+import group_05.ase.data_scraper.Entity.CustomRestAPIObjects.WhatLinksHereFormat.Root;
+import group_05.ase.data_scraper.Entity.CustomRestAPIObjects.SearchFormat.SearchResult;
+import group_05.ase.data_scraper.Entity.CustomRestAPIObjects.SearchFormat.WikipediaResponse;
+import group_05.ase.data_scraper.Service.Interface.ICustomWikipediaRestClient;
+import group_05.ase.data_scraper.Service.WikiDataConsts.WikiDataConsts;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +18,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+
 @Service
 public class CustomWikipediaRestClient implements ICustomWikipediaRestClient {
     private final String WIKIPEDIA_API_URL = "https://en.wikipedia.org/w/api.php";
@@ -23,6 +26,8 @@ public class CustomWikipediaRestClient implements ICustomWikipediaRestClient {
         try {
             HttpURLConnection conn = getHttpURLConnection(query, offset);
             String responseContent = getResponseContent(conn).toString();
+
+            System.out.println("responseContent:" + responseContent);
 
             return deserializeJSONResponse(responseContent);
         } catch (Exception e) {
@@ -82,5 +87,29 @@ public class CustomWikipediaRestClient implements ICustomWikipediaRestClient {
     public WikipediaResponse deserializeJSONResponse(String responseContent) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         return mapper.readValue(responseContent, WikipediaResponse.class);
+    }
+
+    public Root getWhatLinksHere(int limit) {
+        String urlString = "https://www.wikidata.org/w/api.php?action=query&format=json&generator=backlinks"
+                + "&gblnamespace=0&gbllimit=" + limit
+                + "&prop=info&gbltitle=Property:" + WikiDataConsts.VIENNA_HISTORY_WIKI_ID;
+
+        try {
+            URL url = new URL(urlString);
+            System.out.println("url: " +url);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+
+            conn.setRequestMethod("GET");
+            conn.setRequestProperty("User-Agent", "Mozilla/5.0");
+
+            String responseContent = getResponseContent(conn).toString();
+            System.out.println("responseContent:" + responseContent);
+
+            ObjectMapper mapper = new ObjectMapper();
+            Root root = mapper.readValue(responseContent, Root.class);
+            return root;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

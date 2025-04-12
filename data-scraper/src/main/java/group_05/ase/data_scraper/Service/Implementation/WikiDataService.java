@@ -1,7 +1,7 @@
-package group_05.ase.data_scraper.Service.impl;
+package group_05.ase.data_scraper.Service.Implementation;
 
 import group_05.ase.data_scraper.Entity.WikiDataObject;
-import group_05.ase.data_scraper.Service.IWikiDataService;
+import group_05.ase.data_scraper.Service.Interface.IWikiDataService;
 import group_05.ase.data_scraper.Service.WikiDataConsts.WikiDataConsts;
 import org.springframework.stereotype.Service;
 import org.wikidata.wdtk.datamodel.helpers.Datamodel;
@@ -14,11 +14,12 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class WikiDataService implements IWikiDataService {
 
-    private static final String ENGLISH_WIKIPEDIA = "enwiki";
     private static final String DESCRIPTION_LANGUAGE = "en";
     private final WikibaseDataFetcher dataFetcher;
 
@@ -29,10 +30,29 @@ public class WikiDataService implements IWikiDataService {
         );
     }
 
-    @Override
-    public WikiDataObject extractWikiDataObject(String name) {
+    public WikiDataObject extractWikiDataObjectFromEntityId(String entityId) {
         WikiDataObject dataObject = new WikiDataObject();
-        dataObject.setWikiName(name);
+
+        EntityDocument entityDocument = fetchEntityDocument(entityId);
+        if (entityDocument == null) {
+            return dataObject;
+        }
+
+        dataObject.setWikiDataId(entityDocument.getEntityId().getId());
+
+        if (entityDocument instanceof ItemDocument itemDocument) {
+            populateName(dataObject,itemDocument);
+            populateShortDescription(dataObject, itemDocument);
+            populateCoordinates(dataObject, itemDocument);
+            populateInstanceOf(dataObject, itemDocument);
+        }
+        return dataObject;
+    }
+
+
+
+    public WikiDataObject extractWikiDataObjectFromEntityName(String name) {
+        WikiDataObject dataObject = new WikiDataObject();
 
         EntityDocument entityDocument = fetchEntityDocument(name);
         if (entityDocument == null) {
@@ -40,6 +60,7 @@ public class WikiDataService implements IWikiDataService {
         }
 
         dataObject.setWikiDataId(entityDocument.getEntityId().getId());
+        dataObject.setWikiName(name);
 
         if (entityDocument instanceof ItemDocument itemDocument) {
             populateShortDescription(dataObject, itemDocument);
@@ -51,12 +72,17 @@ public class WikiDataService implements IWikiDataService {
 
     private EntityDocument fetchEntityDocument(String title) {
         try {
-            return dataFetcher.getEntityDocumentByTitle(ENGLISH_WIKIPEDIA, title);
+            return dataFetcher.getEntityDocument( title);
         } catch (MediaWikiApiErrorException | IOException e) {
             System.err.println("Failed to fetch entity document for title: " + title);
             return null;
         }
     }
+
+    private void populateName(WikiDataObject dataObject, ItemDocument itemDocument) {
+        dataObject.setWikiName(itemDocument.getLabels().get("en").getText());
+    }
+
 
     private void populateShortDescription(WikiDataObject dataObject, ItemDocument itemDocument) {
         String description = itemDocument.findDescription(DESCRIPTION_LANGUAGE);
@@ -93,7 +119,8 @@ public class WikiDataService implements IWikiDataService {
 
         int progress_counter = 0;
         for (String pageName:names) {
-            WikiDataObject wikiDO = extractWikiDataObject(pageName);
+            System.out.println("checking: " + pageName);
+            WikiDataObject wikiDO = extractWikiDataObjectFromEntityName(pageName);
 
             boolean isPerson = wikiDO.getInstanceOf().stream().anyMatch(WikiDataConsts.PERSON_CODES::contains);
             boolean isPlace = wikiDO.getInstanceOf().stream().anyMatch(WikiDataConsts.PLACE_CODES::contains);
