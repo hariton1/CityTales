@@ -49,27 +49,6 @@ public class WikiDataService implements IWikiDataService {
         return dataObject;
     }
 
-
-
-    public WikiDataObject extractWikiDataObjectFromEntityName(String name) {
-        WikiDataObject dataObject = new WikiDataObject();
-
-        EntityDocument entityDocument = fetchEntityDocument(name);
-        if (entityDocument == null) {
-            return dataObject;
-        }
-
-        dataObject.setWikiDataId(entityDocument.getEntityId().getId());
-        dataObject.setWikiName(name);
-
-        if (entityDocument instanceof ItemDocument itemDocument) {
-            populateShortDescription(dataObject, itemDocument);
-            populateCoordinates(dataObject, itemDocument);
-            populateInstanceOf(dataObject, itemDocument);
-        }
-        return dataObject;
-    }
-
     private EntityDocument fetchEntityDocument(String title) {
         try {
             return dataFetcher.getEntityDocument( title);
@@ -113,45 +92,5 @@ public class WikiDataService implements IWikiDataService {
     private String extractIdFromUrl(String url) {
         String cleanedUrl = url.split("\\s")[0];
         return cleanedUrl.substring(cleanedUrl.lastIndexOf('/') + 1);
-    }
-
-    public void extractWikiDataObjectList(List<String> names, List<WikiDataObject> people,List<WikiDataObject> places) {
-
-        int progress_counter = 0;
-        for (String pageName:names) {
-            System.out.println("checking: " + pageName);
-            WikiDataObject wikiDO = extractWikiDataObjectFromEntityName(pageName);
-
-            boolean isPerson = wikiDO.getInstanceOf().stream().anyMatch(WikiDataConsts.PERSON_CODES::contains);
-            boolean isPlace = wikiDO.getInstanceOf().stream().anyMatch(WikiDataConsts.PLACE_CODES::contains);
-
-            if (isPerson) {
-                people.add(wikiDO);
-                // System.out.println("Person found!: " + wikiDO);
-                appendToFile("people.txt", wikiDO.toString());
-            } else if (isPlace) {
-                places.add(wikiDO);
-                // System.out.println("Place found!: " + wikiDO);
-                appendToFile("places.txt", wikiDO.toString());
-            }
-            //System.out.println("Status: " + progress_counter);
-            //progress_counter++;
-        }
-    }
-
-    private void appendToFile(String filePath, String content) {
-        try {
-            File file = new File(filePath);
-
-            if (!file.exists()) {
-                file.createNewFile();
-            }
-
-            try (FileWriter fw = new FileWriter(file, true)) {
-                fw.write(content + System.lineSeparator());
-            }
-        } catch (IOException e) {
-            System.err.println("Error writing to " + filePath + ": " + e.getMessage());
-        }
     }
 }

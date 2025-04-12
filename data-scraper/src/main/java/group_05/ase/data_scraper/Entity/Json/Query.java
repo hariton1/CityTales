@@ -1,4 +1,4 @@
-package group_05.ase.data_scraper.Entity.CustomRestAPIObjects.WhatLinksHereFormat;
+package group_05.ase.data_scraper.Entity.Json;
 
 import org.jetbrains.annotations.NotNull;
 

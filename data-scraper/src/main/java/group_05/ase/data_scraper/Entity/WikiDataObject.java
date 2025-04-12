@@ -6,6 +6,7 @@ import java.util.List;
 public class WikiDataObject {
     private String wikiDataId;
     private String wikiName;
+    private int pageId;
     private String shortDescription;
     private String location;
     private List<String> instanceOf;
@@ -28,6 +29,14 @@ public class WikiDataObject {
 
     public void setWikiName(String wikiName) {
         this.wikiName = wikiName;
+    }
+
+    public int getPageId() {
+        return pageId;
+    }
+
+    public void setPageId(int pageId) {
+        this.pageId = pageId;
     }
 
     public String getShortDescription() {
@@ -66,6 +75,7 @@ public class WikiDataObject {
         return "WikiDataObject{" +
                 "wikiDataId='" + wikiDataId + '\'' +
                 ", wikiName='" + wikiName + '\'' +
+                ", pageId=" + pageId +
                 ", shortDescription='" + shortDescription + '\'' +
                 ", location='" + location + '\'' +
                 ", instanceOf=" + instanceOf +

@@ -9,32 +9,17 @@ import java.util.*;
 @Service
 public class JWikiService implements IJWikiDataService {
 
-    private final int searchDepth = 100_000;
     private Wiki wiki;
 
     public JWikiService() {
         this.wiki = new Wiki.Builder().build();
     }
 
-    // Just Trying different Methods
-
-    public String getPageText() {
-        return wiki.getPageText("Vienna");
-    }
-
-    public List<String> getCategories(String page) {
-        return wiki.getCategoriesOnPage(page);
-    }
-
-    public List<String> getPageNames() {
-        return wiki.search("Vienna",searchDepth);
-    }
-
     public List<String> getLinkedPagesNames(String name) {
         return wiki.whatLinksHere(name);
     }
 
-    // Recursive method to search linked pages containing "Vienna" in their name
+
     public Map<String, String> recursiveSearch(String seed, int depth, Set<String> visitedPages, Map<String, String> linksMap, int maxDepth, int maxResults) {
         if (depth > maxDepth || linksMap.size() >= maxResults) {
             return linksMap;
