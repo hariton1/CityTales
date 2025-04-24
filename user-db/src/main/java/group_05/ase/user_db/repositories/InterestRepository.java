@@ -9,6 +9,6 @@ import java.util.List;
 @Repository
 public interface InterestRepository extends JpaRepository<InterestEntity, Integer> {
 
-    List<InterestEntity> findAllByDescription(String description);
+    List<InterestEntity> findAllByInterestName(String interestName);
 
 }
