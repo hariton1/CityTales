@@ -30,3 +30,7 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### generated dump files ####
+people.txt
+places.txt
