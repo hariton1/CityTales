@@ -1,0 +1,21 @@
+header[tuiNavigationHeader] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  height: 100%;
+}
+
+[tuiNavigationLogo] {
+  margin-right: auto !important;
+}
+
+tui-segmented {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.auth_buttons {
+
+}
