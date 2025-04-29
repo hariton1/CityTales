@@ -17,6 +17,7 @@
         <module>data-scraper</module>
         <!--module>data-access</module-->
         <module>user-db</module>
+        <module>authentification</module>
     </modules>
 
     <properties>
