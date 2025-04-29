@@ -27,12 +27,12 @@ services:
     # ports:
       # - 8080:8080
 
-  # frontend:
-    # container_name: frontend
-    # build: ./frontend
-    # image: frontend:latest
-    # ports:
-      # - 4200:4200
+  frontend:
+    container_name: frontend
+    build: ./frontend
+    image: frontend:latest
+    ports:
+      - 4200:4200
 
   user-db:
     container_name: user-db

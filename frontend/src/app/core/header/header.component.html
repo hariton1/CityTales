@@ -1,1 +1,33 @@
-<p>header works!</p>
+<header tuiNavigationHeader>
+
+    <span tuiNavigationLogo>
+        CityTales
+    </span>
+
+    <tui-segmented [size]="'m'">
+      <a routerLinkActive href="#">🌎 Explore</a>
+      <a routerLinkActive href="#">🧭 Tours</a>
+      <a routerLinkActive href="#">Contribute</a>
+      <a routerLinkActive href="#">For Educators</a>
+      <a routerLinkActive href="#">About</a>
+    </tui-segmented>
+
+    <div class="auth_buttons">
+      <button
+        appearance="flat"
+        tuiButton
+        type="button"
+      >
+        Sign Up
+      </button>
+
+      <button
+        appearance="primary"
+        tuiButton
+        type="button"
+      >
+        Login
+      </button>
+    </div>
+
+</header>
