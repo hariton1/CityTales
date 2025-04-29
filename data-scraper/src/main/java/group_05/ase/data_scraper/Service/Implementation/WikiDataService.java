@@ -5,17 +5,15 @@ import group_05.ase.data_scraper.Service.Interface.IWikiDataService;
 import group_05.ase.data_scraper.Service.WikiDataConsts.WikiDataConsts;
 import org.springframework.stereotype.Service;
 import org.wikidata.wdtk.datamodel.helpers.Datamodel;
-import org.wikidata.wdtk.datamodel.interfaces.*;
+import org.wikidata.wdtk.datamodel.interfaces.EntityDocument;
+import org.wikidata.wdtk.datamodel.interfaces.ItemDocument;
+import org.wikidata.wdtk.datamodel.interfaces.Statement;
+import org.wikidata.wdtk.datamodel.interfaces.StatementGroup;
 import org.wikidata.wdtk.wikibaseapi.BasicApiConnection;
 import org.wikidata.wdtk.wikibaseapi.WikibaseDataFetcher;
 import org.wikidata.wdtk.wikibaseapi.apierrors.MediaWikiApiErrorException;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Service
 public class WikiDataService implements IWikiDataService {
@@ -59,7 +57,12 @@ public class WikiDataService implements IWikiDataService {
     }
 
     private void populateName(WikiDataObject dataObject, ItemDocument itemDocument) {
-        dataObject.setWikiName(itemDocument.getLabels().get("en").getText());
+        try{
+            dataObject.setWikiName(itemDocument.getLabels().get("en").getText());
+        } catch (NullPointerException e) {
+            System.out.println("Populate Name of object " + itemDocument.getEntityId().toString() + " went wrong.");
+            dataObject.setWikiName("N/A");
+        }
     }
 
 
