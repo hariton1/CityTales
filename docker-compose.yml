@@ -33,3 +33,9 @@ services:
     # image: frontend:latest
     # ports:
       # - 4200:4200
+
+  user-db:
+    container_name: user-db
+    build: ./user-db
+    ports:
+      - 7575:7575
