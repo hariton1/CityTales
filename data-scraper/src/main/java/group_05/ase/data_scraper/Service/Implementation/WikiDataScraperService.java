@@ -14,7 +14,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -22,25 +24,39 @@ public class WikiDataScraperService implements IWikiDataScraperService {
     private final String WIKIDATA_API_URL = "https://www.wikidata.org/w/api.php";
     private final WikiDataService wikiDataService;
 
-    public WikiDataScraperService(WikiDataService wikiDataService) {
+    private final WikiDataObjectPersistenceService persistenceService;
+
+    private boolean listContains(List<String> givenList, List<String> requestedList) {
+        return !requestedList.stream().filter(item -> givenList.contains(item)).collect(Collectors.toSet()).isEmpty();
+    }
+
+    public WikiDataScraperService(WikiDataService wikiDataService, WikiDataObjectPersistenceService persistenceService) {
         this.wikiDataService = wikiDataService;
+        this.persistenceService = persistenceService;
     }
 
     public void batchSearch(int batchSize, int iterations) {
 
-        String continueToken = "";
+        //String continueToken = "";
+        String continueToken = "0|387470";
         System.out.println(continueToken);
-        for (int i = 0; i < iterations;i++) {
-            Root batch = getWhatLinksHere(batchSize,continueToken);
-            for (Map.Entry<String, Page> entry:batch.query.pages.entrySet()) {
+        for (int i = 0; i < iterations; i++) {
+            Root batch = getWhatLinksHere(batchSize, continueToken);
+            for (Map.Entry<String, Page> entry : batch.query.pages.entrySet()) {
                 String wikiDataId = entry.getValue().title;
                 WikiDataObject wDO = wikiDataService.extractWikiDataObjectFromEntityId(wikiDataId);
                 wDO.setPageId(entry.getValue().pageid);
                 System.out.println(wDO);
 
-                // TODO: persist in Neo4JDB
+
+                if (listContains(wDO.getInstanceOf(), WikiDataConsts.PERSON_CODES)) {
+                    persistenceService.persistHistoricPerson(wDO);
+                } else if (listContains(wDO.getInstanceOf(), WikiDataConsts.PLACE_CODES) || wDO.getLocation() != null) {
+                    persistenceService.persistHistoricPlace(wDO);
+                }
             }
             continueToken = batch.continueInfo.gblcontinue;
+            System.out.println("New continue token: " + continueToken);
         }
     }
 
@@ -52,7 +68,7 @@ public class WikiDataScraperService implements IWikiDataScraperService {
 
         if (continueToken != "") {
             urlString = urlString
-                + "&continue=||&gblcontinue=" + continueToken
+                    + "&continue=||&gblcontinue=" + continueToken
                     + "&gbllimit=" + limit;
         }
 

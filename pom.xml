@@ -15,7 +15,6 @@
     <!--Add your new module here-->
     <modules>
         <module>data-scraper</module>
-        <module>data-access</module>
     </modules>
 
     <properties>
