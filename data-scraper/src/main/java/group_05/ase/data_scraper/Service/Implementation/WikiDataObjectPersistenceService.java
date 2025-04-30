@@ -139,10 +139,11 @@ public class WikiDataObjectPersistenceService implements IWikiDataObjectPersiste
     }
 
     private GeographicPoint2d parseGeoString(String input) {
+
         if (input == null || !input.contains(":")) {
             throw new IllegalArgumentException("Invalid input format");
         }
-
+        input = input.replace("\"", "");
         String[] parts = input.split(" ")[0].split(":");
 
         if (parts.length != 2) {

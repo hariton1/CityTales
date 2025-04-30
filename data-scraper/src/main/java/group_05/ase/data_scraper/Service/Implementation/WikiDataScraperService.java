@@ -38,7 +38,7 @@ public class WikiDataScraperService implements IWikiDataScraperService {
     public void batchSearch(int batchSize, int iterations) {
 
         String continueToken = "";
-        //String continueToken = "0|387470";
+        //String continueToken = "0|387470"; //Karlskirche
         System.out.println(continueToken);
         for (int i = 0; i < iterations; i++) {
             Root batch = getWhatLinksHere(batchSize, continueToken);
