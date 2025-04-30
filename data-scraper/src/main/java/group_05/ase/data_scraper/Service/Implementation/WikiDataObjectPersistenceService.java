@@ -37,7 +37,7 @@ public class WikiDataObjectPersistenceService implements IWikiDataObjectPersiste
             String message = session.writeTransaction(new TransactionWork<String>() {
                 @Override
                 public String execute(Transaction tx) {
-                    Result result = tx.run("MERGE (a:HistoricPerson {wikiDataId: $wikiDataId, name: $name, shortDescription: coalesce($shortDescription, \"N/A\")}) RETURN a.name",
+                    Result result = tx.run("MERGE (a:HistoricPerson {wikiDataId: coalesce($wikiDataId, \"N/A\"), name: coalesce($name, \"N/A\"), shortDescription: coalesce($shortDescription, \"N/A\")}) RETURN a.name",
                             parameters("name", wikiDataObject.getWikiName(),
                                     "wikiDataId", wikiDataObject.getWikiDataId(),
                                     "shortDescription", wikiDataObject.getShortDescription()));
@@ -54,7 +54,7 @@ public class WikiDataObjectPersistenceService implements IWikiDataObjectPersiste
             String message = session.writeTransaction(new TransactionWork<String>() {
                 @Override
                 public String execute(Transaction tx) {
-                    Result result = tx.run("MERGE (a:HistoricPlace {wikiDataId: $wikiDataId, name: $name, shortDescription: coalesce($shortDescription, \"N/A\") , location: $location}) RETURN a.name",
+                    Result result = tx.run("MERGE (a:HistoricPlace {wikiDataId: coalesce(wikiDataId, \"N/A\"), name: coalesce($name, \"N/A\"), shortDescription: coalesce($shortDescription, \"N/A\") , location: coalesce($location, \"N/A\")}) RETURN a.name",
                             parameters("name", wikiDataObject.getWikiName(),
                                     "wikiDataId", wikiDataObject.getWikiDataId(),
                                     "shortDescription", wikiDataObject.getShortDescription(),
@@ -96,13 +96,68 @@ public class WikiDataObjectPersistenceService implements IWikiDataObjectPersiste
 
     @Override
     public HistoricalPlaceEntity getPlaceByName(String name) {
-        return null;
+        try (Session session = driver.session()){
+            String query = "MATCH (p:HistoricPlace {name: $name}) RETURN p";
+            Record record = session.executeRead(tx ->
+                    tx.run(query, Values.parameters("name", name)).single());
+
+            Node node = record.get("p").asNode();
+            HistoricalPlaceEntity placeEntity = new HistoricalPlaceEntity();
+            placeEntity.setWikiDataId(node.get("wikiDataId").asString());
+            placeEntity.setShortDescription(node.get("shortDescription").asString());
+            placeEntity.setLocation(parseGeoString(node.get("location").toString()));
+
+            return placeEntity;
+
+        } catch (NoSuchRecordException e) {
+            System.err.println("The requested entity does not exist!");
+            return null;
+        }
     }
 
     @Override
     public HistoricalPlaceEntity getPlaceByCoordinates(GeographicPoint2d coordinates) {
-        return null;
+        try (Session session = driver.session()){
+            String query = "MATCH (p:HistoricPlace {location: $location}) RETURN p";
+            String locationString = coordinates.getLatitude() + ":" + coordinates.getLongitude() + " (Earth)";
+
+            Record record = session.executeRead(tx ->
+                    tx.run(query, Values.parameters("location", locationString)).single());
+
+            Node node = record.get("p").asNode();
+            HistoricalPlaceEntity placeEntity = new HistoricalPlaceEntity();
+            placeEntity.setWikiDataId(node.get("wikiDataId").asString());
+            placeEntity.setShortDescription(node.get("shortDescription").asString());
+            placeEntity.setLocation(parseGeoString(node.get("location").toString()));
+
+            return placeEntity;
+
+        } catch (NoSuchRecordException e) {
+            System.err.println("The requested entity does not exist!");
+            return null;
+        }
     }
+
+    private GeographicPoint2d parseGeoString(String input) {
+        if (input == null || !input.contains(":")) {
+            throw new IllegalArgumentException("Invalid input format");
+        }
+
+        String[] parts = input.split(" ")[0].split(":");
+
+        if (parts.length != 2) {
+            throw new IllegalArgumentException("Input does not contain valid latitude and longitude");
+        }
+
+        try {
+            double latitude = Double.parseDouble(parts[0]);
+            double longitude = Double.parseDouble(parts[1]);
+            return new GeographicPoint2d(latitude, longitude);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Latitude or Longitude is not a valid number", e);
+        }
+    }
+
 
 
 }
