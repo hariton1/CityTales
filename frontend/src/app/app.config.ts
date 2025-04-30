@@ -1,4 +1,4 @@
-import {ApplicationConfig, importProvidersFrom, provideZoneChangeDetection, isDevMode} from '@angular/core';
+import { ApplicationConfig, importProvidersFrom, provideZoneChangeDetection, isDevMode } from '@angular/core';
 import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
@@ -7,6 +7,7 @@ import { provideClientHydration, withEventReplay } from '@angular/platform-brows
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { TuiRoot, TuiAlertService } from '@taiga-ui/core';
 import { provideServiceWorker } from '@angular/service-worker';
+import { provideHttpClient } from '@angular/common/http';
 
 export const appConfig: ApplicationConfig = {
   providers: [
