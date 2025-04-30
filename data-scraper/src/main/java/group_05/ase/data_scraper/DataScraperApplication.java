@@ -12,7 +12,6 @@ public class DataScraperApplication {
 	public static void main(String[] args) {
 		ApplicationContext applicationContext = SpringApplication.run(DataScraperApplication.class, args);
 		WikiDataScraperService service = applicationContext.getBean(WikiDataScraperService.class);
-		service.batchSearch(10, 10);
-		WikiDataObjectPersistenceService persistenceService = applicationContext.getBean(WikiDataObjectPersistenceService.class);
+		service.batchSearch(500, 400);
 	}
 }
