@@ -53,6 +53,10 @@ public class TestController {
         }
     }
 
+    /*TODO
+    *  - SpringREST -> array list to JSON
+    *  - write tests
+    * */
     @GetMapping("/feedbacks")
     @ResponseStatus(HttpStatus.OK)
     public String getAllFeedbacks() {
