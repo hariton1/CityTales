@@ -1,5 +1,6 @@
 package group_05.ase.user_db.endpoints;
 
+import group_05.ase.user_db.restData.*;
 import group_05.ase.user_db.services.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +8,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 @RestController
@@ -35,55 +39,52 @@ public class TestController {
 
     @GetMapping("/interests")
     @ResponseStatus(HttpStatus.OK)
-    public String getAllInterests() {
+    public List<InterestDTO> getAllInterests() {
         try {
-            return this.interestService.getAllInterests().toString();
+            return this.interestService.getAllInterests();
         } catch (Exception e) {
-            return "An internal server error occurred => " + e.getMessage();
+            return new ArrayList<InterestDTO>();//"An internal server error occurred => " + e.getMessage();
         }
     }
 
     @GetMapping("/interestTypes")
     @ResponseStatus(HttpStatus.OK)
-    public String getAllInterestTypes() {
+    public List<InterestTypeDTO> getAllInterestTypes() {
         try {
-            return this.interestTypeService.getAllInterestTypes().toString();
+            return this.interestTypeService.getAllInterestTypes();
         } catch (Exception e) {
-            return "An internal server error occurred => " + e.getMessage();
+            return new ArrayList<InterestTypeDTO>(); //"An internal server error occurred => " + e.getMessage();
         }
     }
 
-    /*TODO
-    *  - SpringREST -> array list to JSON
-    *  - write tests
-    * */
+    /* TODO write tests */
     @GetMapping("/feedbacks")
     @ResponseStatus(HttpStatus.OK)
-    public String getAllFeedbacks() {
+    public List<FeedbackDTO> getAllFeedbacks() {
         try {
-            return this.feedbackService.getAllFeedbacks().toString();
+            return this.feedbackService.getAllFeedbacks();
         } catch (Exception e) {
-            return "An internal server error occurred => " + e.getMessage();
+            return new ArrayList<FeedbackDTO>(); //"An internal server error occurred => " + e.getMessage();
         }
     }
 
     @GetMapping("/userInterests")
     @ResponseStatus(HttpStatus.OK)
-    public String getAllUserInterests() {
+    public List<UserInterestDTO> getAllUserInterests() {
         try {
-            return this.userInterestService.getAllUserInterests().toString();
+            return this.userInterestService.getAllUserInterests();
         } catch (Exception e) {
-            return "An internal server error occurred => " + e.getMessage();
+            return new ArrayList<UserInterestDTO>(); //"An internal server error occurred => " + e.getMessage();
         }
     }
 
     @GetMapping("/userHistories")
     @ResponseStatus(HttpStatus.OK)
-    public String getAllUserHistories() {
+    public List<UserHistoryDTO> getAllUserHistories() {
         try {
-            return this.userHistoryService.getAllUserHistories().toString();
+            return this.userHistoryService.getAllUserHistories();
         } catch (Exception e) {
-            return "An internal server error occurred => " + e.getMessage();
+            return new ArrayList<UserHistoryDTO>(); //"An internal server error occurred => " + e.getMessage();
         }
     }
 
