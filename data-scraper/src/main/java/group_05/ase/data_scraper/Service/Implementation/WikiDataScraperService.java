@@ -49,12 +49,12 @@ public class WikiDataScraperService implements IWikiDataScraperService {
                 System.out.println(wDO);
 
 
-                /*if (listContains(wDO.getInstanceOf(), WikiDataConsts.PERSON_CODES)) {
+                if (listContains(wDO.getInstanceOf(), WikiDataConsts.PERSON_CODES)) {
                     persistenceService.persistHistoricPerson(wDO);
                 } else if (listContains(wDO.getInstanceOf(), WikiDataConsts.PLACE_CODES) || wDO.getLocation() != null) {
                     System.out.println("checking: "+wDO.toString());
                     persistenceService.persistHistoricPlace(wDO);
-                }*/
+                }
             }
             continueToken = batch.continueInfo.gblcontinue;
             System.out.println("New continue token: " + continueToken);
