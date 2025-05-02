@@ -12,7 +12,11 @@ import {GoogleMap, MapMarker} from '@angular/google-maps';
 })
 export class MapViewComponent {
   center: google.maps.LatLngLiteral = { lat: 48.19865798950195, lng: 16.3714542388916 };
-  zoom = 12;
+  zoom = 19;
+
+  options: google.maps.MapOptions = {
+    mapTypeId: 'satellite'
+  };
 
   markerPosition: google.maps.LatLngLiteral = this.center;
 }
