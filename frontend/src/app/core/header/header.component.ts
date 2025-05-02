@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import {TuiAppearance, TuiButton} from '@taiga-ui/core';
+import {TuiButton} from '@taiga-ui/core';
 import {TuiSegmented} from '@taiga-ui/kit';
 
 import {TuiHeaderComponent, TuiLogoComponent} from '@taiga-ui/layout';
@@ -7,7 +7,6 @@ import {TuiHeaderComponent, TuiLogoComponent} from '@taiga-ui/layout';
 @Component({
   selector: 'app-header',
   imports: [
-    TuiAppearance,
     TuiButton,
     TuiSegmented,
     TuiLogoComponent,
