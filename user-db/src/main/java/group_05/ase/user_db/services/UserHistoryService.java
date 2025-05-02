@@ -13,8 +13,11 @@ import java.util.List;
 @Service
 public class UserHistoryService {
 
-    @Autowired
-    UserHistoryRepository repository;
+    private final UserHistoryRepository repository;
+
+    public UserHistoryService(UserHistoryRepository repository) {
+        this.repository = repository;
+    }
 
     public List<UserHistoryDTO> getAllUserHistories() {
 

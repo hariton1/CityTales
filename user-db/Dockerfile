@@ -9,5 +9,5 @@ RUN mvn package -DskipTests
 
 FROM maven:3.8.3-openjdk-17 AS build
 COPY --from=builder /app/target/user-db-*-SNAPSHOT.jar UserDB.jar
-EXPOSE 7575
+EXPOSE 8090
 CMD ["java", "-jar", "/UserDB.jar"]
