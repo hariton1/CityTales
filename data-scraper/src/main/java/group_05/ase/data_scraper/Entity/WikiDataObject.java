@@ -10,6 +10,7 @@ public class WikiDataObject {
     private String shortDescription;
     private String location;
     private List<String> instanceOf;
+    private String wikipediaUrl;
 
     public WikiDataObject() {
         this.instanceOf = new ArrayList<>();
@@ -70,6 +71,14 @@ public class WikiDataObject {
         this.instanceOf.add(s);
     }
 
+    public String getWikipediaUrl() {
+        return wikipediaUrl;
+    }
+
+    public void setWikipediaUrl(String wikipediaUrl) {
+        this.wikipediaUrl = wikipediaUrl;
+    }
+
     @Override
     public String toString() {
         return "WikiDataObject{" +
@@ -79,6 +88,7 @@ public class WikiDataObject {
                 ", shortDescription='" + shortDescription + '\'' +
                 ", location='" + location + '\'' +
                 ", instanceOf=" + instanceOf +
+                ", wikipediaUrl='" + wikipediaUrl + '\'' +
                 '}';
     }
 }
