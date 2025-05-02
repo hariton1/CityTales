@@ -35,10 +35,12 @@ public class WikiDataScraperService implements IWikiDataScraperService {
         this.persistenceService = persistenceService;
     }
 
-    public void batchSearch(int batchSize, int iterations) {
+    public void upsertLinkages() {
+        persistenceService.upsertLinkages();
+    }
 
-        String continueToken = "";
-        //String continueToken = "0|387470"; //Karlskirche
+    public void batchSearch(int batchSize, int iterations, String continueToken) {
+
         System.out.println(continueToken);
         for (int i = 0; i < iterations; i++) {
             Root batch = getWhatLinksHere(batchSize, continueToken);

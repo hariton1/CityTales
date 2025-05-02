@@ -18,6 +18,7 @@ public class HistoricalPlaceEntity {
     private String shortDescription;
     private GeographicPoint2d location;
     private String wikipediaUrl;
+    private String name;
 
     @Relationship(type = "HAS ASSOCIATION TO", direction = Relationship.Direction.OUTGOING)
     private Set<HistoricalEventEntity> associated_historical_events;

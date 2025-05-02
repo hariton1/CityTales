@@ -12,6 +12,8 @@ import org.springframework.data.neo4j.types.GeographicPoint2d;
 import org.springframework.stereotype.Service;
 
 import static org.neo4j.driver.Values.parameters;
+import java.util.List;
+import java.util.ArrayList;
 
 @Service
 public class WikiDataObjectPersistenceService implements IWikiDataObjectPersistenceService {
@@ -21,14 +23,16 @@ public class WikiDataObjectPersistenceService implements IWikiDataObjectPersiste
     private final String NEO4JPW = "***REMOVED***";
 
     private Driver driver;
+    private WikipediaLinkExtractor wikipediaLinkExtractor;
 
-    public WikiDataObjectPersistenceService(){
+    public WikiDataObjectPersistenceService(WikipediaLinkExtractor wikipediaLinkExtractor){
         AuthToken authToken = AuthTokens.basic(NEO4JUSER, NEO4JPW);
         try {
             driver = GraphDatabase.driver(NEO4JURL, authToken);
         } catch (Exception e) {
             System.out.println("Could not initialize db driver");
         }
+        this.wikipediaLinkExtractor = wikipediaLinkExtractor;
     }
 
     @Override
@@ -179,6 +183,115 @@ public class WikiDataObjectPersistenceService implements IWikiDataObjectPersiste
         }
     }
 
+    public void upsertLinkages() {
+        try (Session session = driver.session()) {
+            List<HistoricalPersonEntity> personList = fetchAllHistoricalPersons(session);
+            List<HistoricalPlaceEntity> placesList = fetchAllHistoricalPlaces(session);
 
+            for (HistoricalPersonEntity person : personList) {
+                List<String> linkedUrls = wikipediaLinkExtractor.extractLinks(person.getWikipediaUrl());
 
+                createPersonLinks(session, person, linkedUrls, personList, placesList);
+            }
+
+            for (HistoricalPlaceEntity place : placesList) {
+                List<String> linkedUrls = wikipediaLinkExtractor.extractLinks(place.getWikipediaUrl());
+
+                createPlaceLinks(session, place, linkedUrls, placesList, personList);
+            }
+        }
+    }
+
+    private List<HistoricalPersonEntity> fetchAllHistoricalPersons(Session session) {
+        List<HistoricalPersonEntity> people = new ArrayList<>();
+        Result result = session.run("MATCH (person:HistoricPerson) RETURN person");
+
+        while (result.hasNext()) {
+            Node node = result.next().get("person").asNode();
+            people.add(mapPersonNode(node));
+        }
+        return people;
+    }
+
+    private List<HistoricalPlaceEntity> fetchAllHistoricalPlaces(Session session) {
+        List<HistoricalPlaceEntity> places = new ArrayList<>();
+        Result result = session.run("MATCH (place:HistoricPlace) RETURN place");
+
+        while (result.hasNext()) {
+            Node node = result.next().get("place").asNode();
+            places.add(mapPlaceNode(node));
+        }
+        return places;
+    }
+
+    private HistoricalPersonEntity mapPersonNode(Node node) {
+        HistoricalPersonEntity person = new HistoricalPersonEntity();
+        person.setWikiDataId(node.get("wikiDataId").asString());
+        person.setShortDescription(node.get("shortDescription").asString());
+        person.setName(node.get("name").asString());
+        person.setWikipediaUrl(node.get("wikipediaUrl").asString());
+        return person;
+    }
+
+    private HistoricalPlaceEntity mapPlaceNode(Node node) {
+        HistoricalPlaceEntity place = new HistoricalPlaceEntity();
+        place.setWikiDataId(node.get("wikiDataId").asString());
+        place.setShortDescription(node.get("shortDescription").asString());
+        place.setName(node.get("name").asString());
+        place.setWikipediaUrl(node.get("wikipediaUrl").asString());
+        place.setLocation(parseGeoString(node.get("location").toString()));
+        return place;
+    }
+
+    private void createPersonLinks(Session session, HistoricalPersonEntity currentPerson,
+                                   List<String> urls, List<HistoricalPersonEntity> allPersons,
+                                   List<HistoricalPlaceEntity> allPlaces) {
+        for (HistoricalPersonEntity otherPerson : allPersons) {
+            if (!currentPerson.equals(otherPerson) && urls.contains(otherPerson.getWikipediaUrl())) {
+                logMatch("person", currentPerson.getName(), otherPerson.getName(), otherPerson.getWikipediaUrl());
+                mergeRelation(session, "HistoricPerson", currentPerson.getWikiDataId(), "HistoricPerson", otherPerson.getWikiDataId());
+            }
+        }
+
+        for (HistoricalPlaceEntity place : allPlaces) {
+            if (urls.contains(place.getWikipediaUrl())) {
+                logMatch("person", currentPerson.getName(), place.getName(), place.getWikipediaUrl());
+                mergeRelation(session, "HistoricPerson", currentPerson.getWikiDataId(), "HistoricPlace", place.getWikiDataId());
+            }
+        }
+    }
+
+    private void createPlaceLinks(Session session, HistoricalPlaceEntity currentPlace,
+                                  List<String> urls, List<HistoricalPlaceEntity> allPlaces,
+                                  List<HistoricalPersonEntity> allPersons) {
+        for (HistoricalPlaceEntity otherPlace : allPlaces) {
+            if (!currentPlace.equals(otherPlace) && urls.contains(otherPlace.getWikipediaUrl())) {
+                logMatch("place", currentPlace.getName(), otherPlace.getName(), otherPlace.getWikipediaUrl());
+                mergeRelation(session, "HistoricPlace", currentPlace.getWikiDataId(), "HistoricPlace", otherPlace.getWikiDataId());
+            }
+        }
+
+        for (HistoricalPersonEntity person : allPersons) {
+            if (urls.contains(person.getWikipediaUrl())) {
+                logMatch("place", currentPlace.getName(), person.getName(), person.getWikipediaUrl());
+                mergeRelation(session, "HistoricPlace", currentPlace.getWikiDataId(), "HistoricPerson", person.getWikiDataId());
+            }
+        }
+    }
+
+    private void mergeRelation(Session session, String fromLabel, String fromId, String toLabel, String toId) {
+        String query = String.format(
+                "MATCH (a:%s {wikiDataId: $from}), (b:%s {wikiDataId: $to}) " +
+                        "MERGE (a)-[:RELATED_TO]->(b)", fromLabel, toLabel
+        );
+
+        session.writeTransaction(tx -> {
+            tx.run(query, parameters("from", fromId, "to", toId)).consume();
+            return null;
+        });
+    }
+
+    private void logMatch(String entityType, String fromName, String toName, String url) {
+        System.out.printf("Found matching URL for %s: %s and %s - %s%n", entityType, fromName, toName, url);
+    }
 }

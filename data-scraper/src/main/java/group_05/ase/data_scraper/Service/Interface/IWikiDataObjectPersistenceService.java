@@ -14,5 +14,6 @@ public interface IWikiDataObjectPersistenceService {
     HistoricalPersonEntity getPersonByName(String name);
     HistoricalPlaceEntity getPlaceByName(String name);
     HistoricalPlaceEntity getPlaceByCoordinates(GeographicPoint2d coordinates);
+    void upsertLinkages();
 
 }

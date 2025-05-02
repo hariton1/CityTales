@@ -11,13 +11,4 @@ public class WikiDataController {
     public WikiDataController(WikiDataScraperService customWikipediaApiClientService) {
         this.customWikipediaApiClientService = customWikipediaApiClientService;
     }
-
-    @GetMapping("/api/prototype/batchSearch")
-    public void temp() {
-        // Config
-        int batchSize = 10;
-        int x = 1;
-
-        customWikipediaApiClientService.batchSearch(batchSize,x);
-    }
 }
