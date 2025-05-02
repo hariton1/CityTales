@@ -19,6 +19,7 @@ public class HistoricalEventEntity {
     private String shortDescription;
     private Date eventStartingDate;
     private Date eventEndDate;
+    private String wikipediaUrl;
 
     @Relationship(type = "HAS ASSOCIATION TO", direction = Relationship.Direction.OUTGOING)
     private Set<HistoricalEventEntity> associated_historical_events;

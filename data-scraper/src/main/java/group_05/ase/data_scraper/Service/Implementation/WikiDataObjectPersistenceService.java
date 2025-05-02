@@ -37,10 +37,19 @@ public class WikiDataObjectPersistenceService implements IWikiDataObjectPersiste
             String message = session.writeTransaction(new TransactionWork<String>() {
                 @Override
                 public String execute(Transaction tx) {
-                    Result result = tx.run("MERGE (a:HistoricPerson {wikiDataId: coalesce($wikiDataId, \"N/A\"), name: coalesce($name, \"N/A\"), shortDescription: coalesce($shortDescription, \"N/A\")}) RETURN a.name",
-                            parameters("name", wikiDataObject.getWikiName(),
+                    Result result = tx.run(
+                            "MERGE (a:HistoricPerson {wikiDataId: coalesce($wikiDataId, \"N/A\"), " +
+                                    "name: coalesce($name, \"N/A\"), " +
+                                    "shortDescription: coalesce($shortDescription, \"N/A\"), " +
+                                    "wikipediaUrl: coalesce($wikipediaUrl, \"N/A\")}) " +
+                                    "RETURN a.name",
+                            parameters(
+                                    "name", wikiDataObject.getWikiName(),
                                     "wikiDataId", wikiDataObject.getWikiDataId(),
-                                    "shortDescription", wikiDataObject.getShortDescription()));
+                                    "shortDescription", wikiDataObject.getShortDescription(),
+                                    "wikipediaUrl", wikiDataObject.getWikipediaUrl()
+                            )
+                    );
                     return result.single().get(0).asString();
                 }
             });
@@ -55,12 +64,18 @@ public class WikiDataObjectPersistenceService implements IWikiDataObjectPersiste
                 @Override
                 public String execute(Transaction tx) {
                     Result result = tx.run(
-                            "MERGE (a:HistoricPlace {wikiDataId: coalesce($wikiDataId, \"N/A\"), name: coalesce($name, \"N/A\"), shortDescription: coalesce($shortDescription, \"N/A\"), location: coalesce($location, \"N/A\")}) RETURN a.name",
+                            "MERGE (a:HistoricPlace {wikiDataId: coalesce($wikiDataId, \"N/A\"), " +
+                                    "name: coalesce($name, \"N/A\"), " +
+                                    "shortDescription: coalesce($shortDescription, \"N/A\"), " +
+                                    "location: coalesce($location, \"N/A\"), " +
+                                    "wikipediaUrl: coalesce($wikipediaUrl, \"N/A\")}) " +
+                                    "RETURN a.name",
                             parameters(
                                     "name", wikiDataObject.getWikiName(),
                                     "wikiDataId", wikiDataObject.getWikiDataId(),
                                     "shortDescription", wikiDataObject.getShortDescription(),
-                                    "location", wikiDataObject.getLocation()
+                                    "location", wikiDataObject.getLocation(),
+                                    "wikipediaUrl", wikiDataObject.getWikipediaUrl()
                             )
                     );
                     return result.single().get(0).asString();
@@ -69,6 +84,7 @@ public class WikiDataObjectPersistenceService implements IWikiDataObjectPersiste
             System.out.println("Created Historic Place: " + message);
         }
     }
+
 
     @Override
     public void persistHistoricEvent(WikiDataObject wikiDataObject) {
