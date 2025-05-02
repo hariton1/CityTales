@@ -5,7 +5,7 @@ import { routes } from './app.routes';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { TuiAlertService } from '@taiga-ui/core';
+import {TuiAlertService, tuiAssetsPathProvider} from '@taiga-ui/core';
 import { provideServiceWorker } from '@angular/service-worker';
 
 export const appConfig: ApplicationConfig = {
@@ -13,6 +13,7 @@ export const appConfig: ApplicationConfig = {
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     provideClientHydration(withEventReplay()),
+    tuiAssetsPathProvider('https://taiga-ui.dev/assets/taiga-ui/icons'),
     importProvidersFrom(
       BrowserAnimationsModule,
       TuiAlertService
