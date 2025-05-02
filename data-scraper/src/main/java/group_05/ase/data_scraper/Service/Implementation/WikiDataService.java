@@ -5,15 +5,13 @@ import group_05.ase.data_scraper.Service.Interface.IWikiDataService;
 import group_05.ase.data_scraper.Service.WikiDataConsts.WikiDataConsts;
 import org.springframework.stereotype.Service;
 import org.wikidata.wdtk.datamodel.helpers.Datamodel;
-import org.wikidata.wdtk.datamodel.interfaces.EntityDocument;
-import org.wikidata.wdtk.datamodel.interfaces.ItemDocument;
-import org.wikidata.wdtk.datamodel.interfaces.Statement;
-import org.wikidata.wdtk.datamodel.interfaces.StatementGroup;
+import org.wikidata.wdtk.datamodel.interfaces.*;
 import org.wikidata.wdtk.wikibaseapi.BasicApiConnection;
 import org.wikidata.wdtk.wikibaseapi.WikibaseDataFetcher;
 import org.wikidata.wdtk.wikibaseapi.apierrors.MediaWikiApiErrorException;
 
 import java.io.IOException;
+import java.util.Map;
 
 @Service
 public class WikiDataService implements IWikiDataService {
@@ -43,6 +41,7 @@ public class WikiDataService implements IWikiDataService {
             populateShortDescription(dataObject, itemDocument);
             populateCoordinates(dataObject, itemDocument);
             populateInstanceOf(dataObject, itemDocument);
+            populateWikipediaUrl(dataObject,itemDocument);
         }
         return dataObject;
     }
@@ -89,6 +88,24 @@ public class WikiDataService implements IWikiDataService {
                 String instanceId = extractIdFromUrl(statement.getValue().toString());
                 dataObject.addToInstanceOf(instanceId);
             }
+        }
+    }
+
+    private void populateWikipediaUrl(WikiDataObject dataObject, ItemDocument itemDocument) {
+        if (itemDocument == null || itemDocument.getSiteLinks() == null) {
+            return;
+        }
+
+        Map<String, SiteLink> siteLinks = itemDocument.getSiteLinks();
+        SiteLink siteLink = siteLinks.get("enwiki");
+
+        if (siteLink != null && siteLink.getSiteKey() != null && siteLink.getPageTitle() != null) {
+            String baseUrl = "https://" + siteLink.getSiteKey().replace("wiki", "") + ".wikipedia.org/wiki/";
+            String fullUrl = baseUrl + siteLink.getPageTitle().replace(" ", "_");
+
+            dataObject.setWikipediaUrl(fullUrl);
+        } else {
+            System.out.println("No valid English Wikipedia link found.");
         }
     }
 

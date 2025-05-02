@@ -37,8 +37,8 @@ public class WikiDataScraperService implements IWikiDataScraperService {
 
     public void batchSearch(int batchSize, int iterations) {
 
-        //String continueToken = "";
-        String continueToken = "0|387470"; //Karlskirche
+        String continueToken = "";
+        //String continueToken = "0|387470"; //Karlskirche
         System.out.println(continueToken);
         for (int i = 0; i < iterations; i++) {
             Root batch = getWhatLinksHere(batchSize, continueToken);
@@ -49,12 +49,12 @@ public class WikiDataScraperService implements IWikiDataScraperService {
                 System.out.println(wDO);
 
 
-                if (listContains(wDO.getInstanceOf(), WikiDataConsts.PERSON_CODES)) {
+                /*if (listContains(wDO.getInstanceOf(), WikiDataConsts.PERSON_CODES)) {
                     persistenceService.persistHistoricPerson(wDO);
                 } else if (listContains(wDO.getInstanceOf(), WikiDataConsts.PLACE_CODES) || wDO.getLocation() != null) {
                     System.out.println("checking: "+wDO.toString());
                     persistenceService.persistHistoricPlace(wDO);
-                }
+                }*/
             }
             continueToken = batch.continueInfo.gblcontinue;
             System.out.println("New continue token: " + continueToken);
