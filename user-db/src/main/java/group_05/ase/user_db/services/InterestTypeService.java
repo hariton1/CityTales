@@ -12,8 +12,11 @@ import java.util.List;
 @Service
 public class InterestTypeService {
 
-    @Autowired
-    InterestTypeRepository repository;
+    private final InterestTypeRepository repository;
+
+    public InterestTypeService(InterestTypeRepository repository) {
+        this.repository = repository;
+    }
 
     public List<InterestTypeDTO> getAllInterestTypes() {
 

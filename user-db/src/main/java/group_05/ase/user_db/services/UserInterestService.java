@@ -13,8 +13,11 @@ import java.util.List;
 @Service
 public class UserInterestService {
 
-    @Autowired
-    UserInterestRepository repository;
+    private final UserInterestRepository repository;
+
+    public UserInterestService(UserInterestRepository repository) {
+        this.repository = repository;
+    }
 
     public List<UserInterestDTO> getAllUserInterests() {
 
