@@ -18,7 +18,7 @@ public class WikiDataObjectPersistenceService implements IWikiDataObjectPersiste
 
     private final String NEO4JURL = "bolt://localhost:7687";
     private final String NEO4JUSER = "neo4j";
-    private final String NEO4JPW = "password";
+    private final String NEO4JPW = "***REMOVED***";
 
     private Driver driver;
 
@@ -54,11 +54,15 @@ public class WikiDataObjectPersistenceService implements IWikiDataObjectPersiste
             String message = session.writeTransaction(new TransactionWork<String>() {
                 @Override
                 public String execute(Transaction tx) {
-                    Result result = tx.run("MERGE (a:HistoricPlace {wikiDataId: coalesce(wikiDataId, \"N/A\"), name: coalesce($name, \"N/A\"), shortDescription: coalesce($shortDescription, \"N/A\") , location: coalesce($location, \"N/A\")}) RETURN a.name",
-                            parameters("name", wikiDataObject.getWikiName(),
+                    Result result = tx.run(
+                            "MERGE (a:HistoricPlace {wikiDataId: coalesce($wikiDataId, \"N/A\"), name: coalesce($name, \"N/A\"), shortDescription: coalesce($shortDescription, \"N/A\"), location: coalesce($location, \"N/A\")}) RETURN a.name",
+                            parameters(
+                                    "name", wikiDataObject.getWikiName(),
                                     "wikiDataId", wikiDataObject.getWikiDataId(),
                                     "shortDescription", wikiDataObject.getShortDescription(),
-                                    "location", wikiDataObject.getLocation()));
+                                    "location", wikiDataObject.getLocation()
+                            )
+                    );
                     return result.single().get(0).asString();
                 }
             });

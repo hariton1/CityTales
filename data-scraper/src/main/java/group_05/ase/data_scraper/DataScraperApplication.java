@@ -1,6 +1,5 @@
 package group_05.ase.data_scraper;
 
-import group_05.ase.data_scraper.Service.Implementation.WikiDataObjectPersistenceService;
 import group_05.ase.data_scraper.Service.Implementation.WikiDataScraperService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -13,5 +12,11 @@ public class DataScraperApplication {
 		ApplicationContext applicationContext = SpringApplication.run(DataScraperApplication.class, args);
 		WikiDataScraperService service = applicationContext.getBean(WikiDataScraperService.class);
 		service.batchSearch(500, 400);
+
+		// TODO: populate with sample dataset
+		// 100 people
+		// 100 places
+		// 100 events
+		// all linkages between them
 	}
 }
