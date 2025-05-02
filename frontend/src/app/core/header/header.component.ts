@@ -1,25 +1,17 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-
-import {
-  TuiAppearance,
-  TuiButton
-} from '@taiga-ui/core';
-
-import {
-  TuiChevron,
-  TuiSegmented,
-  TuiSwitch,
-} from '@taiga-ui/kit';
+import {TuiAppearance, TuiButton} from '@taiga-ui/core';
+import {TuiSegmented} from '@taiga-ui/kit';
 
 import {TuiHeaderComponent, TuiLogoComponent} from '@taiga-ui/layout';
 
 @Component({
   selector: 'app-header',
-  imports: [TuiAppearance,
+  imports: [
+    TuiAppearance,
     TuiButton,
-    TuiChevron,
-    TuiSwitch,
-    TuiSegmented, TuiLogoComponent, TuiHeaderComponent,],
+    TuiSegmented,
+    TuiLogoComponent,
+    TuiHeaderComponent,],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
