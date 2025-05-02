@@ -5,7 +5,7 @@ import { routes } from './app.routes';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { TuiRoot, TuiAlertService } from '@taiga-ui/core';
+import { TuiAlertService } from '@taiga-ui/core';
 import { provideServiceWorker } from '@angular/service-worker';
 
 export const appConfig: ApplicationConfig = {
@@ -15,7 +15,6 @@ export const appConfig: ApplicationConfig = {
     provideClientHydration(withEventReplay()),
     importProvidersFrom(
       BrowserAnimationsModule,
-      TuiRoot,
       TuiAlertService
     ), provideServiceWorker('ngsw-worker.js', {
             enabled: !isDevMode(),
