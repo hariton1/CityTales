@@ -23,9 +23,9 @@ public class WikiDataObjectPersistenceService implements IWikiDataObjectPersiste
     private final String NEO4JPW = "neo4jwhatevs";
 
     private Driver driver;
-    private WikipediaLinkExtractor wikipediaLinkExtractor;
+    private WikipediaExtractor wikipediaLinkExtractor;
 
-    public WikiDataObjectPersistenceService(WikipediaLinkExtractor wikipediaLinkExtractor){
+    public WikiDataObjectPersistenceService(WikipediaExtractor wikipediaLinkExtractor){
         AuthToken authToken = AuthTokens.basic(NEO4JUSER, NEO4JPW);
         try {
             driver = GraphDatabase.driver(NEO4JURL, authToken);
@@ -202,7 +202,19 @@ public class WikiDataObjectPersistenceService implements IWikiDataObjectPersiste
         }
     }
 
-    private List<HistoricalPersonEntity> fetchAllHistoricalPersons(Session session) {
+    public List<HistoricalPersonEntity> getAllPersons() {
+        try (Session session = driver.session()){
+            return fetchAllHistoricalPersons(session);
+        }
+    }
+
+    public List<HistoricalPlaceEntity> getAllPlaces() {
+        try (Session session = driver.session()){
+            return fetchAllHistoricalPlaces(session);
+        }
+    }
+
+    public List<HistoricalPersonEntity> fetchAllHistoricalPersons(Session session) {
         List<HistoricalPersonEntity> people = new ArrayList<>();
         Result result = session.run("MATCH (person:HistoricPerson) RETURN person");
 
@@ -213,7 +225,7 @@ public class WikiDataObjectPersistenceService implements IWikiDataObjectPersiste
         return people;
     }
 
-    private List<HistoricalPlaceEntity> fetchAllHistoricalPlaces(Session session) {
+    public List<HistoricalPlaceEntity> fetchAllHistoricalPlaces(Session session) {
         List<HistoricalPlaceEntity> places = new ArrayList<>();
         Result result = session.run("MATCH (place:HistoricPlace) RETURN place");
 

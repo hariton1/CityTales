@@ -1,17 +1,18 @@
 package group_05.ase.data_scraper;
 
 import group_05.ase.data_scraper.Service.Implementation.WikiDataScraperService;
-import group_05.ase.data_scraper.Service.Implementation.WikipediaLinkExtractor;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication
 public class DataScraperApplication {
 
 	public static void main(String[] args) {
 		ApplicationContext applicationContext = SpringApplication.run(DataScraperApplication.class, args);
-		WikiDataScraperService service = applicationContext.getBean(WikiDataScraperService.class);
+		/*WikiDataScraperService service = applicationContext.getBean(WikiDataScraperService.class);
 
 
 		// String continueToken = "0|387470"; //Karlskirche
@@ -20,6 +21,11 @@ public class DataScraperApplication {
 		service.batchSearch(100, 1,"");
 		service.batchSearch(200, 1,continueToken);
 
-		service.upsertLinkages();
+		service.upsertLinkages();*/
+	}
+
+	@Bean
+	public RestTemplate restTemplate() {
+		return new RestTemplate();
 	}
 }
