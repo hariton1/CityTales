@@ -1,7 +1,8 @@
-import {Component, inject, OnInit} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import {TuiRoot, TuiAlertService, TuiButton} from '@taiga-ui/core';
-import {HttpClient} from '@angular/common/http';
+import {UserService} from './services/user.service';
+import {SERVER_CONNECTION_TEST_STRING} from './globals';
 
 @Component({
   selector: 'app-root',
@@ -10,22 +11,28 @@ import {HttpClient} from '@angular/common/http';
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
-export class AppComponent implements OnInit {
+export class AppComponent {
   title = 'frontend';
 
   private readonly alerts = inject(TuiAlertService);
-  private readonly httpClient: HttpClient = inject(HttpClient);
+  private readonly userService = inject(UserService);
 
-  ngOnInit(): void {
-    this.httpClient.get('http://localhost:8090/userInterests', {responseType: "text"}).subscribe(buffer => {
-      console.log(buffer);
+  protected testConnection(): void {
+    console.log('Test Connection');
+    let testConnection = this.userService.testConnection();
+
+    testConnection.subscribe(testString => {
+      if (testString) {
+        if (testString === SERVER_CONNECTION_TEST_STRING) {
+          this.alerts
+            .open(testString, {label: 'Success!'})
+            .subscribe();
+        } else {
+          this.alerts
+            .open('Something went wrong!', {label: 'Failure!'})
+            .subscribe();
+        }
+      }
     });
-  }
-
-  protected showNotification(): void {
-    console.log('show notification');
-    this.alerts
-      .open('Basic <strong>HTML</strong>', {label: 'With a heading!'})
-      .subscribe();
   }
 }
