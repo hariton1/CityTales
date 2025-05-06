@@ -10,6 +10,7 @@ import group_05.ase.user_db.formaters.CustomTimestampSerializer;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
@@ -23,7 +24,7 @@ public class UserHistoryDTO {
     @Getter
     @Setter
     @JsonProperty(required = true, value = "user_id")
-    private String userId;
+    private UUID userId;
 
     @Getter
     @Setter
@@ -39,7 +40,7 @@ public class UserHistoryDTO {
 
     @Getter
     @Setter
-    @JsonProperty(required = true, value = "close_dt")
+    @JsonProperty(value = "close_dt")
     @JsonSerialize(using = CustomTimestampSerializer.class)
     @JsonDeserialize(using = CustomTimestampDeserializer.class)
     private LocalDateTime closeDt;
