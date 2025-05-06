@@ -6,4 +6,10 @@
 /* desktop: >768px show only .desktop */
 @media (min-width: 769px) {
   .mobile { display: none; }
-}/* You can add global styles to this file, and also import other style files */
+}
+
+.centered-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 0;
+}
