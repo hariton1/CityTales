@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import {TuiButton} from '@taiga-ui/core';
+import {TuiButton, TuiIcon} from '@taiga-ui/core';
 import {TuiSegmented} from '@taiga-ui/kit';
 
 import {TuiHeaderComponent, TuiLogoComponent} from '@taiga-ui/layout';
@@ -10,7 +10,9 @@ import {TuiHeaderComponent, TuiLogoComponent} from '@taiga-ui/layout';
     TuiButton,
     TuiSegmented,
     TuiLogoComponent,
-    TuiHeaderComponent,],
+    TuiHeaderComponent,
+    TuiIcon,
+  ],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
