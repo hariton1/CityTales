@@ -4,9 +4,10 @@ import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { provideAnimations, BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {TuiAlertService, tuiAssetsPathProvider} from '@taiga-ui/core';
 import { provideServiceWorker } from '@angular/service-worker';
+import {provideEventPlugins} from '@taiga-ui/event-plugins';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -14,6 +15,8 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideClientHydration(withEventReplay()),
     tuiAssetsPathProvider('https://taiga-ui.dev/assets/taiga-ui/icons'),
+    provideAnimations(),
+    provideEventPlugins(),
     importProvidersFrom(
       BrowserAnimationsModule,
       TuiAlertService
