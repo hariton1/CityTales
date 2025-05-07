@@ -13,8 +13,11 @@ import java.util.List;
 @Service
 public class FeedbackService {
 
-    @Autowired
-    FeedbackRepository repository;
+    private final FeedbackRepository repository;
+
+    public FeedbackService(FeedbackRepository repository) {
+        this.repository = repository;
+    }
 
     public List<FeedbackDTO> getAllFeedbacks() {
 
