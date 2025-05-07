@@ -22,7 +22,6 @@ public class UserInterestsController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<UserInterestDTO> getAllUserInterests() {
-        System.out.println("vosiel som do funkcie");
         try {
             return this.userInterestService.getAllUserInterests();
         } catch (Exception e) {
