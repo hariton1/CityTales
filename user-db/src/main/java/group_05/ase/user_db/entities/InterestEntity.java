@@ -1,8 +1,6 @@
 package group_05.ase.user_db.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 import lombok.*;
 
@@ -14,6 +12,8 @@ import lombok.*;
 public class InterestEntity {
 
     @Id
+    @SequenceGenerator(name = "interestIdSeq", sequenceName = "seq_interest_id", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "interestIdSeq")
     private int interestId;
 
     private int interestTypeId;
