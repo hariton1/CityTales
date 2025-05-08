@@ -7,7 +7,7 @@ import java.util.Date;
 
 @Service
 public class JwtService {
-    private final String SECRET_KEY = "mysecret";
+    private final String SECRET_KEY = "secret-key";
 
     public String generateToken(User user) {
         return Jwts.builder()

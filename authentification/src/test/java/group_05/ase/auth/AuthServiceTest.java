@@ -20,6 +20,7 @@ public class AuthServiceTest {
     @BeforeEach
     public void setup() {
         userRepository.deleteAll();
+
     }
 
     @Test
