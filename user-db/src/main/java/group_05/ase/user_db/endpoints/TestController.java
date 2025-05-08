@@ -10,6 +10,7 @@ public class TestController {
     }
 
     @GetMapping("/test")
+    @ResponseStatus(HttpStatus.OK)
     public String testEndpoint() {
         return "Connection to PostgreDB is working!";
     }
