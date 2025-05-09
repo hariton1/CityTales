@@ -1,5 +1,6 @@
 package group_05.ase.neo4j_data_access.Service;
 
+import group_05.ase.neo4j_data_access.DTO.HistoricPersonDTO;
 import group_05.ase.neo4j_data_access.Entity.HistoricalPersonEntity;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
@@ -18,6 +19,11 @@ public class HistoricPersonService {
     private static final String NEO4J_USER = "neo4j";
     private static final String NEO4J_PASSWORD = "***REMOVED***";
     private Driver driver;
+    private final WikipediaExtractorService wikipediaExtractorService;
+
+    public HistoricPersonService(WikipediaExtractorService wikipediaExtractorService) {
+        this.wikipediaExtractorService = wikipediaExtractorService;
+    }
 
     @PostConstruct
     public void init() {
@@ -36,14 +42,16 @@ public class HistoricPersonService {
         }
     }
 
-    public HistoricalPersonEntity getPersonById(String wikiDataId) {
+    public HistoricPersonDTO getPersonById(String wikiDataId) {
         try (Session session = driver.session()) {
             String query = "MATCH (p:HistoricPerson {wikiDataId: $wikiDataId}) RETURN p";
             Record record = session.executeRead(tx ->
                     tx.run(query, Values.parameters("wikiDataId", wikiDataId)).single());
 
             Node node = record.get("p").asNode();
-            return mapNodeToPersonEntity(node);
+            HistoricalPersonEntity entity = mapNodeToPersonEntity(node);
+            String content = wikipediaExtractorService.getFirstParagraph(entity.getWikipediaUrl());
+            return new HistoricPersonDTO(entity,content);
 
         } catch (NoSuchRecordException e) {
             System.err.println("HistoricPerson with ID " + wikiDataId + " not found.");
@@ -51,8 +59,8 @@ public class HistoricPersonService {
         }
     }
 
-    public List<HistoricalPersonEntity> getPersonsByPartialName(String partialName) {
-        List<HistoricalPersonEntity> people = new ArrayList<>();
+    public List<HistoricPersonDTO> getPersonsByPartialName(String partialName) {
+        List<HistoricPersonDTO> personDTOs = new ArrayList<>();
 
         try (Session session = driver.session()) {
             String query = "MATCH (p:HistoricPerson) " +
@@ -65,18 +73,21 @@ public class HistoricPersonService {
 
             for (Record record : records) {
                 Node node = record.get("p").asNode();
-                people.add(mapNodeToPersonEntity(node));
+                HistoricalPersonEntity entity = mapNodeToPersonEntity(node);
+                String content = wikipediaExtractorService.getFirstParagraph(entity.getWikipediaUrl());
+                HistoricPersonDTO dto = new HistoricPersonDTO(entity, content);
+                personDTOs.add(dto);
             }
 
         } catch (Exception e) {
             System.err.println("Error retrieving people by name: " + e.getMessage());
         }
 
-        return people;
+        return personDTOs;
     }
 
-    public List<HistoricalPersonEntity> getAllLinkedHistoricPersonsById(String wikiDataId) {
-        List<HistoricalPersonEntity> linkedPersons = new ArrayList<>();
+    public List<HistoricPersonDTO> getAllLinkedHistoricPersonsById(String wikiDataId) {
+        List<HistoricPersonDTO> linkedPersons = new ArrayList<>();
 
         try (Session session = driver.session()) {
             String query = "MATCH (p:HistoricPerson {wikiDataId: $wikiDataId})-[:RELATED_TO]->(linked:HistoricPerson) " +
@@ -88,7 +99,10 @@ public class HistoricPersonService {
 
             for (Record record : records) {
                 Node linkedNode = record.get("linked").asNode();
-                linkedPersons.add(mapNodeToPersonEntity(linkedNode));
+                HistoricalPersonEntity entity = mapNodeToPersonEntity(linkedNode);
+                String content = wikipediaExtractorService.getFirstParagraph(entity.getWikipediaUrl());
+                HistoricPersonDTO dto = new HistoricPersonDTO(entity, content);
+                linkedPersons.add(dto);
             }
 
         } catch (Exception e) {
