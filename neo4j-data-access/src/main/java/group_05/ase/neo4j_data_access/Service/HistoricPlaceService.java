@@ -1,5 +1,6 @@
 package group_05.ase.neo4j_data_access.Service;
 
+import group_05.ase.neo4j_data_access.DTO.HistoricPlaceDTO;
 import group_05.ase.neo4j_data_access.Entity.HistoricalPlaceEntity;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
@@ -19,6 +20,11 @@ public class HistoricPlaceService {
     private static final String NEO4J_USER = "neo4j";
     private static final String NEO4J_PASSWORD = "neo4jwhatevs";
     private Driver driver;
+    private final WikipediaExtractorService wikipediaExtractorService;
+
+    public HistoricPlaceService(WikipediaExtractorService wikipediaExtractorService) {
+        this.wikipediaExtractorService = wikipediaExtractorService;
+    }
 
     @PostConstruct
     public void init() {
@@ -37,7 +43,7 @@ public class HistoricPlaceService {
         }
     }
 
-    public HistoricalPlaceEntity getPlaceById(String wikiDataId) {
+    public HistoricPlaceDTO getPlaceById(String wikiDataId) {
         try (Session session = driver.session()) {
             String query = "MATCH (p:HistoricPlace {wikiDataId: $wikiDataId}) RETURN p";
 
@@ -45,15 +51,15 @@ public class HistoricPlaceService {
                     tx.run(query, Values.parameters("wikiDataId", wikiDataId)).single());
 
             Node node = record.get("p").asNode();
-            return mapNodeToHistoricalPlaceEntity(node);
+            return convertToDTO(node);
 
         } catch (NoSuchRecordException e) {
             System.err.println("HistoricPlace with ID " + wikiDataId + " not found.");
             return null;
         }
     }
-    public List<HistoricalPlaceEntity> getPlaceByPartialName(String partialName) {
-        List<HistoricalPlaceEntity> people = new ArrayList<>();
+    public List<HistoricPlaceDTO> getPlaceByPartialName(String partialName) {
+        List<HistoricPlaceDTO> places = new ArrayList<>();
 
         try (Session session = driver.session()) {
             String query = "MATCH (p:HistoricPlace) " +
@@ -66,18 +72,19 @@ public class HistoricPlaceService {
 
             for (Record record : records) {
                 Node node = record.get("p").asNode();
-                people.add(mapNodeToHistoricalPlaceEntity(node));
+                places.add(convertToDTO(node));
+
             }
 
         } catch (Exception e) {
-            System.err.println("Error retrieving people by name: " + e.getMessage());
+            System.err.println("Error retrieving places by name: " + e.getMessage());
         }
 
-        return people;
+        return places;
     }
 
-    public List<HistoricalPlaceEntity> findHistoricalPlacesWithinRadius(double latitude, double longitude, double radius) {
-        List<HistoricalPlaceEntity> places = new ArrayList<>();
+    public List<HistoricPlaceDTO> findHistoricalPlacesWithinRadius(double latitude, double longitude, double radius) {
+        List<HistoricPlaceDTO> places = new ArrayList<>();
 
         try (Session session = driver.session()) {
             String query = "WITH point({latitude: $latitude, longitude: $longitude}) AS targetPoint " +
@@ -95,8 +102,7 @@ public class HistoricPlaceService {
 
             for (Record record : records) {
                 Node node = record.get("p").asNode();
-                HistoricalPlaceEntity place = mapNodeToHistoricalPlaceEntity(node);
-                places.add(place);
+                places.add(convertToDTO(node));
             }
 
         } catch (Exception e) {
@@ -104,6 +110,12 @@ public class HistoricPlaceService {
         }
 
         return places;
+    }
+
+    private HistoricPlaceDTO convertToDTO(Node node) {
+        HistoricalPlaceEntity entity = mapNodeToHistoricalPlaceEntity(node);
+        String content = wikipediaExtractorService.getFirstParagraph(entity.getWikipediaUrl());
+        return new HistoricPlaceDTO(entity, content);
     }
 
     private HistoricalPlaceEntity mapNodeToHistoricalPlaceEntity(Node node) {
