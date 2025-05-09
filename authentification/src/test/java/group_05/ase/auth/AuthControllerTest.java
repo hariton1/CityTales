@@ -9,18 +9,23 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 public class AuthControllerTest {
 
-    @Autowired private MockMvc mockMvc;
+    @Autowired
+    private MockMvc mockMvc;
 
     @Test
     public void shouldRegisterViaApi() throws Exception {
         mockMvc.perform(post("/api/auth/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"email\": \"user@test.com\", \"password\": \"test123\"}"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\": \"user@test.com\", \"password\": \"test123\"}")
+                        .with(csrf()) // <-- Das muss hier rein!
+                )
                 .andExpect(status().isOk());
     }
 }
