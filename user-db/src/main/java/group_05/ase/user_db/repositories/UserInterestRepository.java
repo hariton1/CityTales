@@ -14,4 +14,6 @@ public interface UserInterestRepository extends JpaRepository<UserInterestEntity
 
     List<UserInterestEntity> findByInterestId(int interestId);
 
+    UserInterestEntity findByUserIdAndInterestId(UUID userId, Integer interestId);
+
 }

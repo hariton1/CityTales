@@ -51,7 +51,7 @@ public class UserHistoriesController {
 
     @GetMapping("/article_id={articleId}")
     @ResponseStatus(HttpStatus.OK)
-    public List<UserHistoryDTO> getUserHistoriesByArticleId(@PathVariable("articleId") int articleId) {
+    public List<UserHistoryDTO> getUserHistoriesByArticleId(@PathVariable("articleId") UUID articleId) {
         try {
             return this.userHistoryService.getUserHistoriesByArticleId(articleId);
         } catch (Exception e) {

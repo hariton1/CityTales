@@ -15,7 +15,7 @@ import java.util.UUID;
 @Table(name = "feedback", schema = "public")
 public class FeedbackEntity {
 
-    public FeedbackEntity(int feedbackId, int articleId, double rating, String fbContent) {
+    public FeedbackEntity(int feedbackId, UUID articleId, double rating, String fbContent) {
         this.feedbackId = feedbackId;
         this.articleId = articleId;
         this.rating = rating;
@@ -29,7 +29,7 @@ public class FeedbackEntity {
 
     private UUID userId;
 
-    private int articleId;
+    private UUID articleId;
 
     private double rating;
 

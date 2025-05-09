@@ -52,7 +52,7 @@ public class FeedbacksController {
 
     @GetMapping("/article_id={articleId}")
     @ResponseStatus(HttpStatus.OK)
-    public List<FeedbackDTO> getFeedbacksByArticleId(@PathVariable("articleId") int articleId) {
+    public List<FeedbackDTO> getFeedbacksByArticleId(@PathVariable("articleId") UUID articleId) {
         try {
             return this.feedbackService.getFeedbacksByArticleId(articleId);
         } catch (Exception e) {
