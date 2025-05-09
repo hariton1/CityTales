@@ -29,7 +29,7 @@ public class UserHistoryDTO {
     @Getter
     @Setter
     @JsonProperty(required = true, value = "article_id")
-    private int articleId;
+    private UUID articleId;
 
     @Getter
     @Setter
@@ -44,5 +44,10 @@ public class UserHistoryDTO {
     @JsonSerialize(using = CustomTimestampSerializer.class)
     @JsonDeserialize(using = CustomTimestampDeserializer.class)
     private LocalDateTime closeDt;
+
+    @Getter
+    @Setter
+    @JsonProperty(value = "interest_id")
+    private int interestId;
 
 }

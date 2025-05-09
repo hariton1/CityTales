@@ -29,7 +29,7 @@ public class FeedbackDTO {
     @Getter
     @Setter
     @JsonProperty(required = true, value = "article_id")
-    private int articleId;
+    private UUID articleId;
 
     @Getter
     @Setter

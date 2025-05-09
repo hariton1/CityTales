@@ -22,10 +22,12 @@ public class UserHistoryEntity {
 
     private UUID userId;
 
-    private int articleId;
+    private UUID articleId;
 
     private LocalDateTime openDt;
 
     private LocalDateTime closeDt;
+
+    private int interestId;
 
 }

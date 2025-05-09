@@ -14,7 +14,7 @@ public interface FeedbackRepository extends JpaRepository<FeedbackEntity, Intege
 
     List<FeedbackEntity> findByUserId(UUID userId);
 
-    List<FeedbackEntity> findByArticleId(int articleId);
+    List<FeedbackEntity> findByArticleId(UUID articleId);
 
     List<FeedbackEntity> findByFbContentContaining(String content);
 

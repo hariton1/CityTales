@@ -56,7 +56,7 @@ public class FeedbackService {
 
     }
 
-    public List<FeedbackDTO> getFeedbacksByArticleId(int articleId) {
+    public List<FeedbackDTO> getFeedbacksByArticleId(UUID articleId) {
 
         ArrayList<FeedbackDTO> feedbacks = new ArrayList<>();
         List<FeedbackEntity> tmp = this.repository.findByArticleId(articleId);
