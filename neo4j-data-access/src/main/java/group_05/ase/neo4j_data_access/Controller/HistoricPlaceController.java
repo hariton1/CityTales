@@ -1,7 +1,7 @@
 package group_05.ase.neo4j_data_access.Controller;
 
 import group_05.ase.neo4j_data_access.DTO.HistoricPlaceDTO;
-import group_05.ase.neo4j_data_access.Service.HistoricPlaceService;
+import group_05.ase.neo4j_data_access.Service.Interface.IHistoricPlaceService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,9 +11,9 @@ import java.util.List;
 @RequestMapping("/api/historicPlace")
 public class HistoricPlaceController {
 
-    private final HistoricPlaceService historicPlaceService;
+    private final IHistoricPlaceService historicPlaceService;
 
-    public  HistoricPlaceController(HistoricPlaceService historicPlaceService) {
+    public  HistoricPlaceController(IHistoricPlaceService historicPlaceService) {
         this.historicPlaceService = historicPlaceService;
     }
 

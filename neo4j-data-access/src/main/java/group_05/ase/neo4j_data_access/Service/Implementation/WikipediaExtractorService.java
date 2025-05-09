@@ -1,14 +1,13 @@
-package group_05.ase.neo4j_data_access.Service;
+package group_05.ase.neo4j_data_access.Service.Implementation;
 
+import group_05.ase.neo4j_data_access.Service.Interface.IWikipediaExtractorService;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-
 @Service
-public class WikipediaExtractorService {
+public class WikipediaExtractorService implements IWikipediaExtractorService {
     public String getFirstParagraph(String url) {
         try {
             Document doc = Jsoup.connect(url).get();
