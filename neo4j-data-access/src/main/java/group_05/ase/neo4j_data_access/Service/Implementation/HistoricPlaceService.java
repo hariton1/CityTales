@@ -1,5 +1,6 @@
 package group_05.ase.neo4j_data_access.Service.Implementation;
 
+import group_05.ase.neo4j_data_access.Config.Neo4jProperties;
 import group_05.ase.neo4j_data_access.DTO.HistoricPlaceDTO;
 import group_05.ase.neo4j_data_access.Entity.HistoricalPlaceEntity;
 import group_05.ase.neo4j_data_access.Service.Interface.IHistoricPlaceService;
@@ -18,14 +19,18 @@ import java.util.List;
 
 @Service
 public class HistoricPlaceService implements IHistoricPlaceService {
-    private static final String NEO4J_URL = "bolt://localhost:7687";
-    private static final String NEO4J_USER = "neo4j";
-    private static final String NEO4J_PASSWORD = "neo4jwhatevs";
+    private final String NEO4J_URL;
+    private final String NEO4J_USER;
+    private final String NEO4J_PASSWORD;
     private Driver driver;
     private final IWikipediaExtractorService wikipediaExtractorService;
 
-    public HistoricPlaceService(IWikipediaExtractorService wikipediaExtractorService) {
+    public HistoricPlaceService(IWikipediaExtractorService wikipediaExtractorService, Neo4jProperties properties) {
         this.wikipediaExtractorService = wikipediaExtractorService;
+
+        this.NEO4J_URL = properties.getUrl();
+        this.NEO4J_USER = properties.getUser();
+        this.NEO4J_PASSWORD = properties.getPassword();
     }
 
     @PostConstruct
