@@ -1,7 +1,9 @@
-package group_05.ase.neo4j_data_access.Service;
+package group_05.ase.neo4j_data_access.Service.Implementation;
 
 import group_05.ase.neo4j_data_access.DTO.HistoricPlaceDTO;
 import group_05.ase.neo4j_data_access.Entity.HistoricalPlaceEntity;
+import group_05.ase.neo4j_data_access.Service.Interface.IHistoricPlaceService;
+import group_05.ase.neo4j_data_access.Service.Interface.IWikipediaExtractorService;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import org.neo4j.driver.*;
@@ -15,14 +17,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class HistoricPlaceService {
+public class HistoricPlaceService implements IHistoricPlaceService {
     private static final String NEO4J_URL = "bolt://localhost:7687";
     private static final String NEO4J_USER = "neo4j";
     private static final String NEO4J_PASSWORD = "***REMOVED***";
     private Driver driver;
-    private final WikipediaExtractorService wikipediaExtractorService;
+    private final IWikipediaExtractorService wikipediaExtractorService;
 
-    public HistoricPlaceService(WikipediaExtractorService wikipediaExtractorService) {
+    public HistoricPlaceService(IWikipediaExtractorService wikipediaExtractorService) {
         this.wikipediaExtractorService = wikipediaExtractorService;
     }
 
