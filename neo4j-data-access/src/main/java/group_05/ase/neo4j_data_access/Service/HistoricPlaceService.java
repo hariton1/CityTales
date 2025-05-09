@@ -37,33 +37,6 @@ public class HistoricPlaceService {
         }
     }
 
-    public List<HistoricalPlaceEntity> findHistoricalPlacesWithinRadius(double latitude, double longitude, double radius) {
-        List<HistoricalPlaceEntity> places = new ArrayList<>();
-
-        try (Session session = driver.session()) {
-            // Cypher query to find all HistoricalPlace nodes within the specified radius
-            String query = "MATCH (p:HistoricalPlace) " +
-                    "WHERE point.distance(p.location, point({latitude: $latitude, longitude: $longitude})) <= $radius * 1000 " + // radius in meters
-                    "RETURN p";
-
-            List<org.neo4j.driver.Record> records = session.readTransaction(tx ->
-                    tx.run(query, Values.parameters("latitude", latitude, "longitude", longitude, "radius", radius)).list()
-            );
-
-            // Mapping the results to HistoricalPlaceEntity objects
-            for (Record record : records) {
-                Node node = record.get("p").asNode();
-                HistoricalPlaceEntity place = mapNodeToHistoricalPlaceEntity(node);
-                places.add(place);
-            }
-
-        } catch (Exception e) {
-            System.err.println("Error retrieving historical places by location: " + e.getMessage());
-        }
-
-        return places;
-    }
-
     public HistoricalPlaceEntity getPlaceById(String wikiDataId) {
         try (Session session = driver.session()) {
             String query = "MATCH (p:HistoricPlace {wikiDataId: $wikiDataId}) RETURN p";
@@ -78,6 +51,59 @@ public class HistoricPlaceService {
             System.err.println("HistoricPlace with ID " + wikiDataId + " not found.");
             return null;
         }
+    }
+    public List<HistoricalPlaceEntity> getPlaceByPartialName(String partialName) {
+        List<HistoricalPlaceEntity> people = new ArrayList<>();
+
+        try (Session session = driver.session()) {
+            String query = "MATCH (p:HistoricPlace) " +
+                    "WHERE toLower(p.name) CONTAINS toLower($name) " +
+                    "RETURN p";
+
+            List<Record> records = session.readTransaction(tx ->
+                    tx.run(query, Values.parameters("name", partialName)).list()
+            );
+
+            for (Record record : records) {
+                Node node = record.get("p").asNode();
+                people.add(mapNodeToHistoricalPlaceEntity(node));
+            }
+
+        } catch (Exception e) {
+            System.err.println("Error retrieving people by name: " + e.getMessage());
+        }
+
+        return people;
+    }
+
+    public List<HistoricalPlaceEntity> findHistoricalPlacesWithinRadius(double latitude, double longitude, double radius) {
+        List<HistoricalPlaceEntity> places = new ArrayList<>();
+
+        try (Session session = driver.session()) {
+            String query = "WITH point({latitude: $latitude, longitude: $longitude}) AS targetPoint " +
+                    "MATCH (p:HistoricPlace) " +
+                    "WITH p, split(p.location, ':') AS coords, targetPoint " +
+                    "WHERE size(coords) >= 2 " +
+                    "WITH p, toFloat(coords[0]) AS lat, toFloat(split(coords[1], ' ')[0]) AS lon, targetPoint " +
+                    "WITH p, point({latitude: lat, longitude: lon}) AS placePoint, targetPoint " +
+                    "WHERE point.distance(placePoint, targetPoint) <= $radius " + // radius in meters
+                    "RETURN p";
+
+            List<org.neo4j.driver.Record> records = session.readTransaction(tx ->
+                    tx.run(query, Values.parameters("latitude", latitude, "longitude", longitude, "radius", radius)).list()
+            );
+
+            for (Record record : records) {
+                Node node = record.get("p").asNode();
+                HistoricalPlaceEntity place = mapNodeToHistoricalPlaceEntity(node);
+                places.add(place);
+            }
+
+        } catch (Exception e) {
+            System.err.println("Error retrieving historical places by location: " + e.getMessage());
+        }
+
+        return places;
     }
 
     private HistoricalPlaceEntity mapNodeToHistoricalPlaceEntity(Node node) {

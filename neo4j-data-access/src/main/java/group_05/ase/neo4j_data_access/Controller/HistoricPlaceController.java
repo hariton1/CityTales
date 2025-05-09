@@ -28,12 +28,25 @@ public class HistoricPlaceController {
         }
     }
 
+    @GetMapping("/by/name/{partialName}")
+    public ResponseEntity<List<HistoricalPlaceEntity>> getHistoricPersonsByPartialName(@PathVariable String partialName) {
+        List<HistoricalPlaceEntity> people = historicPlaceService.getPlaceByPartialName(partialName);
+        if (people.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(people);
+    }
+
     @GetMapping("/by/location")
-    public List<HistoricalPlaceEntity> getHistoricalPlacesByLocation(
+    public ResponseEntity<List<HistoricalPlaceEntity>> getHistoricalPlacesByLocation(
             @RequestParam double latitude,
             @RequestParam double longitude,
             @RequestParam double radius) {
 
-        return historicPlaceService.findHistoricalPlacesWithinRadius(latitude, longitude, radius);
+        List<HistoricalPlaceEntity> places = historicPlaceService.findHistoricalPlacesWithinRadius(latitude, longitude, radius);
+        if (places.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(places);
     }
 }
