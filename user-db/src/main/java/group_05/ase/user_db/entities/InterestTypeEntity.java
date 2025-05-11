@@ -1,8 +1,6 @@
 package group_05.ase.user_db.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,6 +16,8 @@ import java.time.LocalDateTime;
 public class InterestTypeEntity {
 
     @Id
+    @SequenceGenerator(name = "interestTypeSeq", sequenceName = "seq_interest_type_id", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "interestTypeSeq")
     private int interestTypeId;
 
     private String typeName;
