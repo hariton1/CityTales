@@ -27,7 +27,6 @@ public class AppUserRepositoryTest {
         AppUser user = new AppUser();
         user.setEmail("test@example.com");
         user.setSupabaseId(UUID.randomUUID());
-        user.setDisplayName("Max Mustermann");
         AppUser saved = appUserRepository.save(user);
 
         Optional<AppUser> found = appUserRepository.findByEmail("test@example.com");
