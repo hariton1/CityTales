@@ -1,37 +1,43 @@
+
 package group_05.ase.auth;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class AuthService {
 
     private final AppUserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final SupabaseService supabaseService;
     private final JwtService jwtService;
 
-
-    public AuthService(AppUserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.jwtService = jwtService;
-    }
-
-    public void register(RegisterRequest request) {
+    public String register(RegisterRequest request) {
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new IllegalArgumentException("Email already in use");
+            throw new RuntimeException("Email already registered");
         }
-        AppUser user = new AppUser();
-        user.setEmail(request.getEmail());
+
+        String supabaseId = supabaseService.createUser(request.getEmail(), request.getPassword());
+
+        AppUser user = AppUser.builder()
+                .email(request.getEmail())
+                .supabaseId(UUID.fromString(supabaseId))
+                .build();
         userRepository.save(user);
+
+        return jwtService.generateToken(user);
     }
 
     public String login(LoginRequest request) {
+        String supabaseToken = supabaseService.loginUser(request.getEmail(), request.getPassword());
+
         AppUser user = userRepository.findByEmail(request.getEmail())
-            .orElseThrow(() -> new UsernameNotFoundException("Email not found"));
+                .orElseThrow(() -> new RuntimeException("User nicht in App DB gefunden"));
+
         return jwtService.generateToken(user);
     }
 }
