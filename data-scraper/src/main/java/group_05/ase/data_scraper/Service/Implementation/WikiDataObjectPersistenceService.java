@@ -11,9 +11,10 @@ import org.neo4j.driver.types.Node;
 import org.springframework.data.neo4j.types.GeographicPoint2d;
 import org.springframework.stereotype.Service;
 
-import static org.neo4j.driver.Values.parameters;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
+
+import static org.neo4j.driver.Values.parameters;
 
 @Service
 public class WikiDataObjectPersistenceService implements IWikiDataObjectPersistenceService {
@@ -45,13 +46,15 @@ public class WikiDataObjectPersistenceService implements IWikiDataObjectPersiste
                             "MERGE (a:HistoricPerson {wikiDataId: coalesce($wikiDataId, \"N/A\"), " +
                                     "name: coalesce($name, \"N/A\"), " +
                                     "shortDescription: coalesce($shortDescription, \"N/A\"), " +
-                                    "wikipediaUrl: coalesce($wikipediaUrl, \"N/A\")}) " +
+                                    "wikipediaUrl: coalesce($wikipediaUrl, \"N/A\"), " +
+                                    "imageURL: coalesce($imageURL, \"N/A\")}) " +
                                     "RETURN a.name",
                             parameters(
                                     "name", wikiDataObject.getWikiName(),
                                     "wikiDataId", wikiDataObject.getWikiDataId(),
                                     "shortDescription", wikiDataObject.getShortDescription(),
-                                    "wikipediaUrl", wikiDataObject.getWikipediaUrl()
+                                    "wikipediaUrl", wikiDataObject.getWikipediaUrl(),
+                                    "imageURL", wikiDataObject.getImageURL()
                             )
                     );
                     return result.single().get(0).asString();
@@ -72,14 +75,16 @@ public class WikiDataObjectPersistenceService implements IWikiDataObjectPersiste
                                     "name: coalesce($name, \"N/A\"), " +
                                     "shortDescription: coalesce($shortDescription, \"N/A\"), " +
                                     "location: coalesce($location, \"N/A\"), " +
-                                    "wikipediaUrl: coalesce($wikipediaUrl, \"N/A\")}) " +
+                                    "wikipediaUrl: coalesce($wikipediaUrl, \"N/A\"), " +
+                                    "imageURL: coalesce($imageURL, \"N/A\")}) " +
                                     "RETURN a.name",
                             parameters(
                                     "name", wikiDataObject.getWikiName(),
                                     "wikiDataId", wikiDataObject.getWikiDataId(),
                                     "shortDescription", wikiDataObject.getShortDescription(),
                                     "location", wikiDataObject.getLocation(),
-                                    "wikipediaUrl", wikiDataObject.getWikipediaUrl()
+                                    "wikipediaUrl", wikiDataObject.getWikipediaUrl(),
+                                    "imageURL", wikiDataObject.getImageURL()
                             )
                     );
                     return result.single().get(0).asString();
