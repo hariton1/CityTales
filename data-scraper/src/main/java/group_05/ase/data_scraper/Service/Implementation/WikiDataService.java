@@ -62,15 +62,16 @@ public class WikiDataService implements IWikiDataService {
         Statement imageStatement = itemDocument.findStatement(WikiDataConsts.IMAGE_PROPERTY_ID);
         if(imageStatement != null){
             String imageName = StringUtils.substringBetween(imageStatement.getMainSnak().toString(), "\"");
+            System.out.println(imageName);
             imageName = imageName.replace(" ", "_");
             System.out.println("Image name: " + imageName);
             try{
                 URL imageUrl = new URL(String.format("https://commons.wikimedia.org/w/index.php?title=Special:Redirect/file/%s", imageName));
-                dataObject.setImage(imageUrl.toString());
+                dataObject.setImageUrl(imageUrl.toString());
 
             } catch (IOException e) {
                 System.out.println("Image to item document URL malformed: " + imageName);
-                dataObject.setImage(null);
+                dataObject.setImageUrl(null);
             }
         } else {
             System.out.println("No image statement found for entity " + itemDocument.getEntityId().toString() + " in Wikidata.");

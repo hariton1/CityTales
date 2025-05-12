@@ -126,6 +126,7 @@ public class HistoricPersonService implements IHistoricPersonService {
         personEntity.setShortDescription(node.get("shortDescription").asString());
         personEntity.setName(node.get("name").asString());
         personEntity.setWikipediaUrl(node.get("wikipediaUrl").asString());
+        personEntity.setImageUrl(node.get("imageUrl").asString());
         personEntity.setYearOfBirth(0); // for now
         personEntity.setYearOfDeath(0); // for now
         return personEntity;

@@ -11,7 +11,7 @@ public class WikiDataObject {
     private String location;
     private List<String> instanceOf;
     private String wikipediaUrl;
-    private String imageURL;
+    private String imageUrl;
 
     public WikiDataObject() {
         this.instanceOf = new ArrayList<>();
@@ -65,8 +65,9 @@ public class WikiDataObject {
         this.instanceOf = instanceOf;
     }
 
-    public String getImageURL() {return imageURL;}
-    public void setImage(String imageURL) {this.imageURL = imageURL;}
+    public String getImageUrl() {return imageUrl;}
+
+    public void setImageUrl(String imageUrl) {this.imageUrl= imageUrl;}
 
     public void addToInstanceOf(String s) {
         if (this.instanceOf == null) {
@@ -93,6 +94,7 @@ public class WikiDataObject {
                 ", location='" + location + '\'' +
                 ", instanceOf=" + instanceOf +
                 ", wikipediaUrl='" + wikipediaUrl + '\'' +
+                ", imageUrl='" + imageUrl + '\'' +
                 '}';
     }
 }

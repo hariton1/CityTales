@@ -47,14 +47,14 @@ public class WikiDataObjectPersistenceService implements IWikiDataObjectPersiste
                                     "name: coalesce($name, \"N/A\"), " +
                                     "shortDescription: coalesce($shortDescription, \"N/A\"), " +
                                     "wikipediaUrl: coalesce($wikipediaUrl, \"N/A\"), " +
-                                    "imageURL: coalesce($imageURL, \"N/A\")}) " +
+                                    "imageUrl: coalesce($imageUrl, \"N/A\")}) " +
                                     "RETURN a.name",
                             parameters(
                                     "name", wikiDataObject.getWikiName(),
                                     "wikiDataId", wikiDataObject.getWikiDataId(),
                                     "shortDescription", wikiDataObject.getShortDescription(),
                                     "wikipediaUrl", wikiDataObject.getWikipediaUrl(),
-                                    "imageURL", wikiDataObject.getImageURL()
+                                    "imageUrl", wikiDataObject.getImageUrl()
                             )
                     );
                     return result.single().get(0).asString();
@@ -76,7 +76,7 @@ public class WikiDataObjectPersistenceService implements IWikiDataObjectPersiste
                                     "shortDescription: coalesce($shortDescription, \"N/A\"), " +
                                     "location: coalesce($location, \"N/A\"), " +
                                     "wikipediaUrl: coalesce($wikipediaUrl, \"N/A\"), " +
-                                    "imageURL: coalesce($imageURL, \"N/A\")}) " +
+                                    "imageUrl: coalesce($imageUrl, \"N/A\")}) " +
                                     "RETURN a.name",
                             parameters(
                                     "name", wikiDataObject.getWikiName(),
@@ -84,7 +84,7 @@ public class WikiDataObjectPersistenceService implements IWikiDataObjectPersiste
                                     "shortDescription", wikiDataObject.getShortDescription(),
                                     "location", wikiDataObject.getLocation(),
                                     "wikipediaUrl", wikiDataObject.getWikipediaUrl(),
-                                    "imageURL", wikiDataObject.getImageURL()
+                                    "imageUrl", wikiDataObject.getImageUrl()
                             )
                     );
                     return result.single().get(0).asString();
