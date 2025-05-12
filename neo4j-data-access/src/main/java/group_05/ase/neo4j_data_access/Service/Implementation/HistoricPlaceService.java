@@ -131,6 +131,7 @@ public class HistoricPlaceService implements IHistoricPlaceService {
         place.setShortDescription(node.get("shortDescription").asString());
         place.setLocation(parseGeoString(node.get("location").toString()));
         place.setWikipediaUrl(node.get("wikipediaUrl").asString());
+        place.setImageUrl(node.get("imageUrl").asString());
         place.setName(node.get("name").asString());
         return place;
     }
