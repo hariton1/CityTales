@@ -1,20 +1,28 @@
 package group_05.ase.user_db.services;
 
 import group_05.ase.user_db.entities.UserHistoryEntity;
+import group_05.ase.user_db.entities.UserInterestEntity;
 import group_05.ase.user_db.repositories.UserHistoryRepository;
+import group_05.ase.user_db.repositories.UserInterestRepository;
 import group_05.ase.user_db.restData.UserHistoryDTO;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class UserHistoryService {
 
-    @Autowired
-    UserHistoryRepository repository;
+    private final UserHistoryRepository repository;
+    private final UserInterestRepository userInterestRepository;
+    private final float weightIncrease = 0.01F;
+
+    public UserHistoryService(UserHistoryRepository repository, UserInterestRepository userInterestRepository) {
+        this.repository = repository;
+        this.userInterestRepository = userInterestRepository;
+    }
 
     public List<UserHistoryDTO> getAllUserHistories() {
 
@@ -23,10 +31,81 @@ public class UserHistoryService {
 
         for(UserHistoryEntity userHistory : tmp) {
             userHistories.add(new UserHistoryDTO(userHistory.getUserHistoryId(), userHistory.getUserId(), userHistory.getArticleId(),
-                                                 userHistory.getOpenDt(), userHistory.getCloseDt()));
+                    userHistory.getOpenDt(), userHistory.getCloseDt(), userHistory.getInterestId()));
         }
 
         return userHistories;
+
+    }
+
+    public UserHistoryDTO getUserHistoriesById(int userHistoryId) {
+
+        UserHistoryEntity tmp = this.repository.findByUserHistoryId(userHistoryId);
+
+        return new UserHistoryDTO(tmp.getUserHistoryId(), tmp.getUserId(), tmp.getArticleId(),
+                tmp.getOpenDt(), tmp.getCloseDt(), tmp.getInterestId());
+
+    }
+
+    public List<UserHistoryDTO> getUserHistoriesByUserId(UUID userId) {
+
+        ArrayList<UserHistoryDTO> userHistories = new ArrayList<>();
+        List<UserHistoryEntity> tmp = this.repository.findAllByUserId(userId);
+
+        for(UserHistoryEntity userHistory : tmp) {
+            userHistories.add(new UserHistoryDTO(userHistory.getUserHistoryId(), userHistory.getUserId(), userHistory.getArticleId(),
+                    userHistory.getOpenDt(), userHistory.getCloseDt(), userHistory.getInterestId()));
+        }
+
+        return userHistories;
+
+    }
+
+    public List<UserHistoryDTO> getUserHistoriesByArticleId(UUID articleId) {
+
+        ArrayList<UserHistoryDTO> userHistories = new ArrayList<>();
+        List<UserHistoryEntity> tmp = this.repository.findAllByArticleId(articleId);
+
+        for(UserHistoryEntity userHistory : tmp) {
+            userHistories.add(new UserHistoryDTO(userHistory.getUserHistoryId(), userHistory.getUserId(), userHistory.getArticleId(),
+                    userHistory.getOpenDt(), userHistory.getCloseDt(), userHistory.getInterestId()));
+        }
+
+        return userHistories;
+
+    }
+
+    public void saveNewUserHistory(UserHistoryDTO userHistoryDTO) {
+
+        UserHistoryEntity tmp = new UserHistoryEntity();
+
+        tmp.setUserId(userHistoryDTO.getUserId());
+        tmp.setArticleId(userHistoryDTO.getArticleId());
+        tmp.setOpenDt(userHistoryDTO.getOpenDt());
+        tmp.setInterestId(userHistoryDTO.getInterestId());
+
+        this.repository.save(tmp);
+
+        UserInterestEntity userInterest = this.userInterestRepository.findByUserIdAndInterestId(userHistoryDTO.getUserId(), userHistoryDTO.getInterestId());
+
+        userInterest.setInterestWeight(userInterest.getInterestWeight() + weightIncrease);
+
+        this.userInterestRepository.save(userInterest);
+
+    }
+
+    public void saveChangedUserHistory(UserHistoryDTO userHistoryDTO) {
+
+        UserHistoryEntity tmp = new UserHistoryEntity();
+
+        tmp.setUserHistoryId(userHistoryDTO.getUserHistoryId());
+        tmp.setUserId(userHistoryDTO.getUserId());
+        tmp.setArticleId(userHistoryDTO.getArticleId());
+        tmp.setOpenDt(userHistoryDTO.getOpenDt());
+        tmp.setCloseDt(userHistoryDTO.getCloseDt());
+        tmp.setInterestId(userHistoryDTO.getInterestId());
+
+        this.repository.save(tmp);
 
     }
 
