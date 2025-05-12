@@ -10,6 +10,8 @@ public class WikiDataObject {
     private String shortDescription;
     private String location;
     private List<String> instanceOf;
+    private String wikipediaUrl;
+    private String imageUrl;
 
     public WikiDataObject() {
         this.instanceOf = new ArrayList<>();
@@ -63,11 +65,23 @@ public class WikiDataObject {
         this.instanceOf = instanceOf;
     }
 
+    public String getImageUrl() {return imageUrl;}
+
+    public void setImageUrl(String imageUrl) {this.imageUrl= imageUrl;}
+
     public void addToInstanceOf(String s) {
         if (this.instanceOf == null) {
             this.instanceOf = new ArrayList<>();
         }
         this.instanceOf.add(s);
+    }
+
+    public String getWikipediaUrl() {
+        return wikipediaUrl;
+    }
+
+    public void setWikipediaUrl(String wikipediaUrl) {
+        this.wikipediaUrl = wikipediaUrl;
     }
 
     @Override
@@ -79,6 +93,8 @@ public class WikiDataObject {
                 ", shortDescription='" + shortDescription + '\'' +
                 ", location='" + location + '\'' +
                 ", instanceOf=" + instanceOf +
+                ", wikipediaUrl='" + wikipediaUrl + '\'' +
+                ", imageUrl='" + imageUrl + '\'' +
                 '}';
     }
 }
