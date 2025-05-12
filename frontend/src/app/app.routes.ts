@@ -3,9 +3,11 @@ import {UserListComponent} from './user-management/pages/user-list/user-list.com
 import {ExploreLayoutComponent} from './layout/explore-layout/explore-layout.component';
 import {LoginComponent} from './user-management/pages/login/login.component';
 import {SignUpComponent} from './user-management/pages/sign-up/sign-up.component';
+import {EditUserComponent} from './user-management/pages/edit-user/edit-user.component';
 
 export const routes: Routes = [
   { path: 'admin/users', component: UserListComponent },
+  { path: 'admin/users/:id/edit', component: EditUserComponent, runGuardsAndResolvers: 'paramsOrQueryParamsChange'},
   { path: 'explore', component: ExploreLayoutComponent },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: SignUpComponent },
