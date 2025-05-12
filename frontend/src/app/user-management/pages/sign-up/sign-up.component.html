@@ -1,1 +1,93 @@
-<p>sign-up works!</p>
+<div class="centered-wrapper">
+  <form
+    tuiForm="l"
+    [formGroup]="signupForm"
+    (ngSubmit)="onSubmit()"
+  >
+    <header tuiHeader>
+      <h3 tuiTitle>
+        Sign Up
+        <span tuiSubtitle>Create an account on CityTales</span>
+      </h3>
+    </header>
+
+    <fieldset>
+      <div class="stack">
+        <tui-textfield>
+          <label tuiLabel>First Name</label>
+          <input
+            formControlName="firstName"
+            placeholder="John"
+            tuiTextfield
+            type="text"
+          />
+        </tui-textfield>
+      </div>
+
+      <div class="stack">
+        <tui-textfield>
+          <label tuiLabel>Last Name</label>
+          <input
+            formControlName="lastName"
+            placeholder="Doe"
+            tuiTextfield
+            type="text"
+          />
+        </tui-textfield>
+      </div>
+    </fieldset>
+
+    <tui-textfield>
+      <label tuiLabel>Email</label>
+      <input
+        formControlName="email"
+        placeholder="john@doe.com"
+        tuiTextfield
+        type="email"
+      />
+      <tui-icon tuiTooltip="example: johndoe@provider.com"/>
+    </tui-textfield>
+
+    <tui-error
+      formControlName="email"
+      [error]="[] | tuiFieldError | async"
+    />
+
+    <tui-textfield>
+      <label tuiLabel>Password</label>
+      <input
+        formControlName="passwordValue"
+        tuiTextfield
+        type="password"
+      />
+      <tui-icon tuiPassword/>
+    </tui-textfield>
+
+    <tui-error
+      formControlName="passwordValue"
+      [error]="[] | tuiFieldError | async"
+    />
+
+    <tui-input-date formControlName="birthday">
+      Birthday
+      <input
+        placeholder="Birthday"
+        tuiTextfieldLegacy
+      />
+    </tui-input-date>
+    <tui-error
+      formControlName="birthday"
+      [error]="[] | tuiFieldError | async"
+    />
+
+    <footer>
+      <button
+        tuiButton
+        type="submit"
+      >
+        Create Account
+      </button>
+    </footer>
+  </form>
+</div>
+
