@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Data
 @AllArgsConstructor
@@ -16,11 +17,13 @@ import java.time.LocalDateTime;
 public class UserInterestEntity {
 
     @Id
-    private String userId;
+    private UUID userId;
 
     @Id
     private int interestId;
 
     private LocalDateTime creDat;
+
+    private float interestWeight;
 
 }
