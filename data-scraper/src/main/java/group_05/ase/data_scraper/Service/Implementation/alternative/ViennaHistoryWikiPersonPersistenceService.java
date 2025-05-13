@@ -1,4 +1,4 @@
-package group_05.ase.data_scraper.Service.Implementation;
+package group_05.ase.data_scraper.Service.Implementation.alternative;
 
 import group_05.ase.data_scraper.Entity.ManualScraping.ViennaHistoryWikiPersonObject;
 import org.neo4j.driver.*;
@@ -77,7 +77,7 @@ public class ViennaHistoryWikiPersonPersistenceService {
                 );
                 return result.single().get(0).asString();
             });
-            System.out.println("Created or updated Person: " + message);
+            // System.out.println("Created or updated Person: " + message);
         } catch (Exception e) {
             e.printStackTrace();
         }

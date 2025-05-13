@@ -1,4 +1,4 @@
-package group_05.ase.data_scraper.Service.Implementation;
+package group_05.ase.data_scraper.Service.Implementation.alternative;
 
 import group_05.ase.data_scraper.Entity.ManualScraping.ViennaHistoryWikiPersonObject;
 import org.jsoup.Jsoup;
@@ -15,7 +15,6 @@ import java.util.Optional;
 public class ViennaHistoryWikiPersonService {
 
     public String personsSeeds = "https://www.geschichtewiki.wien.gv.at/Kategorie:Personen";
-    private List<ViennaHistoryWikiPersonObject> entries = new ArrayList<>();
     private final ViennaHistoryWikiPersonPersistenceService wikiPersonPersistenceService;
     private final ManualExtractorService manualExtractorService;
 
@@ -29,7 +28,9 @@ public class ViennaHistoryWikiPersonService {
         int totalLinks = 0;
         int breaker = 0;
 
-        while (currentUrl != null && breaker == 0) {
+        while (currentUrl != null && breaker <= 24) {
+            System.out.println("persons: " + breaker +"/24");
+            List<ViennaHistoryWikiPersonObject> entries = new ArrayList<>();
             try {
 
                 Document doc = Jsoup.connect(currentUrl).get();
@@ -43,12 +44,9 @@ public class ViennaHistoryWikiPersonService {
                         int pageLinkCount = 0;
 
                         List<ViennaHistoryWikiPersonObject> pageEntries = links.stream()
-                                .limit(10)
+                                .limit(200)
                                 .parallel()
                                 .map(link -> {
-                                    System.out.println("Href: " + link.attr("abs:href"));
-                                    System.out.println("Text: " + link.text());
-                                    System.out.println("------");
                                     return extractBuildingInfos(link.attr("abs:href"), link.text());
                                 })
                                 .filter(obj -> obj != null)
@@ -87,7 +85,7 @@ public class ViennaHistoryWikiPersonService {
                 break;
             }
 
-            breaker = 1;
+            breaker+= 1;
         }
     }
 
@@ -112,7 +110,6 @@ public class ViennaHistoryWikiPersonService {
                     if (tds.size() >= 2) {
                         String key = tds.get(0).text().trim();
                         String value = tds.get(1).text().trim();
-                        System.out.println("key: " + key + "; value: " +value);
 
                         // If-stack
                         if (key.equals("PersonennameName der Person im Format Nachname, Vorname")) {
