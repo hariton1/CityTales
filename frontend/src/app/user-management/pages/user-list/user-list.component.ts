@@ -48,7 +48,8 @@ export class UserListComponent {
         roleName: 'Moderator'
       },
       userData: {
-        name: 'John Cleese',
+        firstName: 'John',
+        lastName: 'Cleese',
         email: 'silly@walk.uk',
       },
       status: {
@@ -64,7 +65,8 @@ export class UserListComponent {
         roleName: 'User'
       },
       userData: {
-        name: 'Eric Idle',
+        firstName: 'Eric',
+        lastName: 'Idle',
         email: 'cool@dude.com',
       },
       status: {
@@ -80,7 +82,8 @@ export class UserListComponent {
         roleName: 'Contributor'
       },
       userData: {
-        name: 'Michael Palin',
+        firstName: 'Michael',
+        lastName: 'Palin',
         email: 'its@man.com',
       },
       status: {
