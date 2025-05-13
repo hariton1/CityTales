@@ -1,13 +1,12 @@
 package group_05.ase.user_db.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Data
 @AllArgsConstructor
@@ -17,14 +16,18 @@ import java.time.LocalDateTime;
 public class UserHistoryEntity {
 
     @Id
+    @SequenceGenerator(name = "userHistoryIdSeq", sequenceName = "seq_user_history_id", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "userHistoryIdSeq")
     private int userHistoryId;
 
-    private String userId;
+    private UUID userId;
 
-    private int articleId;
+    private UUID articleId;
 
     private LocalDateTime openDt;
 
     private LocalDateTime closeDt;
+
+    private int interestId;
 
 }

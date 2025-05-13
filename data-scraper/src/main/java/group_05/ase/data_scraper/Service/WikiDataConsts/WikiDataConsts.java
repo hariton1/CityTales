@@ -7,6 +7,7 @@ public class WikiDataConsts {
     public static final String COORDINATE_PROPERTY_ID = "P625";
     public static final String INSTANCE_OF_PROPERTY_ID = "P31";
     public static final String WIKIPEDIA_PROPERTY_ID = "P856";
+    public static final String IMAGE_PROPERTY_ID = "P18";
 
     // Places
     public static final String CITY_CODE = "Q515";

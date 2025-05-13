@@ -1,8 +1,10 @@
-  <main class="main">
-    <button size="m" tuiButton type="button" (click)="showNotification()">
-      Show
+<tui-root>
+  <app-header class="desktop"></app-header>
+  <app-mobile-navigation class="mobile"></app-mobile-navigation>
+  <main>
+    <button size="m" tuiButton type="button" (click)="testConnection()">
+      test connection
     </button>
+    <router-outlet></router-outlet>
   </main>
-
-  <tui-root></tui-root>
-  <router-outlet></router-outlet>
+</tui-root>

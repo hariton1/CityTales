@@ -4,18 +4,23 @@ import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { TuiRoot, TuiAlertService } from '@taiga-ui/core';
+import { provideAnimations, BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import {TuiAlertService, tuiAssetsPathProvider} from '@taiga-ui/core';
 import { provideServiceWorker } from '@angular/service-worker';
+import { provideHttpClient } from '@angular/common/http';
+import {provideEventPlugins} from '@taiga-ui/event-plugins';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     provideClientHydration(withEventReplay()),
+    provideHttpClient(),
+    tuiAssetsPathProvider('https://taiga-ui.dev/assets/taiga-ui/icons'),
+    provideAnimations(),
+    provideEventPlugins(),
     importProvidersFrom(
       BrowserAnimationsModule,
-      TuiRoot,
       TuiAlertService
     ), provideServiceWorker('ngsw-worker.js', {
             enabled: !isDevMode(),

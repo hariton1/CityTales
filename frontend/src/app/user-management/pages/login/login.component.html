@@ -1,0 +1,58 @@
+<div class="centered-wrapper">
+  <form
+    tuiForm="l"
+    [formGroup]="loginForm"
+    (ngSubmit)="onSubmit()"
+  >
+    <header tuiHeader>
+      <h3 tuiTitle>
+        Login
+        <span tuiSubtitle>Access your favorite trips</span>
+      </h3>
+    </header>
+
+    <tui-textfield>
+      <label tuiLabel>Email</label>
+      <input
+        formControlName="email"
+        placeholder="john@doe.com"
+        tuiTextfield
+        type="email"
+      />
+      <tui-icon tuiTooltip="example: johndoe@provider.com"/>
+    </tui-textfield>
+
+    <tui-error
+      formControlName="email"
+      [error]="[] | tuiFieldError | async"
+    />
+
+    <fieldset>
+      <div class="stack">
+        <tui-textfield>
+          <label tuiLabel>Input password</label>
+          <input
+            formControlName="passwordValue"
+            tuiTextfield
+            type="password"
+          />
+          <tui-icon tuiPassword/>
+        </tui-textfield>
+
+        <tui-error
+          formControlName="passwordValue"
+          [error]="[] | tuiFieldError | async"
+        />
+      </div>
+    </fieldset>
+
+    <footer>
+      <button
+        tuiButton
+        type="submit"
+      >
+        Login
+      </button>
+    </footer>
+  </form>
+</div>

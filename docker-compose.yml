@@ -36,12 +36,27 @@ services:
     ports:
       - "8080:8080"
 
+  #production
+  # frontend:
+    # container_name: frontend
+    # build: ./frontend
+    # image: frontend:latest
+    # ports:
+      # - 4200:4200
+
+  #for development only
   frontend:
     container_name: frontend
-    build: ./frontend
-    image: frontend:latest
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    #image: frontend:latest
+    working_dir: /app
     ports:
       - "4200:4200"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
 
   user-db:
     container_name: user-db
