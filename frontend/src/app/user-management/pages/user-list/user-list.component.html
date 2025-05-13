@@ -29,11 +29,11 @@
       <td tuiTd>
         <div [tuiCell]="'m'">
           <tui-avatar
-            [src]="item.userData.name | tuiInitials"
-            [style.background]="item.userData.name | tuiAutoColor"
+            [src]="item.userData.firstName + ' ' + item.userData.lastName | tuiInitials"
+            [style.background]="item.userData.firstName + ' ' + item.userData.lastName | tuiAutoColor"
           />
           <span tuiTitle>
-                        {{ item.userData.name }}
+                        {{ item.userData.firstName + ' ' + item.userData.lastName }}
             <span tuiSubtitle>{{ item.userData.email }}</span>
                     </span>
         </div>
