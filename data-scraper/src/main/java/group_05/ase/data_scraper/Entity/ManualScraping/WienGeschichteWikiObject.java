@@ -1,9 +1,12 @@
 package group_05.ase.data_scraper.Entity.ManualScraping;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class WienGeschichteWikiObject {
 
+    private String url;
     private String name;
     private Optional<String> buildingType = Optional.empty();
     private Optional<String> dateFrom = Optional.empty();
@@ -22,6 +25,10 @@ public class WienGeschichteWikiObject {
     private Optional<Double> latitude = Optional.empty();
     private Optional<Double> longitude = Optional.empty();
 
+    private List<String> links = new ArrayList<>();
+
+    public String getUrl() { return url; }
+    public void setUrl(String url) { this.url = url; }
 
     public String getName() { return name;}
     public void setName(String name) { this.name = name; }
@@ -75,9 +82,14 @@ public class WienGeschichteWikiObject {
     public Optional<Double> getLongitude() { return longitude; }
 
     public void setLongitude(Optional<Double> longitude) { this.longitude = longitude; }
+
+    public List<String> getLinks() { return links; }
+    public void setLinks(List<String> links) { this.links = links; }
+
     @Override
     public String toString() {
         return "WienGeschichteWikiObject {\n" +
+                "  url=" + url + ",\n" +
                 "  name=" + name + ",\n" +
                 "  buildingType=" + buildingType + ",\n" +
                 "  dateFrom=" + dateFrom + ",\n" +
@@ -95,6 +107,7 @@ public class WienGeschichteWikiObject {
                 "  resource=" + resource + "\n" +
                 "  latitude=" + latitude + ",\n" +
                 "  longitude=" + longitude + ",\n" +
+                "  links=" + links + "\n" +
                 '}';
     }
 }
