@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class WienGeschichteWikiObject {
+public class ViennaHistoryWikiBuildingObject {
 
     private String url;
     private String name;
