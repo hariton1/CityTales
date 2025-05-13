@@ -31,7 +31,7 @@ public class WienGeschichteWikiService {
         int totalLinks = 0;
         int breaker = 0;
 
-        while (currentUrl != null && breaker == 0) {
+        while (currentUrl != null) {
             try {
 
                 Document doc = Jsoup.connect(currentUrl).get();
@@ -81,7 +81,7 @@ public class WienGeschichteWikiService {
                 } else {
                     currentUrl = nextPageUrl;
                 }
-                breaker = 1;
+                breaker+=1;
 
                 System.out.println("Cumulative total of links found: " + totalLinks);
 
@@ -91,9 +91,10 @@ public class WienGeschichteWikiService {
             }
         }
 
-        for (WienGeschichteWikiObject obj:entries) {
+       /* for (WienGeschichteWikiObject obj:entries) {
             System.out.println(obj.toString());
-        }
+        }*/
+        wienGeschichteWikiPersistenceService.createLinkRelationships();
     }
 
     private String getNextPageUrl(Document doc) {
@@ -106,7 +107,11 @@ public class WienGeschichteWikiService {
             Document doc = Jsoup.connect(url).get();
 
             WienGeschichteWikiObject wikiObject = new WienGeschichteWikiObject();
+            wikiObject.setUrl(url);
             wikiObject.setName(text);
+
+            // Extract all links from <p> tags
+            populateLinks(doc,wikiObject);
 
             Element table = doc.selectFirst("table.table.table-condensed.table-hover");
 
@@ -184,6 +189,21 @@ public class WienGeschichteWikiService {
                 e.printStackTrace();
             }
         }
+    }
+
+    private void populateLinks(Document doc, WienGeschichteWikiObject obj) {
+        Elements links = doc.select("p a[href]");
+
+        List<String> validLinks = new ArrayList<>();
+
+        for (Element link : links) {
+            String linkHref = link.attr("abs:href");
+            if (linkHref.startsWith("https://www.geschichtewiki.wien.gv.at/")) {
+                validLinks.add(linkHref);
+            }
+        }
+
+        obj.setLinks(validLinks);
     }
 }
 
