@@ -1,6 +1,6 @@
 package group_05.ase.data_scraper.Service.Implementation;
 
-import group_05.ase.data_scraper.Entity.ManualScraping.WienGeschichteWikiObject;
+import group_05.ase.data_scraper.Entity.ManualScraping.ViennaHistoryWikiBuildingObject;
 import org.neo4j.driver.*;
 import org.neo4j.driver.Record;
 import org.neo4j.driver.types.Node;
@@ -12,17 +12,15 @@ import java.util.List;
 import static org.neo4j.driver.Values.parameters;
 
 @Service
-public class WienGeschichteWikiPersistenceService {
+public class ViennaHistoryWikiBuildingPersistenceService {
 
     private final String NEO4JURL = "bolt://localhost:7687";
     private final String NEO4JUSER = "neo4j";
     private final String NEO4JPW = "neo4jwhatevs";
-
     private final String buildingTableName = "WienGeschichteWikiBuildings";
-
     private Driver driver;
 
-    public WienGeschichteWikiPersistenceService(){
+    public ViennaHistoryWikiBuildingPersistenceService(){
         AuthToken authToken = AuthTokens.basic(NEO4JUSER, NEO4JPW);
         try {
             driver = GraphDatabase.driver(NEO4JURL, authToken);
@@ -31,7 +29,7 @@ public class WienGeschichteWikiPersistenceService {
         }
     }
 
-    public void persistWienGeschichteWikiObject(WienGeschichteWikiObject obj) {
+    public void persistViennaHistoryWikiBuildingObject(ViennaHistoryWikiBuildingObject obj) {
         try (Session session = driver.session()) {
             String message = session.writeTransaction(tx -> {
                 Result result = tx.run(

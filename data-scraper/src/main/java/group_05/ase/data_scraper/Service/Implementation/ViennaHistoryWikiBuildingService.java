@@ -1,6 +1,6 @@
 package group_05.ase.data_scraper.Service.Implementation;
 
-import group_05.ase.data_scraper.Entity.ManualScraping.WienGeschichteWikiObject;
+import group_05.ase.data_scraper.Entity.ManualScraping.ViennaHistoryWikiBuildingObject;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -15,19 +15,20 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class WienGeschichteWikiService {
+public class ViennaHistoryWikiBuildingService {
 
-    public String seedUrl = "https://www.geschichtewiki.wien.gv.at/Kategorie:Geb%C3%A4ude";
-    private List<WienGeschichteWikiObject> entries = new ArrayList<>();
+    public String buildingSeeds = "https://www.geschichtewiki.wien.gv.at/Kategorie:Geb%C3%A4ude";
+    private List<ViennaHistoryWikiBuildingObject> entries = new ArrayList<>();
+    private final ViennaHistoryWikiBuildingPersistenceService wienGeschichteWikiPersistenceService;
+    private final ManualExtractorService manualExtractorService;
 
-    private final WienGeschichteWikiPersistenceService wienGeschichteWikiPersistenceService;
 
-    public WienGeschichteWikiService(WienGeschichteWikiPersistenceService wienGeschichteWikiPersistenceService) {
+    public ViennaHistoryWikiBuildingService(ViennaHistoryWikiBuildingPersistenceService wienGeschichteWikiPersistenceService, ManualExtractorService manualExtractorService) {
         this.wienGeschichteWikiPersistenceService = wienGeschichteWikiPersistenceService;
+        this.manualExtractorService = manualExtractorService;
     }
-
     public void search() {
-        String currentUrl = seedUrl;
+        String currentUrl = buildingSeeds;
         int totalLinks = 0;
         int breaker = 0;
 
@@ -44,14 +45,14 @@ public class WienGeschichteWikiService {
                         Elements links = categoryDiv.select("a");
                         int pageLinkCount = 0;
 
-                        List<WienGeschichteWikiObject> pageEntries = links.stream()
+                        List<ViennaHistoryWikiBuildingObject> pageEntries = links.stream()
                                 .limit(200)
                                 .parallel()
                                 .map(link -> {
                                     System.out.println("Href: " + link.attr("abs:href"));
                                     System.out.println("Text: " + link.text());
                                     System.out.println("------");
-                                    return extractInfos(link.attr("abs:href"), link.text());
+                                    return extractBuildingInfos(link.attr("abs:href"), link.text());
                                 })
                                 .filter(obj -> obj != null)
                                 .toList();
@@ -63,8 +64,8 @@ public class WienGeschichteWikiService {
                         totalLinks += pageLinkCount;
                         System.out.println("Total links found on this page: " + pageLinkCount);
 
-                        for (WienGeschichteWikiObject wgwo:entries) {
-                            wienGeschichteWikiPersistenceService.persistWienGeschichteWikiObject(wgwo);
+                        for (ViennaHistoryWikiBuildingObject wgwo:entries) {
+                            wienGeschichteWikiPersistenceService.persistViennaHistoryWikiBuildingObject(wgwo);
                         }
                     } else {
                         System.out.println("Category div not found on the current page.");
@@ -73,7 +74,7 @@ public class WienGeschichteWikiService {
                     System.out.println("Outer mw-content-ltr div not found on the current page.");
                 }
 
-                String nextPageUrl = getNextPageUrl(doc);
+                String nextPageUrl = manualExtractorService.getNextPageUrl(doc,"Gebäude");
 
                 if (nextPageUrl == null) {
                     System.out.println("No more pages to fetch. Status: " + totalLinks);
@@ -94,24 +95,18 @@ public class WienGeschichteWikiService {
        /* for (WienGeschichteWikiObject obj:entries) {
             System.out.println(obj.toString());
         }*/
-        wienGeschichteWikiPersistenceService.createLinkRelationships();
     }
 
-    private String getNextPageUrl(Document doc) {
-        Element nextLink = doc.selectFirst("a[title=\"Kategorie:Gebäude\"]:contains(nächste Seite)");
-        return nextLink != null ? nextLink.absUrl("href") : null;
-    }
-
-    private WienGeschichteWikiObject extractInfos(String url, String text) {
+    private ViennaHistoryWikiBuildingObject extractBuildingInfos(String url, String text) {
         try {
             Document doc = Jsoup.connect(url).get();
 
-            WienGeschichteWikiObject wikiObject = new WienGeschichteWikiObject();
+            ViennaHistoryWikiBuildingObject wikiObject = new ViennaHistoryWikiBuildingObject();
             wikiObject.setUrl(url);
             wikiObject.setName(text);
 
             // Extract all links from <p> tags
-            populateLinks(doc,wikiObject);
+            wikiObject.setLinks(manualExtractorService.getLinks(doc));
 
             Element table = doc.selectFirst("table.table.table-condensed.table-hover");
 
@@ -168,7 +163,7 @@ public class WienGeschichteWikiService {
         }
     }
 
-    private void populateCoordinates(Document doc, WienGeschichteWikiObject obj) {
+    private void populateCoordinates(Document doc, ViennaHistoryWikiBuildingObject obj) {
         Element mapDataDiv = doc.selectFirst("div.mobilemap div.mapdata");
         if (mapDataDiv != null) {
             String json = mapDataDiv.html();
@@ -190,20 +185,4 @@ public class WienGeschichteWikiService {
             }
         }
     }
-
-    private void populateLinks(Document doc, WienGeschichteWikiObject obj) {
-        Elements links = doc.select("p a[href]");
-
-        List<String> validLinks = new ArrayList<>();
-
-        for (Element link : links) {
-            String linkHref = link.attr("abs:href");
-            if (linkHref.startsWith("https://www.geschichtewiki.wien.gv.at/")) {
-                validLinks.add(linkHref);
-            }
-        }
-
-        obj.setLinks(validLinks);
-    }
 }
-
