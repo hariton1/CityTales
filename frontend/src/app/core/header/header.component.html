@@ -1,0 +1,39 @@
+<header tuiNavigationHeader class="header">
+
+    <span tuiNavigationLogo>
+        CityTales
+    </span>
+
+    <tui-segmented [size]="'m'" class="main-nav-desktop">
+      <a routerLink="/explore" >🌎 Explore</a>
+      <a routerLinkActive  href="#">🧭 Tours</a>
+      <a routerLinkActive href="#">Contribute</a>
+      <a routerLinkActive href="#">For Educators</a>
+      <a routerLinkActive href="#">About</a>
+    </tui-segmented>
+
+    <div class="auth_buttons">
+      <button
+        appearance="secondary"
+        size="s"
+        tuiButton
+        type="button"
+        routerLink="admin/user-list"
+      >
+        <tui-icon
+          icon="@tui.users"
+          [style.height.rem]="1"
+        />
+        User Management
+      </button>
+
+      <button appearance="flat" tuiButton type="button" routerLink="register">
+        Sign Up
+      </button>
+
+      <button appearance="primary" tuiButton type="button" routerLink="login">
+        Login
+      </button>
+    </div>
+
+</header>

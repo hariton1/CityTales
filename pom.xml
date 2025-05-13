@@ -16,6 +16,7 @@
     <modules>
         <module>data-scraper</module>
         <module>user-db</module>
+        <module>neo4j-data-access</module>
         <module>qdrant-adapter</module>
     </modules>
 

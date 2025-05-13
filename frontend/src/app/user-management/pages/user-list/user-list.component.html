@@ -1,0 +1,115 @@
+<div class="centered-wrapper">
+  <table
+    tuiTable
+    [size]="'m'"
+    [style.width.rem]="70"
+    class="users"
+  >
+    <thead>
+    <tr>
+      <th tuiTh>Role</th>
+      <th tuiTh>User Data</th>
+      <th tuiTh>Status</th>
+      <th tuiTh [style.width.rem]="15">Interests</th>
+      <th tuiTh>Created At</th>
+      <th tuiTh>Actions</th>
+    </tr>
+    </thead>
+    <tbody tuiTbody>
+    <tr *ngFor="let item of data">
+      <!-- First column -->
+      <td tuiTd>
+        <div [tuiCell]="'m'">
+                    <span tuiTitle>
+                      {{ item.role.roleName }}
+                    </span>
+        </div>
+      </td>
+      <!-- Second column -->
+      <td tuiTd>
+        <div [tuiCell]="'m'">
+          <tui-avatar
+            [src]="item.userData.name | tuiInitials"
+            [style.background]="item.userData.name | tuiAutoColor"
+          />
+          <span tuiTitle>
+                        {{ item.userData.name }}
+            <span tuiSubtitle>{{ item.userData.email }}</span>
+                    </span>
+        </div>
+      </td>
+      <!-- Third column -->
+      <td tuiTd>
+        <span [tuiStatus]="item.status.color">{{ item.status.value }}</span>
+      </td>
+      <!-- Fourth column -->
+      <td tuiTd>
+        <tui-items-with-more [style.gap.rem]="0.25">
+          <ng-container *ngFor="let chip of item.interests">
+            <tui-badge *tuiItem>{{ chip }}</tui-badge>
+          </ng-container>
+          <ng-template
+            let-number
+            tuiMore
+          >
+            <button
+              appearance="action-grayscale"
+              tuiDropdownAlign="right"
+              tuiDropdownOpen
+              tuiLink
+              type="button"
+              [tuiDropdown]="dropdown"
+            >
+              + {{ item.interests.length - number - 1 }}
+            </button>
+            <ng-template #dropdown>
+              <div
+                tuiStatus
+                [style.padding.rem]="1"
+              >
+                <ng-container *ngFor="let chip of item.interests; let index = index">
+                  <tui-badge *ngIf="index > number">{{ chip }}</tui-badge>
+                </ng-container>
+              </div>
+            </ng-template>
+          </ng-template>
+        </tui-items-with-more>
+      </td>
+
+      <td tuiTd>
+        <span tuiTitle>
+          {{ item.createdAt }}
+        </span>
+
+      </td>
+
+      <!-- edit / more options -->
+      <td tuiTd>
+                <span tuiStatus>
+                    <button
+                      appearance="action"
+                      iconStart="@tui.pencil"
+                      size="xs"
+                      tuiIconButton
+                      type="button"
+                    >
+                        Edit
+                    </button>
+                    <button
+                      appearance="action"
+                      iconStart="@tui.ellipsis"
+                      size="xs"
+                      tuiIconButton
+                      type="button"
+                    >
+                        More
+                    </button>
+                </span>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
+</div>
+
+

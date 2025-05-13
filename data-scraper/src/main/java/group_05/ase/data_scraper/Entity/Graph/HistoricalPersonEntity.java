@@ -21,6 +21,7 @@ public class HistoricalPersonEntity {
     private int yearOfDeath;
     private String name;
     private String wikipediaUrl;
+    private String imageUrl;
 
     @Relationship(type = "HAD ROLE IN", direction = Relationship.Direction.OUTGOING)
     private Set<HistoricalEventEntity> associated_historical_events;

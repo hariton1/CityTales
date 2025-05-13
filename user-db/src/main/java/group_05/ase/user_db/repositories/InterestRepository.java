@@ -9,6 +9,12 @@ import java.util.List;
 @Repository
 public interface InterestRepository extends JpaRepository<InterestEntity, Integer> {
 
-    List<InterestEntity> findAllByInterestName(String interestName);
+    InterestEntity findByInterestId(int interestId);
+
+    InterestEntity findByInterestTypeId(int interestTypeId);
+
+    InterestEntity findByInterestName(String interestName);
+
+    List<InterestEntity> findByDescriptionContaining(String description);
 
 }
