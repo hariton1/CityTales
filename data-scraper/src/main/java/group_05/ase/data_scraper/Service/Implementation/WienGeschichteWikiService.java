@@ -20,6 +20,12 @@ public class WienGeschichteWikiService {
     public String seedUrl = "https://www.geschichtewiki.wien.gv.at/Kategorie:Geb%C3%A4ude";
     private List<WienGeschichteWikiObject> entries = new ArrayList<>();
 
+    private final WienGeschichteWikiPersistenceService wienGeschichteWikiPersistenceService;
+
+    public WienGeschichteWikiService(WienGeschichteWikiPersistenceService wienGeschichteWikiPersistenceService) {
+        this.wienGeschichteWikiPersistenceService = wienGeschichteWikiPersistenceService;
+    }
+
     public void search() {
         String currentUrl = seedUrl;
         int totalLinks = 0;
@@ -56,6 +62,10 @@ public class WienGeschichteWikiService {
 
                         totalLinks += pageLinkCount;
                         System.out.println("Total links found on this page: " + pageLinkCount);
+
+                        for (WienGeschichteWikiObject wgwo:entries) {
+                            wienGeschichteWikiPersistenceService.persistWienGeschichteWikiObject(wgwo);
+                        }
                     } else {
                         System.out.println("Category div not found on the current page.");
                     }
