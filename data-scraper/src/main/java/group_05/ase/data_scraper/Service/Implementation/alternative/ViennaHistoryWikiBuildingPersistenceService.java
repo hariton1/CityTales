@@ -1,4 +1,4 @@
-package group_05.ase.data_scraper.Service.Implementation;
+package group_05.ase.data_scraper.Service.Implementation.alternative;
 
 import group_05.ase.data_scraper.Entity.ManualScraping.ViennaHistoryWikiBuildingObject;
 import org.neo4j.driver.*;
@@ -77,50 +77,7 @@ public class ViennaHistoryWikiBuildingPersistenceService {
                 );
                 return result.single().get(0).asString();
             });
-            System.out.println("Created or updated Building: " + message);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void createLinkRelationships() {
-        try (Session session = driver.session()) {
-            Result result = session.run(
-                    "MATCH (b:" + buildingTableName + ") " +
-                            "RETURN b"
-            );
-
-            while (result.hasNext()) {
-                Record record = result.next();
-                Node buildingNode = record.get("b").asNode();
-                String buildingName = buildingNode.get("name").asString();
-
-
-                List<String> links = buildingNode.get("links").asList(Value::asString);
-
-                for (String link : links) {
-                    Result linkResult = session.run(
-                            "MATCH (b2:" + buildingTableName + " {url: $url}) " +
-                                    "RETURN b2",
-                            parameters("url", link)
-                    );
-
-                    if (linkResult.hasNext()) {
-                        // Create the relationship if the building node with the matching URL exists
-                        session.writeTransaction(tx -> {
-                            tx.run(
-                                    "MATCH (b1:" + buildingTableName + " {name: $buildingName1}), " +
-                                            "(b2:" + buildingTableName + " {url: $url}) " +
-                                            "MERGE (b1)-[:HAS_LINK_TO]->(b2)",
-                                    parameters("buildingName1", buildingName, "url", link)
-                            );
-                            return null;
-                        });
-                    }
-                }
-            }
-
-            System.out.println("Relationships between buildings and their linked buildings created successfully!");
+            // System.out.println("Created or updated Building: " + message);
         } catch (Exception e) {
             e.printStackTrace();
         }

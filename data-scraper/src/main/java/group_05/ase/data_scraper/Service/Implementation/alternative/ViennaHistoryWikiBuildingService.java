@@ -1,4 +1,4 @@
-package group_05.ase.data_scraper.Service.Implementation;
+package group_05.ase.data_scraper.Service.Implementation.alternative;
 
 import group_05.ase.data_scraper.Entity.ManualScraping.ViennaHistoryWikiBuildingObject;
 import org.json.JSONArray;
@@ -18,7 +18,6 @@ import java.util.Optional;
 public class ViennaHistoryWikiBuildingService {
 
     public String buildingSeeds = "https://www.geschichtewiki.wien.gv.at/Kategorie:Geb%C3%A4ude";
-    private List<ViennaHistoryWikiBuildingObject> entries = new ArrayList<>();
     private final ViennaHistoryWikiBuildingPersistenceService wienGeschichteWikiPersistenceService;
     private final ManualExtractorService manualExtractorService;
 
@@ -33,6 +32,8 @@ public class ViennaHistoryWikiBuildingService {
         int breaker = 0;
 
         while (currentUrl != null) {
+            System.out.println("buildings: " + breaker +"/24");
+            List<ViennaHistoryWikiBuildingObject> entries = new ArrayList<>();
             try {
 
                 Document doc = Jsoup.connect(currentUrl).get();
@@ -49,9 +50,6 @@ public class ViennaHistoryWikiBuildingService {
                                 .limit(200)
                                 .parallel()
                                 .map(link -> {
-                                    System.out.println("Href: " + link.attr("abs:href"));
-                                    System.out.println("Text: " + link.text());
-                                    System.out.println("------");
                                     return extractBuildingInfos(link.attr("abs:href"), link.text());
                                 })
                                 .filter(obj -> obj != null)
@@ -62,7 +60,6 @@ public class ViennaHistoryWikiBuildingService {
 
 
                         totalLinks += pageLinkCount;
-                        System.out.println("Total links found on this page: " + pageLinkCount);
 
                         for (ViennaHistoryWikiBuildingObject wgwo:entries) {
                             wienGeschichteWikiPersistenceService.persistViennaHistoryWikiBuildingObject(wgwo);
@@ -82,7 +79,6 @@ public class ViennaHistoryWikiBuildingService {
                 } else {
                     currentUrl = nextPageUrl;
                 }
-                breaker+=1;
 
                 System.out.println("Cumulative total of links found: " + totalLinks);
 
@@ -90,6 +86,7 @@ public class ViennaHistoryWikiBuildingService {
                 e.printStackTrace();
                 break;
             }
+            breaker+=1;
         }
 
        /* for (WienGeschichteWikiObject obj:entries) {

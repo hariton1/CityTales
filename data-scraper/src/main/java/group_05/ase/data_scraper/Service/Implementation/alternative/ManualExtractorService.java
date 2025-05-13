@@ -1,4 +1,4 @@
-package group_05.ase.data_scraper.Service.Implementation;
+package group_05.ase.data_scraper.Service.Implementation.alternative;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;

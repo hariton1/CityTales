@@ -1,7 +1,8 @@
 package group_05.ase.data_scraper;
 
-import group_05.ase.data_scraper.Service.Implementation.ViennaHistoryWikiPersonService;
-import group_05.ase.data_scraper.Service.Implementation.ViennaHistoryWikiBuildingService;
+import group_05.ase.data_scraper.Service.Implementation.alternative.ViennaHistoryWikiLinkService;
+import group_05.ase.data_scraper.Service.Implementation.alternative.ViennaHistoryWikiPersonService;
+import group_05.ase.data_scraper.Service.Implementation.alternative.ViennaHistoryWikiBuildingService;
 import group_05.ase.data_scraper.Service.Implementation.WikiDataScraperService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -13,13 +14,18 @@ public class DataScraperApplication {
 	public static void main(String[] args) {
 		ApplicationContext applicationContext = SpringApplication.run(DataScraperApplication.class, args);
 		WikiDataScraperService service = applicationContext.getBean(WikiDataScraperService.class);
-		ViennaHistoryWikiBuildingService service1 = applicationContext.getBean(ViennaHistoryWikiBuildingService.class);
-		ViennaHistoryWikiPersonService service2 = applicationContext.getBean(ViennaHistoryWikiPersonService.class);
+		ViennaHistoryWikiBuildingService buildingService = applicationContext.getBean(ViennaHistoryWikiBuildingService.class);
+		ViennaHistoryWikiPersonService personService = applicationContext.getBean(ViennaHistoryWikiPersonService.class);
+		ViennaHistoryWikiLinkService linkService = applicationContext.getBean(ViennaHistoryWikiLinkService.class);
 
-		/*String personsSeeds = "https://www.geschichtewiki.wien.gv.at/Kategorie:Personen";
-		service1.search(personsSeeds);*/
+		// Whole thing takes like ~30min
+		// init nodes
+		buildingService.search();
+		personService.search();
 
-		service2.search();
+		// init links
+		linkService.createLinkRelationshipsFromBuildings();
+		linkService.createLinkRelationshipsFromPersons();
 
 		/*// String continueToken = "0|387470"; //Karlskirche
 		String continueToken = "0|697568"; // Arsenal
