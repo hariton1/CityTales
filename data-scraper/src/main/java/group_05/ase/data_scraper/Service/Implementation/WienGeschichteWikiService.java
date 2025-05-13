@@ -37,21 +37,22 @@ public class WienGeschichteWikiService {
                     if (categoryDiv != null) {
                         Elements links = categoryDiv.select("a");
                         int pageLinkCount = 0;
-                        int internalbreaker = 0;
 
-                        for (Element link : links) {
-                            if (internalbreaker >= 10) {
-                                break;
-                            }
-                            System.out.println("Href: " + link.attr("abs:href"));
-                            System.out.println("Text: " + link.text());
-                            System.out.println("------");
-                            pageLinkCount++;
+                        List<WienGeschichteWikiObject> pageEntries = links.stream()
+                                .limit(200)
+                                .parallel()
+                                .map(link -> {
+                                    System.out.println("Href: " + link.attr("abs:href"));
+                                    System.out.println("Text: " + link.text());
+                                    System.out.println("------");
+                                    return extractInfos(link.attr("abs:href"), link.text());
+                                })
+                                .filter(obj -> obj != null)
+                                .toList();
 
-                            WienGeschichteWikiObject obj = extractInfos(link.attr("abs:href"),link.text());
-                            entries.add(obj);
-                            internalbreaker++;
-                        }
+                        entries.addAll(pageEntries);
+                        totalLinks += pageEntries.size();
+
 
                         totalLinks += pageLinkCount;
                         System.out.println("Total links found on this page: " + pageLinkCount);
