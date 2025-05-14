@@ -1,6 +1,7 @@
-package group_05.ase.data_scraper.Service.Implementation.alternative;
+package group_05.ase.data_scraper.Service.Implementation.alternative.buildings;
 
 import group_05.ase.data_scraper.Entity.ManualScraping.ViennaHistoryWikiBuildingObject;
+import group_05.ase.data_scraper.Service.Implementation.alternative.general.ManualExtractorService;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

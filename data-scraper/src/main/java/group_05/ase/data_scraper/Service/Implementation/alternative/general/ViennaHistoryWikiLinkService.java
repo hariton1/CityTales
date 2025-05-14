@@ -1,4 +1,4 @@
-package group_05.ase.data_scraper.Service.Implementation.alternative;
+package group_05.ase.data_scraper.Service.Implementation.alternative.general;
 
 import org.neo4j.driver.*;
 import org.neo4j.driver.Record;
@@ -16,6 +16,8 @@ public class ViennaHistoryWikiLinkService {
     private final String NEO4JPW = "neo4jwhatevs";
     private final String buildingTableName = "WienGeschichteWikiBuildings";
     private final String personsTableName = "WienGeschichteWikiPersons";
+    private final String eventTableName = "WienGeschichteWikiEvents";
+
 
     private Driver driver;
 
@@ -146,6 +148,85 @@ public class ViennaHistoryWikiLinkService {
             }
 
             System.out.println("Relationships for Persons between persons and their linked nodes (buildings or other persons) created successfully!");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void createLinkRelationshipsFromEvents() {
+        try (Session session = driver.session()) {
+            Result result = session.run(
+                    "MATCH (e:" + eventTableName + ") " +
+                            "RETURN e"
+            );
+
+            while (result.hasNext()) {
+                Record record = result.next();
+                Node eventNode = record.get("e").asNode();
+                String eventName = eventNode.get("name").asString();
+
+                List<String> links = eventNode.get("links").asList(Value::asString);
+
+                for (String link : links) {
+                    // Try linking to building
+                    Result buildingResult = session.run(
+                            "MATCH (b:" + buildingTableName + " {url: $url}) RETURN b",
+                            parameters("url", link)
+                    );
+
+                    if (buildingResult.hasNext()) {
+                        session.writeTransaction(tx -> {
+                            tx.run(
+                                    "MATCH (e1:" + eventTableName + " {name: $eventName}), " +
+                                            "(b:" + buildingTableName + " {url: $url}) " +
+                                            "MERGE (e1)-[:HAS_LINK_TO]->(b)",
+                                    parameters("eventName", eventName, "url", link)
+                            );
+                            return null;
+                        });
+                        continue;
+                    }
+
+                    // Try linking to person
+                    Result personResult = session.run(
+                            "MATCH (p:" + personsTableName + " {url: $url}) RETURN p",
+                            parameters("url", link)
+                    );
+
+                    if (personResult.hasNext()) {
+                        session.writeTransaction(tx -> {
+                            tx.run(
+                                    "MATCH (e1:" + eventTableName + " {name: $eventName}), " +
+                                            "(p:" + personsTableName + " {url: $url}) " +
+                                            "MERGE (e1)-[:HAS_LINK_TO]->(p)",
+                                    parameters("eventName", eventName, "url", link)
+                            );
+                            return null;
+                        });
+                        continue;
+                    }
+
+                    // Try linking to another event
+                    Result eventResult = session.run(
+                            "MATCH (e2:" + eventTableName + " {url: $url}) RETURN e2",
+                            parameters("url", link)
+                    );
+
+                    if (eventResult.hasNext()) {
+                        session.writeTransaction(tx -> {
+                            tx.run(
+                                    "MATCH (e1:" + eventTableName + " {name: $eventName}), " +
+                                            "(e2:" + eventTableName + " {url: $url}) " +
+                                            "MERGE (e1)-[:HAS_LINK_TO]->(e2)",
+                                    parameters("eventName", eventName, "url", link)
+                            );
+                            return null;
+                        });
+                    }
+                }
+            }
+
+            System.out.println("Relationships for Events (to buildings, persons, or other events) created successfully!");
         } catch (Exception e) {
             e.printStackTrace();
         }
