@@ -1,0 +1,27 @@
+@media (max-width: 768px) {
+  .centered-wrapper {
+    justify-content: center;
+    padding: 0 !important;
+  }
+
+  .centered-wrapper form {
+    width: 90%;
+  }
+}
+
+/* desktop: >768px show only .desktop */
+@media (min-width: 769px) {
+  .centered-wrapper form {
+    width: 20%;
+  }
+}
+
+form footer {
+  justify-content: flex-end;
+}
+
+.stack {
+  display: flex;
+  gap: inherit;
+  flex-direction: column;
+}
