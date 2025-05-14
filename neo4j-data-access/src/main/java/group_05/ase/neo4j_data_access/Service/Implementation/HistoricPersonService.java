@@ -129,6 +129,7 @@ public class HistoricPersonService implements IHistoricPersonService {
         personEntity.setImageUrl(node.get("imageUrl").asString());
         personEntity.setYearOfBirth(0); // for now
         personEntity.setYearOfDeath(0); // for now
+        personEntity.setImageUrl(node.get("imageUrl").asString());
         return personEntity;
     }
 }
