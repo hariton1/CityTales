@@ -1,13 +1,10 @@
-package group_05.ase.data_scraper.Service.Implementation.alternative;
+package group_05.ase.data_scraper.Service.Implementation.alternative.buildings;
 
 import group_05.ase.data_scraper.Entity.ManualScraping.ViennaHistoryWikiBuildingObject;
 import org.neo4j.driver.*;
-import org.neo4j.driver.Record;
-import org.neo4j.driver.types.Node;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import static org.neo4j.driver.Values.parameters;
 

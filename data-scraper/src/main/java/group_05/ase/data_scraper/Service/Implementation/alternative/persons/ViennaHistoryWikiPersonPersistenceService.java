@@ -1,4 +1,4 @@
-package group_05.ase.data_scraper.Service.Implementation.alternative;
+package group_05.ase.data_scraper.Service.Implementation.alternative.persons;
 
 import group_05.ase.data_scraper.Entity.ManualScraping.ViennaHistoryWikiPersonObject;
 import org.neo4j.driver.*;

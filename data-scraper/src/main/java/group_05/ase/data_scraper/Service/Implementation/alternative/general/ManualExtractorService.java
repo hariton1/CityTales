@@ -1,4 +1,4 @@
-package group_05.ase.data_scraper.Service.Implementation.alternative;
+package group_05.ase.data_scraper.Service.Implementation.alternative.general;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -30,5 +30,4 @@ public class ManualExtractorService {
 
         return validLinks;
     }
-
 }

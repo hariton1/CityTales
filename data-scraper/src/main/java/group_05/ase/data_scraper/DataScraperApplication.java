@@ -1,12 +1,15 @@
 package group_05.ase.data_scraper;
 
-import group_05.ase.data_scraper.Service.Implementation.alternative.ViennaHistoryWikiLinkService;
-import group_05.ase.data_scraper.Service.Implementation.alternative.ViennaHistoryWikiPersonService;
-import group_05.ase.data_scraper.Service.Implementation.alternative.ViennaHistoryWikiBuildingService;
+import group_05.ase.data_scraper.Service.Implementation.alternative.events.ViennaHistoryWikiEventService;
+import group_05.ase.data_scraper.Service.Implementation.alternative.general.ViennaHistoryWikiLinkService;
+import group_05.ase.data_scraper.Service.Implementation.alternative.persons.ViennaHistoryWikiPersonService;
+import group_05.ase.data_scraper.Service.Implementation.alternative.buildings.ViennaHistoryWikiBuildingService;
 import group_05.ase.data_scraper.Service.Implementation.WikiDataScraperService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
+
+import java.io.IOException;
 
 @SpringBootApplication
 public class DataScraperApplication {
@@ -18,14 +21,25 @@ public class DataScraperApplication {
 		ViennaHistoryWikiPersonService personService = applicationContext.getBean(ViennaHistoryWikiPersonService.class);
 		ViennaHistoryWikiLinkService linkService = applicationContext.getBean(ViennaHistoryWikiLinkService.class);
 
+		ViennaHistoryWikiEventService eventService = applicationContext.getBean(ViennaHistoryWikiEventService.class);
+		String eventSeed = "https://www.geschichtewiki.wien.gv.at/Kategorie:Ereignisse";
+
+		/*try {
+			eventService.scrapeCategory(eventSeed);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		eventService.getAllEvents();*/
+		linkService.createLinkRelationshipsFromEvents();
+
 		// Whole thing takes like ~30min
 		// init nodes
-		buildingService.search();
-		personService.search();
+		//buildingService.search();
+		//personService.search();
 
 		// init links
-		linkService.createLinkRelationshipsFromBuildings();
-		linkService.createLinkRelationshipsFromPersons();
+		//linkService.createLinkRelationshipsFromBuildings();
+		//linkService.createLinkRelationshipsFromPersons();
 
 		/*// String continueToken = "0|387470"; //Karlskirche
 		String continueToken = "0|697568"; // Arsenal
