@@ -14,6 +14,7 @@ import java.util.Map;
 public class AuthController {
 
     private final AuthService authService;
+    private final RefreshTokenService refreshTokenService;
 
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody RegisterRequest request) {
@@ -25,6 +26,19 @@ public class AuthController {
     public ResponseEntity<String> login(@RequestBody LoginRequest request) {
         String jwt = authService.login(request);
         return ResponseEntity.ok(jwt);
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refreshToken(@RequestBody RefreshTokenRequest request) {
+        // request.getRefreshToken()
+        String newAccessToken = authService.refreshAccessToken(request.getRefreshToken());
+        return ResponseEntity.ok(new JwtResponse(newAccessToken));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestBody RefreshTokenRequest request) {
+        refreshTokenService.revokeToken(request.getRefreshToken());
+        return ResponseEntity.ok().build();
     }
 
 //    @DeleteMapping("/delete/{email}")

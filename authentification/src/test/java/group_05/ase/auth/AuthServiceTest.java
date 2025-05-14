@@ -13,13 +13,16 @@ import static org.mockito.Mockito.*;
 class AuthServiceTest {
 
     @Mock
-    AppUserRepository userRepository;
+    private AppUserRepository userRepository;
 
     @Mock
-    JwtService jwtService;
+    private JwtService jwtService;
 
     @Mock
-    SupabaseService supabaseService;
+    private SupabaseService supabaseService;
+
+    @Mock
+    private RefreshTokenService refreshTokenService;
 
     @InjectMocks
     AuthService authService;
@@ -27,7 +30,6 @@ class AuthServiceTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        authService = new AuthService(userRepository, supabaseService, jwtService);
     }
 
     @Test

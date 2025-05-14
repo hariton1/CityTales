@@ -6,6 +6,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.UUID;
 
 @Service
@@ -15,6 +16,7 @@ public class AuthService {
     private final AppUserRepository userRepository;
     private final SupabaseService supabaseService;
     private final JwtService jwtService;
+    private final RefreshTokenService refreshTokenService;
 
     public String register(RegisterRequest request) {
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
@@ -39,5 +41,20 @@ public class AuthService {
                 .orElseThrow(() -> new RuntimeException("User nicht in App DB gefunden"));
 
         return jwtService.generateToken(user);
+    }
+
+    public String refreshAccessToken(String refreshTokenString) {
+        RefreshToken token = refreshTokenService.findByToken(refreshTokenString)
+                .orElseThrow(() -> new RuntimeException("Refresh Token not found"));
+        if (token.isRevoked() || token.getExpiresAt().isBefore(Instant.now())) {
+            throw new RuntimeException("Refresh Token invalid");
+        }
+
+        // Find user (hier Beispiel via userId)
+        AppUser user = userRepository.findById(token.getUserId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Erstelle neues Access Token (und ggf. neues Refresh Token)
+        return jwtService.generateToken(user); // Passe an deine JWT-Service Methode an
     }
 }
