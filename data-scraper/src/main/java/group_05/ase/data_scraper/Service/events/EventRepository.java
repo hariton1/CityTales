@@ -75,7 +75,7 @@ public class EventRepository {
                                 "organizer", obj.getOrganizer().orElse(null),
                                 "participantCount", obj.getParticipantCount().orElse(null),
                                 "violence", obj.getViolence().orElse(null),
-                                "viennaHistoryWikiId", obj.getViennaHistoryWikiId().orElse(null),
+                                "viennaHistoryWikiId", obj.getViennaHistoryWikiId(),
                                 "gnd", obj.getGnd().orElse(null),
                                 "wikidataId", obj.getWikidataId().orElse(null),
                                 "seeAlso", obj.getSeeAlso().orElse(null),
