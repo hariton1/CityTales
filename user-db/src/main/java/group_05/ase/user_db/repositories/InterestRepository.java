@@ -11,8 +11,6 @@ public interface InterestRepository extends JpaRepository<InterestEntity, Intege
 
     InterestEntity findByInterestId(int interestId);
 
-    InterestEntity findByInterestTypeId(int interestTypeId);
-
     InterestEntity findByInterestName(String interestName);
 
     List<InterestEntity> findByDescriptionContaining(String description);
