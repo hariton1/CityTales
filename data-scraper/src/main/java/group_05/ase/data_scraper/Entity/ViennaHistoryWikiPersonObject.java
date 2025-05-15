@@ -8,11 +8,11 @@ public class ViennaHistoryWikiPersonObject {
 
     private String url;
     private String name;
+    private int viennaHistoryWikiId;
     private Optional<String> personName = Optional.empty();
     private Optional<String> alternativeName = Optional.empty();
     private Optional<String> titles = Optional.empty();
     private Optional<String> sex = Optional.empty();
-    private Optional<String> viennaHistoryWikiId = Optional.empty();
     private Optional<String> gnd = Optional.empty();
     private Optional<String> wikidataId = Optional.empty();
     private Optional<String> birthDate = Optional.empty();
@@ -46,8 +46,8 @@ public class ViennaHistoryWikiPersonObject {
     public Optional<String> getSex() { return sex; }
     public void setSex(Optional<String> sex) { this.sex = sex; }
 
-    public Optional<String> getViennaHistoryWikiId() { return viennaHistoryWikiId; }
-    public void setViennaHistoryWikiId(Optional<String> viennaHistoryWikiId) { this.viennaHistoryWikiId = viennaHistoryWikiId; }
+    public int getViennaHistoryWikiId() { return viennaHistoryWikiId; }
+    public void setViennaHistoryWikiId(int viennaHistoryWikiId) { this.viennaHistoryWikiId = viennaHistoryWikiId; }
 
     public Optional<String> getGnd() { return gnd; }
     public void setGnd(Optional<String> gnd) { this.gnd = gnd; }

@@ -131,7 +131,7 @@ public class EventService {
                                 wikiObject.setViolence(Optional.empty());
                             }
                         } else if(key.equals("Wien Geschichte WikiIdentifier/Persistenter URL zur Seite ᵖ")) {
-                            wikiObject.setViennaHistoryWikiId(Optional.of(value));
+                            wikiObject.setViennaHistoryWikiId(Integer.parseInt(value));
                         } else if(key.equals("GNDGemeindsame Normdatei")) {
                             wikiObject.setGnd(Optional.of(value));
                         } else if(key.equals("WikidataIDID von Wikidata")) {

@@ -7,6 +7,7 @@ import java.util.Optional;
 public class ViennaHistoryWikiEventObject {
     private String url;
     private String name;
+    private int viennaHistoryWikiId;
     private Optional<String> typeOfEvent = Optional.empty();
     private Optional<String> dateFrom = Optional.empty();
     private Optional<String> dateTo = Optional.empty();
@@ -14,7 +15,6 @@ public class ViennaHistoryWikiEventObject {
     private Optional<String> organizer = Optional.empty();
     private Optional<String> participantCount = Optional.empty();
     private Optional<Boolean> violence = Optional.empty();
-    private Optional<String> viennaHistoryWikiId = Optional.empty();
     private Optional<String> gnd = Optional.empty();
     private Optional<String> wikidataId = Optional.empty();
     private Optional<String> seeAlso = Optional.empty();
@@ -49,8 +49,8 @@ public class ViennaHistoryWikiEventObject {
     public Optional<Boolean> getViolence() { return violence; }
     public void setViolence(Optional<Boolean> violence) { this.violence = violence; }
 
-    public Optional<String> getViennaHistoryWikiId() { return viennaHistoryWikiId; }
-    public void setViennaHistoryWikiId(Optional<String> viennaHistoryWikiId) { this.viennaHistoryWikiId = viennaHistoryWikiId; }
+    public int getViennaHistoryWikiId() { return viennaHistoryWikiId; }
+    public void setViennaHistoryWikiId(int viennaHistoryWikiId) { this.viennaHistoryWikiId = viennaHistoryWikiId; }
 
     public Optional<String> getGnd() { return gnd; }
     public void setGnd(Optional<String> gnd) { this.gnd = gnd; }

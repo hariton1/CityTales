@@ -77,7 +77,7 @@ public class PersonRepository {
                                 "alternativeName", obj.getAlternativeName().orElse(null),
                                 "titles", obj.getTitles().orElse(null),
                                 "sex", obj.getSex().orElse(null),
-                                "viennaHistoryWikiId", obj.getViennaHistoryWikiId().orElse(null),
+                                "viennaHistoryWikiId", obj.getViennaHistoryWikiId(),
                                 "gnd", obj.getGnd().orElse(null),
                                 "wikidataId", obj.getWikidataId().orElse(null),
                                 "birthDate", obj.getBirthDate().orElse(null),

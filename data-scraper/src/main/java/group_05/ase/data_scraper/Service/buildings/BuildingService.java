@@ -135,7 +135,7 @@ public class BuildingService {
                         } else if (key.equals("Prominente BewohnerWichtige Personen mit Bezug zum Objekt oder Bauwerk")) {
                             wikiObject.setFamousResidents(Optional.of(value));
                         } else if (key.equals("Wien Geschichte WikiIdentifier/Persistenter URL zur Seite ᵖ")) {
-                            wikiObject.setWienGeschichteWikiId(Optional.of(value));
+                            wikiObject.setViennaHistoryWikiId(Integer.parseInt(value));
                         } else if (key.equals("GNDGemeindsame Normdatei")) {
                             wikiObject.setGnd(Optional.of(value));
                         } else if (key.equals("WikidataIDID von Wikidata")) {

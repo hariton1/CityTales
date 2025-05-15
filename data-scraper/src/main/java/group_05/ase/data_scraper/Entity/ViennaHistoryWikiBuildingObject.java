@@ -8,6 +8,7 @@ public class ViennaHistoryWikiBuildingObject {
 
     private String url;
     private String name;
+    private int viennaHistoryWikiId;
     private Optional<String> buildingType = Optional.empty();
     private Optional<String> dateFrom = Optional.empty();
     private Optional<String> dateTo = Optional.empty();
@@ -17,7 +18,6 @@ public class ViennaHistoryWikiBuildingObject {
     private Optional<String> entryNumber = Optional.empty();
     private Optional<String> architect = Optional.empty();
     private Optional<String> famousResidents = Optional.empty();
-    private Optional<String> wienGeschichteWikiId = Optional.empty();
     private Optional<String> gnd = Optional.empty();
     private Optional<String> wikidataId = Optional.empty();
     private Optional<String> seeAlso = Optional.empty();
@@ -61,8 +61,8 @@ public class ViennaHistoryWikiBuildingObject {
     public Optional<String> getFamousResidents() { return famousResidents; }
     public void setFamousResidents(Optional<String> famousResidents) { this.famousResidents = famousResidents; }
 
-    public Optional<String> getWienGeschichteWikiId() { return wienGeschichteWikiId; }
-    public void setWienGeschichteWikiId(Optional<String> wienGeschichteWikiId) { this.wienGeschichteWikiId = wienGeschichteWikiId; }
+    public int getViennaHistoryWikiId() { return viennaHistoryWikiId; }
+    public void setViennaHistoryWikiId(int viennaHistoryWikiId) { this.viennaHistoryWikiId = viennaHistoryWikiId; }
 
     public Optional<String> getGnd() { return gnd; }
     public void setGnd(Optional<String> gnd) { this.gnd = gnd; }
@@ -104,7 +104,7 @@ public class ViennaHistoryWikiBuildingObject {
                 "  entryNumber=" + entryNumber + ",\n" +
                 "  architect=" + architect + ",\n" +
                 "  famousResidents=" + famousResidents + ",\n" +
-                "  wienGeschichteWikiId=" + wienGeschichteWikiId + ",\n" +
+                "  viennaHistoryWikiId=" + viennaHistoryWikiId + ",\n" +
                 "  gnd=" + gnd + ",\n" +
                 "  wikidataId=" + wikidataId + ",\n" +
                 "  seeAlso=" + seeAlso + ",\n" +

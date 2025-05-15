@@ -58,7 +58,7 @@ public class BuildingRepository {
                                 "    b.entryNumber = coalesce($entryNumber, 'N/A'), " +
                                 "    b.architect = coalesce($architect, 'N/A'), " +
                                 "    b.famousResidents = coalesce($famousResidents, 'N/A'), " +
-                                "    b.wienGeschichteWikiId = coalesce($wienGeschichteWikiId, 'N/A'), " +
+                                "    b.viennaHistoryWikiId = coalesce($viennaHistoryWikiId, 'N/A'), " +
                                 "    b.gnd = coalesce($gnd, 'N/A'), " +
                                 "    b.wikidataId = coalesce($wikidataId, 'N/A'), " +
                                 "    b.seeAlso = coalesce($seeAlso, 'N/A'), " +
@@ -80,7 +80,7 @@ public class BuildingRepository {
                                 "entryNumber", obj.getEntryNumber().orElse(null),
                                 "architect", obj.getArchitect().orElse(null),
                                 "famousResidents", obj.getFamousResidents().orElse(null),
-                                "wienGeschichteWikiId", obj.getWienGeschichteWikiId().orElse(null),
+                                "viennaHistoryWikiId", obj.getViennaHistoryWikiId(),
                                 "gnd", obj.getGnd().orElse(null),
                                 "wikidataId", obj.getWikidataId().orElse(null),
                                 "seeAlso", obj.getSeeAlso().orElse(null),
