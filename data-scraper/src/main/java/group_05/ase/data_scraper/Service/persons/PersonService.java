@@ -13,14 +13,14 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class ViennaHistoryWikiPersonService {
+public class PersonService {
 
     public String personsSeeds = "https://www.geschichtewiki.wien.gv.at/Kategorie:Personen";
-    private final ViennaHistoryWikiPersonPersistenceService wikiPersonPersistenceService;
+    private final PersonRepository personRepository;
     private final ManualExtractorService manualExtractorService;
 
-    public ViennaHistoryWikiPersonService(ViennaHistoryWikiPersonPersistenceService wikiPersonPersistenceService, ManualExtractorService manualExtractorService) {
-        this.wikiPersonPersistenceService = wikiPersonPersistenceService;
+    public PersonService(PersonRepository wikiPersonPersistenceService, ManualExtractorService manualExtractorService) {
+        this.personRepository = wikiPersonPersistenceService;
         this.manualExtractorService = manualExtractorService;
     }
 
@@ -61,7 +61,7 @@ public class ViennaHistoryWikiPersonService {
                         System.out.println("Total links found on this page: " + pageLinkCount);
 
                         for (ViennaHistoryWikiPersonObject wgwo:entries) {
-                            wikiPersonPersistenceService.persistViennaHistoryWikiPersonObject(wgwo);
+                            personRepository.persistViennaHistoryWikiPersonObject(wgwo);
                         }
                     } else {
                         System.out.println("Category div not found on the current page.");
