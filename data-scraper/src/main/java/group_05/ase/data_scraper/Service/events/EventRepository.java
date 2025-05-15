@@ -1,6 +1,9 @@
 package group_05.ase.data_scraper.Service.events;
 
+import group_05.ase.data_scraper.Config.Neo4jProperties;
 import group_05.ase.data_scraper.Entity.ViennaHistoryWikiEventObject;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import org.neo4j.driver.*;
 import org.springframework.stereotype.Service;
 
@@ -10,20 +13,34 @@ import static org.neo4j.driver.Values.parameters;
 
 
 @Service
-public class ViennaHistoryWikiEventPersistenceService {
+public class EventRepository {
 
-    private final String NEO4JURL = "bolt://localhost:7687";
-    private final String NEO4JUSER = "neo4j";
-    private final String NEO4JPW = "neo4jwhatevs";
+    private final String NEO4J_URL;
+    private final String NEO4J_USER;
+    private final String NEO4J_PASSWORD;
     private final String eventTableName = "WienGeschichteWikiEvents";
     private Driver driver;
 
-    public ViennaHistoryWikiEventPersistenceService() {
-        AuthToken authToken = AuthTokens.basic(NEO4JUSER, NEO4JPW);
-        try {
-            driver = GraphDatabase.driver(NEO4JURL, authToken);
-        } catch (Exception e) {
-            System.out.println("Could not initialize db driver");
+    public EventRepository(Neo4jProperties properties) {
+        this.NEO4J_URL = properties.getUrl();
+        this.NEO4J_USER = properties.getUser();
+        this.NEO4J_PASSWORD = properties.getPassword();
+    }
+
+    @PostConstruct
+    public void init() {
+        driver = GraphDatabase.driver(
+                NEO4J_URL,
+                AuthTokens.basic(NEO4J_USER, NEO4J_PASSWORD)
+        );
+        System.out.println("Neo4j driver initialized.");
+    }
+
+    @PreDestroy
+    public void close() {
+        if (driver != null) {
+            driver.close();
+            System.out.println("Neo4j driver closed.");
         }
     }
 

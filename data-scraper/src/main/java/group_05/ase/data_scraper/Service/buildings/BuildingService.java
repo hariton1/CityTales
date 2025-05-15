@@ -16,15 +16,14 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class ViennaHistoryWikiBuildingService {
+public class BuildingService {
 
     public String buildingSeeds = "https://www.geschichtewiki.wien.gv.at/Kategorie:Geb%C3%A4ude";
-    private final ViennaHistoryWikiBuildingPersistenceService wienGeschichteWikiPersistenceService;
+    private final BuildingRepository buildingRepository;
     private final ManualExtractorService manualExtractorService;
 
-
-    public ViennaHistoryWikiBuildingService(ViennaHistoryWikiBuildingPersistenceService wienGeschichteWikiPersistenceService, ManualExtractorService manualExtractorService) {
-        this.wienGeschichteWikiPersistenceService = wienGeschichteWikiPersistenceService;
+    public BuildingService(BuildingRepository wienGeschichteWikiPersistenceService, ManualExtractorService manualExtractorService) {
+        this.buildingRepository = wienGeschichteWikiPersistenceService;
         this.manualExtractorService = manualExtractorService;
     }
     public void search() {
@@ -63,7 +62,7 @@ public class ViennaHistoryWikiBuildingService {
                         totalLinks += pageLinkCount;
 
                         for (ViennaHistoryWikiBuildingObject wgwo:entries) {
-                            wienGeschichteWikiPersistenceService.persistViennaHistoryWikiBuildingObject(wgwo);
+                            buildingRepository.persistViennaHistoryWikiBuildingObject(wgwo);
                         }
                     } else {
                         System.out.println("Category div not found on the current page.");
@@ -89,10 +88,6 @@ public class ViennaHistoryWikiBuildingService {
             }
             breaker+=1;
         }
-
-       /* for (WienGeschichteWikiObject obj:entries) {
-            System.out.println(obj.toString());
-        }*/
     }
 
     private ViennaHistoryWikiBuildingObject extractBuildingInfos(String url, String text) {

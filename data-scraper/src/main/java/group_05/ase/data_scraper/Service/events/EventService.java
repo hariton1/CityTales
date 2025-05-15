@@ -15,22 +15,26 @@ import java.util.Optional;
 import java.util.Set;
 
 @Service
-public class ViennaHistoryWikiEventService {
+public class EventService {
 
 
     public String eventSeed = "https://www.geschichtewiki.wien.gv.at/Kategorie:Ereignisse";
     private final ManualExtractorService manualExtractorService;
-    private final ViennaHistoryWikiEventPersistenceService wikiEventPersistenceService;
+    private final EventRepository eventRepository;
     private final Set<String> allEvents = new HashSet<>();
 
-    public ViennaHistoryWikiEventService( ManualExtractorService manualExtractorService, ViennaHistoryWikiEventPersistenceService wikiEventPersistenceService) {
+    public EventService(ManualExtractorService manualExtractorService, EventRepository wikiEventPersistenceService) {
         this.manualExtractorService = manualExtractorService;
-        this.wikiEventPersistenceService = wikiEventPersistenceService;
+        this.eventRepository = wikiEventPersistenceService;
     }
 
-    public void getAllEvents() {
-        allEvents.forEach(System.out::println);
-        System.out.println("Total Events retrieved: " + allEvents.size());
+    public void search() {
+        try {
+            this.scrapeCategory(eventSeed);
+            System.out.println("#Total events: " + allEvents.size());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void scrapeCategory(String url) throws IOException {
@@ -44,7 +48,6 @@ public class ViennaHistoryWikiEventService {
 
             for (Element link : categoryLinks) {
                 String fullUrl = "https://www.geschichtewiki.wien.gv.at" + link.attr("href");
-                //System.out.println("Sub-category: " + fullUrl);
                 scrapeCategory(fullUrl);
             }
         }
@@ -71,8 +74,9 @@ public class ViennaHistoryWikiEventService {
                     .toList();
 
             for (ViennaHistoryWikiEventObject obj:pageEntries) {
-                wikiEventPersistenceService.persistViennaHistoryWikiEventObject(obj);
+                eventRepository.persistViennaHistoryWikiEventObject(obj);
             }
+
             // pagination
             Elements nextPageLinks = mwPagesDiv.select("a:contains(nächste Seite)");
             if (!nextPageLinks.isEmpty()) {
@@ -80,14 +84,6 @@ public class ViennaHistoryWikiEventService {
                 String nextPageUrl = "https://www.geschichtewiki.wien.gv.at" + nextPageHref;
                 scrapeCategory(nextPageUrl);
             }
-        }
-    }
-
-    public void search() {
-        try {
-            this.scrapeCategory(eventSeed);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 

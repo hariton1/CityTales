@@ -1,9 +1,9 @@
 package group_05.ase.data_scraper;
 
-import group_05.ase.data_scraper.Service.events.ViennaHistoryWikiEventService;
+import group_05.ase.data_scraper.Service.events.EventService;
 import group_05.ase.data_scraper.Service.general.ViennaHistoryWikiLinkService;
-import group_05.ase.data_scraper.Service.persons.ViennaHistoryWikiPersonService;
-import group_05.ase.data_scraper.Service.buildings.ViennaHistoryWikiBuildingService;
+import group_05.ase.data_scraper.Service.persons.PersonService;
+import group_05.ase.data_scraper.Service.buildings.BuildingService;
 import group_05.ase.data_scraper.Old_Scraper.Service.Implementation.WikiDataScraperService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -15,11 +15,11 @@ public class DataScraperApplication {
 	public static void main(String[] args) {
 		ApplicationContext applicationContext = SpringApplication.run(DataScraperApplication.class, args);
 		WikiDataScraperService service = applicationContext.getBean(WikiDataScraperService.class);
-		ViennaHistoryWikiBuildingService buildingService = applicationContext.getBean(ViennaHistoryWikiBuildingService.class);
-		ViennaHistoryWikiPersonService personService = applicationContext.getBean(ViennaHistoryWikiPersonService.class);
+		BuildingService buildingService = applicationContext.getBean(BuildingService.class);
+		PersonService personService = applicationContext.getBean(PersonService.class);
 		ViennaHistoryWikiLinkService linkService = applicationContext.getBean(ViennaHistoryWikiLinkService.class);
 
-		ViennaHistoryWikiEventService eventService = applicationContext.getBean(ViennaHistoryWikiEventService.class);
+		EventService eventService = applicationContext.getBean(EventService.class);
 		String eventSeed = "https://www.geschichtewiki.wien.gv.at/Kategorie:Ereignisse";
 
 		/*try {
