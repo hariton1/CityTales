@@ -4,10 +4,10 @@ import group_05.ase.neo4j_data_access.DTO.HistoricPersonDTO;
 import java.util.List;
 
 public interface IHistoricPersonService {
-    HistoricPersonDTO getPersonById(String wikiDataId);
+    HistoricPersonDTO getPersonById(int viennaHistoryWikiId);
 
     List<HistoricPersonDTO> getPersonsByPartialName(String partialName);
 
-    List<HistoricPersonDTO> getAllLinkedHistoricPersonsById(String wikiDataId);
+    List<HistoricPersonDTO> getAllLinkedHistoricPersonsById(int viennaHistoryWikiId);
 
 }
