@@ -29,7 +29,7 @@ public class FeedbackServiceTest {
     private final FeedbackEntity feedbackEntity = new FeedbackEntity (
             1,
             UUID.fromString("f5599c8c-166b-495c-accc-65addfaa572b"),
-            UUID.fromString("f5599c8c-166b-495c-accc-65addfaa572a"),
+            1,
             100.0,
             "Completely correct",
             null
@@ -87,7 +87,7 @@ public class FeedbackServiceTest {
     @Test
     public void testGetFeedbacksByArticleId() {
 
-        when(feedbackRepository.findByArticleId(any(UUID.class))).thenReturn(feedbackEntities);
+        when(feedbackRepository.findByArticleId(any(int.class))).thenReturn(feedbackEntities);
 
         ArrayList<FeedbackDTO> feedbackDTOs = new ArrayList<>(feedbackService.getFeedbacksByArticleId(feedbackEntity.getArticleId()));
 

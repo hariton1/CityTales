@@ -29,7 +29,7 @@ public class UserHistoryDTO {
     @Getter
     @Setter
     @JsonProperty(required = true, value = "article_id")
-    private UUID articleId;
+    private int articleId;
 
     @Getter
     @Setter
