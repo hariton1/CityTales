@@ -39,16 +39,6 @@ public class InterestsController {
         }
     }
 
-    @GetMapping("/type_id={interestTypeId}")
-    @ResponseStatus(HttpStatus.OK)
-    public InterestDTO getInterestByInterestTypeId(@PathVariable("interestTypeId") int interestTypeId) {
-        try {
-            return this.interestService.getInterestByInterestTypeId(interestTypeId);
-        } catch (Exception e) {
-            return new InterestDTO();//"An internal server error occurred => " + e.getMessage();
-        }
-    }
-
     @GetMapping("/name={interestName}")
     @ResponseStatus(HttpStatus.OK)
     public InterestDTO getInterestByName(@PathVariable("interestName") String interestName) {
