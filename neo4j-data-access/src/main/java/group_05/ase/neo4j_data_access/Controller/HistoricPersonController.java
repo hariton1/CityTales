@@ -20,9 +20,9 @@ public class HistoricPersonController {
         this.historicPersonService = historicPersonService;
     }
 
-    @GetMapping("/by/id/{wikiDataId}")
-    public ResponseEntity<HistoricPersonDTO> getHistoricPersonById(@PathVariable("wikiDataId") String wikiDataId) {
-        HistoricPersonDTO personDTO = historicPersonService.getPersonById(wikiDataId);
+    @GetMapping("/by/id/{viennaHistoryWikiId}")
+    public ResponseEntity<HistoricPersonDTO> getHistoricPersonById(@PathVariable int viennaHistoryWikiId) {
+        HistoricPersonDTO personDTO = historicPersonService.getPersonById(viennaHistoryWikiId);
 
         if (personDTO != null) {
             return ResponseEntity.ok(personDTO);
@@ -41,9 +41,9 @@ public class HistoricPersonController {
         return ResponseEntity.ok(people);
     }
 
-    @GetMapping("/links/by/id/{wikiDataId}")
-    public ResponseEntity<List<HistoricPersonDTO>> getLinksById(@PathVariable String wikiDataId) {
-        List<HistoricPersonDTO> people = historicPersonService.getAllLinkedHistoricPersonsById(wikiDataId);
+    @GetMapping("/links/by/id/{viennaHistoryWikiId}")
+    public ResponseEntity<List<HistoricPersonDTO>> getLinksById(@PathVariable int viennaHistoryWikiId) {
+        List<HistoricPersonDTO> people = historicPersonService.getAllLinkedHistoricPersonsById(viennaHistoryWikiId);
         if (people.isEmpty()) {
             return ResponseEntity.noContent().build();
         }

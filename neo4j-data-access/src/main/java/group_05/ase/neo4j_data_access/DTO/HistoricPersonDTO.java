@@ -1,21 +1,21 @@
 package group_05.ase.neo4j_data_access.DTO;
 
-import group_05.ase.neo4j_data_access.Entity.HistoricalPersonEntity;
+import group_05.ase.neo4j_data_access.Entity.ViennaHistoryWikiPersonObject;
 
 public class HistoricPersonDTO {
-    private HistoricalPersonEntity person;
+    private ViennaHistoryWikiPersonObject person;
     private String content;
 
-    public HistoricPersonDTO(HistoricalPersonEntity person, String content) {
+    public HistoricPersonDTO(ViennaHistoryWikiPersonObject person, String content) {
         this.person = person;
         this.content = content;
     }
 
-    public HistoricalPersonEntity getPerson() {
+    public ViennaHistoryWikiPersonObject getPerson() {
         return person;
     }
 
-    public void setPerson(HistoricalPersonEntity person) {
+    public void setPerson(ViennaHistoryWikiPersonObject person) {
         this.person = person;
     }
 
