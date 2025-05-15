@@ -1,15 +1,13 @@
 package group_05.ase.data_scraper;
 
-import group_05.ase.data_scraper.Service.Implementation.alternative.events.ViennaHistoryWikiEventService;
-import group_05.ase.data_scraper.Service.Implementation.alternative.general.ViennaHistoryWikiLinkService;
-import group_05.ase.data_scraper.Service.Implementation.alternative.persons.ViennaHistoryWikiPersonService;
-import group_05.ase.data_scraper.Service.Implementation.alternative.buildings.ViennaHistoryWikiBuildingService;
-import group_05.ase.data_scraper.Service.Implementation.WikiDataScraperService;
+import group_05.ase.data_scraper.Service.events.ViennaHistoryWikiEventService;
+import group_05.ase.data_scraper.Service.general.ViennaHistoryWikiLinkService;
+import group_05.ase.data_scraper.Service.persons.ViennaHistoryWikiPersonService;
+import group_05.ase.data_scraper.Service.buildings.ViennaHistoryWikiBuildingService;
+import group_05.ase.data_scraper.Old_Scraper.Service.Implementation.WikiDataScraperService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
-
-import java.io.IOException;
 
 @SpringBootApplication
 public class DataScraperApplication {
