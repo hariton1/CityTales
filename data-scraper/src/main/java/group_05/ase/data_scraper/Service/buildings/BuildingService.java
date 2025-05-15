@@ -26,13 +26,12 @@ public class BuildingService {
         this.buildingRepository = wienGeschichteWikiPersistenceService;
         this.manualExtractorService = manualExtractorService;
     }
-    public void search() {
+    public void search(int limit) {
         String currentUrl = buildingSeeds;
         int totalLinks = 0;
-        int breaker = 0;
+        int counter = 0;
 
         while (currentUrl != null) {
-            System.out.println("buildings: " + breaker +"/24");
             List<ViennaHistoryWikiBuildingObject> entries = new ArrayList<>();
             try {
 
@@ -62,7 +61,11 @@ public class BuildingService {
                         totalLinks += pageLinkCount;
 
                         for (ViennaHistoryWikiBuildingObject wgwo:entries) {
+                            if (counter >= limit) {
+                                return;
+                            }
                             buildingRepository.persistViennaHistoryWikiBuildingObject(wgwo);
+                            counter++;
                         }
                     } else {
                         System.out.println("Category div not found on the current page.");
@@ -86,7 +89,6 @@ public class BuildingService {
                 e.printStackTrace();
                 break;
             }
-            breaker+=1;
         }
     }
 

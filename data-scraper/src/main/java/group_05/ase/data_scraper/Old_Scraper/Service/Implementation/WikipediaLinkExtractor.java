@@ -1,6 +1,6 @@
 package group_05.ase.data_scraper.Old_Scraper.Service.Implementation;
 
-import group_05.ase.data_scraper.Service.Interface.IWikipediaLinkExtractor;
+import group_05.ase.data_scraper.Old_Scraper.Service.Interface.IWikipediaLinkExtractor;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
