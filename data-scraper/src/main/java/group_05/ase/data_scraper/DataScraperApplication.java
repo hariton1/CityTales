@@ -1,7 +1,9 @@
 package group_05.ase.data_scraper;
 
-import group_05.ase.data_scraper.Service.Implementation.WikiDataScraperService;
-import group_05.ase.data_scraper.Service.Implementation.WikipediaLinkExtractor;
+import group_05.ase.data_scraper.Service.events.EventService;
+import group_05.ase.data_scraper.Service.general.LinkService;
+import group_05.ase.data_scraper.Service.persons.PersonService;
+import group_05.ase.data_scraper.Service.buildings.BuildingService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
@@ -11,15 +13,24 @@ public class DataScraperApplication {
 
 	public static void main(String[] args) {
 		ApplicationContext applicationContext = SpringApplication.run(DataScraperApplication.class, args);
-		WikiDataScraperService service = applicationContext.getBean(WikiDataScraperService.class);
 
+		BuildingService buildingService = applicationContext.getBean(BuildingService.class);
+		PersonService personService = applicationContext.getBean(PersonService.class);
+		EventService eventService = applicationContext.getBean(EventService.class);
+		LinkService linkService = applicationContext.getBean(LinkService.class);
 
-		// String continueToken = "0|387470"; //Karlskirche
-		String continueToken = "0|697568"; // Arsenal
-		// Sample Dataset: 300 entries - max number of nodes in neo4j-ui
-		service.batchSearch(100, 1,"");
-		service.batchSearch(200, 1,continueToken);
+		// Scraper-Run: Note you can change the params and comment out sections that you already inserted
 
-		service.upsertLinkages();
+		// Initialize Nodes
+		System.out.println("events: ");
+		eventService.search();
+		System.out.println("buildings: ");
+		buildingService.search(1000);
+		System.out.println("persons: ");
+		personService.search(1000);
+
+		// Initialize Links
+		System.out.println("linking: ");
+		linkService.createLinkages();
 	}
 }
