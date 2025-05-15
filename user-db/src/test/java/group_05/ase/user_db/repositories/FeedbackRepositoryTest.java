@@ -22,7 +22,7 @@ public class FeedbackRepositoryTest {
     private final FeedbackEntity feedbackEntity = new FeedbackEntity(
             1,
             UUID.fromString("f5599c8c-166b-495c-accc-65addfaa572b"),
-            UUID.fromString("f5599c8c-166b-495c-accc-65addfaa572a"),
+            1,
             100.0,
             "Completely correct",
             null
@@ -63,7 +63,7 @@ public class FeedbackRepositoryTest {
     @Test
     public void testFindByArticleId() {
 
-        ArrayList<FeedbackEntity> tmp = new ArrayList<>(feedbackRepository.findByArticleId(UUID.fromString("f5599c8c-166b-495c-accc-65addfaa572a")));
+        ArrayList<FeedbackEntity> tmp = new ArrayList<>(feedbackRepository.findByArticleId(1));
 
         assertThat(tmp).isNotNull();
         assertThat(tmp.getFirst().getFeedbackId()).isEqualTo(feedbackEntity.getFeedbackId());

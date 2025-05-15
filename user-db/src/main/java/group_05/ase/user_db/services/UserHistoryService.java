@@ -61,7 +61,7 @@ public class UserHistoryService {
 
     }
 
-    public List<UserHistoryDTO> getUserHistoriesByArticleId(UUID articleId) {
+    public List<UserHistoryDTO> getUserHistoriesByArticleId(int articleId) {
 
         ArrayList<UserHistoryDTO> userHistories = new ArrayList<>();
         List<UserHistoryEntity> tmp = this.repository.findAllByArticleId(articleId);

@@ -22,7 +22,7 @@ public class UserHistoryRepositoryTest {
     private final UserHistoryEntity userHistoryEntity = new UserHistoryEntity(
             2,
             UUID.fromString("f5599c8c-166b-495c-accc-65addfaa572b"),
-            UUID.fromString("f5599c8c-166b-495c-accc-65addfaa572a"),
+            1,
             null,
             null,
             2
@@ -61,7 +61,7 @@ public class UserHistoryRepositoryTest {
     @Test
     public void testFindAllByArticleId() {
 
-        ArrayList<UserHistoryEntity> tmp = new ArrayList<>(userHistoryRepository.findAllByArticleId(UUID.fromString("f5599c8c-166b-495c-accc-65addfaa572a")));
+        ArrayList<UserHistoryEntity> tmp = new ArrayList<>(userHistoryRepository.findAllByArticleId(1));
 
         assertThat(tmp).isNotNull();
         assertThat(tmp.getFirst().getUserHistoryId()).isEqualTo(userHistoryEntity.getUserHistoryId());
