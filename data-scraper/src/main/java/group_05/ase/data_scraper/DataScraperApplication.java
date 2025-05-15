@@ -1,10 +1,9 @@
 package group_05.ase.data_scraper;
 
 import group_05.ase.data_scraper.Service.events.EventService;
-import group_05.ase.data_scraper.Service.general.ViennaHistoryWikiLinkService;
+import group_05.ase.data_scraper.Service.general.LinkService;
 import group_05.ase.data_scraper.Service.persons.PersonService;
 import group_05.ase.data_scraper.Service.buildings.BuildingService;
-import group_05.ase.data_scraper.Old_Scraper.Service.Implementation.WikiDataScraperService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
@@ -14,37 +13,20 @@ public class DataScraperApplication {
 
 	public static void main(String[] args) {
 		ApplicationContext applicationContext = SpringApplication.run(DataScraperApplication.class, args);
-		WikiDataScraperService service = applicationContext.getBean(WikiDataScraperService.class);
+
 		BuildingService buildingService = applicationContext.getBean(BuildingService.class);
 		PersonService personService = applicationContext.getBean(PersonService.class);
-		ViennaHistoryWikiLinkService linkService = applicationContext.getBean(ViennaHistoryWikiLinkService.class);
-
 		EventService eventService = applicationContext.getBean(EventService.class);
-		String eventSeed = "https://www.geschichtewiki.wien.gv.at/Kategorie:Ereignisse";
+		LinkService linkService = applicationContext.getBean(LinkService.class);
 
-		/*try {
-			eventService.scrapeCategory(eventSeed);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-		eventService.getAllEvents();*/
-		linkService.createLinkRelationshipsFromEvents();
+		// Scraper-Run:
 
-		// Whole thing takes like ~30min
-		// init nodes
-		//buildingService.search();
-		//personService.search();
+		// Initialize Nodes
+		eventService.search();
+		buildingService.search(1000);
+		personService.search(1000);
 
-		// init links
-		//linkService.createLinkRelationshipsFromBuildings();
-		//linkService.createLinkRelationshipsFromPersons();
-
-		/*// String continueToken = "0|387470"; //Karlskirche
-		String continueToken = "0|697568"; // Arsenal
-		// Sample Dataset: 300 entries - max number of nodes in neo4j-ui
-		service.batchSearch(100, 1,"");
-		service.batchSearch(200, 1,continueToken);
-
-		service.upsertLinkages();*/
+		// Initialize Links
+		linkService.createLinkages();
 	}
 }

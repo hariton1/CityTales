@@ -1,9 +1,9 @@
 package group_05.ase.data_scraper.Old_Scraper.Service.Implementation;
 
-import group_05.ase.data_scraper.Entity.Graph.HistoricalPersonEntity;
-import group_05.ase.data_scraper.Entity.Graph.HistoricalPlaceEntity;
+import group_05.ase.data_scraper.Old_Scraper.Entity.Graph.HistoricalPersonEntity;
+import group_05.ase.data_scraper.Old_Scraper.Entity.Graph.HistoricalPlaceEntity;
 import group_05.ase.data_scraper.Old_Scraper.Entity.WikiDataObject;
-import group_05.ase.data_scraper.Service.Interface.IWikiDataObjectPersistenceService;
+import group_05.ase.data_scraper.Old_Scraper.Service.Interface.IWikiDataObjectPersistenceService;
 import org.neo4j.driver.*;
 import org.neo4j.driver.Record;
 import org.neo4j.driver.exceptions.NoSuchRecordException;

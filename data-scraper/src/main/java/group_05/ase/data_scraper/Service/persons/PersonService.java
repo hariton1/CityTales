@@ -24,13 +24,12 @@ public class PersonService {
         this.manualExtractorService = manualExtractorService;
     }
 
-    public void search() {
+    public void search(int limit) {
         String currentUrl = personsSeeds;
         int totalLinks = 0;
-        int breaker = 0;
+        int counter = 0;
 
-        while (currentUrl != null && breaker <= 24) {
-            System.out.println("persons: " + breaker +"/24");
+        while (currentUrl != null) {
             List<ViennaHistoryWikiPersonObject> entries = new ArrayList<>();
             try {
 
@@ -61,7 +60,11 @@ public class PersonService {
                         System.out.println("Total links found on this page: " + pageLinkCount);
 
                         for (ViennaHistoryWikiPersonObject wgwo:entries) {
+                            if (counter >= limit) {
+                                return;
+                            }
                             personRepository.persistViennaHistoryWikiPersonObject(wgwo);
+                            counter++;
                         }
                     } else {
                         System.out.println("Category div not found on the current page.");
@@ -85,8 +88,6 @@ public class PersonService {
                 e.printStackTrace();
                 break;
             }
-
-            breaker+= 1;
         }
     }
 

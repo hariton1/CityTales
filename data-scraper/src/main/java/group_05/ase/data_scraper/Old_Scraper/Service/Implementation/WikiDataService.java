@@ -1,8 +1,8 @@
 package group_05.ase.data_scraper.Old_Scraper.Service.Implementation;
 
 import group_05.ase.data_scraper.Old_Scraper.Entity.WikiDataObject;
-import group_05.ase.data_scraper.Service.Interface.IWikiDataService;
-import group_05.ase.data_scraper.Service.WikiDataConsts.WikiDataConsts;
+import group_05.ase.data_scraper.Old_Scraper.Service.Interface.IWikiDataService;
+import group_05.ase.data_scraper.Old_Scraper.Service.WikiDataConsts.WikiDataConsts;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.wikidata.wdtk.datamodel.helpers.Datamodel;

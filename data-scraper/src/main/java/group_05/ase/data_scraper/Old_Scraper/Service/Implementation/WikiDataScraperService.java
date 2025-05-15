@@ -1,11 +1,11 @@
 package group_05.ase.data_scraper.Old_Scraper.Service.Implementation;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import group_05.ase.data_scraper.Entity.Json.Page;
-import group_05.ase.data_scraper.Entity.Json.Root;
+import group_05.ase.data_scraper.Old_Scraper.Entity.Json.Page;
+import group_05.ase.data_scraper.Old_Scraper.Entity.Json.Root;
 import group_05.ase.data_scraper.Old_Scraper.Entity.WikiDataObject;
-import group_05.ase.data_scraper.Service.Interface.IWikiDataScraperService;
-import group_05.ase.data_scraper.Service.WikiDataConsts.WikiDataConsts;
+import group_05.ase.data_scraper.Old_Scraper.Service.Interface.IWikiDataScraperService;
+import group_05.ase.data_scraper.Old_Scraper.Service.WikiDataConsts.WikiDataConsts;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 

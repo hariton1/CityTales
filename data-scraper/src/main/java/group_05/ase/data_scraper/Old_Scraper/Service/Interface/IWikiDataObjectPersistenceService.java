@@ -1,7 +1,7 @@
 package group_05.ase.data_scraper.Old_Scraper.Service.Interface;
 
-import group_05.ase.data_scraper.Entity.Graph.HistoricalPersonEntity;
-import group_05.ase.data_scraper.Entity.Graph.HistoricalPlaceEntity;
+import group_05.ase.data_scraper.Old_Scraper.Entity.Graph.HistoricalPersonEntity;
+import group_05.ase.data_scraper.Old_Scraper.Entity.Graph.HistoricalPlaceEntity;
 import group_05.ase.data_scraper.Old_Scraper.Entity.WikiDataObject;
 import org.springframework.data.neo4j.types.GeographicPoint2d;
 
