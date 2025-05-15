@@ -47,8 +47,9 @@ public class BuildingRepository {
         try (Session session = driver.session()) {
             String message = session.writeTransaction(tx -> {
                 Result result = tx.run(
-                        "MERGE (b:"+buildingTableName+" {name: coalesce($name, 'N/A')}) " +
+                        "MERGE (b:"+buildingTableName+" {viennaHistoryWikiId: coalesce($viennaHistoryWikiId, 'N/A')}) " +
                                 "SET b.url = coalesce($url, 'N/A'), " +
+                                "    b.name = coalesce($name, 'N/A'), " +
                                 "    b.buildingType = coalesce($buildingType, 'N/A'), " +
                                 "    b.dateFrom = coalesce($dateFrom, 'N/A'), " +
                                 "    b.dateTo = coalesce($dateTo, 'N/A'), " +
@@ -58,7 +59,7 @@ public class BuildingRepository {
                                 "    b.entryNumber = coalesce($entryNumber, 'N/A'), " +
                                 "    b.architect = coalesce($architect, 'N/A'), " +
                                 "    b.famousResidents = coalesce($famousResidents, 'N/A'), " +
-                                "    b.wienGeschichteWikiId = coalesce($wienGeschichteWikiId, 'N/A'), " +
+                                "    b.viennaHistoryWikiId = coalesce($viennaHistoryWikiId, 'N/A'), " +
                                 "    b.gnd = coalesce($gnd, 'N/A'), " +
                                 "    b.wikidataId = coalesce($wikidataId, 'N/A'), " +
                                 "    b.seeAlso = coalesce($seeAlso, 'N/A'), " +
@@ -69,6 +70,7 @@ public class BuildingRepository {
                                 "    b.imageUrls = coalesce($imageUrls, []) " +
                                 "RETURN b.name",
                         parameters(
+                                "viennaHistoryWikiId", obj.getViennaHistoryWikiId(),
                                 "name", obj.getName(),
                                 "url", obj.getUrl(),
                                 "buildingType", obj.getBuildingType().orElse(null),
@@ -80,7 +82,6 @@ public class BuildingRepository {
                                 "entryNumber", obj.getEntryNumber().orElse(null),
                                 "architect", obj.getArchitect().orElse(null),
                                 "famousResidents", obj.getFamousResidents().orElse(null),
-                                "wienGeschichteWikiId", obj.getWienGeschichteWikiId().orElse(null),
                                 "gnd", obj.getGnd().orElse(null),
                                 "wikidataId", obj.getWikidataId().orElse(null),
                                 "seeAlso", obj.getSeeAlso().orElse(null),

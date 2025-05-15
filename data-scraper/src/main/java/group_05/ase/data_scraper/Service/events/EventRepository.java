@@ -48,8 +48,9 @@ public class EventRepository {
         try (Session session = driver.session()) {
             String message = session.writeTransaction(tx -> {
                 Result result = tx.run(
-                        "MERGE (e:"+eventTableName+" {name: coalesce($name, 'N/A')}) " +
+                        "MERGE (e:"+eventTableName+" {viennaHistoryWikiId: coalesce($viennaHistoryWikiId, 'N/A')}) " +
                                 "SET e.url = coalesce($url, 'N/A'), " +
+                                "    e.name = coalesce($name, 'N/A'), " +
                                 "    e.typeOfEvent = coalesce($typeOfEvent, 'N/A'), " +
                                 "    e.dateFrom = coalesce($dateFrom, 'N/A'), " +
                                 "    e.dateTo = coalesce($dateTo, 'N/A'), " +
@@ -66,6 +67,7 @@ public class EventRepository {
                                 "    e.imageUrls = coalesce($imageUrls, []) " +
                                 "RETURN e.name",
                         parameters(
+                                "viennaHistoryWikiId", obj.getViennaHistoryWikiId(),
                                 "name", obj.getName(),
                                 "url", obj.getUrl(),
                                 "typeOfEvent", obj.getTypeOfEvent().orElse(null),
@@ -75,7 +77,6 @@ public class EventRepository {
                                 "organizer", obj.getOrganizer().orElse(null),
                                 "participantCount", obj.getParticipantCount().orElse(null),
                                 "violence", obj.getViolence().orElse(null),
-                                "viennaHistoryWikiId", obj.getViennaHistoryWikiId().orElse(null),
                                 "gnd", obj.getGnd().orElse(null),
                                 "wikidataId", obj.getWikidataId().orElse(null),
                                 "seeAlso", obj.getSeeAlso().orElse(null),

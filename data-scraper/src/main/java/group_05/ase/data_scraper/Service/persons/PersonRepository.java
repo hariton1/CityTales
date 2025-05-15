@@ -48,8 +48,9 @@ public class PersonRepository {
         try (Session session = driver.session()) {
             String message = session.writeTransaction(tx -> {
                 Result result = tx.run(
-                        "MERGE (p:" + personsTableName + " {name: coalesce($name, 'N/A')}) " +
+                        "MERGE (p:" + personsTableName + " {viennaHistoryWikiId: coalesce($viennaHistoryWikiId, 'N/A')}) " +
                                 "SET p.url = coalesce($url, 'N/A'), " +
+                                "    p.name = coalesce($name, 'N/A'), " +
                                 "    p.personName = coalesce($personName, 'N/A'), " +
                                 "    p.alternativeName = coalesce($alternativeName, 'N/A'), " +
                                 "    p.titles = coalesce($titles, 'N/A'), " +
@@ -71,13 +72,13 @@ public class PersonRepository {
                                 "    p.imageUrls = coalesce($imageUrls, []) " +
                                 "RETURN p.name",
                         parameters(
+                                "viennaHistoryWikiId", obj.getViennaHistoryWikiId(),
                                 "name", obj.getName(),
                                 "url", obj.getUrl(),
                                 "personName", obj.getPersonName().orElse(null),
                                 "alternativeName", obj.getAlternativeName().orElse(null),
                                 "titles", obj.getTitles().orElse(null),
                                 "sex", obj.getSex().orElse(null),
-                                "viennaHistoryWikiId", obj.getViennaHistoryWikiId().orElse(null),
                                 "gnd", obj.getGnd().orElse(null),
                                 "wikidataId", obj.getWikidataId().orElse(null),
                                 "birthDate", obj.getBirthDate().orElse(null),
