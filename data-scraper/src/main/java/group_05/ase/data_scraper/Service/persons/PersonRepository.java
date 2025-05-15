@@ -67,7 +67,8 @@ public class PersonRepository {
                                 "    p.estate = coalesce($estate, 0.0), " +
                                 "    p.seeAlso = coalesce($seeAlso, 0.0), " +
                                 "    p.resource = coalesce($resource, 0.0), " +
-                                "    p.links = coalesce($links, []) " +
+                                "    p.links = coalesce($links, []), " +
+                                "    p.imageUrls = coalesce($imageUrls, []) " +
                                 "RETURN p.name",
                         parameters(
                                 "name", obj.getName(),
@@ -89,7 +90,8 @@ public class PersonRepository {
                                 "estate", obj.getEstate().orElse(null),
                                 "seeAlso", obj.getSeeAlso().orElse(null),
                                 "resource", obj.getResource().orElse(null),
-                                "links", obj.getLinks() != null ? obj.getLinks() : new ArrayList<>()
+                                "links", obj.getLinks() != null ? obj.getLinks() : new ArrayList<>(),
+                                "imageUrls", obj.getImageUrls() != null ? obj.getImageUrls() : new ArrayList<>()
                         )
                 );
                 return result.single().get(0).asString();

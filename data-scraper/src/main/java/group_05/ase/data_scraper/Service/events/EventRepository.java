@@ -62,7 +62,8 @@ public class EventRepository {
                                 "    e.wikidataId = coalesce($wikidataId, 'N/A'), " +
                                 "    e.seeAlso = coalesce($seeAlso, 'N/A'), " +
                                 "    e.resource = coalesce($resource, 'N/A'), " +
-                                "    e.links = coalesce($links, []) " +
+                                "    e.links = coalesce($links, []), " +
+                                "    e.imageUrls = coalesce($imageUrls, []) " +
                                 "RETURN e.name",
                         parameters(
                                 "name", obj.getName(),
@@ -79,7 +80,8 @@ public class EventRepository {
                                 "wikidataId", obj.getWikidataId().orElse(null),
                                 "seeAlso", obj.getSeeAlso().orElse(null),
                                 "resource", obj.getResource().orElse(null),
-                                "links", obj.getLinks() != null ? obj.getLinks() : new ArrayList<>()
+                                "links", obj.getLinks() != null ? obj.getLinks() : new ArrayList<>(),
+                                "imageUrls", obj.getImageUrls() != null ? obj.getImageUrls() : new ArrayList<>()
                         )
                 );
                 return result.single().get(0).asString();

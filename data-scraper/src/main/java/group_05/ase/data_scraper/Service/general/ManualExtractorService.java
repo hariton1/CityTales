@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ManualExtractorService {
@@ -29,5 +28,19 @@ public class ManualExtractorService {
         }
 
         return validLinks;
+    }
+
+    public List<String> getImageUrls(Document doc) {
+        List<String> imageUrls = new ArrayList<>();
+        Elements imgElements = doc.select("img");
+
+        for (Element img : imgElements) {
+            String src = img.attr("abs:src");
+            if (!src.isEmpty()) {
+                imageUrls.add(src);
+            }
+        }
+
+        return imageUrls;
     }
 }

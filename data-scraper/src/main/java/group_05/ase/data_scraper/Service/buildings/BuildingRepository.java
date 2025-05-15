@@ -65,7 +65,8 @@ public class BuildingRepository {
                                 "    b.resource = coalesce($resource, 'N/A'), " +
                                 "    b.latitude = $latitude, " +
                                 "    b.longitude = $longitude, " +
-                                "    b.links = coalesce($links, []) " +
+                                "    b.links = coalesce($links, []), " +
+                                "    b.imageUrls = coalesce($imageUrls, []) " +
                                 "RETURN b.name",
                         parameters(
                                 "name", obj.getName(),
@@ -86,7 +87,8 @@ public class BuildingRepository {
                                 "resource", obj.getResource().orElse(null),
                                 "latitude", obj.getLatitude().orElse(null),
                                 "longitude", obj.getLongitude().orElse(null),
-                                "links", obj.getLinks() != null ? obj.getLinks() : new ArrayList<>()
+                                "links", obj.getLinks() != null ? obj.getLinks() : new ArrayList<>(),
+                                "imageUrls", obj.getImageUrls() != null ? obj.getImageUrls() : new ArrayList<>()
                         )
                 );
                 return result.single().get(0).asString();
