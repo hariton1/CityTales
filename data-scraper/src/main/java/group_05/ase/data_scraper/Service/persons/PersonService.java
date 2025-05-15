@@ -123,7 +123,7 @@ public class PersonService {
                         } else if (key.equals("Geschlecht")) {
                             wikiObject.setSex(Optional.of(value));
                         } else if (key.equals("Wien Geschichte WikiIdentifier/Persistenter URL zur Seite ᵖ")) {
-                            wikiObject.setViennaHistoryWikiId(Optional.of(value));
+                            wikiObject.setViennaHistoryWikiId(Integer.parseInt(value));
                         } else if (key.equals("GNDGemeindsame Normdatei")) {
                             wikiObject.setGnd(Optional.of(value));
                         } else if (key.equals("Wikidata")) {
