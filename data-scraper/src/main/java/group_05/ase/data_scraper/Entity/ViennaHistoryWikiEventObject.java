@@ -20,7 +20,7 @@ public class ViennaHistoryWikiEventObject {
     private Optional<String> seeAlso = Optional.empty();
     private Optional<String> resource = Optional.empty();
     private List<String> links = new ArrayList<>();
-
+    private List<String> imageUrls = new ArrayList<>();
 
     public String getUrl() { return url; }
     public void setUrl(String url) { this.url = url; }
@@ -66,6 +66,9 @@ public class ViennaHistoryWikiEventObject {
 
     public List<String> getLinks() { return links; }
     public void setLinks(List<String> links) { this.links = links; }
+
+    public List<String> getImageUrls() { return imageUrls; }
+    public void setImageUrls(List<String> imageUrls) { this.imageUrls = imageUrls; }
     @Override
     public String toString() {
         return "ViennaHistoryWikiEventObject {\n" +
@@ -84,6 +87,7 @@ public class ViennaHistoryWikiEventObject {
                 "  seeAlso=" + seeAlso + ",\n" +
                 "  resource=" + resource + "\n" +
                 "  links=" + links + "\n" +
+                "  imageUrls=" + imageUrls + "\n" +
                 '}';
     }
 }

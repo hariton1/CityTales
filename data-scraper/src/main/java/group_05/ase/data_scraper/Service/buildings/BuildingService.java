@@ -100,8 +100,9 @@ public class BuildingService {
             wikiObject.setUrl(url);
             wikiObject.setName(text);
 
-            // Extract all links from <p> tags
+            // Extract all links from <p> tags and images from <img> tags
             wikiObject.setLinks(manualExtractorService.getLinks(doc));
+            wikiObject.setImageUrls(manualExtractorService.getImageUrls(doc));
 
             Element table = doc.selectFirst("table.table.table-condensed.table-hover");
 
