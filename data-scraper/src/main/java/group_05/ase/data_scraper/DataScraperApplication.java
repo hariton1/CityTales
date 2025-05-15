@@ -19,14 +19,18 @@ public class DataScraperApplication {
 		EventService eventService = applicationContext.getBean(EventService.class);
 		LinkService linkService = applicationContext.getBean(LinkService.class);
 
-		// Scraper-Run:
+		// Scraper-Run: Note you can change the params and comment out sections that you already inserted
 
 		// Initialize Nodes
+		System.out.println("events: ");
 		eventService.search();
+		System.out.println("buildings: ");
 		buildingService.search(1000);
+		System.out.println("persons: ");
 		personService.search(1000);
 
 		// Initialize Links
+		System.out.println("linking: ");
 		linkService.createLinkages();
 	}
 }

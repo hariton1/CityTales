@@ -48,9 +48,9 @@ public class LinkService {
     public void createLinkages() {
         this.createLinkRelationshipsFromX(personsTableName,eventTableName,buildingTableName);
         this.createLinkRelationshipsFromX(buildingTableName,eventTableName,personsTableName);
-        this.createLinkRelationshipsFromX(personsTableName,buildingTableName,eventTableName);
+        this.createLinkRelationshipsFromX(eventTableName,buildingTableName,personsTableName);
     }
-                                                    // event            building       person
+
     public void createLinkRelationshipsFromX(String fromTable, String toTable1, String toTable2) {
         try (Session session = driver.session()) {
             Result result = session.run(
@@ -75,7 +75,7 @@ public class LinkService {
                     if (toTable1Result.hasNext()) {
                         session.writeTransaction(tx -> {
                             tx.run(
-                                    "MATCH (e1:" + fromTable + " {name: $eventName}), " +
+                                    "MATCH (e1:" + fromTable + " {name: $fromName}), " +
                                             "(b:" + toTable1 + " {url: $url}) " +
                                             "MERGE (e1)-[:HAS_LINK_TO]->(b)",
                                     parameters("fromName", fromName, "url", link)
@@ -94,7 +94,7 @@ public class LinkService {
                     if (toTable2Result.hasNext()) {
                         session.writeTransaction(tx -> {
                             tx.run(
-                                    "MATCH (e1:" + fromTable + " {name: $eventName}), " +
+                                    "MATCH (e1:" + fromTable + " {name: $fromName}), " +
                                             "(p:" + toTable2 + " {url: $url}) " +
                                             "MERGE (e1)-[:HAS_LINK_TO]->(p)",
                                     parameters("fromName", fromName, "url", link)
@@ -104,16 +104,16 @@ public class LinkService {
                         continue;
                     }
 
-                    // Try linking to another event
-                    Result eventResult = session.run(
+                    // Try linking to another entity of the same type
+                    Result selfFromResult = session.run(
                             "MATCH (e2:" + fromTable + " {url: $url}) RETURN e2",
                             parameters("url", link)
                     );
 
-                    if (eventResult.hasNext()) {
+                    if (selfFromResult.hasNext()) {
                         session.writeTransaction(tx -> {
                             tx.run(
-                                    "MATCH (e1:" + fromTable + " {name: $eventName}), " +
+                                    "MATCH (e1:" + fromTable + " {name: $fromName}), " +
                                             "(e2:" + fromTable + " {url: $url}) " +
                                             "MERGE (e1)-[:HAS_LINK_TO]->(e2)",
                                     parameters("fromName", fromName, "url", link)

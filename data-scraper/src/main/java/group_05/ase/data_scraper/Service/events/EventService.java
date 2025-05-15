@@ -60,7 +60,6 @@ public class EventService {
 
             for (Element link : links) {
                 String fullUrl = "https://www.geschichtewiki.wien.gv.at" + link.attr("href");
-                System.out.println("Event: " + fullUrl);
                 allEvents.add(fullUrl);
             }
 
@@ -144,7 +143,6 @@ public class EventService {
                     }
                 }
             }
-            System.out.println(wikiObject);
             return wikiObject;
 
         } catch (Exception e) {

@@ -57,7 +57,6 @@ public class PersonService {
 
 
                         totalLinks += pageLinkCount;
-                        System.out.println("Total links found on this page: " + pageLinkCount);
 
                         for (ViennaHistoryWikiPersonObject wgwo:entries) {
                             if (counter >= limit) {
