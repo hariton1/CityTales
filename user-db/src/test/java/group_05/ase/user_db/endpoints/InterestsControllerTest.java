@@ -37,9 +37,8 @@ public class InterestsControllerTest {
 
     private final InterestDTO interestDTO = new InterestDTO (
             2,
-            4,
-            "classical",
-            "the person is interested in classical music"
+            "music",
+            "the person is interested in music"
     );
 
     private final ArrayList<InterestDTO> interestDTOs = new ArrayList<>(List.of(interestDTO));
@@ -54,7 +53,6 @@ public class InterestsControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].interest_id").value(interestDTO.getInterestId()))
-                .andExpect(jsonPath("$[0].interest_type_id").value(interestDTO.getInterestTypeId()))
                 .andExpect(jsonPath("$[0].interest_name").value(interestDTO.getInterestName()))
                 .andExpect(jsonPath("$[0].description").value(interestDTO.getDescription()));
 
@@ -72,29 +70,10 @@ public class InterestsControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.interest_id").value(interestDTO.getInterestId()))
-                .andExpect(jsonPath("$.interest_type_id").value(interestDTO.getInterestTypeId()))
                 .andExpect(jsonPath("$.interest_name").value(interestDTO.getInterestName()))
                 .andExpect(jsonPath("$.description").value(interestDTO.getDescription()));
 
         System.out.println("Test testGetInterestByInterestId passed!");
-
-    }
-
-    @Test
-    public void testGetInterestByInterestTypeId() throws Exception {
-
-        when(interestService.getInterestByInterestTypeId(any(int.class))).thenReturn(interestDTO);
-
-        mockMvc.perform(get("/interests/type_id=4")
-                        .content(mapper.writeValueAsString(interestDTO))
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.interest_id").value(interestDTO.getInterestId()))
-                .andExpect(jsonPath("$.interest_type_id").value(interestDTO.getInterestTypeId()))
-                .andExpect(jsonPath("$.interest_name").value(interestDTO.getInterestName()))
-                .andExpect(jsonPath("$.description").value(interestDTO.getDescription()));
-
-        System.out.println("Test testGetInterestByInterestTypeId passed!");
 
     }
 
@@ -108,7 +87,6 @@ public class InterestsControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.interest_id").value(interestDTO.getInterestId()))
-                .andExpect(jsonPath("$.interest_type_id").value(interestDTO.getInterestTypeId()))
                 .andExpect(jsonPath("$.interest_name").value(interestDTO.getInterestName()))
                 .andExpect(jsonPath("$.description").value(interestDTO.getDescription()));
 
@@ -126,7 +104,6 @@ public class InterestsControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].interest_id").value(interestDTO.getInterestId()))
-                .andExpect(jsonPath("$[0].interest_type_id").value(interestDTO.getInterestTypeId()))
                 .andExpect(jsonPath("$[0].interest_name").value(interestDTO.getInterestName()))
                 .andExpect(jsonPath("$[0].description").value(interestDTO.getDescription()));
 
