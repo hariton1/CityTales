@@ -1,1 +1,10 @@
-<p>onboarding works!</p>
+<form [formGroup]="form">
+  <tui-filter
+    formControlName="filters"
+    size="s"
+    [items]="items"
+  />
+</form>
+<div>
+  <pre>Form value: {{ form.value | json }}</pre>
+</div>
