@@ -8,7 +8,6 @@ import {TourDto} from "../dto/tour.dto";
 import {FunFactDto} from "../dto/fun-fact.dto";
 import {GamificationDto} from "../dto/gamificationDto";
 import {Injectable} from "@angular/core";
-import {UUID} from 'node:crypto';
 import {InterestDto} from '../dto/interest.dto';
 
 @Injectable({ providedIn: 'root' })
