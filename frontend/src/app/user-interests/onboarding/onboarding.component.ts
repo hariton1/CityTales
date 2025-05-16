@@ -1,10 +1,8 @@
 import {JsonPipe} from '@angular/common';
-import {AfterContentInit, Component, OnInit} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {TuiFilter} from '@taiga-ui/kit';
 import {UserService} from '../../services/user.service';
-import {UserInterestDto} from '../../dto/user-interest.dto';
-import {forkJoin, Observable, of, switchMap} from 'rxjs';
 import {InterestDto} from '../../dto/interest.dto';
 
 
