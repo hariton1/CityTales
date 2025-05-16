@@ -1,5 +1,5 @@
 export class InterestDto {
-  private interestId: number;
+  protected interestId: number;
   private interestName: string;
   private description: string;
 

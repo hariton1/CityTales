@@ -1,6 +1,6 @@
 import {HttpClient} from "@angular/common/http";
 import {UserAccountDto} from "../dto/user-account.dto";
-import {Observable} from "rxjs";
+import {map, Observable} from "rxjs";
 import {UserInterestDto} from "../dto/user-interest.dto";
 import {SERVER_ADDRESS} from "../globals";
 import {SearchHistoryDTO} from "../dto/search-history.dto";
@@ -8,6 +8,8 @@ import {TourDto} from "../dto/tour.dto";
 import {FunFactDto} from "../dto/fun-fact.dto";
 import {GamificationDto} from "../dto/gamificationDto";
 import {Injectable} from "@angular/core";
+import {UUID} from 'node:crypto';
+import {InterestDto} from '../dto/interest.dto';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
@@ -51,9 +53,33 @@ export class UserService {
         });
     }
 
-    public readInterests(userId: number): Observable<UserInterestDto[]> {
-        return this.httpClient.get<UserInterestDto[]>(SERVER_ADDRESS + 'interests/read' + userId);
+  public getAllInterests(): Observable<InterestDto[]> {
+      return this.httpClient.get<any>(SERVER_ADDRESS + 'interests')
+        .pipe(
+          map(data => data.map((item: { interest_id: number; interest_name: string; description: string; }) => {
+            return new InterestDto(item.interest_id, item.interest_name, item.description);
+          }))
+        );
+  }
+
+    public readInterests(userId: string): Observable<UserInterestDto[]> {
+      return this.httpClient.get<any[]>(SERVER_ADDRESS + 'userInterests/user_id=' + userId)
+        .pipe(
+          map(data => data.map(item => {
+            return new UserInterestDto(item.user, item.interest_id);
+          }))
+        );
     }
+
+  public readInterestDetail(interestId: number): Observable<InterestDto> {
+    return this.httpClient.get<any>(SERVER_ADDRESS + 'interests/id=' + interestId)
+      .pipe(
+        map(item => {
+          // Create a proper UserInterestDto instance from the raw JSON
+          return new InterestDto(item.interest_id, item.interest_name, item.description);
+        })
+      );
+  }
 
     public updateInterests(userInterestDto: UserInterestDto): Observable<UserInterestDto> {
         return this.httpClient.put<UserInterestDto>(SERVER_ADDRESS + 'interests/update', {
