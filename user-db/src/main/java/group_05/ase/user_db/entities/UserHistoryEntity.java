@@ -22,7 +22,7 @@ public class UserHistoryEntity {
 
     private UUID userId;
 
-    private UUID articleId;
+    private int articleId;
 
     private LocalDateTime openDt;
 

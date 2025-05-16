@@ -22,7 +22,7 @@ public class FeedbackEntity {
 
     private UUID userId;
 
-    private UUID articleId;
+    private int articleId;
 
     private double rating;
 

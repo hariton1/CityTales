@@ -29,7 +29,7 @@ public class UserHistoryServiceTest {
     private final UserHistoryEntity userHistoryEntity = new UserHistoryEntity (
             1,
             UUID.fromString("f5599c8c-166b-495c-accc-65addfaa572b"),
-            UUID.fromString("f5599c8c-166b-495c-accc-65addfaa572a"),
+            1,
             null,
             null,
             2
@@ -88,7 +88,7 @@ public class UserHistoryServiceTest {
     @Test
     public void testGetUserHistoriesByArticleId() {
 
-        when(userHistoryRepository.findAllByArticleId(any(UUID.class))).thenReturn(userHistoryEntities);
+        when(userHistoryRepository.findAllByArticleId(any(int.class))).thenReturn(userHistoryEntities);
 
         ArrayList<UserHistoryDTO> userHistoryDTOs = new ArrayList<>(userHistoryService.getUserHistoriesByArticleId(userHistoryEntity.getArticleId()));
 

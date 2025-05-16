@@ -23,8 +23,7 @@ public class InterestService {
         List<InterestEntity> tmp = this.repository.findAll();
 
         for(InterestEntity interest : tmp) {
-            interests.add(new InterestDTO(interest.getInterestId(), interest.getInterestTypeId(),
-                                          interest.getInterestName(), interest.getDescription()));
+            interests.add(new InterestDTO(interest.getInterestId(), interest.getInterestName(), interest.getDescription()));
         }
 
         return interests;
@@ -34,25 +33,15 @@ public class InterestService {
 
         InterestEntity tmp = this.repository.findByInterestId(interestId);
 
-        return new InterestDTO(tmp.getInterestId(), tmp.getInterestTypeId(),
-                tmp.getInterestName(), tmp.getDescription());
+        return new InterestDTO(tmp.getInterestId(), tmp.getInterestName(), tmp.getDescription());
 
-    }
-
-    public InterestDTO getInterestByInterestTypeId(int interestTypeId) {
-
-        InterestEntity tmp = this.repository.findByInterestTypeId(interestTypeId);
-
-        return new InterestDTO(tmp.getInterestId(), tmp.getInterestTypeId(),
-                tmp.getInterestName(), tmp.getDescription());
     }
 
     public InterestDTO getInterestByName(String interestName) {
 
         InterestEntity tmp = this.repository.findByInterestName(interestName);
 
-        return new InterestDTO(tmp.getInterestId(), tmp.getInterestTypeId(),
-                               tmp.getInterestName(), tmp.getDescription());
+        return new InterestDTO(tmp.getInterestId(), tmp.getInterestName(), tmp.getDescription());
     }
 
     public List<InterestDTO> getInterestsByDescriptionLike(String description) {
@@ -61,8 +50,7 @@ public class InterestService {
         List<InterestEntity> tmp = this.repository.findByDescriptionContaining(description);
 
         for(InterestEntity interest : tmp) {
-            interests.add(new InterestDTO(interest.getInterestId(), interest.getInterestTypeId(),
-                    interest.getInterestName(), interest.getDescription()));
+            interests.add(new InterestDTO(interest.getInterestId(), interest.getInterestName(), interest.getDescription()));
         }
 
         return interests;
@@ -73,7 +61,6 @@ public class InterestService {
 
         InterestEntity tmp = new InterestEntity();
 
-        tmp.setInterestTypeId(interestDTO.getInterestTypeId());
         tmp.setInterestName(interestDTO.getInterestName());
         tmp.setDescription(interestDTO.getDescription());
 
