@@ -4,6 +4,7 @@ import {ExploreLayoutComponent} from './layout/explore-layout/explore-layout.com
 import {LoginComponent} from './user-management/pages/login/login.component';
 import {SignUpComponent} from './user-management/pages/sign-up/sign-up.component';
 import {EditUserComponent} from './user-management/pages/edit-user/edit-user.component';
+import {OnboardingComponent} from './user-interests/onboarding/onboarding.component';
 
 export const routes: Routes = [
   {
@@ -24,5 +25,6 @@ export const routes: Routes = [
   { path: 'explore', component: ExploreLayoutComponent },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: SignUpComponent },
+  { path: 'onboarding', component: OnboardingComponent },
   { path: '', redirectTo: '/explore', pathMatch: 'full' } //default page, to be changed
 ];
