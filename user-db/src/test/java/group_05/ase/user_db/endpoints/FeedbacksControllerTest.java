@@ -41,7 +41,7 @@ public class FeedbacksControllerTest {
 	private final FeedbackDTO feedbackDTO = new FeedbackDTO (
 			1,
 			UUID.fromString("f5599c8c-166b-495c-accc-65addfaa572b"),
-			UUID.fromString("f5599c8c-166b-495c-accc-65addfaa572a"),
+			1,
 			100.0,
 			"Completely correct",
 			null
@@ -60,7 +60,7 @@ public class FeedbacksControllerTest {
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$[0].feedback_id").value(feedbackDTO.getFeedbackId()))
 				.andExpect(jsonPath("$[0].user_id").value(feedbackDTO.getUserId().toString()))
-				.andExpect(jsonPath("$[0].article_id").value(feedbackDTO.getArticleId().toString()))
+				.andExpect(jsonPath("$[0].article_id").value(feedbackDTO.getArticleId()))
 				.andExpect(jsonPath("$[0].rating").value(feedbackDTO.getRating()))
 				.andExpect(jsonPath("$[0].fb_content").value(feedbackDTO.getFbContent()));
 
@@ -94,7 +94,7 @@ public class FeedbacksControllerTest {
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$[0].feedback_id").value(feedbackDTO.getFeedbackId()))
 				.andExpect(jsonPath("$[0].user_id").value(feedbackDTO.getUserId().toString()))
-				.andExpect(jsonPath("$[0].article_id").value(feedbackDTO.getArticleId().toString()))
+				.andExpect(jsonPath("$[0].article_id").value(feedbackDTO.getArticleId()))
 				.andExpect(jsonPath("$[0].rating").value(feedbackDTO.getRating()))
 				.andExpect(jsonPath("$[0].fb_content").value(feedbackDTO.getFbContent()));
 
@@ -105,15 +105,15 @@ public class FeedbacksControllerTest {
 	@Test
 	public void testGetFeedbacksByArticleId() throws Exception {
 
-		when(feedbackService.getFeedbacksByArticleId(any(UUID.class))).thenReturn(feedbackDTOs);
+		when(feedbackService.getFeedbacksByArticleId(any(int.class))).thenReturn(feedbackDTOs);
 
-		mockMvc.perform(get("/feedbacks/article_id=f5599c8c-166b-495c-accc-65addfaa572a")
+		mockMvc.perform(get("/feedbacks/article_id=1")
 						.content(mapper.writeValueAsString(feedbackDTOs))
 						.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$[0].feedback_id").value(feedbackDTO.getFeedbackId()))
 				.andExpect(jsonPath("$[0].user_id").value(feedbackDTO.getUserId().toString()))
-				.andExpect(jsonPath("$[0].article_id").value(feedbackDTO.getArticleId().toString()))
+				.andExpect(jsonPath("$[0].article_id").value(feedbackDTO.getArticleId()))
 				.andExpect(jsonPath("$[0].rating").value(feedbackDTO.getRating()))
 				.andExpect(jsonPath("$[0].fb_content").value(feedbackDTO.getFbContent()));
 
@@ -132,7 +132,7 @@ public class FeedbacksControllerTest {
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$[0].feedback_id").value(feedbackDTO.getFeedbackId()))
 				.andExpect(jsonPath("$[0].user_id").value(feedbackDTO.getUserId().toString()))
-				.andExpect(jsonPath("$[0].article_id").value(feedbackDTO.getArticleId().toString()))
+				.andExpect(jsonPath("$[0].article_id").value(feedbackDTO.getArticleId()))
 				.andExpect(jsonPath("$[0].rating").value(feedbackDTO.getRating()))
 				.andExpect(jsonPath("$[0].fb_content").value(feedbackDTO.getFbContent()));
 

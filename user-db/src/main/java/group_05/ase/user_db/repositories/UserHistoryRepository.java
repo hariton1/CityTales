@@ -14,6 +14,6 @@ public interface UserHistoryRepository extends JpaRepository<UserHistoryEntity, 
 
     List<UserHistoryEntity> findAllByUserId(UUID userId);
 
-    List<UserHistoryEntity> findAllByArticleId(UUID articleId);
+    List<UserHistoryEntity> findAllByArticleId(int articleId);
 
 }

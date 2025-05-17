@@ -20,9 +20,8 @@ public class InterestRepositoryTest {
 
     private final InterestEntity friendsEntity = new InterestEntity(
             4,
-            1,
             "building",
-            "the person is interested in buildings serving as a medical centers"
+            "the person is interested in buildings"
     );
 
     @Test
@@ -32,26 +31,10 @@ public class InterestRepositoryTest {
 
         assertThat(tmp).isNotNull();
         assertThat(tmp.getInterestId()).isEqualTo(friendsEntity.getInterestId());
-        assertThat(tmp.getInterestTypeId()).isEqualTo(friendsEntity.getInterestTypeId());
         assertThat(tmp.getInterestName()).isEqualTo(friendsEntity.getInterestName());
         assertThat(tmp.getDescription()).isEqualTo(friendsEntity.getDescription());
 
         System.out.println("Test testFindByInterestId passed!");
-
-    }
-
-    @Test
-    public void testFindByInterestTypeId() {
-
-        InterestEntity tmp = interestRepository.findByInterestTypeId(1);
-
-        assertThat(tmp).isNotNull();
-        assertThat(tmp.getInterestId()).isEqualTo(friendsEntity.getInterestId());
-        assertThat(tmp.getInterestTypeId()).isEqualTo(friendsEntity.getInterestTypeId());
-        assertThat(tmp.getInterestName()).isEqualTo(friendsEntity.getInterestName());
-        assertThat(tmp.getDescription()).isEqualTo(friendsEntity.getDescription());
-
-        System.out.println("Test testFindByInterestTypeId passed!");
 
     }
 
@@ -62,7 +45,6 @@ public class InterestRepositoryTest {
 
         assertThat(tmp).isNotNull();
         assertThat(tmp.getInterestId()).isEqualTo(friendsEntity.getInterestId());
-        assertThat(tmp.getInterestTypeId()).isEqualTo(friendsEntity.getInterestTypeId());
         assertThat(tmp.getInterestName()).isEqualTo(friendsEntity.getInterestName());
         assertThat(tmp.getDescription()).isEqualTo(friendsEntity.getDescription());
 
@@ -73,11 +55,10 @@ public class InterestRepositoryTest {
     @Test
     public void testFindByDescriptionContaining() {
 
-        ArrayList<InterestEntity> tmp = new ArrayList<>(interestRepository.findByDescriptionContaining("medical"));
+        ArrayList<InterestEntity> tmp = new ArrayList<>(interestRepository.findByDescriptionContaining("build"));
 
         assertThat(tmp).isNotNull();
         assertThat(tmp.getFirst().getInterestId()).isEqualTo(friendsEntity.getInterestId());
-        assertThat(tmp.getFirst().getInterestTypeId()).isEqualTo(friendsEntity.getInterestTypeId());
         assertThat(tmp.getFirst().getInterestName()).isEqualTo(friendsEntity.getInterestName());
         assertThat(tmp.getFirst().getDescription()).isEqualTo(friendsEntity.getDescription());
 
