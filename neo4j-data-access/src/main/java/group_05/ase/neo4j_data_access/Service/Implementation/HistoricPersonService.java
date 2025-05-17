@@ -50,19 +50,20 @@ public class HistoricPersonService implements IHistoricPersonService {
         }
     }
 
-    public HistoricPersonDTO getPersonById(String wikiDataId) {
+    public HistoricPersonDTO getPersonById(int viennaHistoryWikiId) {
         try (Session session = driver.session()) {
-            String query = "MATCH (p:HistoricPerson {wikiDataId: $wikiDataId}) RETURN p";
+            String query = "MATCH (p:WienGeschichteWikiPersons {viennaHistoryWikiId: $viennaHistoryWikiId}) RETURN p";
             Record record = session.executeRead(tx ->
-                    tx.run(query, Values.parameters("wikiDataId", wikiDataId)).single());
+                    tx.run(query, Values.parameters("viennaHistoryWikiId", viennaHistoryWikiId)).single());
 
             Node node = record.get("p").asNode();
-            HistoricalPersonEntity entity = mapNodeToPersonEntity(node);
-            String content = wikipediaExtractorService.getFirstParagraph(entity.getWikipediaUrl());
+            ViennaHistoryWikiPersonObject entity = mapNodeToPersonEntity(node);
+            // Todo: change
+            String content = "";
             return new HistoricPersonDTO(entity,content);
 
         } catch (NoSuchRecordException e) {
-            System.err.println("HistoricPerson with ID " + wikiDataId + " not found.");
+            System.err.println("WienGeschichteWikiPersons with ID " + viennaHistoryWikiId + " not found.");
             return null;
         }
     }
@@ -71,7 +72,7 @@ public class HistoricPersonService implements IHistoricPersonService {
         List<HistoricPersonDTO> personDTOs = new ArrayList<>();
 
         try (Session session = driver.session()) {
-            String query = "MATCH (p:HistoricPerson) " +
+            String query = "MATCH (p:WienGeschichteWikiPersons) " +
                     "WHERE toLower(p.name) CONTAINS toLower($name) " +
                     "RETURN p";
 
@@ -81,8 +82,9 @@ public class HistoricPersonService implements IHistoricPersonService {
 
             for (Record record : records) {
                 Node node = record.get("p").asNode();
-                HistoricalPersonEntity entity = mapNodeToPersonEntity(node);
-                String content = wikipediaExtractorService.getFirstParagraph(entity.getWikipediaUrl());
+                ViennaHistoryWikiPersonObject entity = mapNodeToPersonEntity(node);
+                // Todo: change
+                String content = "";
                 HistoricPersonDTO dto = new HistoricPersonDTO(entity, content);
                 personDTOs.add(dto);
             }
@@ -94,42 +96,72 @@ public class HistoricPersonService implements IHistoricPersonService {
         return personDTOs;
     }
 
-    public List<HistoricPersonDTO> getAllLinkedHistoricPersonsById(String wikiDataId) {
+    public List<HistoricPersonDTO> getAllLinkedHistoricPersonsById(int viennaHistoryWikiId) {
         List<HistoricPersonDTO> linkedPersons = new ArrayList<>();
 
         try (Session session = driver.session()) {
-            String query = "MATCH (p:HistoricPerson {wikiDataId: $wikiDataId})-[:RELATED_TO]->(linked:HistoricPerson) " +
+            String query = "MATCH (p:WienGeschichteWikiPersons {viennaHistoryWikiId: $viennaHistoryWikiId})-[:HAS_LINK_TO]->(linked:WienGeschichteWikiPersons) " +
                     "RETURN linked";
 
             List<Record> records = session.readTransaction(tx ->
-                    tx.run(query, Values.parameters("wikiDataId", wikiDataId)).list()
+                    tx.run(query, Values.parameters("viennaHistoryWikiId", viennaHistoryWikiId)).list()
             );
 
             for (Record record : records) {
                 Node linkedNode = record.get("linked").asNode();
-                HistoricalPersonEntity entity = mapNodeToPersonEntity(linkedNode);
-                String content = wikipediaExtractorService.getFirstParagraph(entity.getWikipediaUrl());
+                ViennaHistoryWikiPersonObject entity = mapNodeToPersonEntity(linkedNode);
+                // Todo: change
+                String content = "";
                 HistoricPersonDTO dto = new HistoricPersonDTO(entity, content);
                 linkedPersons.add(dto);
             }
 
         } catch (Exception e) {
-            System.err.println("Error retrieving linked historic persons for wikiDataId " + wikiDataId + ": " + e.getMessage());
+            System.err.println("Error retrieving linked historic persons for wikiDataId " + viennaHistoryWikiId + ": " + e.getMessage());
         }
 
         return linkedPersons;
     }
 
-    private HistoricalPersonEntity mapNodeToPersonEntity(Node node) {
-        HistoricalPersonEntity personEntity = new HistoricalPersonEntity();
-        personEntity.setWikiDataId(node.get("wikiDataId").asString());
-        personEntity.setShortDescription(node.get("shortDescription").asString());
+    private ViennaHistoryWikiPersonObject mapNodeToPersonEntity(Node node) {
+        ViennaHistoryWikiPersonObject personEntity = new ViennaHistoryWikiPersonObject();
+
+        personEntity.setViennaHistoryWikiId(node.get("viennaHistoryWikiId").asInt());
         personEntity.setName(node.get("name").asString());
-        personEntity.setWikipediaUrl(node.get("wikipediaUrl").asString());
-        personEntity.setImageUrl(node.get("imageUrl").asString());
-        personEntity.setYearOfBirth(0); // for now
-        personEntity.setYearOfDeath(0); // for now
-        personEntity.setImageUrl(node.get("imageUrl").asString());
+        personEntity.setUrl(node.get("url").asString());
+        personEntity.setPersonName(Optional.ofNullable(getSafeString(node, "personName")));
+        personEntity.setAlternativeName(Optional.ofNullable(getSafeString(node, "alternativeName")));
+        personEntity.setTitles(Optional.ofNullable(getSafeString(node, "titles")));
+        personEntity.setSex(Optional.ofNullable(getSafeString(node, "sex")));
+        personEntity.setGnd(Optional.ofNullable(getSafeString(node, "gnd")));
+        personEntity.setWikidataId(Optional.ofNullable(getSafeString(node, "wikidataId")));
+        personEntity.setBirthDate(Optional.ofNullable(getSafeString(node, "birthDate")));
+        personEntity.setBirthPlace(Optional.ofNullable(getSafeString(node, "birthPlace")));
+        personEntity.setDeathDate(Optional.ofNullable(getSafeString(node, "deathDate")));
+        personEntity.setDeathPlace(Optional.ofNullable(getSafeString(node, "deathPlace")));
+        personEntity.setJobs(Optional.ofNullable(getSafeString(node, "jobs")));
+        personEntity.setPoliticalLinkage(Optional.ofNullable(getSafeString(node, "politicalLinkage")));
+        personEntity.setEvent(Optional.ofNullable(getSafeString(node, "event")));
+        personEntity.setEstate(Optional.ofNullable(getSafeString(node, "estate")));
+        personEntity.setSeeAlso(Optional.ofNullable(getSafeString(node, "seeAlso")));
+        personEntity.setResource(Optional.ofNullable(getSafeString(node, "resource")));
+
+        if (node.containsKey("links")) {
+            personEntity.setLinks(node.get("links").asList(Value::asString));
+        } else {
+            personEntity.setLinks(new ArrayList<>());
+        }
+
+        if (node.containsKey("imageUrls")) {
+            personEntity.setImageUrls(node.get("imageUrls").asList(Value::asString));
+        } else {
+            personEntity.setImageUrls(new ArrayList<>());
+        }
+
         return personEntity;
+    }
+
+    private String getSafeString(Node node, String key) {
+        return node.containsKey(key) ? node.get(key).asString() : "N/A";
     }
 }

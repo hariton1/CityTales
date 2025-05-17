@@ -39,7 +39,7 @@ public class UserHistoriesControllerTest {
     private final UserHistoryDTO userHistoryDTO = new UserHistoryDTO (
             2,
             UUID.fromString("f5599c8c-166b-495c-accc-65addfaa572b"),
-            UUID.fromString("f5599c8c-166b-495c-accc-65addfaa572a"),
+            1,
             null,
             null,
             2
@@ -58,7 +58,7 @@ public class UserHistoriesControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].user_history_id").value(userHistoryDTO.getUserHistoryId()))
                 .andExpect(jsonPath("$[0].user_id").value(userHistoryDTO.getUserId().toString()))
-                .andExpect(jsonPath("$[0].article_id").value(userHistoryDTO.getArticleId().toString()))
+                .andExpect(jsonPath("$[0].article_id").value(userHistoryDTO.getArticleId()))
                 .andExpect(jsonPath("$[0].interest_id").value(userHistoryDTO.getInterestId()));
 
         System.out.println("Test testGetAllUserHistories passed!");
@@ -76,7 +76,7 @@ public class UserHistoriesControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.user_history_id").value(userHistoryDTO.getUserHistoryId()))
                 .andExpect(jsonPath("$.user_id").value(userHistoryDTO.getUserId().toString()))
-                .andExpect(jsonPath("$.article_id").value(userHistoryDTO.getArticleId().toString()))
+                .andExpect(jsonPath("$.article_id").value(userHistoryDTO.getArticleId()))
                 .andExpect(jsonPath("$.interest_id").value(userHistoryDTO.getInterestId()));
 
         System.out.println("Test testGetUserHistoriesById passed!");
@@ -94,7 +94,7 @@ public class UserHistoriesControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].user_history_id").value(userHistoryDTO.getUserHistoryId()))
                 .andExpect(jsonPath("$[0].user_id").value(userHistoryDTO.getUserId().toString()))
-                .andExpect(jsonPath("$[0].article_id").value(userHistoryDTO.getArticleId().toString()))
+                .andExpect(jsonPath("$[0].article_id").value(userHistoryDTO.getArticleId()))
                 .andExpect(jsonPath("$[0].interest_id").value(userHistoryDTO.getInterestId()));
 
         System.out.println("Test testGetUserHistoriesByUserId passed!");
@@ -104,15 +104,15 @@ public class UserHistoriesControllerTest {
     @Test
     public void testGetUserHistoriesByArticleId() throws Exception {
 
-        when(userHistoryService.getUserHistoriesByArticleId(any(UUID.class))).thenReturn(userHistoryDTOs);
+        when(userHistoryService.getUserHistoriesByArticleId(any(int.class))).thenReturn(userHistoryDTOs);
 
-        mockMvc.perform(get("/userHistories/article_id=f5599c8c-166b-495c-accc-65addfaa572a")
+        mockMvc.perform(get("/userHistories/article_id=1")
                         .content(mapper.writeValueAsString(userHistoryDTOs))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].user_history_id").value(userHistoryDTO.getUserHistoryId()))
                 .andExpect(jsonPath("$[0].user_id").value(userHistoryDTO.getUserId().toString()))
-                .andExpect(jsonPath("$[0].article_id").value(userHistoryDTO.getArticleId().toString()))
+                .andExpect(jsonPath("$[0].article_id").value(userHistoryDTO.getArticleId()))
                 .andExpect(jsonPath("$[0].interest_id").value(userHistoryDTO.getInterestId()));
 
         System.out.println("Test testGetUserHistoriesByArticleId passed!");
