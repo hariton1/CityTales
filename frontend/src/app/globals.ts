@@ -3,4 +3,4 @@ export const SERVER_CONNECTION_TEST_STRING = 'Connection to PostgreDB is working
 
 
 //Adress for fetching backend entites in search function
-export const BACKEND_ADDRESS = 'http://localhost:8083';
+export const BACKEND_ADDRESS = 'http://localhost:8083/';

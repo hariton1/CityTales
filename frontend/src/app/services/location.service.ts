@@ -1,14 +1,23 @@
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpParams} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {SERVER_ADDRESS} from '../globals';
+import {BACKEND_ADDRESS, SERVER_ADDRESS} from '../globals';
 import {LocationDto} from '../dto/location.dto';
 import {Injectable} from '@angular/core';
+import {HistoricalPlaceEntity} from '../dto/db_entity/HistoricalPlaceEntity';
 
 @Injectable({ providedIn: 'root' })
 export class LocationService {
 
   constructor(private httpClient: HttpClient) {
   }
+
+  public getLocationsInRadius(latitude: number, longitude: number, radius: number): Observable<HistoricalPlaceEntity[]> {
+    var params = new HttpParams().set('latitude', latitude).set('longitude', longitude).set('radius', radius);
+    return this.httpClient.get<HistoricalPlaceEntity[]>(BACKEND_ADDRESS + 'api/historicPlace/by/location', {
+      params: params
+    });
+  }
+
 
   public createLocation(locationDto: LocationDto): Observable<LocationDto> {
     return this.httpClient.post<LocationDto>(SERVER_ADDRESS + 'location/create', {
