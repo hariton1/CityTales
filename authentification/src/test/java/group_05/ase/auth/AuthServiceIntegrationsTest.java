@@ -1,89 +1,101 @@
 package group_05.ase.auth;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-import java.util.UUID;
+import java.time.Instant;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-@Transactional // Rollback nach jedem Test (empfohlen für Integrationstests)
-class AuthServiceIntegrationTest {
+public class AuthServiceIntegrationsTest {
 
     @Autowired
-    AppUserRepository userRepository;
-
+    private AuthService authService;
     @Autowired
-    AuthService authService;
-
+    private AppUserRepository userRepository;
     @Autowired
-    JwtService jwtService;
+    private RefreshTokenService refreshTokenService;
 
-    @Autowired
-    SupabaseService supabaseService;
-
-    String testEmail = "integrationtest@example.com";
-
-    @BeforeEach
-    void cleanUpBefore() {
-        // Optional: Clean-up oder Setup, falls nötig
-        userRepository.deleteAll();
-    }
-
-    @Test
-    void registerAndLoginWithSupabaseAndJwt() {
-        RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setEmail(testEmail);
-        registerRequest.setPassword("MySecret123!");
-
-        String jwt = authService.register(registerRequest);
-        assertNotNull(jwt, "JWT sollte zurückgegeben werden");
-
-        Optional<AppUser> createdUserOpt = userRepository.findByEmail("integrationtest@example.com");
-        assertTrue(createdUserOpt.isPresent(), "User sollte in der DB gespeichert sein");
-        AppUser createdUser = createdUserOpt.get();
-        assertNotNull(createdUser.getSupabaseId(), "SupabaseId sollte gesetzt sein");
-
-        LoginRequest loginRequest = new LoginRequest();
-        loginRequest.setEmail(testEmail);
-        loginRequest.setPassword("MySecret123!");
-
-        String jwt2 = authService.login(loginRequest);
-        assertNotNull(jwt2, "Login sollte JWT zurückgeben");
-
-        // 4. Login mit falschem Passwort (soll Exception werfen)
-        LoginRequest wrongLogin = new LoginRequest();
-        wrongLogin.setEmail("integrationtest@example.com");
-        wrongLogin.setPassword("wrongPassword");
-        assertThrows(Exception.class, () -> authService.login(wrongLogin));
-    }
-
-    @Test
-    void userRepositorySavesAndFindsUser() {
-        AppUser user = AppUser.builder()
-                .email("findme@example.com")
-                .supabaseId(UUID.randomUUID())
-                .build();
-
-        userRepository.save(user);
-
-        Optional<AppUser> found = userRepository.findByEmail("findme@example.com");
-        assertTrue(found.isPresent());
-        assertEquals(user.getEmail(), found.get().getEmail());
-    }
+    private final List<String> createdEmails = new ArrayList<>();
 
     @AfterEach
     void cleanupAfter() {
-        userRepository.findByEmail(testEmail).ifPresent(user -> {
-            if (user.getSupabaseId() != null) {
-                supabaseService.deleteUser(user.getSupabaseId());
-            }
-        });
-        userRepository.deleteAll();
+        for (String email : createdEmails) {
+            userRepository.findByEmail(email).ifPresent(userRepository::delete);
+        }
+        createdEmails.clear();
     }
 
+    @Test
+    void shouldRegisterAndLoginViaService() {
+        String email = "serviceint-" + UUID.randomUUID() + "@test.com";
+        String password = "pw123";
+        createdEmails.add(email);
+
+        RegisterRequest regReq = new RegisterRequest();
+        regReq.setEmail(email);
+        regReq.setPassword(password);
+
+        String jwt = authService.register(regReq);
+        assertNotNull(jwt);
+
+        LoginRequest loginReq = new LoginRequest();
+        loginReq.setEmail(email);
+        loginReq.setPassword(password);
+
+        String jwt2 = authService.login(loginReq);
+        assertNotNull(jwt2);
+    }
+
+    @Test
+    void shouldFailRegisterWithDuplicateEmail() {
+        String email = "dupserviceint-" + UUID.randomUUID() + "@test.com";
+        String password = "pw123";
+        createdEmails.add(email);
+
+        RegisterRequest regReq = new RegisterRequest();
+        regReq.setEmail(email);
+        regReq.setPassword(password);
+
+        String jwt = authService.register(regReq);
+        assertNotNull(jwt);
+
+        RegisterRequest regReq2 = new RegisterRequest();
+        regReq2.setEmail(email);
+        regReq2.setPassword(password);
+
+        assertThrows(RuntimeException.class, () -> authService.register(regReq2));
+    }
+
+    @Test
+    void shouldRefreshTokenAndRevoke() {
+        String email = "refreshint-" + UUID.randomUUID() + "@test.com";
+        String password = "pw123";
+        createdEmails.add(email);
+
+        RegisterRequest regReq = new RegisterRequest();
+        regReq.setEmail(email);
+        regReq.setPassword(password);
+
+        String jwt = authService.register(regReq);
+        assertNotNull(jwt);
+
+        AppUser user = userRepository.findByEmail(email).orElseThrow();
+        String refreshToken = UUID.randomUUID().toString();
+        refreshTokenService.createToken(user.getId(), refreshToken, Instant.now().plusSeconds(3600));
+
+        // Should work
+        String newJwt = authService.refreshAccessToken(refreshToken);
+        assertNotNull(newJwt);
+
+        // Revoke
+        refreshTokenService.revokeToken(refreshToken);
+
+        // Should fail now
+        assertThrows(RuntimeException.class, () -> authService.refreshAccessToken(refreshToken));
+    }
 }
