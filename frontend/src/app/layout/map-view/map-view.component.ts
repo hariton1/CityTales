@@ -1,11 +1,10 @@
-import { Component } from '@angular/core';
+import {Component, Output} from '@angular/core';
 import { GoogleMapsModule} from '@angular/google-maps';
 import { CommonModule} from '@angular/common';
 import {HistoricalPlaceEntity} from '../../dto/db_entity/HistoricalPlaceEntity';
 import {UserLocationService} from '../../services/user-location.service';
 import {LocationService} from '../../services/location.service';
-import {LocationDto} from '../../dto/location.dto';
-
+import {EventEmitter} from '@angular/core';
 @Component({
   selector: 'app-map-view',
   imports: [
@@ -21,7 +20,9 @@ export class MapViewComponent {
               private userLocationService: UserLocationService) {
   }
 
-  private locationsNearby: HistoricalPlaceEntity[] = [];
+  @Output() selectPlaceEvent: EventEmitter<HistoricalPlaceEntity> = new EventEmitter<HistoricalPlaceEntity>();
+
+  locationsNearby: HistoricalPlaceEntity[] = [];
 
   markers: any[] = [];
   center: google.maps.LatLngLiteral = { lat: 48.19865798950195, lng: 16.3714542388916 };
@@ -58,7 +59,7 @@ export class MapViewComponent {
 
     location.then(position => {
       this.center = {lat: position.lat, lng: position.lng};
-      this.locationService.getLocationsInRadius(position.lat, position.lng, 1000).subscribe(locations => {
+      this.locationService.getLocationsInRadius(position.lat, position.lng, 3000).subscribe(locations => {
         this.locationsNearby = locations;
         this.addMarkersToMap(locations);
       })
@@ -71,9 +72,8 @@ export class MapViewComponent {
     })
   }
 
-  openMarkerInfo(marker: google.maps.Marker): void {
-    console.log(marker);
+  openMarkerInfo(location: HistoricalPlaceEntity): void {
+    this.selectPlaceEvent.emit(location);
+    console.log(location);
   }
-
-
 }
