@@ -1,0 +1,49 @@
+<div class="place-detail-container" *ngIf="selectedPlace">
+  <div class="place-detail-card">
+    <!-- Header with building information -->
+    <div class="place-detail-header">
+      <h2 class="place-detail-title">{{selectedPlace.building.name}}</h2>
+      <div class="place-location">
+        <span class="coordinates">
+          {{ selectedPlace.building.latitude }}°N, {{ selectedPlace.building.longitude }}°E
+        </span>
+      </div>
+    </div>
+
+
+    <!-- Main content -->
+    <div class="place-detail-content">
+      <div class="content-section">
+        <h3>Description</h3>
+        <p>{{ selectedPlace.content }}</p>
+      </div>
+
+      <div class="content-section">
+        <h3>Building Information</h3>
+        <div class="building-details">
+          <div class="detail-row" *ngIf="selectedPlace.building.name">
+            <span class="label">Name:</span>
+            <span class="value">{{ selectedPlace.building.name }}</span>
+          </div>
+          <div class="detail-row" *ngIf="selectedPlace.building.dateFrom">
+            <span class="label">Build in:</span>
+            <span class="value">{{ selectedPlace.building.dateFrom }}</span>
+          </div>
+          <div class="detail-row" *ngIf="selectedPlace.building.dateTo">
+            <span class="label">Demolished in:</span>
+            <span class="value">{{ selectedPlace.building.dateTo }}</span>
+          </div>
+          <div class="detail-row" *ngIf="selectedPlace.building.architect">
+            <span class="label">Responsible Architect:</span>
+            <span class="value">{{ selectedPlace.building.architect }}</span>
+          </div>
+          <div class="detail-row" *ngIf="selectedPlace.building.url">
+            <span class="label">Wiki URL:</span>
+            <span class="value"> <a href="{{ selectedPlace.building.url }}"></a>{{ selectedPlace.building.url }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
