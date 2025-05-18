@@ -7,6 +7,7 @@ import {RouterLink, RouterLinkActive} from '@angular/router';
 
 import {LocationDto} from '../../dto/location.dto'
 import {SearchService} from '../../services/search.service'
+import {HistoricalPlaceEntity} from '../../dto/db_entity/HistoricalPlaceEntity';
 
 @Component({
   selector: 'app-header',
@@ -26,7 +27,7 @@ import {SearchService} from '../../services/search.service'
 export class HeaderComponent {
   constructor(private searchService: SearchService) {}
 
-  filteredLocationList: LocationDto[] = [];
+  filteredLocationList: HistoricalPlaceEntity[] = [];
 
 
   getResults(query: string) {
@@ -35,7 +36,7 @@ export class HeaderComponent {
         return;
     }
     this.searchService.searchLocation(query).subscribe({
-      next: (locations: LocationDto[]) => {
+      next: (locations: HistoricalPlaceEntity[]) => {
         this.filteredLocationList = locations;
         console.log(locations);
         console.log("Received locations!")
@@ -47,7 +48,6 @@ export class HeaderComponent {
         // Optional: Handle completion if needed
       }
     });
-
 
     console.log(this.searchService.searchLocation(query));
     }
