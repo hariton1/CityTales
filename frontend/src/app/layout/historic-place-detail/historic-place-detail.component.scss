@@ -1,0 +1,101 @@
+.place-detail-container {
+  padding: 16px;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.place-detail-card {
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.place-detail-header {
+  padding: 16px 24px;
+  background-color: #f5f5f5;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.place-detail-title {
+  margin: 0;
+  font-size: 24px;
+  color: #333;
+  font-weight: 500;
+}
+
+.place-location {
+  margin-top: 8px;
+  color: #666;
+  font-size: 14px;
+}
+
+.place-detail-content {
+  padding: 24px;
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+.content-section {
+  margin-bottom: 24px;
+
+  h3 {
+    margin: 0 0 16px 0;
+    color: #333;
+    font-size: 18px;
+    font-weight: 500;
+  }
+
+  p {
+    margin: 0;
+    line-height: 1.6;
+    color: #444;
+  }
+}
+
+.building-details {
+  .detail-row {
+    display: flex;
+    margin-bottom: 8px;
+
+    .label {
+      width: 100px;
+      color: #666;
+      font-weight: 500;
+    }
+
+    .value {
+      color: #333;
+      flex: 1;
+    }
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 600px) {
+  .place-detail-container {
+    padding: 8px;
+  }
+
+  .place-detail-header {
+    padding: 12px 16px;
+  }
+
+  .place-detail-content {
+    padding: 16px;
+  }
+
+  .building-details {
+    .detail-row {
+      flex-direction: column;
+
+      .label {
+        width: auto;
+        margin-bottom: 4px;
+      }
+    }
+  }
+}
