@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import {SidebarComponent} from '../sidebar/sidebar.component';
 import {MapViewComponent} from '../map-view/map-view.component';
+import {HistoricalPlaceEntity} from '../../dto/db_entity/HistoricalPlaceEntity';
 
 @Component({
   selector: 'app-explore-layout',
@@ -12,5 +13,12 @@ import {MapViewComponent} from '../map-view/map-view.component';
   styleUrl: './explore-layout.component.scss'
 })
 export class ExploreLayoutComponent {
+
+  public selectedPlace?: HistoricalPlaceEntity;
+
+  setSelectedPlace(place: HistoricalPlaceEntity) {
+    this.selectedPlace = place;
+  }
+
 
 }
