@@ -33,5 +33,31 @@ public class AppUserRepositoryTest {
         assertTrue(found.isPresent());
         assertEquals(saved.getId(), found.get().getId());
     }
+
+    @Test
+    void shouldReturnEmptyIfUserNotExists() {
+        Optional<AppUser> found = appUserRepository.findByEmail("doesnotexist@example.com");
+        assertTrue(found.isEmpty());
+    }
+
+    @Test
+    void shouldNotMixUpUsers() {
+        AppUser user1 = new AppUser();
+        user1.setEmail("one@example.com");
+        user1.setSupabaseId(UUID.randomUUID());
+        appUserRepository.save(user1);
+
+        AppUser user2 = new AppUser();
+        user2.setEmail("two@example.com");
+        user2.setSupabaseId(UUID.randomUUID());
+        appUserRepository.save(user2);
+
+        Optional<AppUser> found = appUserRepository.findByEmail("two@example.com");
+        assertTrue(found.isPresent());
+        assertEquals("two@example.com", found.get().getEmail());
+    }
+
+
+
 }
 

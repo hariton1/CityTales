@@ -91,4 +91,19 @@ public class SupabaseService {
         }
     }
 
+    public void forgotPassword(String email) {
+        String url = supabaseProjectUrl + "/auth/v1/recover";
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("apikey", supabaseServiceRoleKey);
+        headers.set("Authorization", "Bearer " + supabaseServiceRoleKey);
+
+        JSONObject json = new JSONObject();
+        json.put("email", email);
+
+        HttpEntity<String> request = new HttpEntity<>(json.toString(), headers);
+
+        restTemplate.postForEntity(url, request, String.class);
+    }
+
 }

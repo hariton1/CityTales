@@ -23,16 +23,25 @@ public class AuthService {
             throw new RuntimeException("Email already registered");
         }
 
+        // Create the user on Supabase
         String supabaseId = supabaseService.createUser(request.getEmail(), request.getPassword());
 
+        // Ensure the supabaseId is not null or invalid before proceeding
+        if (supabaseId == null || supabaseId.isEmpty()) {
+            throw new RuntimeException("Failed to create user on Supabase, ID is null or empty");
+        }
+
+        // Continue with the registration process
         AppUser user = AppUser.builder()
                 .email(request.getEmail())
-                .supabaseId(UUID.fromString(supabaseId))
+                .supabaseId(UUID.fromString(supabaseId))  // Convert the ID to UUID
                 .build();
         userRepository.save(user);
 
-        return jwtService.generateToken(user);
+        return jwtService.generateToken(user);  // Return the generated JWT token
     }
+
+
 
     public String login(LoginRequest request) {
         String supabaseToken = supabaseService.loginUser(request.getEmail(), request.getPassword());

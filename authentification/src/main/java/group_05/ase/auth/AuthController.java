@@ -15,6 +15,7 @@ public class AuthController {
 
     private final AuthService authService;
     private final RefreshTokenService refreshTokenService;
+    private final SupabaseService supabaseService;
 
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody RegisterRequest request) {
@@ -41,9 +42,9 @@ public class AuthController {
         return ResponseEntity.ok().build();
     }
 
-//    @DeleteMapping("/delete/{email}")
-//    public ResponseEntity<String> delete(@PathVariable String email) {
-//        authService.deleteAccount(email);
-//        return ResponseEntity.ok("Account deleted.");
-//    }
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> body) {
+        supabaseService.forgotPassword(body.get("email"));
+        return ResponseEntity.ok().build();
+    }
 }
