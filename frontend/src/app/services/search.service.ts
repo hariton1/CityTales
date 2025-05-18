@@ -3,7 +3,6 @@ import { HttpParams } from '@angular/common/http';
 
 import {Observable} from 'rxjs';
 import {BACKEND_ADDRESS} from '../globals';
-import {LocationDto} from '../dto/location.dto';
 import {Injectable} from '@angular/core';
 import {HistoricalPlaceEntity} from '../dto/db_entity/HistoricalPlaceEntity';
 import {HistoricalPersonEntity} from '../dto/db_entity/HistoricalPersonEntity';

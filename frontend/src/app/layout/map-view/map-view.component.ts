@@ -74,6 +74,5 @@ export class MapViewComponent {
 
   openMarkerInfo(location: HistoricalPlaceEntity): void {
     this.selectPlaceEvent.emit(location);
-    console.log(location);
   }
 }
