@@ -8,36 +8,23 @@ import {HistoricalPlaceEntity} from '../dto/db_entity/HistoricalPlaceEntity';
 @Injectable({ providedIn: 'root' })
 export class LocationService {
 
+  private LOCATION_PATH = 'api/historicPlace/'
+
   constructor(private httpClient: HttpClient) {
   }
 
   public getLocationsInRadius(latitude: number, longitude: number, radius: number): Observable<HistoricalPlaceEntity[]> {
     var params = new HttpParams().set('latitude', latitude).set('longitude', longitude).set('radius', radius);
-    return this.httpClient.get<HistoricalPlaceEntity[]>(BACKEND_ADDRESS + 'api/historicPlace/by/location', {
+    return this.httpClient.get<HistoricalPlaceEntity[]>(BACKEND_ADDRESS + this.LOCATION_PATH + 'by/location', {
       params: params
     });
   }
 
-
-  public createLocation(locationDto: LocationDto): Observable<LocationDto> {
-    return this.httpClient.post<LocationDto>(SERVER_ADDRESS + 'location/create', {
-      params: [],
-      data: locationDto
-    });
+  public getLocationByVHWId(id: number): Observable<HistoricalPlaceEntity> {
+    return this.httpClient.get<HistoricalPlaceEntity>(BACKEND_ADDRESS + this.LOCATION_PATH + 'by/id/' + id.toString());
   }
 
-  public readLocation(locationId: number): Observable<LocationDto> {
-    return this.httpClient.get<LocationDto>(SERVER_ADDRESS + 'location/read' + locationId);
-  }
-
-  public updateLocation(locationDto: LocationDto): Observable<LocationDto> {
-    return this.httpClient.put<LocationDto>(SERVER_ADDRESS + 'location/update', {
-      params: [],
-      data: locationDto
-    });
-  }
-
-  public deleteLocation(locationId: number): Observable<boolean> {
-    return this.httpClient.delete<boolean>(SERVER_ADDRESS + 'location/delete/' + locationId);
+  public getLocationByPartialName(name: string): Observable<HistoricalPlaceEntity[]> {
+    return this.httpClient.get<HistoricalPlaceEntity[]>(BACKEND_ADDRESS + this.LOCATION_PATH + 'by/name/' + name);
   }
 }
