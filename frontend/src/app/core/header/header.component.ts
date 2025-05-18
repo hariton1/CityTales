@@ -5,7 +5,6 @@ import {TuiSegmented} from '@taiga-ui/kit';
 import {TuiHeaderComponent, TuiLogoComponent} from '@taiga-ui/layout';
 import {RouterLink, RouterLinkActive} from '@angular/router';
 
-import {LocationDto} from '../../dto/location.dto'
 import {SearchService} from '../../services/search.service'
 import {HistoricalPlaceEntity} from '../../dto/db_entity/HistoricalPlaceEntity';
 

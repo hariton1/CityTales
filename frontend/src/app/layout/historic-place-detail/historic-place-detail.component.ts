@@ -1,6 +1,5 @@
 import { Component, Input } from '@angular/core';
-import {CommonModule, DecimalPipe, NgIf} from '@angular/common';
-import {HistoricalPlaceEntity} from '../../dto/db_entity/HistoricalPlaceEntity';
+import {CommonModule, NgIf} from '@angular/common';
 
 @Component({
   selector: 'app-historic-place-detail',
