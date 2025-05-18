@@ -6,6 +6,7 @@ import {BACKEND_ADDRESS} from '../globals';
 import {LocationDto} from '../dto/location.dto';
 import {Injectable} from '@angular/core';
 import {HistoricalPlaceEntity} from '../dto/db_entity/HistoricalPlaceEntity';
+import {HistoricalPersonEntity} from '../dto/db_entity/HistoricalPersonEntity';
 
 @Injectable({ providedIn: 'root' })
 export class SearchService {
@@ -15,7 +16,14 @@ export class SearchService {
 
   public searchLocation(text: string): Observable<HistoricalPlaceEntity[]> {
     const params = new HttpParams().set('query', text);
-    return this.httpClient.get<HistoricalPlaceEntity[]>('http://localhost:8083/api/search/searchPlaces', {
+    return this.httpClient.get<HistoricalPlaceEntity[]>(BACKEND_ADDRESS + 'api/search/searchPlaces', {
+      params: params
+    });
+  }
+
+  public searchPersons(text: string): Observable<HistoricalPersonEntity[]> {
+    const params = new HttpParams().set('query', text);
+    return this.httpClient.get<HistoricalPersonEntity[]>(BACKEND_ADDRESS + 'api/search/searchPersons', {
       params: params
     });
   }
