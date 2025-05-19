@@ -1,0 +1,28 @@
+<tui-scrollbar class="preview-scroll-block">
+  <div tuiPlatform="web" class="preview-block" *ngFor="let place of historicalPlaces">
+    <div
+      tuiAppearance="floating"
+      tuiCardLarge
+    >
+      <header tuiHeader>
+        <h2 tuiTitle>{{place.building.name}}</h2>
+      </header>
+
+      <section>WikiDataId: {{place.building.wikidataId}}</section>
+
+      <footer>
+        <button
+          appearance="secondary"
+          size="l"
+          tuiButton
+          type="button",
+          (click)="onDetailsClick(place)"
+        >
+          Details
+        </button>
+      </footer>
+    </div>
+  </div>
+
+</tui-scrollbar>
+

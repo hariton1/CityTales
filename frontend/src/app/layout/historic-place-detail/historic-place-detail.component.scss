@@ -15,10 +15,16 @@
 }
 
 .place-detail-header {
-  padding: 16px 24px;
-  background-color: #f5f5f5;
-  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 1rem;
 }
+
+.header-content {
+  flex: 1;
+}
+
 
 .place-detail-title {
   margin: 0;

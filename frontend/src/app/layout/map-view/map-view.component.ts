@@ -5,6 +5,9 @@ import {HistoricalPlaceEntity} from '../../dto/db_entity/HistoricalPlaceEntity';
 import {UserLocationService} from '../../services/user-location.service';
 import {LocationService} from '../../services/location.service';
 import {EventEmitter} from '@angular/core';
+import {Router} from '@angular/router';
+import {RouterModule} from '@angular/router';
+
 @Component({
   selector: 'app-map-view',
   imports: [
@@ -21,7 +24,7 @@ export class MapViewComponent {
   }
 
   @Output() selectPlaceEvent: EventEmitter<HistoricalPlaceEntity> = new EventEmitter<HistoricalPlaceEntity>();
-
+  @Output() populatePlacesEvent = new EventEmitter<HistoricalPlaceEntity[]>();
   locationsNearby: HistoricalPlaceEntity[] = [];
 
   markers: any[] = [];
@@ -62,6 +65,7 @@ export class MapViewComponent {
       this.locationService.getLocationsInRadius(position.lat, position.lng, 3000).subscribe(locations => {
         this.locationsNearby = locations;
         this.addMarkersToMap(locations);
+        this.populatePlacesEvent.emit(locations);
       })
     })
   }
