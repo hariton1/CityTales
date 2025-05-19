@@ -4,6 +4,8 @@ import {FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {TuiFilter} from '@taiga-ui/kit';
 import {UserService} from '../../services/user.service';
 import {InterestDto} from '../../dto/interest.dto';
+import {forkJoin, of, switchMap} from 'rxjs';
+import {UserInterestDto} from '../../dto/user-interest.dto';
 
 
 @Component({
@@ -38,46 +40,6 @@ export class OnboardingComponent implements OnInit{
     this.getAllInterests();
   }
 
-  /*
-  fetchUserInterests(): void {
-    this.loading = true;
-
-    // Use switchMap to handle the sequential flow
-    this.userService.readInterests('f5599c8c-166b-495c-accc-65addfaa572b')
-      .pipe(
-        switchMap(interests => {
-          this.interestsList = interests;
-
-          // If no interests, return an empty array observable
-          if (interests.length === 0) {
-            return of([]);
-          }
-
-          // Create an array of observables for each interest detail request
-          const detailRequests = interests.map(interest =>
-            this.userService.readInterestDetail(interest.getInterestId())
-          );
-
-          // Use forkJoin to wait for all detail requests to complete
-          return forkJoin(detailRequests);
-        })
-      )
-      .subscribe({
-        next: (interestDetails) => {
-          // Extract names from the interest details
-          this.interestNames = interestDetails.map(detail => detail.getInterestName());
-          console.log('Interest names:', this.interestNames);
-          this.loading = false;
-        },
-        error: (err) => {
-          console.error('Error fetching interests or details:', err);
-          this.error = err;
-          this.loading = false;
-        }
-      });
-  } */
-
-
   getAllInterests(): void {
     this.userService.getAllInterests()
       .subscribe({
@@ -90,8 +52,6 @@ export class OnboardingComponent implements OnInit{
         }
       });
   }
-
-
 
   protected readonly form = new FormGroup({
     filters: new FormControl([]),

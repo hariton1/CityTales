@@ -1,0 +1,27 @@
+<div class="centered-wrapper">
+  <form [formGroup]="form">
+    <tui-filter
+      formControlName="filters"
+      size="s"
+      [items]="interestNames"
+    />
+
+    <footer>
+      <button
+        tuiButton
+        type="submit"
+        (click)="onSubmit()"
+      >
+        <tui-icon
+          icon="@tui.save"
+          [style.height.rem]="1.2"
+        />
+        Save changes
+      </button>
+    </footer>
+
+  </form>
+  <div>
+    <pre>Form value: {{ form.value | json }}</pre>
+  </div>
+</div>
