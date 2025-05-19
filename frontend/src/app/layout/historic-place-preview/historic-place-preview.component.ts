@@ -20,10 +20,11 @@ export class HistoricPlacePreviewComponent {
 
   @Input() historicalPlaces: HistoricalPlaceEntity[] = [];
   @Output() selectPlaceEvent: EventEmitter<HistoricalPlaceEntity> = new EventEmitter<HistoricalPlaceEntity>();
+  @Output() setDetailedViewEvent: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   onDetailsClick(place: HistoricalPlaceEntity) {
-    console.log(place);
     this.selectPlaceEvent.emit(place);
+    this.setDetailedViewEvent.emit(true);
   }
 
 }

@@ -18,9 +18,7 @@ export class SidebarComponent {
 
   @Input() selectedPlace: any;
   @Input() historicalPlaces: HistoricalPlaceEntity[] = [];
-
-  showDetail: boolean = false;
-  showPreview: boolean = false;
+  @Input() detailedView: boolean = false;
 
 
   setSelectedPlace(place: any) {
@@ -28,8 +26,8 @@ export class SidebarComponent {
   }
 
   setDetailEvent(event: boolean): void {
-    this.showDetail = event
-    console.log(event);
+    this.detailedView = event
+    console.log(this.detailedView);
   }
 
   setHistoricalPlaces(places: HistoricalPlaceEntity[]): void {
