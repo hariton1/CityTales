@@ -16,6 +16,7 @@ export class ExploreLayoutComponent {
 
   selectedPlace: HistoricalPlaceEntity | null = null;
   historicalPlaces: HistoricalPlaceEntity[] = [];
+  setDetailedView: boolean = false;
 
   setSelectedPlace(place: HistoricalPlaceEntity) {
     this.selectedPlace = place;
@@ -24,5 +25,10 @@ export class ExploreLayoutComponent {
   setHistoricalPlaces(places: HistoricalPlaceEntity[]) {
     this.historicalPlaces = places;
     console.log(places);
+  }
+
+  setDetailedViewEvent(value: boolean) {
+    this.setDetailedView = value;
+    console.log(this.setDetailedView);
   }
 }
