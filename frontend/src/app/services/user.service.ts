@@ -1,7 +1,7 @@
 import {HttpClient} from "@angular/common/http";
 import {UserAccountDto} from "../dto/user-account.dto";
 import {map, Observable} from "rxjs";
-import {UserInterestDto} from "../dto/user-interest.dto";
+import {UserInterestDto} from '../user_db.dto/user-interest.dto'
 import {SERVER_ADDRESS} from "../globals";
 import {SearchHistoryDTO} from "../dto/search-history.dto";
 import {TourDto} from "../dto/tour.dto";
@@ -65,7 +65,7 @@ export class UserService {
       return this.httpClient.get<any[]>(SERVER_ADDRESS + 'userInterests/user_id=' + userId)
         .pipe(
           map(data => data.map(item => {
-            return new UserInterestDto(item.user, item.interest_id);
+            return new UserInterestDto(item.user, item.interest_id, item.cre_dat, item.interest_weight);
           }))
         );
     }
