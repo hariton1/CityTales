@@ -1,4 +1,4 @@
-<div class="place-detail-container" *ngIf="selectedPlace">
+<div class="place-detail-container">
   <div class="place-detail-card">
     <!-- Header with building information -->
     <div class="place-detail-header">
@@ -8,6 +8,12 @@
           {{ selectedPlace.building.latitude }}°N, {{ selectedPlace.building.longitude }}°E
         </span>
       </div>
+
+      <button
+        (click)="closeDetail()"
+      > Close </button>
+
+
     </div>
 
 

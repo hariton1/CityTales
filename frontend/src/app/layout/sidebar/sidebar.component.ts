@@ -1,11 +1,15 @@
 import { Component, Input } from '@angular/core';
 import { HistoricalPlaceEntity} from '../../dto/db_entity/HistoricalPlaceEntity';
 import {HistoricPlaceDetailComponent} from '../historic-place-detail/historic-place-detail.component';
+import {HistoricPlacePreviewComponent} from '../historic-place-preview/historic-place-preview.component';
+import {NgIf} from '@angular/common';
 
 @Component({
   selector: 'app-sidebar',
   imports: [
-    HistoricPlaceDetailComponent
+    NgIf,
+    HistoricPlaceDetailComponent,
+    HistoricPlacePreviewComponent
   ],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.scss'
@@ -13,9 +17,24 @@ import {HistoricPlaceDetailComponent} from '../historic-place-detail/historic-pl
 export class SidebarComponent {
 
   @Input() selectedPlace: any;
+  @Input() historicalPlaces: HistoricalPlaceEntity[] = [];
 
-  setSelectedPlace(place: HistoricalPlaceEntity) {
+  showDetail: boolean = false;
+  showPreview: boolean = false;
+
+
+  setSelectedPlace(place: any) {
     this.selectedPlace = place;
+  }
+
+  setDetailEvent(event: boolean): void {
+    this.showDetail = event
+    console.log(event);
+  }
+
+  setHistoricalPlaces(places: HistoricalPlaceEntity[]): void {
+    this.historicalPlaces = places;
+    console.log(this.historicalPlaces);
   }
 
 }

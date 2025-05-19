@@ -14,11 +14,15 @@ import {HistoricalPlaceEntity} from '../../dto/db_entity/HistoricalPlaceEntity';
 })
 export class ExploreLayoutComponent {
 
-  public selectedPlace?: HistoricalPlaceEntity;
+  selectedPlace: HistoricalPlaceEntity | null = null;
+  historicalPlaces: HistoricalPlaceEntity[] = [];
 
   setSelectedPlace(place: HistoricalPlaceEntity) {
     this.selectedPlace = place;
   }
 
-
+  setHistoricalPlaces(places: HistoricalPlaceEntity[]) {
+    this.historicalPlaces = places;
+    console.log(places);
+  }
 }

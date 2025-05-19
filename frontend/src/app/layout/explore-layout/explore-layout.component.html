@@ -1,2 +1,2 @@
-<app-sidebar [selectedPlace]="selectedPlace"></app-sidebar>
-<app-map-view (selectPlaceEvent)="setSelectedPlace($event)"></app-map-view>
+<app-sidebar [selectedPlace]="selectedPlace" [historicalPlaces]="historicalPlaces"></app-sidebar>
+<app-map-view (selectPlaceEvent)="setSelectedPlace($event)" (populatePlacesEvent)="setHistoricalPlaces($event)"></app-map-view>

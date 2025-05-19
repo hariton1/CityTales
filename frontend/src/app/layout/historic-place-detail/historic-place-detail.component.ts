@@ -1,5 +1,6 @@
-import { Component, Input } from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {CommonModule, NgIf} from '@angular/common';
+import {HistoricalPlaceEntity} from '../../dto/db_entity/HistoricalPlaceEntity';
 
 @Component({
   selector: 'app-historic-place-detail',
@@ -20,19 +21,9 @@ export class HistoricPlaceDetailComponent {
   }
   private _selectedPlace: any;
 
-  images: string[] = [];
+  @Output() setDetailEvent: EventEmitter<boolean> = new EventEmitter<boolean>();
 
-  currentImageIndex: number = 0;
-
-  nextImage(){
-    this.currentImageIndex++;
-  }
-
-  previousImage() {
-    this.currentImageIndex--;
-  }
-
-  setImage(index: number) {
-    this.currentImageIndex = index;
+  closeDetail():void{
+      this.setDetailEvent.emit(false);
   }
 }

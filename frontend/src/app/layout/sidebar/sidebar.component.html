@@ -1,1 +1,8 @@
-<app-historic-place-detail [selectedPlace]="selectedPlace"></app-historic-place-detail>
+<div class="place-detail-container" *ngIf="showDetail">
+  <app-historic-place-detail [selectedPlace]="selectedPlace" (setDetailEvent)="setDetailEvent($event)"></app-historic-place-detail>
+</div>
+
+<div class="place-preview-container" *ngIf="!showDetail">
+  <app-historic-place-preview [historicalPlaces]="historicalPlaces" (selectPlaceEvent)="setSelectedPlace($event)"></app-historic-place-preview>
+
+</div>
