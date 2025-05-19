@@ -1,6 +1,8 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {CommonModule, NgIf} from '@angular/common';
 import {HistoricalPlaceEntity} from '../../dto/db_entity/HistoricalPlaceEntity';
+import {PersonService} from '../../services/person.service';
+import {HistoricalPersonEntity} from '../../dto/db_entity/HistoricalPersonEntity';
 
 @Component({
   selector: 'app-historic-place-detail',
@@ -12,6 +14,12 @@ import {HistoricalPlaceEntity} from '../../dto/db_entity/HistoricalPlaceEntity';
   styleUrl: './historic-place-detail.component.scss'
 })
 export class HistoricPlaceDetailComponent {
+
+  constructor(private personService: PersonService) {
+  }
+
+  private associatedPersons: HistoricalPersonEntity[] = [];
+
   @Input()
   get selectedPlace(): any {
     return this._selectedPlace;
@@ -26,4 +34,22 @@ export class HistoricPlaceDetailComponent {
   closeDetail():void{
       this.setDetailEvent.emit(false);
   }
+
+  ngOnInit():void {
+    this.fetchAssociatedPersons();
+  }
+
+  fetchAssociatedPersons(): void {
+    if(!this.selectedPlace.building.wikidataId === null) {
+      this.personService.getLinkedPersonsByVHWikiId(this.selectedPlace.building.wikidataId.replace('Q', '')).subscribe(
+        persons => {
+          this.associatedPersons = persons;
+        }
+      )
+    }
+  }
+
+
+
+
 }

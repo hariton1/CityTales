@@ -25,6 +25,8 @@ export class MapViewComponent {
 
   @Output() selectPlaceEvent: EventEmitter<HistoricalPlaceEntity> = new EventEmitter<HistoricalPlaceEntity>();
   @Output() populatePlacesEvent = new EventEmitter<HistoricalPlaceEntity[]>();
+  @Output() setDetailedViewEvent: EventEmitter<boolean> = new EventEmitter<boolean>();
+
   locationsNearby: HistoricalPlaceEntity[] = [];
 
   markers: any[] = [];
@@ -78,5 +80,6 @@ export class MapViewComponent {
 
   openMarkerInfo(location: HistoricalPlaceEntity): void {
     this.selectPlaceEvent.emit(location);
+    this.setDetailedViewEvent.emit(true);
   }
 }
