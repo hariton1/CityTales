@@ -2,7 +2,7 @@ package group_05.ase.neo4j_data_access.Service.Implementation;
 
 import group_05.ase.neo4j_data_access.Config.Neo4jProperties;
 import group_05.ase.neo4j_data_access.DTO.HistoricPersonDTO;
-import group_05.ase.neo4j_data_access.Entity.HistoricalPersonEntity;
+import group_05.ase.neo4j_data_access.Entity.ViennaHistoryWikiPersonObject;
 import group_05.ase.neo4j_data_access.Service.Interface.IHistoricPersonService;
 import group_05.ase.neo4j_data_access.Service.Interface.IWikipediaExtractorService;
 import jakarta.annotation.PostConstruct;
@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class HistoricPersonService implements IHistoricPersonService {
