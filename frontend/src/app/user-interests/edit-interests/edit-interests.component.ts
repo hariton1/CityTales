@@ -83,6 +83,7 @@ export class EditInterestsComponent implements OnInit{
     this.userService.getAllInterests()
       .subscribe({
         next: (interests) => {
+          this.allInterestsList = interests;
           this.interestNames = interests.map(interest => interest.getInterestName());
           console.log('Interest names:', this.interestNames);
         },
@@ -91,6 +92,74 @@ export class EditInterestsComponent implements OnInit{
         }
       });
   }
+
+  createInterests(): void {
+    const selectInterestsNames = this.form.value.filters || [];
+    let selectedInterests = this.allInterestsList.filter(interest =>
+      selectInterestsNames.includes(interest.getInterestName()));
+
+    console.log('Selected interests:', selectedInterests);
+    console.log('Current user interests:', this.userInterestsList);
+
+    // Use forkJoin to handle multiple requests and wait for all to complete
+    const createRequests: Observable<any>[] = [];
+
+    for (let interest of selectedInterests) {
+      // Check if this interest is already in user's list
+      const alreadyExists = this.userInterestsList.some(
+        userInterest => userInterest.getInterestId() === interest.getInterestId()
+      );
+
+      if (!alreadyExists) {
+        console.log('Creating interest:', interest.getInterestName(), interest.getInterestId());
+        const newInterest = new UserInterestDto(
+          'f5599c8c-166b-495c-accc-65addfaa572b',
+          interest.getInterestId(),
+          new Date(),
+          1
+        );
+        createRequests.push(this.userInterestService.createNewUserInterest(newInterest));
+      } else {
+        console.log('Interest already exists:', interest.getInterestName());
+      }
+    }
+
+    // Execute all requests and refresh once when all are done
+    if (createRequests.length > 0) {
+      forkJoin(createRequests).subscribe({
+        next: (results) => {
+          console.log('All interests created successfully', results);
+          this.fetchUserInterests(); // Refresh the list only once after all operations
+        },
+        error: (err) => {
+          console.error('Error creating interests:', err);
+        }
+      });
+    } else {
+      console.log('No new interests to create');
+    }
+  }
+
+    /*
+    for (let interest of newInterests) {
+      console.log('interest: ' + interest);
+      for (let interestDetail of this.userInterestsList) {
+          console.log('interestDetail: ' + interestDetail.());
+        if (interest !== interestDetail.getInterestName()) {
+          this.userInterestService.createNewUserInterest(new UserInterestDto('f5599c8c-166b-495c-accc-65addfaa572b', interestDetail.getInterestId(), new Date(), 1))
+            .subscribe({
+              next: () => {
+                console.log('Interest created successfully');
+                this.fetchUserInterests();
+              },
+              error: (err) => {
+                console.error('Error creating interest:', err);
+              }
+            });
+        }
+      }
+    }*/
+
 
   deleteInterest(): void {
     for (let interest of this.userInterestsList) {
@@ -101,8 +170,8 @@ export class EditInterestsComponent implements OnInit{
             console.log('Deleting interest:', interest);
             this.userInterestService.deleteUserInterest(interest).subscribe({
               next: () => {
-                console.log('Interest deleted successfully');
-                this.fetchUserInterests();
+                console.log('Interest deleted successfully')
+                this.userInterestNames = this.form.get('filters')?.value as string[];
               },
               error: (err) => {
                 console.error('Error deleting interest:', err);
@@ -116,6 +185,7 @@ export class EditInterestsComponent implements OnInit{
   onSubmit(): void {
     console.log('Form submitted with values:', this.form.value);
     this.deleteInterest();
+    this.createInterests();
   }
 
   protected form = new FormGroup({
