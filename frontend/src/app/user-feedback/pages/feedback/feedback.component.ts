@@ -1,37 +1,30 @@
 import { Component } from '@angular/core';
 import {
   TuiButton,
-  TuiError, TuiHint,
+  TuiHint,
   TuiIcon,
   TuiLabel,
   TuiTextfieldComponent,
   TuiTextfieldDirective,
-  TuiTitle
 } from '@taiga-ui/core';
-import {TuiForm, TuiHeader} from '@taiga-ui/layout';
-import {FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {TuiFieldErrorPipe, TuiPassword, TuiSlider, TuiTooltip} from '@taiga-ui/kit';
+import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {TuiSlider} from '@taiga-ui/kit';
 import {AsyncPipe, PercentPipe} from '@angular/common';
 import {TuiInputDateModule, TuiInputModule} from '@taiga-ui/legacy';
-import {BehaviorSubject, distinctUntilChanged, map, of, switchMap, timer} from 'rxjs';
+import {BehaviorSubject, distinctUntilChanged, forkJoin, map, Observable, of, switchMap, timer} from 'rxjs';
 import {TUI_FALSE_HANDLER, tuiClamp, tuiRound} from '@taiga-ui/cdk';
+import {FeedbackDto} from '../../../user_db.dto/feedback.dto';
+import {FeedbackService} from '../../../user_db.services/feedback.service';
 
 @Component({
   selector: 'app-feedback',
   imports: [
     TuiButton,
-    TuiForm,
     TuiTextfieldComponent,
-    TuiHeader,
-    TuiTitle,
     TuiLabel,
     ReactiveFormsModule,
     TuiTextfieldDirective,
-    TuiError,
-    TuiFieldErrorPipe,
     AsyncPipe,
-    TuiPassword,
-    TuiTooltip,
     TuiIcon,
     TuiInputModule,
     TuiInputDateModule,
@@ -48,6 +41,9 @@ export class FeedbackComponent {
   protected min = 0;
   protected max = 100;
   protected value = 100;
+
+  constructor(private feeedbackService: FeedbackService) {
+  }
 
   protected readonly active$ = new BehaviorSubject(false);
   protected readonly showHint$ = this.active$.pipe(
@@ -68,7 +64,38 @@ export class FeedbackComponent {
   onSubmit(): void {
     this.value = tuiRound(this.value,0);
     console.log(this.value);
+    console.log(this.form.value.fb_content);
+    let newFeedbackDto = new FeedbackDto(
+      -1,
+      'f5599c8c-166b-495c-accc-65addfaa572b',
+      1,
+      this.value,
+      this.form.value.fb_content ?? '',
+      new Date()
+    );
+    console.log(newFeedbackDto.toString());
+
+    const createRequests: Observable<any>[] = [];
+
+    createRequests.push(this.feeedbackService.createNewFeedback(newFeedbackDto));
+
+    if (createRequests.length > 0) {
+      forkJoin(createRequests).subscribe({
+        next: (results) => {
+          console.log('All feedbacks created successfully', results);
+        },
+        error: (err) => {
+          console.error('Error creating feedback:', err);
+        }
+      });
+    } else {
+      console.log('No new feedback to create');
+    }
   }
 
   protected readonly tuiRound = tuiRound;
+
+  protected form = new FormGroup({
+    fb_content: new FormControl(''),
+  });
 }
