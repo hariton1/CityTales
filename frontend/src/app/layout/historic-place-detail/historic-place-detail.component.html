@@ -1,0 +1,98 @@
+<div class="place-detail-container">
+  <div class="place-detail-card">
+    <!-- Header with building information -->
+    <div class="place-detail-header">
+      <h2 class="place-detail-title">{{selectedPlace.building.name}}</h2>
+      <div class="place-location">
+        <span class="coordinates">
+          {{ selectedPlace.building.latitude }}°N, {{ selectedPlace.building.longitude }}°E
+        </span>
+      </div>
+
+      <button
+        (click)="closeDetail()"
+      > Close </button>
+
+
+    </div>
+
+
+    <!-- Main content -->
+    <tui-scrollbar class="scrollable-content">
+    <div class="place-detail-content">
+      <div class="content-section">
+        <h3>Description</h3>
+        <p>{{ selectedPlace.content }}</p>
+      </div>
+
+      <div class="content-section">
+        <h3>Building Information</h3>
+        <div class="building-details">
+          <div class="detail-row" *ngIf="selectedPlace.building.name">
+            <span class="label">Name:</span>
+            <span class="value">{{ selectedPlace.building.name }}</span>
+          </div>
+          <div class="detail-row" *ngIf="selectedPlace.building.dateFrom">
+            <span class="label">Build in:</span>
+            <span class="value">{{ selectedPlace.building.dateFrom }}</span>
+          </div>
+          <div class="detail-row" *ngIf="selectedPlace.building.dateTo">
+            <span class="label">Demolished in:</span>
+            <span class="value">{{ selectedPlace.building.dateTo }}</span>
+          </div>
+          <div class="detail-row" *ngIf="selectedPlace.building.architect">
+            <span class="label">Responsible Architect:</span>
+            <span class="value">{{ selectedPlace.building.architect }}</span>
+          </div>
+          <div class="detail-row" *ngIf="selectedPlace.building.url">
+            <span class="label">Wiki URL:</span>
+            <span class="value">
+              <a [href]="selectedPlace.building.url" target="_blank"> {{ selectedPlace.building.url }} </a>
+            </span>
+          </div>
+          <div class="detail-row" *ngIf="selectedPlace.building.imageUrls.length > 0">
+            <img [src]="selectedPlace.building.imageUrls[0]" alt="Building image" class="building-image">
+          </div>
+
+          <div class="content-section" *ngIf="selectedPlace.linkedPersons?.length">
+            <h3>Related Persons</h3>
+            <div class="related-items">
+              <div class="related-item" *ngFor="let person of selectedPlace.linkedPersons">
+            <span class="value">
+              <a [href]="person.person.url" target="_blank" *ngIf="person.person.url">{{ person.person.name }}</a>
+              <span *ngIf="!person.person.url">{{ person.person.name }}</span>
+            </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="content-section" *ngIf="selectedPlace.linkedPlaces?.length">
+            <h3>Related Places</h3>
+            <div class="related-items">
+              <div class="related-item" *ngFor="let place of selectedPlace.linkedPlaces">
+            <span class="value">
+              <a [href]="place.building.url" target="_blank" *ngIf="place.building.url">{{ place.building.name }}</a>
+              <span *ngIf="!place.building.url">{{ place.building.name }}</span>
+            </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="content-section" *ngIf="selectedPlace.linkedEvents?.length">
+            <h3>Related Events</h3>
+            <div class="related-items">
+              <div class="related-item" *ngFor="let event of selectedPlace.linkedEvents">
+            <span class="value">
+              <a [href]="event.event.url" target="_blank" *ngIf="event.event.url">{{ event.event.name }}</a>
+              <span *ngIf="!event.event.url">{{ event.event.name }}</span>
+            </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    </tui-scrollbar>
+  </div>
+</div>
+

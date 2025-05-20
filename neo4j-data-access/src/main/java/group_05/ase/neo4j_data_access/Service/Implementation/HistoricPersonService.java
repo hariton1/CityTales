@@ -1,21 +1,30 @@
 package group_05.ase.neo4j_data_access.Service.Implementation;
 
 import group_05.ase.neo4j_data_access.Config.Neo4jProperties;
+import group_05.ase.neo4j_data_access.DTO.HistoricBuildingDTO;
+import group_05.ase.neo4j_data_access.DTO.HistoricEventDTO;
 import group_05.ase.neo4j_data_access.DTO.HistoricPersonDTO;
+import group_05.ase.neo4j_data_access.Entity.ViennaHistoryWikiBuildingObject;
+import group_05.ase.neo4j_data_access.Entity.ViennaHistoryWikiEventObject;
 import group_05.ase.neo4j_data_access.Entity.ViennaHistoryWikiPersonObject;
 import group_05.ase.neo4j_data_access.Service.Interface.IHistoricPersonService;
+import group_05.ase.neo4j_data_access.Service.Interface.IMappingService;
 import group_05.ase.neo4j_data_access.Service.Interface.IWikipediaExtractorService;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.neo4j.driver.*;
 import org.neo4j.driver.Record;
 import org.neo4j.driver.exceptions.NoSuchRecordException;
 import org.neo4j.driver.types.Node;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class HistoricPersonService implements IHistoricPersonService {
@@ -25,13 +34,15 @@ public class HistoricPersonService implements IHistoricPersonService {
 
     private Driver driver;
     private final IWikipediaExtractorService wikipediaExtractorService;
+    private final IMappingService mappingService;
 
-    public HistoricPersonService(IWikipediaExtractorService wikipediaExtractorService, Neo4jProperties properties) {
+    public HistoricPersonService(IWikipediaExtractorService wikipediaExtractorService, Neo4jProperties properties, IMappingService mappingService) {
         this.wikipediaExtractorService = wikipediaExtractorService;
 
         this.NEO4J_URL = properties.getUrl();
         this.NEO4J_USER = properties.getUser();
         this.NEO4J_PASSWORD = properties.getPassword();
+        this.mappingService = mappingService;
     }
 
     @PostConstruct
@@ -58,9 +69,9 @@ public class HistoricPersonService implements IHistoricPersonService {
                     tx.run(query, Values.parameters("viennaHistoryWikiId", viennaHistoryWikiId)).single());
 
             Node node = record.get("p").asNode();
-            ViennaHistoryWikiPersonObject entity = mapNodeToPersonEntity(node);
-            // Todo: change
-            String content = "";
+            ViennaHistoryWikiPersonObject entity = mappingService.mapNodeToPersonEntity(node);
+
+            String content = extractMainArticleText(entity.getUrl());
             return new HistoricPersonDTO(entity,content);
 
         } catch (NoSuchRecordException e) {
@@ -83,9 +94,9 @@ public class HistoricPersonService implements IHistoricPersonService {
 
             for (Record record : records) {
                 Node node = record.get("p").asNode();
-                ViennaHistoryWikiPersonObject entity = mapNodeToPersonEntity(node);
-                // Todo: change
-                String content = "";
+                ViennaHistoryWikiPersonObject entity = mappingService.mapNodeToPersonEntity(node);
+
+                String content = extractMainArticleText(entity.getUrl());
                 HistoricPersonDTO dto = new HistoricPersonDTO(entity, content);
                 personDTOs.add(dto);
             }
@@ -95,6 +106,64 @@ public class HistoricPersonService implements IHistoricPersonService {
         }
 
         return personDTOs;
+    }
+
+    @Override
+    public List<HistoricEventDTO> getAllLinkedHistoricEventsById(int viennaHistoryWikiId) {
+        List<HistoricEventDTO> linkedEvents = new ArrayList<>();
+
+        try (Session session = driver.session()) {
+            String query = "MATCH (p:WienGeschichteWikiPersons {viennaHistoryWikiId: $viennaHistoryWikiId})-[:HAS_LINK_TO]->(linked:WienGeschichteWikiEvents) " +
+                    "RETURN linked";
+
+            List<Record> records = session.readTransaction(tx ->
+                    tx.run(query, Values.parameters("viennaHistoryWikiId", viennaHistoryWikiId)).list()
+            );
+
+            for (Record record : records) {
+                Node linkedNode = record.get("linked").asNode();
+                ViennaHistoryWikiEventObject entity = mappingService.mapNodeToEventEntity(linkedNode);
+
+                //preliminary content fetching
+                String content = extractMainArticleText(entity.getUrl());;
+                HistoricEventDTO dto = new HistoricEventDTO(entity, content);
+                linkedEvents.add(dto);
+            }
+
+        } catch (Exception e) {
+            System.err.println("Error retrieving linked historic persons for wikiDataId " + viennaHistoryWikiId + ": " + e.getMessage());
+        }
+
+        return linkedEvents;
+    }
+
+    @Override
+    public List<HistoricBuildingDTO> getAllLinkedHistoricBuildingsById(int viennaHistoryWikiId) {
+        List<HistoricBuildingDTO> linkedBuildings = new ArrayList<>();
+
+        try (Session session = driver.session()) {
+            String query = "MATCH (p:WienGeschichteWikiPersons {viennaHistoryWikiId: $viennaHistoryWikiId})-[:HAS_LINK_TO]->(linked:WienGeschichteWikiBuildings) " +
+                    "RETURN linked";
+
+            List<Record> records = session.readTransaction(tx ->
+                    tx.run(query, Values.parameters("viennaHistoryWikiId", viennaHistoryWikiId)).list()
+            );
+
+            for (Record record : records) {
+                Node linkedNode = record.get("linked").asNode();
+                ViennaHistoryWikiBuildingObject entity = mappingService.mapNodeToHistoricalBuildingEntity(linkedNode);
+
+                //preliminary content fetching
+                String content = extractMainArticleText(entity.getUrl());;
+                HistoricBuildingDTO dto = new HistoricBuildingDTO(entity, content);
+                linkedBuildings.add(dto);
+            }
+
+        } catch (Exception e) {
+            System.err.println("Error retrieving linked historic persons for wikiDataId " + viennaHistoryWikiId + ": " + e.getMessage());
+        }
+
+        return linkedBuildings;
     }
 
     public List<HistoricPersonDTO> getAllLinkedHistoricPersonsById(int viennaHistoryWikiId) {
@@ -110,9 +179,9 @@ public class HistoricPersonService implements IHistoricPersonService {
 
             for (Record record : records) {
                 Node linkedNode = record.get("linked").asNode();
-                ViennaHistoryWikiPersonObject entity = mapNodeToPersonEntity(linkedNode);
-                // Todo: change
-                String content = "";
+                ViennaHistoryWikiPersonObject entity = mappingService.mapNodeToPersonEntity(linkedNode);
+
+                String content = extractMainArticleText(entity.getUrl());
                 HistoricPersonDTO dto = new HistoricPersonDTO(entity, content);
                 linkedPersons.add(dto);
             }
@@ -124,45 +193,38 @@ public class HistoricPersonService implements IHistoricPersonService {
         return linkedPersons;
     }
 
-    private ViennaHistoryWikiPersonObject mapNodeToPersonEntity(Node node) {
-        ViennaHistoryWikiPersonObject personEntity = new ViennaHistoryWikiPersonObject();
+    private String extractMainArticleText(String url) {
+        StringBuilder textContent = new StringBuilder();
 
-        personEntity.setViennaHistoryWikiId(node.get("viennaHistoryWikiId").asInt());
-        personEntity.setName(node.get("name").asString());
-        personEntity.setUrl(node.get("url").asString());
-        personEntity.setPersonName(Optional.ofNullable(getSafeString(node, "personName")));
-        personEntity.setAlternativeName(Optional.ofNullable(getSafeString(node, "alternativeName")));
-        personEntity.setTitles(Optional.ofNullable(getSafeString(node, "titles")));
-        personEntity.setSex(Optional.ofNullable(getSafeString(node, "sex")));
-        personEntity.setGnd(Optional.ofNullable(getSafeString(node, "gnd")));
-        personEntity.setWikidataId(Optional.ofNullable(getSafeString(node, "wikidataId")));
-        personEntity.setBirthDate(Optional.ofNullable(getSafeString(node, "birthDate")));
-        personEntity.setBirthPlace(Optional.ofNullable(getSafeString(node, "birthPlace")));
-        personEntity.setDeathDate(Optional.ofNullable(getSafeString(node, "deathDate")));
-        personEntity.setDeathPlace(Optional.ofNullable(getSafeString(node, "deathPlace")));
-        personEntity.setJobs(Optional.ofNullable(getSafeString(node, "jobs")));
-        personEntity.setPoliticalLinkage(Optional.ofNullable(getSafeString(node, "politicalLinkage")));
-        personEntity.setEvent(Optional.ofNullable(getSafeString(node, "event")));
-        personEntity.setEstate(Optional.ofNullable(getSafeString(node, "estate")));
-        personEntity.setSeeAlso(Optional.ofNullable(getSafeString(node, "seeAlso")));
-        personEntity.setResource(Optional.ofNullable(getSafeString(node, "resource")));
+        try {
+            Document doc = Jsoup.connect(url).get();
 
-        if (node.containsKey("links")) {
-            personEntity.setLinks(node.get("links").asList(Value::asString));
-        } else {
-            personEntity.setLinks(new ArrayList<>());
+            Element contentDiv = doc.selectFirst("div.mw-parser-output");
+
+            if (contentDiv != null) {
+                Elements paragraphs = contentDiv.select("p");
+
+                for (Element paragraph : paragraphs) {
+                    String text = paragraph.text().trim();
+                    if (!text.isEmpty()) {
+                        textContent.append(text).append("\n\n");
+                    }
+                }
+            } else {
+                System.err.println("Main content div not found.");
+            }
+
+        } catch (IOException e) {
+            System.err.println("Error fetching URL: " + e.getMessage());
         }
 
-        if (node.containsKey("imageUrls")) {
-            personEntity.setImageUrls(node.get("imageUrls").asList(Value::asString));
+        String[] parts = textContent.toString().split("\n", 7);
+        if (parts.length < 7) {
+            return "";
         } else {
-            personEntity.setImageUrls(new ArrayList<>());
+            String rest = parts[6];
+            rest = rest.replaceAll("\n", "");
+            return rest;
         }
-
-        return personEntity;
-    }
-
-    private String getSafeString(Node node, String key) {
-        return node.containsKey(key) ? node.get(key).asString() : "N/A";
     }
 }
