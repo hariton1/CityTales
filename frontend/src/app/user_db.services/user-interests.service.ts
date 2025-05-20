@@ -18,7 +18,13 @@ export class UserInterestsService {
   }
 
   public getUserInterestsByUserId(user_id: UUID): Observable<UserInterestDto[]> {
-    return this.httpClient.get<UserInterestDto[]>(this.DOMAIN + 'user_id=' + user_id);
+    // this.httpClient.get<UserInterestDto[]>(this.DOMAIN + 'user_id=' + user_id);
+    return this.httpClient.get<any[]>(this.DOMAIN + 'user_id=' + user_id)
+        .pipe(
+            map(data => data.map(item => {
+              return new UserInterestDto(item.user, item.interest_id, item.cre_dat, item.interest_weight);
+            }))
+        );
   }
 
   public getUserInterestsByInterestId(interest_id: number): Observable<UserInterestDto[]> {
@@ -38,7 +44,7 @@ export class UserInterestsService {
     const seconds = String(date.getSeconds()).padStart(2, '0');
 
     // Format the date string exactly as required by the backend
-    const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.000+00:00`;
+    const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.000+02:00`;
 
     const userInterestToSend = {
       user_id: user_interest.getUserId(),
