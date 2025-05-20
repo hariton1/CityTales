@@ -32,4 +32,9 @@ public class UserInterestDTO {
     @JsonDeserialize(using = CustomTimestampDeserializer.class)
     private LocalDateTime creDat;
 
+    @Getter
+    @Setter
+    @JsonProperty(required = true, value = "interest_weight")
+    private float interestWeight;
+
 }

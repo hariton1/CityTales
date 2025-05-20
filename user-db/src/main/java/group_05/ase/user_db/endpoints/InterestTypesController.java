@@ -19,50 +19,51 @@ public class InterestTypesController {
     }
 
     @GetMapping
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
     public List<InterestTypeDTO> getAllInterestTypes() {
         try {
-            return this.interestTypeService.getAllInterestTypes();
+            return null;//this.interestTypeService.getAllInterestTypes();
         } catch (Exception e) {
             return new ArrayList<InterestTypeDTO>(); //"An internal server error occurred => " + e.getMessage();
         }
     }
 
     @GetMapping("/id={interestTypeId}")
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
     public InterestTypeDTO getInterestTypesByInterestTypeId(@PathVariable("interestTypeId") int interestTypeId) {
         try {
-            return this.interestTypeService.getInterestById(interestTypeId);
+            return null;//this.interestTypeService.getInterestById(interestTypeId);
         } catch (Exception e) {
             return new InterestTypeDTO();//"An internal server error occurred => " + e.getMessage();
         }
     }
 
     @GetMapping("/name={typeName}")
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
     public InterestTypeDTO getInterestTypesByTypeName(@PathVariable("typeName") String typeName) {
         try {
-            return this.interestTypeService.getInterestByName(typeName);
+            return null;//this.interestTypeService.getInterestByName(typeName);
         } catch (Exception e) {
             return new InterestTypeDTO();//"An internal server error occurred => " + e.getMessage();
         }
     }
 
     @GetMapping("/description={description}")
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
     public List<InterestTypeDTO> getInterestTypesByDescriptionLike(@PathVariable("description") String description) {
         try {
-            return this.interestTypeService.getInterestTypesByDescriptionLike(description);
+            return null;//this.interestTypeService.getInterestTypesByDescriptionLike(description);
         } catch (Exception e) {
             return new ArrayList<InterestTypeDTO>(); //"An internal server error occurred => " + e.getMessage();
         }
     }
 
     @PostMapping("/create")
-    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
     public void createNewInterestType(@RequestBody InterestTypeDTO interestTypeDTO) {
         try {
-            this.interestTypeService.saveNewInterestType(interestTypeDTO);
+            System.out.println("not supported");
+            //this.interestTypeService.saveNewInterestType(interestTypeDTO);
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }

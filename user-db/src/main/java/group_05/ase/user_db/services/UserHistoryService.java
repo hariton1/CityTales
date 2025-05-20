@@ -1,7 +1,9 @@
 package group_05.ase.user_db.services;
 
 import group_05.ase.user_db.entities.UserHistoryEntity;
+import group_05.ase.user_db.entities.UserInterestEntity;
 import group_05.ase.user_db.repositories.UserHistoryRepository;
+import group_05.ase.user_db.repositories.UserInterestRepository;
 import group_05.ase.user_db.restData.UserHistoryDTO;
 
 import org.springframework.stereotype.Service;
@@ -14,9 +16,12 @@ import java.util.UUID;
 public class UserHistoryService {
 
     private final UserHistoryRepository repository;
+    private final UserInterestRepository userInterestRepository;
+    private final float weightIncrease = 0.01F;
 
-    public UserHistoryService(UserHistoryRepository repository) {
+    public UserHistoryService(UserHistoryRepository repository, UserInterestRepository userInterestRepository) {
         this.repository = repository;
+        this.userInterestRepository = userInterestRepository;
     }
 
     public List<UserHistoryDTO> getAllUserHistories() {
@@ -26,7 +31,7 @@ public class UserHistoryService {
 
         for(UserHistoryEntity userHistory : tmp) {
             userHistories.add(new UserHistoryDTO(userHistory.getUserHistoryId(), userHistory.getUserId(), userHistory.getArticleId(),
-                    userHistory.getOpenDt(), userHistory.getCloseDt()));
+                    userHistory.getOpenDt(), userHistory.getCloseDt(), userHistory.getInterestId()));
         }
 
         return userHistories;
@@ -38,7 +43,7 @@ public class UserHistoryService {
         UserHistoryEntity tmp = this.repository.findByUserHistoryId(userHistoryId);
 
         return new UserHistoryDTO(tmp.getUserHistoryId(), tmp.getUserId(), tmp.getArticleId(),
-                tmp.getOpenDt(), tmp.getCloseDt());
+                tmp.getOpenDt(), tmp.getCloseDt(), tmp.getInterestId());
 
     }
 
@@ -49,7 +54,7 @@ public class UserHistoryService {
 
         for(UserHistoryEntity userHistory : tmp) {
             userHistories.add(new UserHistoryDTO(userHistory.getUserHistoryId(), userHistory.getUserId(), userHistory.getArticleId(),
-                    userHistory.getOpenDt(), userHistory.getCloseDt()));
+                    userHistory.getOpenDt(), userHistory.getCloseDt(), userHistory.getInterestId()));
         }
 
         return userHistories;
@@ -63,7 +68,7 @@ public class UserHistoryService {
 
         for(UserHistoryEntity userHistory : tmp) {
             userHistories.add(new UserHistoryDTO(userHistory.getUserHistoryId(), userHistory.getUserId(), userHistory.getArticleId(),
-                    userHistory.getOpenDt(), userHistory.getCloseDt()));
+                    userHistory.getOpenDt(), userHistory.getCloseDt(), userHistory.getInterestId()));
         }
 
         return userHistories;
@@ -77,8 +82,15 @@ public class UserHistoryService {
         tmp.setUserId(userHistoryDTO.getUserId());
         tmp.setArticleId(userHistoryDTO.getArticleId());
         tmp.setOpenDt(userHistoryDTO.getOpenDt());
+        tmp.setInterestId(userHistoryDTO.getInterestId());
 
         this.repository.save(tmp);
+
+        UserInterestEntity userInterest = this.userInterestRepository.findByUserIdAndInterestId(userHistoryDTO.getUserId(), userHistoryDTO.getInterestId());
+
+        userInterest.setInterestWeight(userInterest.getInterestWeight() + weightIncrease);
+
+        this.userInterestRepository.save(userInterest);
 
     }
 
@@ -91,6 +103,7 @@ public class UserHistoryService {
         tmp.setArticleId(userHistoryDTO.getArticleId());
         tmp.setOpenDt(userHistoryDTO.getOpenDt());
         tmp.setCloseDt(userHistoryDTO.getCloseDt());
+        tmp.setInterestId(userHistoryDTO.getInterestId());
 
         this.repository.save(tmp);
 

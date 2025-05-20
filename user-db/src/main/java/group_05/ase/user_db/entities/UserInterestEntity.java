@@ -24,4 +24,6 @@ public class UserInterestEntity {
 
     private LocalDateTime creDat;
 
+    private float interestWeight;
+
 }

@@ -1,0 +1,27 @@
+header[tuiNavigationHeader][tuiNavigationHeader] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: .6rem 1rem !important;
+  height: 100%;
+}
+
+[tuiNavigationLogo] {
+  margin-right: auto !important;
+  padding: 0 !important;
+}
+
+.main-nav-desktop {
+  background: none !important;
+}
+
+.main-nav-desktop a {
+  border: none !important;
+}
+
+tui-segmented {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}

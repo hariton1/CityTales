@@ -14,11 +14,6 @@ public class InterestDTO {
 
     @Getter
     @Setter
-    @JsonProperty(required = true, value = "interest_type_id")
-    private int interestTypeId;
-
-    @Getter
-    @Setter
     @JsonProperty(required = true, value = "interest_name")
     private String interestName;
 

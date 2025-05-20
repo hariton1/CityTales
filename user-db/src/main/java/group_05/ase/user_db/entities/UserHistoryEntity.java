@@ -28,4 +28,6 @@ public class UserHistoryEntity {
 
     private LocalDateTime closeDt;
 
+    private int interestId;
+
 }

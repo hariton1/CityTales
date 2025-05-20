@@ -1,1 +1,17 @@
-/* You can add global styles to this file, and also import other style files */
+/* mobile: ≤768px show only .mobile */
+@media (max-width: 768px) {
+  .desktop { display: none; }
+}
+
+/* desktop: >768px show only .desktop */
+@media (min-width: 769px) {
+  .mobile { display: none; }
+}
+
+.centered-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  padding: 4em 0;
+}

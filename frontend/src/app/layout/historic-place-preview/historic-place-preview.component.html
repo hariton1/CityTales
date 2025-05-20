@@ -1,0 +1,26 @@
+<tui-scrollbar class="preview-scroll-block">
+  <div tuiPlatform="web" class="preview-block" *ngFor="let place of historicalPlaces">
+    <div
+      tuiAppearance="floating"
+      tuiCardLarge
+      class="card-with-background"
+      [style.backgroundImage]="place.building.imageUrls[0] ? 'url(' + place.building.imageUrls[0] + ')' : 'none'"
+
+    >
+      <header tuiHeader>
+        <h2 tuiTitle>{{place.building.name}}</h2>
+      </header>
+
+
+      <footer>
+        <button
+          (click)="onDetailsClick(place)"
+        >
+          Details
+        </button>
+      </footer>
+    </div>
+  </div>
+
+</tui-scrollbar>
+
