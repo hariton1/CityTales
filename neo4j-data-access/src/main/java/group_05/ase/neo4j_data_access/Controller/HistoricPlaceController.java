@@ -1,6 +1,8 @@
 package group_05.ase.neo4j_data_access.Controller;
 
 import group_05.ase.neo4j_data_access.DTO.HistoricBuildingDTO;
+import group_05.ase.neo4j_data_access.DTO.HistoricEventDTO;
+import group_05.ase.neo4j_data_access.DTO.HistoricPersonDTO;
 import group_05.ase.neo4j_data_access.Service.Interface.IHistoricBuildingService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -48,5 +50,32 @@ public class HistoricPlaceController {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(places);
+    }
+
+    @GetMapping("/links/buildings/by/id/{viennaHistoryWikiId}")
+    public ResponseEntity<List<HistoricBuildingDTO>> getLinkedBuildingsById(@PathVariable int viennaHistoryWikiId) {
+        List<HistoricBuildingDTO> buildings = historicPlaceService.getAllLinkedHistoricBuildingsById(viennaHistoryWikiId);
+        if (buildings.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(buildings);
+    }
+
+    @GetMapping("/links/persons/by/id/{viennaHistoryWikiId}")
+    public ResponseEntity<List<HistoricPersonDTO>> getLinkedPersonsById(@PathVariable int viennaHistoryWikiId) {
+        List<HistoricPersonDTO> persons = historicPlaceService.getAllLinkedHistoricPersonsById(viennaHistoryWikiId);
+        if (persons.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(persons);
+    }
+
+    @GetMapping("/links/events/by/id/{viennaHistoryWikiId}")
+    public ResponseEntity<List<HistoricEventDTO>> getLinkedEventsById(@PathVariable int viennaHistoryWikiId) {
+        List<HistoricEventDTO> events = historicPlaceService.getAllLinkedHistoricEventsById(viennaHistoryWikiId);
+        if (events.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(events);
     }
 }

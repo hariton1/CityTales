@@ -1,11 +1,14 @@
 package group_05.ase.neo4j_data_access.Service.Implementation;
 
 import group_05.ase.neo4j_data_access.Config.Neo4jProperties;
+import group_05.ase.neo4j_data_access.DTO.HistoricBuildingDTO;
 import group_05.ase.neo4j_data_access.DTO.HistoricEventDTO;
 import group_05.ase.neo4j_data_access.DTO.HistoricPersonDTO;
+import group_05.ase.neo4j_data_access.Entity.ViennaHistoryWikiBuildingObject;
 import group_05.ase.neo4j_data_access.Entity.ViennaHistoryWikiEventObject;
 import group_05.ase.neo4j_data_access.Entity.ViennaHistoryWikiPersonObject;
 import group_05.ase.neo4j_data_access.Service.Interface.IHistoricEventService;
+import group_05.ase.neo4j_data_access.Service.Interface.IMappingService;
 import group_05.ase.neo4j_data_access.Service.Interface.IWikipediaExtractorService;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
@@ -22,7 +25,6 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class HistoricEventService implements IHistoricEventService {
@@ -32,13 +34,14 @@ public class HistoricEventService implements IHistoricEventService {
 
     private Driver driver;
     private final IWikipediaExtractorService wikipediaExtractorService;
+    private final IMappingService mappingService;
 
-    public HistoricEventService(IWikipediaExtractorService wikipediaExtractorService, Neo4jProperties properties) {
+    public HistoricEventService(IWikipediaExtractorService wikipediaExtractorService, Neo4jProperties properties, IMappingService mappingService) {
         this.wikipediaExtractorService = wikipediaExtractorService;
-
         this.NEO4J_URL = properties.getUrl();
         this.NEO4J_USER = properties.getUser();
         this.NEO4J_PASSWORD = properties.getPassword();
+        this.mappingService = mappingService;
     }
 
     @PostConstruct
@@ -68,7 +71,7 @@ public class HistoricEventService implements IHistoricEventService {
                     tx.run(query, Values.parameters("viennaHistoryWikiId", viennaHistoryWikiId)).single());
 
             Node node = record.get("p").asNode();
-            ViennaHistoryWikiEventObject entity = mapNodeToEventEntity(node);
+            ViennaHistoryWikiEventObject entity = mappingService.mapNodeToEventEntity(node);
 
             // preliminary content fetching
             String content = extractMainArticleText(entity.getUrl());
@@ -95,7 +98,7 @@ public class HistoricEventService implements IHistoricEventService {
 
             for (Record record : records) {
                 Node node = record.get("p").asNode();
-                ViennaHistoryWikiEventObject entity = mapNodeToEventEntity(node);
+                ViennaHistoryWikiEventObject entity = mappingService.mapNodeToEventEntity(node);
 
                 // preliminary content fetching
                 String content = extractMainArticleText(entity.getUrl());
@@ -124,7 +127,7 @@ public class HistoricEventService implements IHistoricEventService {
 
             for (Record record : records) {
                 Node linkedNode = record.get("linked").asNode();
-                ViennaHistoryWikiEventObject entity = mapNodeToEventEntity(linkedNode);
+                ViennaHistoryWikiEventObject entity = mappingService.mapNodeToEventEntity(linkedNode);
 
                 //preliminary content fetching
                 String content = extractMainArticleText(entity.getUrl());;
@@ -139,39 +142,61 @@ public class HistoricEventService implements IHistoricEventService {
         return linkedEvents;
     }
 
-    private ViennaHistoryWikiEventObject mapNodeToEventEntity(Node node) {
-        ViennaHistoryWikiEventObject eventEntity = new ViennaHistoryWikiEventObject();
+    @Override
+    public List<HistoricBuildingDTO> getAllLinkedHistoricBuildingsById(int viennaHistoryWikiId) {
+        List<HistoricBuildingDTO> linkedBuildings = new ArrayList<>();
 
-        eventEntity.setViennaHistoryWikiId(node.get("viennaHistoryWikiId").asInt());
-        eventEntity.setName(node.get("name").asString());
-        eventEntity.setUrl(node.get("url").asString());
-        eventEntity.setDateFrom(Optional.ofNullable(getSafeString(node, "dateFrom")));
-        eventEntity.setDateTo(Optional.ofNullable(getSafeString(node, "dateTo")));
-        eventEntity.setOrganizer(Optional.ofNullable(getSafeString(node, "organizer")));
-        eventEntity.setParticipantCount(Optional.ofNullable(getSafeString(node, "participantCount")));
-        eventEntity.setGnd(Optional.ofNullable(getSafeString(node, "gnd")));
-        eventEntity.setWikidataId(Optional.ofNullable(getSafeString(node, "wikidataId")));
-        eventEntity.setResource(Optional.ofNullable(getSafeString(node, "resource")));
-        eventEntity.setTypeOfEvent(Optional.ofNullable(getSafeString(node, "typeOfEvent")));
-        eventEntity.setTopic(Optional.ofNullable(getSafeString(node, "topic")));
-        eventEntity.setSeeAlso(Optional.ofNullable(getSafeString(node, "seeAlso")));
-        if (node.containsKey("links")) {
-            eventEntity.setLinks(node.get("links").asList(Value::asString));
-        } else {
-            eventEntity.setLinks(new ArrayList<>());
+        try (Session session = driver.session()) {
+            String query = "MATCH (p:WienGeschichteWikiEvents {viennaHistoryWikiId: $viennaHistoryWikiId})-[:HAS_LINK_TO]->(linked:WienGeschichteWikiBuildings) " +
+                    "RETURN linked";
+
+            List<Record> records = session.readTransaction(tx ->
+                    tx.run(query, Values.parameters("viennaHistoryWikiId", viennaHistoryWikiId)).list()
+            );
+
+            for (Record record : records) {
+                Node linkedNode = record.get("linked").asNode();
+                ViennaHistoryWikiBuildingObject entity = mappingService.mapNodeToHistoricalBuildingEntity(linkedNode);
+
+                //preliminary content fetching
+                String content = extractMainArticleText(entity.getUrl());;
+                HistoricBuildingDTO dto = new HistoricBuildingDTO(entity, content);
+                linkedBuildings.add(dto);
+            }
+
+        } catch (Exception e) {
+            System.err.println("Error retrieving linked historic persons for wikiDataId " + viennaHistoryWikiId + ": " + e.getMessage());
         }
 
-        if (node.containsKey("imageUrls")) {
-            eventEntity.setImageUrls(node.get("imageUrls").asList(Value::asString));
-        } else {
-            eventEntity.setImageUrls(new ArrayList<>());
-        }
-
-        return eventEntity;
+        return linkedBuildings;
     }
 
-    private String getSafeString(Node node, String key) {
-        return node.containsKey(key) ? node.get(key).asString() : "N/A";
+    @Override
+    public List<HistoricPersonDTO> getAllLinkedHistoricPersonsById(int viennaHistoryWikiId) {
+        List<HistoricPersonDTO> linkedPersons = new ArrayList<>();
+
+        try (Session session = driver.session()) {
+            String query = "MATCH (p:WienGeschichteWikiEvents {viennaHistoryWikiId: $viennaHistoryWikiId})-[:HAS_LINK_TO]->(linked:WienGeschichteWikiPersons) " +
+                    "RETURN linked";
+
+            List<Record> records = session.readTransaction(tx ->
+                    tx.run(query, Values.parameters("viennaHistoryWikiId", viennaHistoryWikiId)).list()
+            );
+
+            for (Record record : records) {
+                Node linkedNode = record.get("linked").asNode();
+                ViennaHistoryWikiPersonObject entity = mappingService.mapNodeToPersonEntity(linkedNode);
+
+                //preliminary content fetching
+                String content = extractMainArticleText(entity.getUrl());;
+                HistoricPersonDTO dto = new HistoricPersonDTO(entity, content);
+                linkedPersons.add(dto);
+            }
+
+        } catch (Exception e) {
+            System.err.println("Error retrieving linked historic persons for wikiDataId " + viennaHistoryWikiId + ": " + e.getMessage());
+        }
+        return linkedPersons;
     }
 
     private String extractMainArticleText(String url) {
