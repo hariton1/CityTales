@@ -1,7 +1,9 @@
 package group_05.ase.data_scraper;
 
-import group_05.ase.data_scraper.Service.Implementation.WikiDataScraperService;
-import group_05.ase.data_scraper.Service.Implementation.WikipediaLinkExtractor;
+import group_05.ase.data_scraper.Service.events.EventService;
+import group_05.ase.data_scraper.Service.general.LinkService;
+import group_05.ase.data_scraper.Service.persons.PersonService;
+import group_05.ase.data_scraper.Service.buildings.BuildingService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
