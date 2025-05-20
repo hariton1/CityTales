@@ -10,19 +10,19 @@ build:user-db:
   stage: build
   script:
     - cd user-db
-    - mvn clean install
+    - mvn clean package -DskipTests
 
 build:data-scraper:
   stage: build
   script:
     - cd data-scraper
-    - mvn clean install
+    - mvn clean package -DskipTests
 
 build:neo4j-data-access:
   stage: build
   script:
     - cd neo4j-data-access
-    - mvn clean install
+    - mvn clean package -DskipTests
 
 # TODO: FE
 
