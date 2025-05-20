@@ -1,6 +1,7 @@
 package group_05.ase.neo4j_data_access.Service.Implementation;
 
 import group_05.ase.neo4j_data_access.DTO.HistoricBuildingDTO;
+import group_05.ase.neo4j_data_access.DTO.HistoricEventDTO;
 import group_05.ase.neo4j_data_access.DTO.HistoricPersonDTO;
 import group_05.ase.neo4j_data_access.Service.Interface.ISearchService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,8 @@ public class SearchService implements ISearchService {
     private HistoricBuildingService historicBuildingService;
     @Autowired
     private HistoricPersonService historicPersonService;
+    @Autowired
+    private HistoricEventService historicEventService;
 
     @Override
     public List<HistoricPersonDTO> searchPersonsWithKeyword(String query) {
@@ -30,5 +33,12 @@ public class SearchService implements ISearchService {
         //TODO: Preprocess Query
 
         return historicBuildingService.getBuildingByPartialName(query);
+    }
+
+    @Override
+    public List<HistoricEventDTO> searchEventsWithKeyword(String query) {
+        //TODO: Preprocess Query
+
+        return historicEventService.getEventByPartialName(query);
     }
 }
