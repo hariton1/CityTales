@@ -10,12 +10,20 @@ build:data-scraper:
   script:
     - cd data-scraper
     - mvn clean install
+  artifacts:
+    paths:
+      - data-scraper/target/
+    expire_in: 1h
 
 build:neo4j-data-access:
   stage: build
   script:
     - cd neo4j-data-access
     - mvn clean install
+  artifacts:
+    paths:
+      - neo4j-data-access/target/
+    expire_in: 1h
 
 # Test
 test:data-scraper:
@@ -31,3 +39,5 @@ test:neo4j-data-access:
   script:
     - cd neo4j-data-access
     - mvn test
+
+# Deploy: TODO
