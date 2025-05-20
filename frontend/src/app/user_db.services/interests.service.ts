@@ -1,5 +1,5 @@
 import {HttpClient} from '@angular/common/http';
-import {Observable} from 'rxjs';
+import {map, Observable} from 'rxjs';
 import {SERVER_ADDRESS} from '../globals';
 import {Injectable} from '@angular/core';
 import {InterestDto} from '../user_db.dto/interest.dto';
@@ -13,7 +13,6 @@ export class InterestsService {
   }
 
   public getAllInterests(): Observable<InterestDto[]> {
-    //return this.httpClient.get<InterestDto[]>(this.DOMAIN);
     return this.httpClient.get<any>(this.DOMAIN)
       .pipe(
         map(data => data.map((item: { interest_id: number; interest_name: string; description: string; }) => {
@@ -23,7 +22,6 @@ export class InterestsService {
   }
 
   public getInterestByInterestId(interest_id: number): Observable<InterestDto> {
-    //return this.httpClient.get<InterestDto>(this.DOMAIN + '/id=' + interest_id);
     return this.httpClient.get<any>(this.DOMAIN + '/id=' + interest_id)
       .pipe(
         map(item => {

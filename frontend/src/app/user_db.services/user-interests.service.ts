@@ -1,5 +1,5 @@
 import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {Observable} from 'rxjs';
+import {map, Observable} from 'rxjs';
 import {SERVER_ADDRESS} from '../globals';
 import {Injectable} from '@angular/core';
 import {UserInterestDto} from '../user_db.dto/user-interest.dto';
