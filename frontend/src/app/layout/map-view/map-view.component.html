@@ -1,0 +1,11 @@
+<google-map
+  height="100%"
+  width="100%"
+  [center]="center"
+  [zoom]="zoom"
+  [options]="options"
+>
+  <map-marker *ngFor="let location of locationsNearby" [position]="{lat: location.building.latitude, lng: location.building.longitude}" [options]="markerOptions" (mapClick)="openMarkerInfo(location)"></map-marker>
+  <map-marker [position]="center" [options]="locationMarkerOptions"></map-marker>
+
+</google-map>
