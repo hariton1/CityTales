@@ -15,9 +15,10 @@
     <!--Add your new module here-->
     <modules>
         <module>data-scraper</module>
-        <!--module>data-access</module-->
         <module>user-db</module>
         <module>authentification</module>
+        <module>neo4j-data-access</module>
+        <module>qdrant-adapter</module>
     </modules>
 
     <properties>

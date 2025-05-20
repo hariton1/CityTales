@@ -25,7 +25,7 @@ public class UserInterestService {
         List<UserInterestEntity> tmp = this.repository.findAll();
 
         for(UserInterestEntity userInterest : tmp) {
-            userInterests.add(new UserInterestDTO(userInterest.getUserId(), userInterest.getInterestId(), userInterest.getCreDat()));
+            userInterests.add(new UserInterestDTO(userInterest.getUserId(), userInterest.getInterestId(), userInterest.getCreDat(), userInterest.getInterestWeight()));
         }
 
         return userInterests;
@@ -38,7 +38,7 @@ public class UserInterestService {
         List<UserInterestEntity> tmp = this.repository.findByUserId(userId);
 
         for(UserInterestEntity userInterest : tmp) {
-            userInterests.add(new UserInterestDTO(userInterest.getUserId(), userInterest.getInterestId(), userInterest.getCreDat()));
+            userInterests.add(new UserInterestDTO(userInterest.getUserId(), userInterest.getInterestId(), userInterest.getCreDat(), userInterest.getInterestWeight()));
         }
 
         return userInterests;
@@ -51,7 +51,7 @@ public class UserInterestService {
         List<UserInterestEntity> tmp = this.repository.findByInterestId(interestId);
 
         for(UserInterestEntity userInterest : tmp) {
-            userInterests.add(new UserInterestDTO(userInterest.getUserId(), userInterest.getInterestId(), userInterest.getCreDat()));
+            userInterests.add(new UserInterestDTO(userInterest.getUserId(), userInterest.getInterestId(), userInterest.getCreDat(), userInterest.getInterestWeight()));
         }
 
         return userInterests;
@@ -65,6 +65,7 @@ public class UserInterestService {
         tmp.setUserId(userInterestDTO.getUserId());
         tmp.setInterestId(userInterestDTO.getInterestId());
         tmp.setCreDat(userInterestDTO.getCreDat());
+        tmp.setInterestWeight(userInterestDTO.getInterestWeight());
 
         this.repository.save(tmp);
 

@@ -1,0 +1,17 @@
+<div class="my-tab-bar-wrapper">
+  <nav
+    tuiTabBar
+    class="tabs"
+    [(activeItemIndex)]="activeItemIndex"
+  >
+    <button
+      *ngFor="let item of items"
+      tuiTabBarItem
+      type="button"
+      [badge]="item.badge"
+      [icon]="item.icon"
+    >
+      {{ item.text }}
+    </button>
+  </nav>
+</div>

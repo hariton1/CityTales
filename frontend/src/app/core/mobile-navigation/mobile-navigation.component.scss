@@ -1,0 +1,8 @@
+.my-tab-bar-wrapper {
+  position: fixed;
+  bottom: 0;
+  left:   0;
+  right:  0;
+  /* ensure it sits above your content */
+  z-index: 1000;
+}
