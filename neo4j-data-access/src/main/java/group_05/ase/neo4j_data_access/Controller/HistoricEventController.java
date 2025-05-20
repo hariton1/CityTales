@@ -43,8 +43,8 @@ public class HistoricEventController {
         return ResponseEntity.ok(events);
     }
 
-    @GetMapping("/links/by/id/{viennaHistoryWikiId}")
-    public ResponseEntity<List<HistoricEventDTO>> getLinksById(@PathVariable int viennaHistoryWikiId) {
+    @GetMapping("/links/events/by/id/{viennaHistoryWikiId}")
+    public ResponseEntity<List<HistoricEventDTO>> getLinkedEventsById(@PathVariable int viennaHistoryWikiId) {
         List<HistoricEventDTO> events = historicEventService.getAllLinkedHistoricEventsById(viennaHistoryWikiId);
         if (events.isEmpty()) {
             return ResponseEntity.noContent().build();

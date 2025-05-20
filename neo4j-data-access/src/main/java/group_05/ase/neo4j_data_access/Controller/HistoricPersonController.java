@@ -43,8 +43,8 @@ public class HistoricPersonController {
         return ResponseEntity.ok(people);
     }
 
-    @GetMapping("/links/by/id/{viennaHistoryWikiId}")
-    public ResponseEntity<List<HistoricPersonDTO>> getLinksById(@PathVariable int viennaHistoryWikiId) {
+    @GetMapping("/links/persons/by/id/{viennaHistoryWikiId}")
+    public ResponseEntity<List<HistoricPersonDTO>> getLinkedPersonsById(@PathVariable int viennaHistoryWikiId) {
         List<HistoricPersonDTO> people = historicPersonService.getAllLinkedHistoricPersonsById(viennaHistoryWikiId);
         if (people.isEmpty()) {
             return ResponseEntity.noContent().build();
