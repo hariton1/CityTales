@@ -34,22 +34,4 @@ export class HistoricPlaceDetailComponent {
   closeDetail():void{
       this.setDetailEvent.emit(false);
   }
-
-  ngOnInit():void {
-    this.fetchAssociatedPersons();
-  }
-
-  fetchAssociatedPersons(): void {
-    if(!this.selectedPlace.building.wikidataId === null) {
-      this.personService.getLinkedPersonsByVHWikiId(this.selectedPlace.building.wikidataId.replace('Q', '')).subscribe(
-        persons => {
-          this.associatedPersons = persons;
-        }
-      )
-    }
-  }
-
-
-
-
 }
