@@ -4,15 +4,25 @@
         CityTales
     </span>
 
+
+
+
+
+
     <tui-segmented [size]="'m'" class="main-nav-desktop">
       <a routerLink="/explore" >🌎 Explore</a>
       <a routerLinkActive  href="#">🧭 Tours</a>
       <a routerLinkActive href="#">Contribute</a>
       <a routerLinkActive href="#">For Educators</a>
       <a routerLinkActive href="#">About</a>
+
     </tui-segmented>
 
+  <input type="text" placeholder="Search for sites/people" #filter>
+  <button class="primary" type="button" (click)="getResults(filter.value)">Search</button>
+
     <div class="auth_buttons">
+
       <button
         appearance="secondary"
         size="s"

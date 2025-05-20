@@ -1,17 +1,22 @@
 package group_05.ase.data_scraper.Old_Scraper.Service.Implementation;
 
+<<<<<<<< HEAD:data-scraper/src/main/java/group_05/ase/data_scraper/Old_Scraper/Service/Implementation/WikipediaExtractor.java
+import group_05.ase.data_scraper.Service.Interface.IWikipediaExtractor;
+========
 import group_05.ase.data_scraper.Old_Scraper.Service.Interface.IWikipediaLinkExtractor;
+>>>>>>>> origin/master:data-scraper/src/main/java/group_05/ase/data_scraper/Old_Scraper/Service/Implementation/WikipediaLinkExtractor.java
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class WikipediaLinkExtractor implements IWikipediaLinkExtractor {
+public class WikipediaExtractor implements IWikipediaExtractor {
 
     public List<String> extractLinks(String url) {
         System.out.println("ur: " + url);
@@ -32,5 +37,25 @@ public class WikipediaLinkExtractor implements IWikipediaLinkExtractor {
         }
 
         return fullUrls;
+    }
+
+    public String extractBodyContent(String url) throws IOException {
+        StringBuilder bodyContent = new StringBuilder();
+        // Connect to the URL and fetch the document
+        Document doc = Jsoup.connect(url).get();
+
+        // Select the div with id 'bodyContent'
+        Element bodyDiv = doc.getElementById("bodyContent");
+
+        // Extract and concatenate all <p> tag contents within that div
+        if (bodyDiv != null) {
+            for (Element paragraph : bodyDiv.select("p")) {
+                bodyContent.append(paragraph.text()).append("\n");
+            }
+        } else {
+            System.out.println("No bodyContent div found for: " + url);
+        }
+
+        return bodyContent.toString().trim();
     }
 }
