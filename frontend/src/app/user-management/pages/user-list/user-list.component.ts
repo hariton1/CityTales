@@ -12,6 +12,7 @@ import {TuiCell} from '@taiga-ui/layout';
 import {NgForOf, NgIf} from '@angular/common';
 import {TuiTable} from '@taiga-ui/addon-table';
 import {TuiItem} from '@taiga-ui/cdk';
+import {RouterLink} from '@angular/router';
 
 @Component({
   selector: 'app-user-list',
@@ -33,7 +34,8 @@ import {TuiItem} from '@taiga-ui/cdk';
     TuiMore,
     TuiDropdownOptionsDirective,
     TuiDropdownOpen,
-    TuiTitle
+    TuiTitle,
+    RouterLink
   ],
   templateUrl: './user-list.component.html',
   styleUrl: './user-list.component.scss'
@@ -41,11 +43,13 @@ import {TuiItem} from '@taiga-ui/cdk';
 export class UserListComponent {
   protected readonly data = [
     {
+      id: 1,
       role: {
         roleName: 'Moderator'
       },
       userData: {
-        name: 'John Cleese',
+        firstName: 'John',
+        lastName: 'Cleese',
         email: 'silly@walk.uk',
       },
       status: {
@@ -56,11 +60,13 @@ export class UserListComponent {
       createdAt: '2021-01-01'
     },
     {
+      id: 2,
       role: {
         roleName: 'User'
       },
       userData: {
-        name: 'Eric Idle',
+        firstName: 'Eric',
+        lastName: 'Idle',
         email: 'cool@dude.com',
       },
       status: {
@@ -71,11 +77,13 @@ export class UserListComponent {
       createdAt: '2024-02-23'
     },
     {
+      id:3,
       role: {
         roleName: 'Contributor'
       },
       userData: {
-        name: 'Michael Palin',
+        firstName: 'Michael',
+        lastName: 'Palin',
         email: 'its@man.com',
       },
       status: {
