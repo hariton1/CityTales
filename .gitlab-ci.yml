@@ -4,7 +4,22 @@ stages:
   - build
   - test
 
+cache:
+  key: ${CI_PROJECT_NAME}
+  paths:
+    - .m2/repository
+
 # Build
+build:user-db:
+  stage: build
+  script:
+    - cd user-db
+    - mvn clean install
+  artifacts:
+    paths:
+      - user-db/target/
+    expire_in: 1h
+
 build:data-scraper:
   stage: build
   script:
@@ -26,6 +41,13 @@ build:neo4j-data-access:
     expire_in: 1h
 
 # Test
+test:user-db:
+  stage: test
+  needs: ["build:user-db"]
+  script:
+    - cd user-db
+    - mvn test
+
 test:data-scraper:
   stage: test
   needs: ["build:data-scraper"]
