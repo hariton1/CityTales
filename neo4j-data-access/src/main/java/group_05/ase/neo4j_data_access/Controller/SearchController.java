@@ -1,6 +1,7 @@
 package group_05.ase.neo4j_data_access.Controller;
 
 
+import group_05.ase.neo4j_data_access.DTO.HistoricEventDTO;
 import group_05.ase.neo4j_data_access.DTO.HistoricPersonDTO;
 import group_05.ase.neo4j_data_access.DTO.HistoricBuildingDTO;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +35,14 @@ public class SearchController {
         List<HistoricBuildingDTO> places = searchService.searchPlacesWithKeyword(query);
         if (places.isEmpty()) {return ResponseEntity.noContent().build();}
         return ResponseEntity.ok(places);
+    }
+
+    @CrossOrigin(origins = "http://localhost:4200")
+    @GetMapping("/searchEvents")
+    public ResponseEntity<List<HistoricEventDTO>> searchHistoricEvents(@RequestParam String query) {
+        List<HistoricEventDTO> events = searchService.searchEventsWithKeyword(query);
+        if (events.isEmpty()) {return ResponseEntity.noContent().build();}
+        return ResponseEntity.ok(events);
     }
 
 }
