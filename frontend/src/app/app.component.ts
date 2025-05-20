@@ -18,23 +18,4 @@ export class AppComponent {
 
   private readonly alerts = inject(TuiAlertService);
   private readonly userService = inject(UserService);
-
-  protected testConnection(): void {
-    console.log('Test Connection');
-    let testConnection = this.userService.testConnection();
-
-    testConnection.subscribe(testString => {
-      if (testString) {
-        if (testString === SERVER_CONNECTION_TEST_STRING) {
-          this.alerts
-            .open(testString, {label: 'Success!'})
-            .subscribe();
-        } else {
-          this.alerts
-            .open('Something went wrong!', {label: 'Failure!'})
-            .subscribe();
-        }
-      }
-    });
-  }
 }

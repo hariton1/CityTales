@@ -1,1 +1,8 @@
-<h2>Welcome to CityTales</h2>
+<div class="place-detail-container" *ngIf="detailedView">
+  <app-historic-place-detail [selectedPlace]="selectedPlace" (setDetailEvent)="setDetailEvent($event)"></app-historic-place-detail>
+</div>
+
+<div class="place-preview-container" *ngIf="!detailedView">
+  <app-historic-place-preview [historicalPlaces]="historicalPlaces" (selectPlaceEvent)="setSelectedPlace($event)" (setDetailedViewEvent)="setDetailEvent($event)"></app-historic-place-preview>
+
+</div>
