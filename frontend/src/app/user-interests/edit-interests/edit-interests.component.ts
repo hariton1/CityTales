@@ -3,7 +3,6 @@ import {JsonPipe} from "@angular/common";
 import {FormControl, FormGroup, ReactiveFormsModule} from "@angular/forms";
 import {TuiFilter} from "@taiga-ui/kit";
 import {UserInterestDto} from '../../user_db.dto/user-interest.dto'
-import {UserService} from '../../services/user.service';
 import {forkJoin, Observable, of, switchMap} from 'rxjs';
 import {InterestDto} from '../../user_db.dto/interest.dto';
 import {TuiButton, TuiIcon} from '@taiga-ui/core';
