@@ -1,0 +1,78 @@
+
+  <div class="stack">
+    <tui-textfield>
+      <label tuiLabel>Feedback</label>
+      <input
+        formControlName="fb_content"
+        placeholder="text of your feedback ..."
+        tuiTextfield
+        type="text"
+      />
+    </tui-textfield>
+  </div>
+
+  <section class="zoom-controller">
+  <button
+    appearance="icon"
+    iconStart="@tui.minus"
+    size="xs"
+    tuiIconButton
+    type="button"
+    class="minus"
+    (click)="change(-1)"
+  >
+    Minus
+  </button>
+
+  <label
+    tuiSliderThumbLabel
+    class="slider-wrapper"
+  >
+    <div
+      tuiHintAppearance="dark"
+      tuiHintDirection="top"
+      [tuiHint]="value | percent"
+      [tuiHintManual]="!!(showHint$ | async)"
+    ></div>
+
+    <input
+      step="any"
+      tuiSlider
+      type="range"
+      [max]="max"
+      [min]="min"
+      [(ngModel)]="value"
+    />
+  </label>
+
+  <button
+    appearance="icon"
+    iconStart="@tui.plus"
+    size="xs"
+    tuiIconButton
+    type="button"
+    class="plus"
+    (click)="change(+1)"
+  >
+    Plus
+  </button>
+    <p>
+      Control value:
+      <code>{{ tuiRound(value, 0) }}</code>
+    </p>
+</section>
+
+  <footer>
+    <button
+      tuiButton
+      type="submit"
+      (click)="onSubmit()"
+    >
+      <tui-icon
+        icon="@tui.save"
+        [style.height.rem]="1.2"
+      />
+      Save changes
+    </button>
+  </footer>
+
