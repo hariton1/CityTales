@@ -9,10 +9,17 @@
   }
 }
 
-/* desktop: >768px show only .desktop */
-@media (min-width: 769px) {
+/* tablet: 769px-1024px */
+@media (min-width: 769px) and (max-width: 1024px) {
   .centered-wrapper form {
-    width: 20%;
+    width: 60%;
+  }
+}
+
+/* desktop: >768px show only .desktop */
+@media (min-width: 1025px) {
+  .centered-wrapper form {
+    width: 25%;
   }
 }
 

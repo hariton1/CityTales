@@ -1,26 +1,33 @@
-import {Component, OnInit} from '@angular/core';
-import {JsonPipe} from "@angular/common";
+import {Component, inject, OnInit} from '@angular/core';
 import {FormControl, FormGroup, ReactiveFormsModule} from "@angular/forms";
 import {TuiFilter} from "@taiga-ui/kit";
 import {UserInterestDto} from '../../user_db.dto/user-interest.dto'
-import {UserService} from '../../services/user.service';
 import {forkJoin, Observable, of, switchMap} from 'rxjs';
 import {InterestDto} from '../../user_db.dto/interest.dto';
-import {TuiButton, TuiIcon} from '@taiga-ui/core';
+import {TuiAlertService, TuiButton, TuiIcon, TuiTitle} from '@taiga-ui/core';
 import {UserInterestsService} from '../../user_db.services/user-interests.service';
 import {InterestsService} from '../../user_db.services/interests.service';
+import {TuiAppBarBack, TuiAppBarComponent, TuiHeader} from '@taiga-ui/layout';
+import {TuiPlatform} from '@taiga-ui/cdk';
+import {NgIf} from '@angular/common';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 
 @Component({
   selector: 'app-edit-interests',
   imports: [
-    JsonPipe,
     ReactiveFormsModule,
     TuiFilter,
     TuiButton,
-    TuiIcon
+    TuiIcon,
+    TuiHeader,
+    TuiTitle,
+    TuiPlatform,
+    TuiAppBarComponent,
+    TuiAppBarBack,
+    NgIf,
   ],
   templateUrl: './edit-interests.component.html',
-  styleUrl: './edit-interests.component.scss'
+  styleUrl: './edit-interests.component.less'
 })
 export class EditInterestsComponent implements OnInit{
   protected allInterestsList: InterestDto[] = [];
@@ -32,12 +39,22 @@ export class EditInterestsComponent implements OnInit{
   protected loading = true;
   protected error: any = null;
 
-  constructor(private interestsService: InterestsService,
-              private userInterestService: UserInterestsService) {
+  isMobile = false;
 
-  }
+  private readonly alerts = inject(TuiAlertService);
+
+  constructor(
+    private interestsService: InterestsService,
+    private userInterestService: UserInterestsService,
+    private breakpointObserver: BreakpointObserver) {}
 
   ngOnInit(): void {
+    this.breakpointObserver
+      .observe([Breakpoints.HandsetPortrait, Breakpoints.HandsetLandscape])
+      .subscribe(result => {
+        this.isMobile = result.matches;
+      });
+
     this.getAllInterests();
     this.fetchUserInterests();
   }
@@ -130,6 +147,9 @@ export class EditInterestsComponent implements OnInit{
       forkJoin(createRequests).subscribe({
         next: (results) => {
           console.log('All interests created successfully', results);
+          this.alerts
+            .open('Your new interests are saved', {label: 'Success!', appearance: 'success', autoClose: 3000})
+            .subscribe();
           this.fetchUserInterests(); // Refresh the list only once after all operations
         },
         error: (err) => {
@@ -140,27 +160,6 @@ export class EditInterestsComponent implements OnInit{
       console.log('No new interests to create');
     }
   }
-
-    /*
-    for (let interest of newInterests) {
-      console.log('interest: ' + interest);
-      for (let interestDetail of this.userInterestsList) {
-          console.log('interestDetail: ' + interestDetail.());
-        if (interest !== interestDetail.getInterestName()) {
-          this.userInterestService.createNewUserInterest(new UserInterestDto('f5599c8c-166b-495c-accc-65addfaa572b', interestDetail.getInterestId(), new Date(), 1))
-            .subscribe({
-              next: () => {
-                console.log('Interest created successfully');
-                this.fetchUserInterests();
-              },
-              error: (err) => {
-                console.error('Error creating interest:', err);
-              }
-            });
-        }
-      }
-    }*/
-
 
   deleteInterest(): void {
     for (let interest of this.userInterestsList) {

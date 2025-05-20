@@ -1,5 +1,5 @@
-import {JsonPipe} from '@angular/common';
-import {Component, OnInit} from '@angular/core';
+import {NgIf} from '@angular/common';
+import {Component, inject, OnInit} from '@angular/core';
 import {FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {TuiFilter} from '@taiga-ui/kit';
 import {InterestDto} from '../../user_db.dto/interest.dto';
@@ -7,26 +7,33 @@ import {InterestsService} from '../../user_db.services/interests.service';
 import {forkJoin, Observable} from 'rxjs';
 import {UserInterestDto} from '../../user_db.dto/user-interest.dto';
 import {UserInterestsService} from '../../user_db.services/user-interests.service';
+import {TuiAppBarBack, TuiAppBarComponent, TuiHeader} from '@taiga-ui/layout';
+import {TuiAlertService, TuiButton, TuiIcon, TuiTitle} from '@taiga-ui/core';
+import {TuiPlatform} from '@taiga-ui/cdk';
+import {BreakpointObserver, Breakpoints} from '@angular/cdk/layout';
 
 
 @Component({
   selector: 'app-onboarding',
   imports: [
     ReactiveFormsModule,
-    JsonPipe,
     ReactiveFormsModule,
-    TuiFilter
+    TuiFilter,
+    TuiAppBarBack,
+    TuiAppBarComponent,
+    TuiButton,
+    TuiPlatform,
+    TuiHeader,
+    TuiTitle,
+    TuiIcon,
+    NgIf
   ],
   templateUrl: './onboarding.component.html',
-  styleUrl: './onboarding.component.scss',
+  styleUrl: './onboarding.component.less',
 })
 
 export class OnboardingComponent implements OnInit{
 
-  //protected interests: Observable<UserInterestDto[]>;
-  //protected interestsList: UserInterestDto[] = [];
-
-  //protected interestDetail: Observable<InterestDto>;
   protected allInterestsList: InterestDto[] = [];
   protected interestNames: string[] = [];
 
@@ -36,12 +43,23 @@ export class OnboardingComponent implements OnInit{
   protected loading = true;
   protected error: any = null;
 
+  isMobile = false;
 
-  constructor(private interestsService: InterestsService, private userInterestService: UserInterestsService) {
+  private readonly alerts = inject(TuiAlertService);
 
+
+  constructor(private interestsService: InterestsService,
+              private userInterestService: UserInterestsService,
+              private breakpointObserver: BreakpointObserver) {
   }
 
   ngOnInit(): void {
+    this.breakpointObserver
+      .observe([Breakpoints.HandsetPortrait, Breakpoints.HandsetLandscape])
+      .subscribe(result => {
+        this.isMobile = result.matches;
+      });
+
     this.getAllInterests();
   }
 
@@ -95,7 +113,9 @@ export class OnboardingComponent implements OnInit{
       forkJoin(createRequests).subscribe({
         next: (results) => {
           console.log('All interests created successfully', results);
-          //this.fetchUserInterests(); // Refresh the list only once after all operations
+          this.alerts
+            .open('Your new interests are saved', {label: 'Success!', appearance: 'success', autoClose: 3000})
+            .subscribe();
         },
         error: (err) => {
           console.error('Error creating interests:', err);
@@ -104,6 +124,11 @@ export class OnboardingComponent implements OnInit{
     } else {
       console.log('No new interests to create');
     }
+  }
+
+  onSubmit(): void {
+    console.log('Form submitted with values:', this.form.value);
+    this.createInterests();
   }
 
   protected readonly form = new FormGroup({

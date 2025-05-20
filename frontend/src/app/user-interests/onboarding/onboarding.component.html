@@ -1,12 +1,51 @@
+<!-- top nav displayed for mobile only -->
+<section tuiPlatform="ios" *ngIf="isMobile">
+  <tui-app-bar>
+    <button
+      tuiAppBarBack
+      tuiSlot="left"
+      type="button"
+    >
+      Profile
+    </button>
+    John Doe
+    <a
+      iconStart="@tui.user"
+      title="User"
+      tuiIconButton
+      tuiSlot="right"
+    ></a>
+  </tui-app-bar>
+</section>
+
 <div class="centered-wrapper">
   <form [formGroup]="form">
+    <header tuiHeader>
+      <h3 tuiTitle>Select your interests
+        <span tuiSubtitle>Tailor your interests to discover the best spots for you</span>
+      </h3>
+    </header>
     <tui-filter
       formControlName="filters"
-      size="s"
+      size="l"
+      class="filters"
       [items]="interestNames"
     />
+
+    <footer>
+      <button
+        appearance="floating"
+        tuiButton
+        type="button"
+        class="next-button"
+        (click)="onSubmit()"
+      >
+        Next
+        <tui-icon
+          icon="@tui.arrow-right"
+          [style.height.rem]="5"
+        />
+      </button>
+    </footer>
   </form>
-  <div>
-    <pre>Form value: {{ form.value | json }}</pre>
-  </div>
 </div>
