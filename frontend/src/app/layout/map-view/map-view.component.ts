@@ -1,6 +1,6 @@
 import {Component, Output} from '@angular/core';
-import { GoogleMapsModule} from '@angular/google-maps';
-import { CommonModule} from '@angular/common';
+import {GoogleMapsModule} from '@angular/google-maps';
+import {CommonModule} from '@angular/common';
 import {HistoricalPlaceEntity} from '../../dto/db_entity/HistoricalPlaceEntity';
 import {UserLocationService} from '../../services/user-location.service';
 import {LocationService} from '../../services/location.service';
@@ -30,7 +30,7 @@ export class MapViewComponent {
   locationsNearby: HistoricalPlaceEntity[] = [];
 
   markers: any[] = [];
-  center: google.maps.LatLngLiteral = { lat: 48.19865798950195, lng: 16.3714542388916 };
+  center: google.maps.LatLngLiteral = {lat: 48.19865798950195, lng: 16.3714542388916};
   zoom = 15;
 
   options: google.maps.MapOptions = {
@@ -39,7 +39,7 @@ export class MapViewComponent {
     minZoom: 4,
     zoomControl: true,
     clickableIcons: true,
-    styles : [
+    styles: [
       {
         "featureType": "poi",
         "elementType": "labels.text",
@@ -107,6 +107,7 @@ export class MapViewComponent {
       this.center = {lat: position.lat, lng: position.lng};
       this.locationService.getLocationsInRadius(position.lat, position.lng, 1000).subscribe(locations => {
         this.locationsNearby = locations;
+        this.deleteAllUnwantedImageUrls();
         this.addMarkersToMap(locations);
         this.populatePlacesEvent.emit(locations);
       })
@@ -123,4 +124,19 @@ export class MapViewComponent {
     this.selectPlaceEvent.emit(location);
     this.setDetailedViewEvent.emit(true);
   }
+
+  deleteAllUnwantedImageUrls(): void {
+    this.locationsNearby.forEach(location => {
+      location.building.imageUrls = location.building.imageUrls.filter(imageUrl => {
+        return !(
+          imageUrl.includes('wgw_logo_10') ||
+          imageUrl.includes('RDF') ||
+          imageUrl.includes('https://www.geschichtewiki.wien.gv.at/KnowledgeWiki.png') ||
+          imageUrl.includes('logo_footer')
+        );
+      });
+    });
+  }
+
+
 }

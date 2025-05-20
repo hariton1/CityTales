@@ -45,7 +45,12 @@
           </div>
           <div class="detail-row" *ngIf="selectedPlace.building.url">
             <span class="label">Wiki URL:</span>
-            <span class="value"> <a href="{{ selectedPlace.building.url }}"></a>{{ selectedPlace.building.url }}</span>
+            <span class="value">
+              <a [href]="selectedPlace.building.url" target="_blank"> {{ selectedPlace.building.url }} </a>
+            </span>
+          </div>
+          <div class="detail-row" *ngIf="selectedPlace.building.imageUrls.length > 0">
+            <img [src]="selectedPlace.building.imageUrls[0]" alt="Building image" class="building-image">
           </div>
         </div>
       </div>
