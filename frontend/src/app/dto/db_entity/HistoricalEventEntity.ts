@@ -4,7 +4,7 @@ import {HistoricalPlaceEntity} from './HistoricalPlaceEntity';
 
 export interface HistoricalEventEntity {
   content: string;
-  person: EventEntity;
+  event: EventEntity;
   linkedEvents: HistoricalEventEntity[];
   linkedPersons: HistoricalPersonEntity[];
   linkedPlaces: HistoricalPlaceEntity[];

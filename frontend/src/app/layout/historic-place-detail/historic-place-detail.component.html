@@ -18,6 +18,7 @@
 
 
     <!-- Main content -->
+    <tui-scrollbar class="scrollable-content">
     <div class="place-detail-content">
       <div class="content-section">
         <h3>Description</h3>
@@ -52,9 +53,46 @@
           <div class="detail-row" *ngIf="selectedPlace.building.imageUrls.length > 0">
             <img [src]="selectedPlace.building.imageUrls[0]" alt="Building image" class="building-image">
           </div>
+
+          <div class="content-section" *ngIf="selectedPlace.linkedPersons?.length">
+            <h3>Related Persons</h3>
+            <div class="related-items">
+              <div class="related-item" *ngFor="let person of selectedPlace.linkedPersons">
+            <span class="value">
+              <a [href]="person.person.url" target="_blank" *ngIf="person.person.url">{{ person.person.name }}</a>
+              <span *ngIf="!person.person.url">{{ person.person.name }}</span>
+            </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="content-section" *ngIf="selectedPlace.linkedPlaces?.length">
+            <h3>Related Places</h3>
+            <div class="related-items">
+              <div class="related-item" *ngFor="let place of selectedPlace.linkedPlaces">
+            <span class="value">
+              <a [href]="place.building.url" target="_blank" *ngIf="place.building.url">{{ place.building.name }}</a>
+              <span *ngIf="!place.building.url">{{ place.building.name }}</span>
+            </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="content-section" *ngIf="selectedPlace.linkedEvents?.length">
+            <h3>Related Events</h3>
+            <div class="related-items">
+              <div class="related-item" *ngFor="let event of selectedPlace.linkedEvents">
+            <span class="value">
+              <a [href]="event.event.url" target="_blank" *ngIf="event.event.url">{{ event.event.name }}</a>
+              <span *ngIf="!event.event.url">{{ event.event.name }}</span>
+            </span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
+    </tui-scrollbar>
   </div>
 </div>
 
