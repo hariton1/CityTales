@@ -64,4 +64,9 @@ export class FeedbackDto {
   public setCreDat(value: Date): void {
     this.creDat = value;
   }
+
+  public toString(): string {
+    return this.user_id + ' ' + this.article_id + ' ' + this.rating + ' ' + this.fb_content;
+  }
+
 }
