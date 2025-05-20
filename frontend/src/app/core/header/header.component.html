@@ -10,8 +10,11 @@
       <a routerLink="/feedback">Contribute</a>
       <a routerLinkActive href="#">For Educators</a>
       <a routerLinkActive href="#">About</a>
-      <a routerLink="/onboarding" >🌎 Onboarding</a>
+      <a routerLink="/onboarding" >Onboarding</a>
     </tui-segmented>
+
+  <input type="text" placeholder="Search for sites/people" #filter>
+  <button class="primary" type="button" (click)="getResults(filter.value)">Search</button>
 
     <div class="auth_buttons">
       <button
@@ -19,7 +22,7 @@
         size="s"
         tuiButton
         type="button"
-        routerLink="admin/users"
+        routerLink="admin/user-list"
       >
         <tui-icon
           icon="@tui.users"
