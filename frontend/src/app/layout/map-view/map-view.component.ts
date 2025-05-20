@@ -5,8 +5,6 @@ import {HistoricalPlaceEntity} from '../../dto/db_entity/HistoricalPlaceEntity';
 import {UserLocationService} from '../../services/user-location.service';
 import {LocationService} from '../../services/location.service';
 import {EventEmitter} from '@angular/core';
-import {Router} from '@angular/router';
-import {RouterModule} from '@angular/router';
 
 @Component({
   selector: 'app-map-view',
@@ -105,10 +103,11 @@ export class MapViewComponent {
 
     location.then(position => {
       this.center = {lat: position.lat, lng: position.lng};
-      this.locationService.getLocationsInRadius(position.lat, position.lng, 1000).subscribe(locations => {
+      this.locationService.getLocationsInRadius(position.lat, position.lng, 2000).subscribe(locations => {
         this.locationsNearby = locations;
         this.deleteAllUnwantedImageUrls();
         this.addMarkersToMap(locations);
+        this.locationsNearby.forEach(location => {this.addAllRelatedEntities(location);});
         this.populatePlacesEvent.emit(locations);
       })
     })
@@ -138,5 +137,17 @@ export class MapViewComponent {
     });
   }
 
+  addAllRelatedEntities(location: HistoricalPlaceEntity){
+    this.locationService.getLinkedLocations(location.building.viennaHistoryWikiId).subscribe(locations => {
+      location.linkedPlaces = locations;
+    });
 
+    this.locationService.getLinkedPersons(location.building.viennaHistoryWikiId).subscribe(persons => {
+      location.linkedPersons = persons;
+    });
+
+    this.locationService.getLinkedEvents(location.building.viennaHistoryWikiId).subscribe(events => {
+      location.linkedEvents = events;
+    });
+  }
 }
