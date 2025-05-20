@@ -3,16 +3,18 @@
     <div
       tuiAppearance="floating"
       tuiCardLarge
+      class="card-with-background"
+      [style.backgroundImage]="place.building.imageUrls[0] ? 'url(' + place.building.imageUrls[0] + ')' : 'none'"
+
     >
       <header tuiHeader>
         <h2 tuiTitle>{{place.building.name}}</h2>
       </header>
 
-      <section>Vienna History Wiki Id: {{place.building.viennaHistoryWikiId}}</section>
 
       <footer>
         <button
-          appearance="secondary"
+          appearance="secondary-white"
           size="l"
           tuiButton
           type="button"
