@@ -3,13 +3,13 @@ import {UUID} from 'node:crypto';
 export class UserInterestDto {
   private user_id: UUID;
   private interest_id: number;
-  private creDat: Date;
+  private cre_dat: Date;
   private interest_weight: number;
 
   constructor(user_id: UUID, interest_id: number, creDat: Date, interest_weight: number) {
     this.interest_id = interest_id;
     this.user_id = user_id;
-    this.creDat = creDat;
+    this.cre_dat = creDat;
     this.interest_weight = interest_weight;
   }
 
@@ -30,11 +30,11 @@ export class UserInterestDto {
   }
 
   public getCreDat(): Date {
-    return this.creDat;
+    return this.cre_dat;
   }
 
   public setCreDat(value: Date): void {
-    this.creDat = value;
+    this.cre_dat = value;
   }
 
   public getInterestWeight(): number {
@@ -43,5 +43,9 @@ export class UserInterestDto {
 
   public setInterestWeight(value: number): void {
     this.interest_weight = value;
+  }
+
+  public toString(): string {
+    return this.user_id + ' ' + this.interest_id + ' ' + this.cre_dat + ' ' + this.interest_weight;
   }
 }

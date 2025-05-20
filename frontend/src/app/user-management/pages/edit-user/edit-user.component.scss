@@ -23,13 +23,12 @@
   }
 }
 
+form footer {
+  justify-content: flex-end;
+}
+
 .stack {
   display: flex;
   gap: inherit;
   flex-direction: column;
-}
-
-.ticks-labels {
-  color: var(--tui-text-secondary);
-  margin-block-start: -1rem;
 }

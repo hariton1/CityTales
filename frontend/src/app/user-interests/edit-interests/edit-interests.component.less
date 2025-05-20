@@ -1,0 +1,48 @@
+@import '@taiga-ui/core/styles/taiga-ui-local.less';
+
+@media @tui-mobile-interval {
+  .centered-wrapper {
+    padding: 3em 0 3em 0 !important;
+  }
+
+  .centered-wrapper form {
+    width: 90%;
+  }
+}
+
+/* tablet: 769px-1024px */
+@media @tui-tablet-interval {
+  .centered-wrapper {
+    padding: 3em 0 0 0 !important;
+  }
+
+  .centered-wrapper form {
+    width: 60%;
+  }
+}
+
+/* desktop: > 1024px */
+@media @tui-desktop-interval {
+  .centered-wrapper form {
+    width: 50%;
+  }
+}
+
+@media @tui-desktop-lg-min {
+  .centered-wrapper form {
+    width: 30%;
+  }
+}
+
+form footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.filters {
+  padding: 2rem 0;
+}
+
+.next-button {
+  margin-bottom: 3em;
+}
