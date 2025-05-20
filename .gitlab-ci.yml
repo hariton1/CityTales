@@ -1,13 +1,9 @@
+# TODO: use custom docker image to prevent multiple dependency imports
 image: maven:latest
 
 stages:
   - build
   - test
-
-cache:
-  key: ${CI_PROJECT_NAME}
-  paths:
-    - .m2/repository
 
 # Build
 build:user-db:
@@ -15,30 +11,20 @@ build:user-db:
   script:
     - cd user-db
     - mvn clean install
-  artifacts:
-    paths:
-      - user-db/target/
-    expire_in: 1h
 
 build:data-scraper:
   stage: build
   script:
     - cd data-scraper
     - mvn clean install
-  artifacts:
-    paths:
-      - data-scraper/target/
-    expire_in: 1h
 
 build:neo4j-data-access:
   stage: build
   script:
     - cd neo4j-data-access
     - mvn clean install
-  artifacts:
-    paths:
-      - neo4j-data-access/target/
-    expire_in: 1h
+
+# TODO: FE
 
 # Test
 test:user-db:
@@ -47,6 +33,9 @@ test:user-db:
   script:
     - cd user-db
     - mvn test
+  artifacts:
+    paths:
+      - user-db/target/user-db-*.jar
 
 test:data-scraper:
   stage: test
@@ -54,6 +43,9 @@ test:data-scraper:
   script:
     - cd data-scraper
     - mvn test
+  artifacts:
+    paths:
+      - user-db/target/data-scraper-*.jar
 
 test:neo4j-data-access:
   stage: test
@@ -61,5 +53,11 @@ test:neo4j-data-access:
   script:
     - cd neo4j-data-access
     - mvn test
+  artifacts:
+    paths:
+      - user-db/target/neo4j-data-access-*.jar
 
-# Deploy: TODO
+# TODO: FE
+
+# Deploy
+# TODO: Deploy Jars
