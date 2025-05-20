@@ -9,12 +9,17 @@ import group_05.ase.neo4j_data_access.Service.Interface.IHistoricEventService;
 import group_05.ase.neo4j_data_access.Service.Interface.IWikipediaExtractorService;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.neo4j.driver.*;
 import org.neo4j.driver.Record;
 import org.neo4j.driver.exceptions.NoSuchRecordException;
 import org.neo4j.driver.types.Node;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -64,8 +69,9 @@ public class HistoricEventService implements IHistoricEventService {
 
             Node node = record.get("p").asNode();
             ViennaHistoryWikiEventObject entity = mapNodeToEventEntity(node);
-            // Todo: change
-            String content = "";
+
+            // preliminary content fetching
+            String content = extractMainArticleText(entity.getUrl());
             return new HistoricEventDTO(entity,content);
 
         } catch (NoSuchRecordException e) {
@@ -90,8 +96,9 @@ public class HistoricEventService implements IHistoricEventService {
             for (Record record : records) {
                 Node node = record.get("p").asNode();
                 ViennaHistoryWikiEventObject entity = mapNodeToEventEntity(node);
-                // Todo: change
-                String content = "";
+
+                // preliminary content fetching
+                String content = extractMainArticleText(entity.getUrl());
                 HistoricEventDTO dto = new HistoricEventDTO(entity, content);
                 eventDTOs.add(dto);
             }
@@ -118,8 +125,9 @@ public class HistoricEventService implements IHistoricEventService {
             for (Record record : records) {
                 Node linkedNode = record.get("linked").asNode();
                 ViennaHistoryWikiEventObject entity = mapNodeToEventEntity(linkedNode);
-                // Todo: change
-                String content = "";
+
+                //preliminary content fetching
+                String content = extractMainArticleText(entity.getUrl());;
                 HistoricEventDTO dto = new HistoricEventDTO(entity, content);
                 linkedEvents.add(dto);
             }
@@ -165,6 +173,42 @@ public class HistoricEventService implements IHistoricEventService {
     private String getSafeString(Node node, String key) {
         return node.containsKey(key) ? node.get(key).asString() : "N/A";
     }
+
+    private String extractMainArticleText(String url) {
+        StringBuilder textContent = new StringBuilder();
+
+        try {
+            Document doc = Jsoup.connect(url).get();
+
+            Element contentDiv = doc.selectFirst("div.mw-parser-output");
+
+            if (contentDiv != null) {
+                Elements paragraphs = contentDiv.select("p");
+
+                for (Element paragraph : paragraphs) {
+                    String text = paragraph.text().trim();
+                    if (!text.isEmpty()) {
+                        textContent.append(text).append("\n\n");
+                    }
+                }
+            } else {
+                System.err.println("Main content div not found.");
+            }
+
+        } catch (IOException e) {
+            System.err.println("Error fetching URL: " + e.getMessage());
+        }
+
+        String[] parts = textContent.toString().split("\n", 7);
+        if (parts.length < 7) {
+            return "";
+        } else {
+            String rest = parts[6];
+            rest = rest.replaceAll("\n", "");
+            return rest;
+        }
+    }
+
 
 
 }

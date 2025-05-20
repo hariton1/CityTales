@@ -7,12 +7,17 @@ import group_05.ase.neo4j_data_access.Service.Interface.IHistoricBuildingService
 import group_05.ase.neo4j_data_access.Service.Interface.IWikipediaExtractorService;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.neo4j.driver.*;
 import org.neo4j.driver.Record;
 import org.neo4j.driver.exceptions.NoSuchRecordException;
 import org.neo4j.driver.types.Node;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -121,8 +126,9 @@ public class HistoricBuildingService implements IHistoricBuildingService {
 
     private HistoricBuildingDTO convertToDTO(Node node) {
         ViennaHistoryWikiBuildingObject entity = mapNodeToHistoricalBuildingEntity(node);
-        // TODO change
-        String content = "";
+
+        //preliminary solution
+        String content = extractMainArticleText(entity.getUrl());
         return new HistoricBuildingDTO(entity, content);
     }
 
@@ -173,5 +179,40 @@ public class HistoricBuildingService implements IHistoricBuildingService {
 
     private String getSafeStringOrNull(Node node, String key) {
         return node.containsKey(key) && !node.get(key).isNull() ? node.get(key).asString() : null;
+    }
+
+    private String extractMainArticleText(String url) {
+        StringBuilder textContent = new StringBuilder();
+
+        try {
+            Document doc = Jsoup.connect(url).get();
+
+            Element contentDiv = doc.selectFirst("div.mw-parser-output");
+
+            if (contentDiv != null) {
+                Elements paragraphs = contentDiv.select("p");
+
+                for (Element paragraph : paragraphs) {
+                    String text = paragraph.text().trim();
+                    if (!text.isEmpty()) {
+                        textContent.append(text).append("\n\n");
+                    }
+                }
+            } else {
+                System.err.println("Main content div not found.");
+            }
+
+        } catch (IOException e) {
+            System.err.println("Error fetching URL: " + e.getMessage());
+        }
+
+        String[] parts = textContent.toString().split("\n", 7);
+        if (parts.length < 7) {
+            return "";
+        } else {
+            String rest = parts[6];
+            rest = rest.replaceAll("\n", "");
+            return rest;
+        }
     }
 }
