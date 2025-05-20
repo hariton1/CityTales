@@ -39,14 +39,55 @@ export class MapViewComponent {
     minZoom: 4,
     zoomControl: true,
     clickableIcons: true,
-
+    styles : [
+      {
+        "featureType": "poi",
+        "elementType": "labels.text",
+        "stylers": [
+          {
+            "visibility": "off"
+          }
+        ]
+      },
+      {
+        "featureType": "poi.business",
+        "stylers": [
+          {
+            "visibility": "off"
+          }
+        ]
+      },
+      {
+        "featureType": "road",
+        "elementType": "labels.icon",
+        "stylers": [
+          {
+            "visibility": "off"
+          }
+        ]
+      },
+      {
+        "featureType": "transit",
+        "stylers": [
+          {
+            "visibility": "off"
+          }
+        ]
+      }
+    ]
   };
 
   markerOptions: google.maps.MarkerOptions = {
     draggable: false,
-    animation: google.maps.Animation.DROP
+    animation: google.maps.Animation.DROP,
+    icon: {
+      url: 'https://cdn-icons-png.flaticon.com/512/263/263633.png',
+      scaledSize: new google.maps.Size(25, 25),
+      origin: new google.maps.Point(0, 0),
+      anchor: new google.maps.Point(17, 34),
+      labelOrigin: new google.maps.Point(12, 34)
+    }
   }
-
   locationMarkerOptions: google.maps.MarkerOptions = {
     draggable: false,
     animation: google.maps.Animation.BOUNCE,
@@ -64,7 +105,7 @@ export class MapViewComponent {
 
     location.then(position => {
       this.center = {lat: position.lat, lng: position.lng};
-      this.locationService.getLocationsInRadius(position.lat, position.lng, 3000).subscribe(locations => {
+      this.locationService.getLocationsInRadius(position.lat, position.lng, 1000).subscribe(locations => {
         this.locationsNearby = locations;
         this.addMarkersToMap(locations);
         this.populatePlacesEvent.emit(locations);
