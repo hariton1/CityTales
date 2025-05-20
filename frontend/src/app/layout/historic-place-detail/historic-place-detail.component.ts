@@ -1,14 +1,15 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {CommonModule, NgIf} from '@angular/common';
-import {HistoricalPlaceEntity} from '../../dto/db_entity/HistoricalPlaceEntity';
 import {PersonService} from '../../services/person.service';
 import {HistoricalPersonEntity} from '../../dto/db_entity/HistoricalPersonEntity';
+import {TuiScrollbar} from '@taiga-ui/core';
 
 @Component({
   selector: 'app-historic-place-detail',
   imports: [
     NgIf,
-    CommonModule
+    CommonModule,
+    TuiScrollbar
   ],
   templateUrl: './historic-place-detail.component.html',
   styleUrl: './historic-place-detail.component.scss'
