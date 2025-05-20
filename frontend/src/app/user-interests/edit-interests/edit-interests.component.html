@@ -1,0 +1,47 @@
+<!-- top nav displayed for mobile only -->
+<section tuiPlatform="ios" *ngIf="isMobile">
+  <tui-app-bar>
+    <button
+      tuiAppBarBack
+      tuiSlot="left"
+      type="button"
+    >
+      Profile
+    </button>
+    John Doe
+  </tui-app-bar>
+</section>
+
+<div class="centered-wrapper">
+  <form [formGroup]="form">
+    <header tuiHeader>
+      <h3 tuiTitle>Edit your interests
+        <span tuiSubtitle>Tailor your interests to discover the best spots for you</span>
+      </h3>
+    </header>
+
+    <div class="filters">
+      <tui-filter
+        formControlName="filters"
+        size="l"
+        [items]="interestNames"
+      />
+    </div>
+
+    <footer>
+      <button
+        appearance="floating"
+        tuiButton
+        type="button"
+        class="next-button"
+        (click)="onSubmit()"
+      >
+        Next
+        <tui-icon
+          icon="@tui.arrow-right"
+          [style.height.rem]="5"
+        />
+      </button>
+    </footer>
+  </form>
+</div>

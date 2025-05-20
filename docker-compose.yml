@@ -20,6 +20,15 @@ services:
       - ./neo4j_db/import:/var/lib/neo4j/import
       - ./neo4j_db/plugins:/plugins
 
+  qdrant:
+    container_name: qdrant
+    image: qdrant/qdrant:latest
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - ./qdrant_data:/qdrant/storage
+
   data-scraper:
     container_name: data-scraper
     platform: linux/amd64
@@ -27,12 +36,27 @@ services:
     ports:
       - "8080:8080"
 
+  #production
+  # frontend:
+    # container_name: frontend
+    # build: ./frontend
+    # image: frontend:latest
+    # ports:
+      # - 4200:4200
+
+  #for development only
   frontend:
     container_name: frontend
-    build: ./frontend
-    image: frontend:latest
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    #image: frontend:latest
+    working_dir: /app
     ports:
       - "4200:4200"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
 
   user-db:
     container_name: user-db

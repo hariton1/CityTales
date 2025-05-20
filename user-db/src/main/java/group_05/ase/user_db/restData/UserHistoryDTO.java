@@ -45,4 +45,9 @@ public class UserHistoryDTO {
     @JsonDeserialize(using = CustomTimestampDeserializer.class)
     private LocalDateTime closeDt;
 
+    @Getter
+    @Setter
+    @JsonProperty(value = "interest_id")
+    private int interestId;
+
 }

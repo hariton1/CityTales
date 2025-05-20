@@ -1,25 +1,63 @@
+# TODO: use custom docker image to prevent multiple dependency imports
 image: maven:latest
 
-build-job:
+stages:
+  - build
+  - test
+
+# Build
+build:user-db:
   stage: build
   script:
-    - echo "Hello, $GITLAB_USER_LOGIN!"
+    - cd user-db
+    - mvn clean package -DskipTests
 
-test-job1:
+build:data-scraper:
+  stage: build
+  script:
+    - cd data-scraper
+    - mvn clean package -DskipTests
+
+build:neo4j-data-access:
+  stage: build
+  script:
+    - cd neo4j-data-access
+    - mvn clean package -DskipTests
+
+# TODO: FE
+
+# Test
+test:user-db:
   stage: test
+  needs: ["build:user-db"]
   script:
-    - echo "This job tests something"
+    - cd user-db
+    - mvn test
+  artifacts:
+    paths:
+      - user-db/target/user-db-*.jar
 
-test-job2:
+test:data-scraper:
   stage: test
+  needs: ["build:data-scraper"]
   script:
-    - echo "This job tests something, but takes more time than test-job1."
-    - echo "After the echo commands complete, it runs the sleep command for 20 seconds"
-    - echo "which simulates a test that runs 20 seconds longer than test-job1"
-    - sleep 20
+    - cd data-scraper
+    - mvn test
+  artifacts:
+    paths:
+      - user-db/target/data-scraper-*.jar
 
-deploy-prod:
-  stage: deploy
+test:neo4j-data-access:
+  stage: test
+  needs: ["build:neo4j-data-access"]
   script:
-    - echo "This job deploys something from the $CI_COMMIT_BRANCH branch."
-  environment: production
+    - cd neo4j-data-access
+    - mvn test
+  artifacts:
+    paths:
+      - user-db/target/neo4j-data-access-*.jar
+
+# TODO: FE
+
+# Deploy
+# TODO: Deploy Jars

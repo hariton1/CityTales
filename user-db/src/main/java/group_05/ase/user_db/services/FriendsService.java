@@ -90,7 +90,7 @@ public class FriendsService {
         tmp.setFriendTwo(friendsDTO.getFriendTwo());
         tmp.setCreDat(friendsDTO.getCreDat());
 
-        this.repository.save(tmp);
+        this.repository.delete(tmp);
 
     }
 

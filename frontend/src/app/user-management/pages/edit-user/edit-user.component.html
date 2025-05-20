@@ -1,0 +1,149 @@
+<div class="centered-wrapper">
+  <form
+    tuiForm="l"
+    [formGroup]="editUserForm"
+  >
+    <header tuiHeader>
+      <h3 tuiTitle>
+        Editing user: {{ this.loadUser.userData.firstName + ' ' + this.loadUser.userData.lastName }}
+        <span tuiSubtitle>User since {{getMonthName(this.accountCreated?.month)}} {{this.accountCreated.day}}, {{this.accountCreated?.year}}</span>
+      </h3>
+      <button
+        tuiButton
+        appearance="outline"
+        type="button"
+        routerLink="/admin/users"
+      >
+        <tui-icon
+          icon="@tui.arrow-left"
+          [style.height.rem]="1"
+        />
+        Return to user list
+      </button>
+    </header>
+
+    <fieldset>
+      <div class="stack">
+        <tui-textfield>
+          <label tuiLabel>First Name</label>
+          <input
+            formControlName="firstName"
+            placeholder="John"
+            tuiTextfield
+            type="text"
+          />
+        </tui-textfield>
+      </div>
+
+      <div class="stack">
+        <tui-textfield>
+          <label tuiLabel>Last Name</label>
+          <input
+            formControlName="lastName"
+            placeholder="Doe"
+            tuiTextfield
+            type="text"
+          />
+        </tui-textfield>
+      </div>
+    </fieldset>
+
+    <tui-textfield>
+      <label tuiLabel>Email</label>
+      <input
+        formControlName="email"
+        placeholder="john@doe.com"
+        tuiTextfield
+        type="email"
+      />
+    </tui-textfield>
+
+    <tui-error
+      formControlName="email"
+      [error]="[] | tuiFieldError | async"
+    />
+
+    <fieldset>
+      <div class="stack">
+        <tui-textfield
+          tuiChevron
+          [tuiTextfieldCleaner]="false"
+        >
+          <label tuiLabel>Assigned role</label>
+
+          <input
+            formControlName="role"
+            tuiSelect
+          />
+
+          <tui-data-list-wrapper
+            *tuiTextfieldDropdown
+            new
+            [items]="persons"
+          />
+        </tui-textfield>
+        <tui-error
+          formControlName="role"
+          [error]="[] | tuiFieldError | async"
+        />
+      </div>
+      <div class="stack">
+        <tui-textfield
+          tuiChevron
+          [tuiTextfieldCleaner]="false"
+        >
+          <label tuiLabel>Status</label>
+
+          <input
+            formControlName="status"
+            tuiSelect
+          />
+
+          <tui-data-list-wrapper
+            *tuiTextfieldDropdown
+            new
+            [items]="statusValues"
+          />
+        </tui-textfield>
+        <tui-error
+          formControlName="status"
+          [error]="[] | tuiFieldError | async"
+        />
+      </div>
+    </fieldset>
+
+    <tui-input-date formControlName="birthday">
+      Birthday
+      <input
+        placeholder="Birthday"
+        tuiTextfieldLegacy
+      />
+    </tui-input-date>
+    <tui-error
+      formControlName="birthday"
+      [error]="[] | tuiFieldError | async"
+    />
+
+    <footer>
+      <button
+        tuiButton
+        appearance="flat"
+        type="button"
+      >
+        Discard
+      </button>
+
+      <button
+        tuiButton
+        type="submit"
+      >
+        <tui-icon
+          icon="@tui.save"
+          [style.height.rem]="1.2"
+        />
+        Save changes
+      </button>
+    </footer>
+  </form>
+</div>
+
