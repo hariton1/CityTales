@@ -5,9 +5,10 @@ import {TuiFilter} from "@taiga-ui/kit";
 import {UserInterestDto} from '../../user_db.dto/user-interest.dto'
 import {UserService} from '../../services/user.service';
 import {forkJoin, Observable, of, switchMap} from 'rxjs';
-import {InterestDto} from '../../dto/interest.dto';
+import {InterestDto} from '../../user_db.dto/interest.dto';
 import {TuiButton, TuiIcon} from '@taiga-ui/core';
 import {UserInterestsService} from '../../user_db.services/user-interests.service';
+import {InterestsService} from '../../user_db.services/interests.service';
 
 @Component({
   selector: 'app-edit-interests',
@@ -31,7 +32,7 @@ export class EditInterestsComponent implements OnInit{
   protected loading = true;
   protected error: any = null;
 
-  constructor(private userService: UserService,
+  constructor(private interestsService: InterestsService,
               private userInterestService: UserInterestsService) {
 
   }
@@ -44,7 +45,7 @@ export class EditInterestsComponent implements OnInit{
   fetchUserInterests(): void {
     this.loading = true;
     // Use switchMap to handle the sequential flow
-    this.userService.readInterests('f5599c8c-166b-495c-accc-65addfaa572b')
+    this.userInterestService.getUserInterestsByUserId('f5599c8c-166b-495c-accc-65addfaa572b')
       .pipe(
         switchMap(interests => {
           this.userInterestsList = interests;
@@ -56,7 +57,7 @@ export class EditInterestsComponent implements OnInit{
 
           // Create an array of observables for each interest detail request
           const detailRequests = interests.map(interest =>
-            this.userService.readInterestDetail(interest.getInterestId())
+            this.interestsService.getInterestByInterestId(interest.getInterestId())
           );
 
           // Use forkJoin to wait for all detail requests to complete
@@ -80,7 +81,7 @@ export class EditInterestsComponent implements OnInit{
   }
 
   getAllInterests(): void {
-    this.userService.getAllInterests()
+    this.interestsService.getAllInterests()
       .subscribe({
         next: (interests) => {
           this.allInterestsList = interests;
@@ -163,7 +164,7 @@ export class EditInterestsComponent implements OnInit{
 
   deleteInterest(): void {
     for (let interest of this.userInterestsList) {
-      this.userService.readInterestDetail(interest.getInterestId()).subscribe(detail => {
+      this.interestsService.getInterestByInterestId(interest.getInterestId()).subscribe(detail => {
           const selectedFilters = this.form.value.filters || [];
           if (!selectedFilters.includes(detail.getInterestName())) {
             interest.setUserId('f5599c8c-166b-495c-accc-65addfaa572b');

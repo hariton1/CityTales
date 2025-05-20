@@ -8,7 +8,7 @@ import {TourDto} from "../dto/tour.dto";
 import {FunFactDto} from "../dto/fun-fact.dto";
 import {GamificationDto} from "../dto/gamificationDto";
 import {Injectable} from "@angular/core";
-import {InterestDto} from '../dto/interest.dto';
+import {InterestDto} from '../user_db.dto/interest.dto';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
