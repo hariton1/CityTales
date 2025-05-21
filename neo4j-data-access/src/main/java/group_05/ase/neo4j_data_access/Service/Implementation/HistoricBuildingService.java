@@ -7,22 +7,18 @@ import group_05.ase.neo4j_data_access.DTO.HistoricPersonDTO;
 import group_05.ase.neo4j_data_access.Entity.ViennaHistoryWikiBuildingObject;
 import group_05.ase.neo4j_data_access.Entity.ViennaHistoryWikiEventObject;
 import group_05.ase.neo4j_data_access.Entity.ViennaHistoryWikiPersonObject;
+import group_05.ase.neo4j_data_access.Service.Interface.IEntityDescriptionCacheService;
 import group_05.ase.neo4j_data_access.Service.Interface.IHistoricBuildingService;
 import group_05.ase.neo4j_data_access.Service.Interface.IMappingService;
 import group_05.ase.neo4j_data_access.Service.Interface.IWikipediaExtractorService;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import org.neo4j.driver.*;
 import org.neo4j.driver.Record;
 import org.neo4j.driver.exceptions.NoSuchRecordException;
 import org.neo4j.driver.types.Node;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,14 +30,16 @@ public class HistoricBuildingService implements IHistoricBuildingService {
     private Driver driver;
     private final IWikipediaExtractorService wikipediaExtractorService;
     private final IMappingService mappingService;
+    private final IEntityDescriptionCacheService descriptionCacheService;
 
-    public HistoricBuildingService(IWikipediaExtractorService wikipediaExtractorService, Neo4jProperties properties, IMappingService mappingService) {
+    public HistoricBuildingService(IWikipediaExtractorService wikipediaExtractorService, Neo4jProperties properties, IMappingService mappingService, IEntityDescriptionCacheService descriptionCacheService) {
         this.wikipediaExtractorService = wikipediaExtractorService;
 
         this.NEO4J_URL = properties.getUrl();
         this.NEO4J_USER = properties.getUser();
         this.NEO4J_PASSWORD = properties.getPassword();
         this.mappingService = mappingService;
+        this.descriptionCacheService = descriptionCacheService;
     }
 
     @PostConstruct
@@ -134,7 +132,7 @@ public class HistoricBuildingService implements IHistoricBuildingService {
         ViennaHistoryWikiBuildingObject entity = mappingService.mapNodeToHistoricalBuildingEntity(node);
 
         //preliminary solution
-        String content = extractMainArticleText(entity.getUrl());
+        String content = descriptionCacheService.extractMainArticleText(entity.getUrl());
         return new HistoricBuildingDTO(entity, content);
     }
 
@@ -157,7 +155,7 @@ public class HistoricBuildingService implements IHistoricBuildingService {
                 ViennaHistoryWikiEventObject entity = mappingService.mapNodeToEventEntity(linkedNode);
 
                 //preliminary content fetching
-                String content = extractMainArticleText(entity.getUrl());;
+                String content = descriptionCacheService.extractMainArticleText(entity.getUrl());;
                 HistoricEventDTO dto = new HistoricEventDTO(entity, content);
                 linkedEvents.add(dto);
             }
@@ -186,7 +184,7 @@ public class HistoricBuildingService implements IHistoricBuildingService {
                 ViennaHistoryWikiBuildingObject entity = mappingService.mapNodeToHistoricalBuildingEntity(linkedNode);
 
                 //preliminary content fetching
-                String content = extractMainArticleText(entity.getUrl());;
+                String content = descriptionCacheService.extractMainArticleText(entity.getUrl());;
                 HistoricBuildingDTO dto = new HistoricBuildingDTO(entity, content);
                 linkedBuildings.add(dto);
             }
@@ -215,7 +213,7 @@ public class HistoricBuildingService implements IHistoricBuildingService {
                 ViennaHistoryWikiPersonObject entity = mappingService.mapNodeToPersonEntity(linkedNode);
 
                 //preliminary content fetching
-                String content = extractMainArticleText(entity.getUrl());;
+                String content = descriptionCacheService.extractMainArticleText(entity.getUrl());;
                 HistoricPersonDTO dto = new HistoricPersonDTO(entity, content);
                 linkedPersons.add(dto);
             }
@@ -224,44 +222,5 @@ public class HistoricBuildingService implements IHistoricBuildingService {
             System.err.println("Error retrieving linked historic persons for wikiDataId " + viennaHistoryWikiId + ": " + e.getMessage());
         }
         return linkedPersons;
-    }
-
-    private String getSafeStringOrNull(Node node, String key) {
-        return node.containsKey(key) && !node.get(key).isNull() ? node.get(key).asString() : null;
-    }
-
-    private String extractMainArticleText(String url) {
-        StringBuilder textContent = new StringBuilder();
-
-        try {
-            Document doc = Jsoup.connect(url).get();
-
-            Element contentDiv = doc.selectFirst("div.mw-parser-output");
-
-            if (contentDiv != null) {
-                Elements paragraphs = contentDiv.select("p");
-
-                for (Element paragraph : paragraphs) {
-                    String text = paragraph.text().trim();
-                    if (!text.isEmpty()) {
-                        textContent.append(text).append("\n\n");
-                    }
-                }
-            } else {
-                System.err.println("Main content div not found.");
-            }
-
-        } catch (IOException e) {
-            System.err.println("Error fetching URL: " + e.getMessage());
-        }
-
-        String[] parts = textContent.toString().split("\n", 7);
-        if (parts.length < 7) {
-            return "";
-        } else {
-            String rest = parts[6];
-            rest = rest.replaceAll("\n", "");
-            return rest;
-        }
     }
 }
