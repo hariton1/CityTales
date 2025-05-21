@@ -123,7 +123,7 @@ public class HistoricPersonService implements IHistoricPersonService {
                 ViennaHistoryWikiEventObject entity = mappingService.mapNodeToEventEntity(linkedNode);
 
                 //preliminary content fetching
-                String content = descriptionCacheService.extractMainArticleText(entity.getUrl());;
+                String content = descriptionCacheService.extractMainArticleText(entity.getUrl());
                 HistoricEventDTO dto = new HistoricEventDTO(entity, content);
                 linkedEvents.add(dto);
             }
@@ -152,7 +152,7 @@ public class HistoricPersonService implements IHistoricPersonService {
                 ViennaHistoryWikiBuildingObject entity = mappingService.mapNodeToHistoricalBuildingEntity(linkedNode);
 
                 //preliminary content fetching
-                String content = descriptionCacheService.extractMainArticleText(entity.getUrl());;
+                String content = descriptionCacheService.extractMainArticleText(entity.getUrl());
                 HistoricBuildingDTO dto = new HistoricBuildingDTO(entity, content);
                 linkedBuildings.add(dto);
             }

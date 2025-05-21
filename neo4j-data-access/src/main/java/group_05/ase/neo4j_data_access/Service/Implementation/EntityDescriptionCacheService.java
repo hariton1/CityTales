@@ -33,7 +33,7 @@ public class EntityDescriptionCacheService implements IEntityDescriptionCacheSer
             urlDescriptionCache.remove(urlDescriptionCache.keySet().iterator().next());
         }
         urlDescriptionCache.put(url, description);
-        System.out.println("Cache-usage: " + (urlDescriptionCache.keySet().size() / MAX_CACHE_SIZE) * 100 + "%");
+        System.out.println("Cache-usage: " + (urlDescriptionCache.size() / MAX_CACHE_SIZE) * 100 + "%");
     }
 
     public String extractMainArticleText(String url) {
