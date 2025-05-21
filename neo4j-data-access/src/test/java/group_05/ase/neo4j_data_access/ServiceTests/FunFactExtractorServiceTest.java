@@ -31,7 +31,7 @@ public class FunFactExtractorServiceTest {
         String funFact2 = service.extractFunFact(stories.get(2).getText());
 
         assertEquals("The oldest coffee house opened in 1685.", funFact0);
-        assertEquals("It was once a prison, then an observatory.", funFact1);
-        assertEquals("Mozart wrote about this in a letter to his sister.", funFact2);
+        assertEquals("People say it is haunted by a ghostly astronomer.", funFact1);
+        assertEquals("One night, he helped a lost child find her parents.", funFact2);
     }
 }
