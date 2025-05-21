@@ -1,5 +1,6 @@
-package group_05.ase.auth;
+package group_05.ase.auth.unit;
 
+import group_05.ase.auth.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
