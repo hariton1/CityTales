@@ -63,3 +63,11 @@ services:
     build: ./user-db
     ports:
       - "8090:8090"
+  authentification:
+    container_name: authentification
+    build: ./authentification
+    ports:
+      - "8081:8081"
+    depends_on:
+      - user-db
+#    environment:
