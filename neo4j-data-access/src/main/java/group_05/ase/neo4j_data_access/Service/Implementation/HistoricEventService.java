@@ -7,22 +7,18 @@ import group_05.ase.neo4j_data_access.DTO.HistoricPersonDTO;
 import group_05.ase.neo4j_data_access.Entity.ViennaHistoryWikiBuildingObject;
 import group_05.ase.neo4j_data_access.Entity.ViennaHistoryWikiEventObject;
 import group_05.ase.neo4j_data_access.Entity.ViennaHistoryWikiPersonObject;
+import group_05.ase.neo4j_data_access.Service.Interface.IEntityDescriptionCacheService;
 import group_05.ase.neo4j_data_access.Service.Interface.IHistoricEventService;
 import group_05.ase.neo4j_data_access.Service.Interface.IMappingService;
 import group_05.ase.neo4j_data_access.Service.Interface.IWikipediaExtractorService;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import org.neo4j.driver.*;
 import org.neo4j.driver.Record;
 import org.neo4j.driver.exceptions.NoSuchRecordException;
 import org.neo4j.driver.types.Node;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,13 +31,15 @@ public class HistoricEventService implements IHistoricEventService {
     private Driver driver;
     private final IWikipediaExtractorService wikipediaExtractorService;
     private final IMappingService mappingService;
+    private final IEntityDescriptionCacheService descriptionCacheService;
 
-    public HistoricEventService(IWikipediaExtractorService wikipediaExtractorService, Neo4jProperties properties, IMappingService mappingService) {
+    public HistoricEventService(IWikipediaExtractorService wikipediaExtractorService, Neo4jProperties properties, IMappingService mappingService, IEntityDescriptionCacheService descriptionCacheService) {
         this.wikipediaExtractorService = wikipediaExtractorService;
         this.NEO4J_URL = properties.getUrl();
         this.NEO4J_USER = properties.getUser();
         this.NEO4J_PASSWORD = properties.getPassword();
         this.mappingService = mappingService;
+        this.descriptionCacheService = descriptionCacheService;
     }
 
     @PostConstruct
@@ -74,7 +72,7 @@ public class HistoricEventService implements IHistoricEventService {
             ViennaHistoryWikiEventObject entity = mappingService.mapNodeToEventEntity(node);
 
             // preliminary content fetching
-            String content = extractMainArticleText(entity.getUrl());
+            String content = descriptionCacheService.extractMainArticleText(entity.getUrl());
             return new HistoricEventDTO(entity,content);
 
         } catch (NoSuchRecordException e) {
@@ -101,7 +99,7 @@ public class HistoricEventService implements IHistoricEventService {
                 ViennaHistoryWikiEventObject entity = mappingService.mapNodeToEventEntity(node);
 
                 // preliminary content fetching
-                String content = extractMainArticleText(entity.getUrl());
+                String content = descriptionCacheService.extractMainArticleText(entity.getUrl());
                 HistoricEventDTO dto = new HistoricEventDTO(entity, content);
                 eventDTOs.add(dto);
             }
@@ -130,7 +128,7 @@ public class HistoricEventService implements IHistoricEventService {
                 ViennaHistoryWikiEventObject entity = mappingService.mapNodeToEventEntity(linkedNode);
 
                 //preliminary content fetching
-                String content = extractMainArticleText(entity.getUrl());;
+                String content = descriptionCacheService.extractMainArticleText(entity.getUrl());;
                 HistoricEventDTO dto = new HistoricEventDTO(entity, content);
                 linkedEvents.add(dto);
             }
@@ -159,7 +157,7 @@ public class HistoricEventService implements IHistoricEventService {
                 ViennaHistoryWikiBuildingObject entity = mappingService.mapNodeToHistoricalBuildingEntity(linkedNode);
 
                 //preliminary content fetching
-                String content = extractMainArticleText(entity.getUrl());;
+                String content = descriptionCacheService.extractMainArticleText(entity.getUrl());;
                 HistoricBuildingDTO dto = new HistoricBuildingDTO(entity, content);
                 linkedBuildings.add(dto);
             }
@@ -188,7 +186,7 @@ public class HistoricEventService implements IHistoricEventService {
                 ViennaHistoryWikiPersonObject entity = mappingService.mapNodeToPersonEntity(linkedNode);
 
                 //preliminary content fetching
-                String content = extractMainArticleText(entity.getUrl());;
+                String content = descriptionCacheService.extractMainArticleText(entity.getUrl());;
                 HistoricPersonDTO dto = new HistoricPersonDTO(entity, content);
                 linkedPersons.add(dto);
             }
@@ -198,42 +196,4 @@ public class HistoricEventService implements IHistoricEventService {
         }
         return linkedPersons;
     }
-
-    private String extractMainArticleText(String url) {
-        StringBuilder textContent = new StringBuilder();
-
-        try {
-            Document doc = Jsoup.connect(url).get();
-
-            Element contentDiv = doc.selectFirst("div.mw-parser-output");
-
-            if (contentDiv != null) {
-                Elements paragraphs = contentDiv.select("p");
-
-                for (Element paragraph : paragraphs) {
-                    String text = paragraph.text().trim();
-                    if (!text.isEmpty()) {
-                        textContent.append(text).append("\n\n");
-                    }
-                }
-            } else {
-                System.err.println("Main content div not found.");
-            }
-
-        } catch (IOException e) {
-            System.err.println("Error fetching URL: " + e.getMessage());
-        }
-
-        String[] parts = textContent.toString().split("\n", 7);
-        if (parts.length < 7) {
-            return "";
-        } else {
-            String rest = parts[6];
-            rest = rest.replaceAll("\n", "");
-            return rest;
-        }
-    }
-
-
-
 }
