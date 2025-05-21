@@ -1,5 +1,7 @@
-package group_05.ase.auth;
+package group_05.ase.auth.unit;
 
+import group_05.ase.auth.AppUser;
+import group_05.ase.auth.AppUserRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
