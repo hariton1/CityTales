@@ -27,4 +27,8 @@ export class UserService {
       }));
   }
 
+  public deleteUserById(id: string) : Observable<void> {
+    return this.httpClient.delete<void>(`${this.DOMAIN}/id=${id}`);
+  }
+
 }
