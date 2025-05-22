@@ -10,18 +10,18 @@
       <th tuiTh>Role</th>
       <th tuiTh>User Data</th>
       <th tuiTh>Status</th>
-      <th tuiTh [style.width.rem]="15">Interests</th>
+      <!-- <th tuiTh [style.width.rem]="15">Interests</th> -->
       <th tuiTh>Created At</th>
       <th tuiTh>Actions</th>
     </tr>
     </thead>
     <tbody tuiTbody>
-    <tr *ngFor="let item of data">
+    <tr *ngFor="let user of users">
       <!-- First column -->
       <td tuiTd>
         <div [tuiCell]="'m'">
                     <span tuiTitle>
-                      {{ item.role.roleName }}
+                      Default
                     </span>
         </div>
       </td>
@@ -29,20 +29,20 @@
       <td tuiTd>
         <div [tuiCell]="'m'">
           <tui-avatar
-            [src]="item.userData.firstName + ' ' + item.userData.lastName | tuiInitials"
-            [style.background]="item.userData.firstName + ' ' + item.userData.lastName | tuiAutoColor"
+            [src]="user.display_name | tuiInitials"
+            [style.background]="user.display_name | tuiAutoColor"
           />
           <span tuiTitle>
-                        {{ item.userData.firstName + ' ' + item.userData.lastName }}
-            <span tuiSubtitle>{{ item.userData.email }}</span>
+                        {{ user.display_name }}
+            <span tuiSubtitle>{{ user.email }}</span>
                     </span>
         </div>
       </td>
       <!-- Third column -->
       <td tuiTd>
-        <span [tuiStatus]="item.status.color">{{ item.status.value }}</span>
+        <span [tuiStatus]="'var(--tui-status-positive)'">{{ user.is_active ? 'Active' : 'Blocked' }}</span>
       </td>
-      <!-- Fourth column -->
+      <!-- Fourth column
       <td tuiTd>
         <tui-items-with-more [style.gap.rem]="0.25">
           <ng-container *ngFor="let chip of item.interests">
@@ -74,11 +74,11 @@
             </ng-template>
           </ng-template>
         </tui-items-with-more>
-      </td>
+      </td> -->
 
       <td tuiTd>
         <span tuiTitle>
-          {{ item.createdAt }}
+          {{ user.created_at | date: 'dd.MM.yyyy' }}
         </span>
 
       </td>
@@ -92,7 +92,7 @@
                       size="xs"
                       tuiIconButton
                       type="button"
-                      [routerLink]="['/admin/users', item.id, 'edit']"
+                      [routerLink]="['/admin/users', user.id, 'edit']"
                     >
                         Edit
                     </button>

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {
   TuiAutoColorPipe,
   TuiButton,
@@ -9,10 +9,12 @@ import {
 } from '@taiga-ui/core';
 import {TuiAvatar, TuiBadge, TuiItemsWithMoreComponent, TuiMore, TuiStatus} from '@taiga-ui/kit';
 import {TuiCell} from '@taiga-ui/layout';
-import {NgForOf, NgIf} from '@angular/common';
+import {DatePipe, NgForOf, NgIf} from '@angular/common';
 import {TuiTable} from '@taiga-ui/addon-table';
 import {TuiItem} from '@taiga-ui/cdk';
 import {RouterLink} from '@angular/router';
+import {UserService} from '../../../user_db.services/user.service';
+import {UserDto} from '../../../user_db.dto/user.dto';
 
 @Component({
   selector: 'app-user-list',
@@ -35,12 +37,35 @@ import {RouterLink} from '@angular/router';
     TuiDropdownOptionsDirective,
     TuiDropdownOpen,
     TuiTitle,
-    RouterLink
+    RouterLink,
+    DatePipe
   ],
   templateUrl: './user-list.component.html',
   styleUrl: './user-list.component.scss'
 })
-export class UserListComponent {
+export class UserListComponent implements OnInit {
+
+  protected users : UserDto[];
+
+  constructor(readonly userService: UserService) {
+    this.users = [];
+  }
+
+  ngOnInit(): void {
+    this.userService.getAllUsers()
+      .subscribe({
+        next: (users) => {
+          this.users = users;
+        },
+        error(error) {
+          console.error('Error fetching users:', error);
+        },
+        complete() {
+          console.log('Users fetched successfully!');
+        }
+    });
+  }
+
   protected readonly data = [
     {
       id: 1,
