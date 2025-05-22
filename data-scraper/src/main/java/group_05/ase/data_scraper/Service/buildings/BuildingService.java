@@ -1,6 +1,8 @@
 package group_05.ase.data_scraper.Service.buildings;
 
 import group_05.ase.data_scraper.Entity.ViennaHistoryWikiBuildingObject;
+import group_05.ase.data_scraper.Service.embeddings.OpenAiService;
+import group_05.ase.data_scraper.Service.embeddings.QdrantService;
 import group_05.ase.data_scraper.Service.general.ManualExtractorService;
 import group_05.ase.data_scraper.Service.general.ContentService;
 import org.json.JSONArray;
@@ -23,18 +25,21 @@ public class BuildingService {
     private final BuildingRepository buildingRepository;
     private final ManualExtractorService manualExtractorService;
     private final ContentService contentService;
+    private final OpenAiService openAiService;
 
-    public BuildingService(BuildingRepository wienGeschichteWikiPersistenceService, ManualExtractorService manualExtractorService, ContentService contentService) {
+    public BuildingService(BuildingRepository wienGeschichteWikiPersistenceService, ManualExtractorService manualExtractorService, ContentService contentService, OpenAiService openAiService) {
         this.buildingRepository = wienGeschichteWikiPersistenceService;
         this.manualExtractorService = manualExtractorService;
         this.contentService = contentService;
+        this.openAiService = openAiService;
     }
     public void search(int limit) {
         String currentUrl = buildingSeeds;
         int totalLinks = 0;
         int counter = 0;
+        int outer_counter = 0;
 
-        while (currentUrl != null) {
+        while (currentUrl != null && outer_counter < limit) {
             List<ViennaHistoryWikiBuildingObject> entries = new ArrayList<>();
             try {
 
@@ -49,7 +54,7 @@ public class BuildingService {
                         int pageLinkCount = 0;
 
                         List<ViennaHistoryWikiBuildingObject> pageEntries = links.stream()
-                                .limit(200)
+                                .limit(2)
                                 .parallel()
                                 .map(link -> {
                                     return extractBuildingInfos(link.attr("abs:href"), link.text());
@@ -70,6 +75,7 @@ public class BuildingService {
                             buildingRepository.persistViennaHistoryWikiBuildingObject(wgwo);
                             counter++;
                         }
+                        outer_counter ++;
                     } else {
                         System.out.println("Category div not found on the current page.");
                     }
@@ -107,7 +113,6 @@ public class BuildingService {
             wikiObject.setLinks(manualExtractorService.getLinks(doc));
             wikiObject.setImageUrls(manualExtractorService.getImageUrls(doc));
             wikiObject.setContent(contentService.extractMainArticleText(doc));
-
             System.out.println(wikiObject.getContent());
 
             Element table = doc.selectFirst("table.table.table-condensed.table-hover");
@@ -153,6 +158,12 @@ public class BuildingService {
                         }
                     }
                 }
+            }
+            // Embeddings
+            if (wikiObject.getContent() != null  && !wikiObject.getContent().equals("")) {
+                System.out.println("Content!: " + wikiObject.getContent());
+                float[] embedding = openAiService.getEmbedding(wikiObject.getContent());
+                buildingRepository.persistEmbedding(embedding,wikiObject.getViennaHistoryWikiId());
             }
 
             populateCoordinates(doc,wikiObject);
