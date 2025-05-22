@@ -2,6 +2,7 @@ package group_05.ase.data_scraper.Service.events;
 
 import group_05.ase.data_scraper.Entity.ViennaHistoryWikiEventObject;
 import group_05.ase.data_scraper.Service.general.ManualExtractorService;
+import group_05.ase.data_scraper.Service.general.ContentService;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -22,10 +23,13 @@ public class EventService {
     private final ManualExtractorService manualExtractorService;
     private final EventRepository eventRepository;
     private final Set<String> allEvents = new HashSet<>();
+    private final ContentService contentService;
 
-    public EventService(ManualExtractorService manualExtractorService, EventRepository wikiEventPersistenceService) {
+
+    public EventService(ManualExtractorService manualExtractorService, EventRepository wikiEventPersistenceService, ContentService contentService) {
         this.manualExtractorService = manualExtractorService;
         this.eventRepository = wikiEventPersistenceService;
+        this.contentService = contentService;
     }
 
     public void search() {
@@ -94,9 +98,12 @@ public class EventService {
             wikiObject.setUrl(url);
             wikiObject.setName(text);
 
-            // Extract all links from <p> tags and images from <img> tags
+            // Extract all links from <p> tags and images from <img> tags & content
             wikiObject.setLinks(manualExtractorService.getLinks(doc));
             wikiObject.setImageUrls(manualExtractorService.getImageUrls(doc));
+            wikiObject.setContent(contentService.extractMainArticleText(doc));
+
+            System.out.println(wikiObject.getContent());
 
             Element table = doc.selectFirst("table.table.table-condensed.table-hover");
 

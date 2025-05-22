@@ -1,6 +1,7 @@
 package group_05.ase.data_scraper.Service.persons;
 
 import group_05.ase.data_scraper.Entity.ViennaHistoryWikiPersonObject;
+import group_05.ase.data_scraper.Service.general.ContentService;
 import group_05.ase.data_scraper.Service.general.ManualExtractorService;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -18,10 +19,13 @@ public class PersonService {
     public String personsSeeds = "https://www.geschichtewiki.wien.gv.at/Kategorie:Personen";
     private final PersonRepository personRepository;
     private final ManualExtractorService manualExtractorService;
+    private final ContentService contentService;
 
-    public PersonService(PersonRepository wikiPersonPersistenceService, ManualExtractorService manualExtractorService) {
+
+    public PersonService(PersonRepository wikiPersonPersistenceService, ManualExtractorService manualExtractorService, ContentService contentService) {
         this.personRepository = wikiPersonPersistenceService;
         this.manualExtractorService = manualExtractorService;
+        this.contentService = contentService;
     }
 
     public void search(int limit) {
@@ -98,9 +102,12 @@ public class PersonService {
             wikiObject.setUrl(url);
             wikiObject.setName(text);
 
-            // Extract all links from <p> tags and images from <img> tags
+            // Extract all links from <p> tags and images from <img> tags & content
             wikiObject.setLinks(manualExtractorService.getLinks(doc));
             wikiObject.setImageUrls(manualExtractorService.getImageUrls(doc));
+            wikiObject.setContent(contentService.extractMainArticleText(doc));
+
+            System.out.println(wikiObject.getContent());
 
             Element table = doc.selectFirst("table.table.table-condensed.table-hover");
 

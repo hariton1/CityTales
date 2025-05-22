@@ -2,6 +2,7 @@ package group_05.ase.data_scraper.Service.buildings;
 
 import group_05.ase.data_scraper.Config.Neo4jProperties;
 import group_05.ase.data_scraper.Entity.ViennaHistoryWikiBuildingObject;
+import group_05.ase.data_scraper.Service.general.ContentService;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import org.neo4j.driver.*;
@@ -19,6 +20,7 @@ public class BuildingRepository {
     private final String NEO4J_PASSWORD;
     private Driver driver;
     private final String buildingTableName = "WienGeschichteWikiBuildings";
+
 
     public BuildingRepository(Neo4jProperties properties){
         this.NEO4J_URL = properties.getUrl();
@@ -50,6 +52,7 @@ public class BuildingRepository {
                         "MERGE (b:"+buildingTableName+" {viennaHistoryWikiId: coalesce($viennaHistoryWikiId, 'N/A')}) " +
                                 "SET b.url = coalesce($url, 'N/A'), " +
                                 "    b.name = coalesce($name, 'N/A'), " +
+                                "    b.content = coalesce($content, 'N/A'), " +
                                 "    b.buildingType = coalesce($buildingType, 'N/A'), " +
                                 "    b.dateFrom = coalesce($dateFrom, 'N/A'), " +
                                 "    b.dateTo = coalesce($dateTo, 'N/A'), " +
@@ -72,6 +75,7 @@ public class BuildingRepository {
                         parameters(
                                 "viennaHistoryWikiId", obj.getViennaHistoryWikiId(),
                                 "name", obj.getName(),
+                                "content", obj.getContent(),
                                 "url", obj.getUrl(),
                                 "buildingType", obj.getBuildingType().orElse(null),
                                 "dateFrom", obj.getDateFrom().orElse(null),

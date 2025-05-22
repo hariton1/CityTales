@@ -51,6 +51,7 @@ public class PersonRepository {
                         "MERGE (p:" + personsTableName + " {viennaHistoryWikiId: coalesce($viennaHistoryWikiId, 'N/A')}) " +
                                 "SET p.url = coalesce($url, 'N/A'), " +
                                 "    p.name = coalesce($name, 'N/A'), " +
+                                "    p.content = coalesce($content, 'N/A'), " +
                                 "    p.personName = coalesce($personName, 'N/A'), " +
                                 "    p.alternativeName = coalesce($alternativeName, 'N/A'), " +
                                 "    p.titles = coalesce($titles, 'N/A'), " +
@@ -74,6 +75,7 @@ public class PersonRepository {
                         parameters(
                                 "viennaHistoryWikiId", obj.getViennaHistoryWikiId(),
                                 "name", obj.getName(),
+                                "content", obj.getContent(),
                                 "url", obj.getUrl(),
                                 "personName", obj.getPersonName().orElse(null),
                                 "alternativeName", obj.getAlternativeName().orElse(null),

@@ -131,13 +131,7 @@ public class MappingService implements IMappingService {
         return building;
     }
 
-
-
-
-
     private String getSafeString(Node node, String key) {
         return node.containsKey(key) ? node.get(key).asString() : "N/A";
     }
-
-
 }
