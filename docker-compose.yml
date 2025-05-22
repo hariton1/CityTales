@@ -12,8 +12,8 @@ services:
       - NEO4J_apoc_import_file_enabled=true
       - NEO4J_apoc_import_file_use__neo4j__config=true
       - NEO4J_PLUGINS=["apoc", "graph-data-science"]
-      - NEO4J_server_memory_heap_initial__size=4G
-      - NEO4J_server_memory_heap_max__size=6G
+      - NEO4J_server_memory_heap_initial__size=5G
+      - NEO4J_server_memory_heap_max__size=5G
     volumes:
       - ./neo4j_db/data:/data
       - ./neo4j_db/logs:/logs
@@ -29,17 +29,17 @@ services:
       # - 4200:4200
 
   #for development only
-  # frontend:
-    # container_name: frontend
-    # build:
-      # context: ./frontend
-      # dockerfile: Dockerfile.dev
-    # working_dir: /app
-    # ports:
-      # - "4200:4200"
-     #volumes:
-       #- ./frontend:/app
-       #- /app/node_modules
+  frontend:
+    container_name: frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    working_dir: /app
+    ports:
+      - "4200:4200"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
 
   user-db:
     container_name: user-db
