@@ -2,6 +2,7 @@ package group_05.ase.data_scraper.Service.buildings;
 
 import group_05.ase.data_scraper.Entity.ViennaHistoryWikiBuildingObject;
 import group_05.ase.data_scraper.Service.general.ManualExtractorService;
+import group_05.ase.data_scraper.Service.general.ContentService;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -21,10 +22,12 @@ public class BuildingService {
     public String buildingSeeds = "https://www.geschichtewiki.wien.gv.at/Kategorie:Geb%C3%A4ude";
     private final BuildingRepository buildingRepository;
     private final ManualExtractorService manualExtractorService;
+    private final ContentService contentService;
 
-    public BuildingService(BuildingRepository wienGeschichteWikiPersistenceService, ManualExtractorService manualExtractorService) {
+    public BuildingService(BuildingRepository wienGeschichteWikiPersistenceService, ManualExtractorService manualExtractorService, ContentService contentService) {
         this.buildingRepository = wienGeschichteWikiPersistenceService;
         this.manualExtractorService = manualExtractorService;
+        this.contentService = contentService;
     }
     public void search(int limit) {
         String currentUrl = buildingSeeds;
@@ -100,9 +103,12 @@ public class BuildingService {
             wikiObject.setUrl(url);
             wikiObject.setName(text);
 
-            // Extract all links from <p> tags and images from <img> tags
+            // Extract all links from <p> tags and images from <img> tags  & content
             wikiObject.setLinks(manualExtractorService.getLinks(doc));
             wikiObject.setImageUrls(manualExtractorService.getImageUrls(doc));
+            wikiObject.setContent(contentService.extractMainArticleText(doc));
+
+            System.out.println(wikiObject.getContent());
 
             Element table = doc.selectFirst("table.table.table-condensed.table-hover");
 

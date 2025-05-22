@@ -51,6 +51,7 @@ public class EventRepository {
                         "MERGE (e:"+eventTableName+" {viennaHistoryWikiId: coalesce($viennaHistoryWikiId, 'N/A')}) " +
                                 "SET e.url = coalesce($url, 'N/A'), " +
                                 "    e.name = coalesce($name, 'N/A'), " +
+                                "    e.content = coalesce($content, 'N/A'), " +
                                 "    e.typeOfEvent = coalesce($typeOfEvent, 'N/A'), " +
                                 "    e.dateFrom = coalesce($dateFrom, 'N/A'), " +
                                 "    e.dateTo = coalesce($dateTo, 'N/A'), " +
@@ -69,6 +70,7 @@ public class EventRepository {
                         parameters(
                                 "viennaHistoryWikiId", obj.getViennaHistoryWikiId(),
                                 "name", obj.getName(),
+                                "content", obj.getContent(),
                                 "url", obj.getUrl(),
                                 "typeOfEvent", obj.getTypeOfEvent().orElse(null),
                                 "dateFrom", obj.getDateFrom().orElse(null),
