@@ -1,4 +1,4 @@
-import {Component, Output} from '@angular/core';
+import {Component, OnInit, Output} from '@angular/core';
 import {GoogleMapsModule} from '@angular/google-maps';
 import {CommonModule} from '@angular/common';
 import {HistoricalPlaceEntity} from '../../dto/db_entity/HistoricalPlaceEntity';
@@ -15,7 +15,7 @@ import {EventEmitter} from '@angular/core';
   templateUrl: './map-view.component.html',
   styleUrl: './map-view.component.scss'
 })
-export class MapViewComponent {
+export class MapViewComponent implements OnInit{
 
   constructor(private locationService: LocationService,
               private userLocationService: UserLocationService) {
@@ -98,7 +98,7 @@ export class MapViewComponent {
     }
   }
 
-  ngOnInit(): void {
+  /*ngOnInit(): void {
     var location = this.userLocationService.getPosition();
 
     location.then(position => {
@@ -111,6 +111,19 @@ export class MapViewComponent {
         this.populatePlacesEvent.emit(locations);
       })
     })
+  }*/
+
+  // TODO: remove later on
+  // For testing in case navigator.geolocation breaks - happened to me for some reason...
+  ngOnInit(): void {
+
+      this.locationService.getLocationsInRadius(this.center.lat, this.center.lng, 450).subscribe(locations => {
+        this.locationsNearby = locations;
+        this.deleteAllUnwantedImageUrls();
+        this.addMarkersToMap(locations);
+        this.locationsNearby.forEach(location => {this.addAllRelatedEntities(location);});
+        this.populatePlacesEvent.emit(locations);
+      });
   }
 
   addMarkersToMap(locations: HistoricalPlaceEntity[]): void {

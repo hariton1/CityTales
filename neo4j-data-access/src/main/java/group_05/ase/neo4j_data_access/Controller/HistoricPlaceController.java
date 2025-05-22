@@ -21,6 +21,7 @@ public class HistoricPlaceController {
 
     @GetMapping("/by/id/{viennaHistoryWikiId}")
     public ResponseEntity<HistoricBuildingDTO> getHistoricalPlaceById(@PathVariable int viennaHistoryWikiId) {
+
         HistoricBuildingDTO place = historicPlaceService.getBuildingById(viennaHistoryWikiId);
 
         if (place != null) {
