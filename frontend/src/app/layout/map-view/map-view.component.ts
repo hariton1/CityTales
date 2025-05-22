@@ -98,7 +98,7 @@ export class MapViewComponent implements OnInit{
     }
   }
 
-  ngOnInit(): void {
+  /*ngOnInit(): void {
     var location = this.userLocationService.getPosition();
 
     location.then(position => {
@@ -111,11 +111,11 @@ export class MapViewComponent implements OnInit{
         this.populatePlacesEvent.emit(locations);
       })
     })
-  }
+  }*/
 
   // TODO: remove later on
   // For testing in case navigator.geolocation breaks - happened to me for some reason...
-  /*ngOnInit(): void {
+  ngOnInit(): void {
 
       this.locationService.getLocationsInRadius(this.center.lat, this.center.lng, 450).subscribe(locations => {
         this.locationsNearby = locations;
@@ -124,7 +124,7 @@ export class MapViewComponent implements OnInit{
         this.locationsNearby.forEach(location => {this.addAllRelatedEntities(location);});
         this.populatePlacesEvent.emit(locations);
       });
-  }*/
+  }
 
   addMarkersToMap(locations: HistoricalPlaceEntity[]): void {
     locations.forEach(location => {
