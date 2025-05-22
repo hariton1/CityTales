@@ -3,6 +3,7 @@ package group_05.ase.user_db.endpoints;
 import group_05.ase.user_db.restData.UserDTO;
 import group_05.ase.user_db.services.UserService;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -47,6 +48,17 @@ public class UserController {
             logger.error("Error fetching user with ID {}: {}", userId, e.getMessage());
             throw new RuntimeException("Error fetching user", e);
 
+        }
+    }
+
+    @DeleteMapping("/id={userId}")
+    @ResponseStatus(HttpStatus.OK)
+    public void deleteUserById(@PathVariable("userId") UUID userId) {
+        try {
+            this.userService.deleteUserById(userId);
+        } catch (Exception e) {
+            logger.error("Error deleting user with ID {}: {}", userId, e.getMessage());
+            throw new RuntimeException("Error deleting user", e);
         }
     }
 
