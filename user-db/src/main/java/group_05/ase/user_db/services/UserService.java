@@ -41,4 +41,11 @@ public class UserService {
         return new UserDTO(user.getId(), user.getSupabaseId(), user.getEmail(), user.getCreatedAt(), user.getDisplayName(), user.isActive());
     }
 
+    public void deleteUserById(UUID userId) {
+        if (userId == null) {
+            throw new IllegalArgumentException("User ID cannot be null");
+        }
+        this.repository.deleteById(userId);
+    }
+
 }
