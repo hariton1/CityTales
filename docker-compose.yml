@@ -29,13 +29,6 @@ services:
     volumes:
       - ./qdrant_data:/qdrant/storage
 
-  data-scraper:
-    container_name: data-scraper
-    platform: linux/amd64
-    build: ./data-scraper
-    ports:
-      - "8080:8080"
-
   #production
   # frontend:
     # container_name: frontend
