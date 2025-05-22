@@ -20,4 +20,11 @@ export class UserService {
     );
   }
 
+  public getUserById(id: string) : Observable<UserDto> {
+    return this.httpClient.get<UserDto>(`${this.DOMAIN}/id=${id}`)
+      .pipe(map(user => {
+        return new UserDto(user.id, user.supabase_id, user.email, user.created_at, user.display_name, user.is_active);
+      }));
+  }
+
 }
