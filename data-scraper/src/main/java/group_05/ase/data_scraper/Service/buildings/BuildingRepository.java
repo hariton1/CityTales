@@ -2,6 +2,7 @@ package group_05.ase.data_scraper.Service.buildings;
 
 import group_05.ase.data_scraper.Config.Neo4jProperties;
 import group_05.ase.data_scraper.Entity.ViennaHistoryWikiBuildingObject;
+import group_05.ase.data_scraper.Service.embeddings.QdrantService;
 import group_05.ase.data_scraper.Service.general.ContentService;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
@@ -20,12 +21,15 @@ public class BuildingRepository {
     private final String NEO4J_PASSWORD;
     private Driver driver;
     private final String buildingTableName = "WienGeschichteWikiBuildings";
+    private final QdrantService qdrantService;
 
 
-    public BuildingRepository(Neo4jProperties properties){
+    public BuildingRepository(Neo4jProperties properties, QdrantService qdrantService){
         this.NEO4J_URL = properties.getUrl();
         this.NEO4J_USER = properties.getUser();
         this.NEO4J_PASSWORD = properties.getPassword();
+
+        this.qdrantService = qdrantService;
     }
 
     @PostConstruct
@@ -102,5 +106,9 @@ public class BuildingRepository {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void persistEmbedding(float[] embedding, int id) {
+        qdrantService.upsertEntry(embedding,buildingTableName,id);
     }
 }
