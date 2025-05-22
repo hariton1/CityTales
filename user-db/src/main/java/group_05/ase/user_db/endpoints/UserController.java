@@ -5,7 +5,9 @@ import group_05.ase.user_db.services.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -59,6 +61,17 @@ public class UserController {
         } catch (Exception e) {
             logger.error("Error deleting user with ID {}: {}", userId, e.getMessage());
             throw new RuntimeException("Error deleting user", e);
+        }
+    }
+
+    @PatchMapping("/id={userId}")
+    @ResponseStatus(HttpStatus.OK)
+    public void updateUserById(@PathVariable("userId") UUID userId, @RequestBody UserDTO updatedValues) {
+        try {
+            this.userService.updateUserById(userId, updatedValues);
+        } catch (Exception e) {
+            logger.error("Error updating user with ID {}: {}", userId, e.getMessage());
+            throw new RuntimeException("Error updating user", e);
         }
     }
 

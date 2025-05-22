@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
@@ -46,6 +47,27 @@ public class UserService {
             throw new IllegalArgumentException("User ID cannot be null");
         }
         this.repository.deleteById(userId);
+    }
+
+    public UserDTO updateUserById(UUID userId, UserDTO updatedValues) {
+        UserEntity existingUser = this.repository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("User not found"));
+
+        if (updatedValues.getDisplayName() != null) {
+            existingUser.setDisplayName(updatedValues.getDisplayName());
+        }
+
+        if (updatedValues.getEmail() != null) {
+            existingUser.setDisplayName(updatedValues.getDisplayName());
+        }
+
+        if (updatedValues.getIsActive() != null) {
+            existingUser.setActive(!updatedValues.getIsActive().equals(false));
+        }
+
+        UserEntity updatedUser = this.repository.save(existingUser);
+
+        return new UserDTO(updatedUser.getId(), updatedUser.getSupabaseId(), updatedUser.getEmail(), updatedUser.getCreatedAt(), updatedUser.getDisplayName(), updatedUser.isActive());
     }
 
 }
