@@ -12,29 +12,13 @@ services:
       - NEO4J_apoc_import_file_enabled=true
       - NEO4J_apoc_import_file_use__neo4j__config=true
       - NEO4J_PLUGINS=["apoc", "graph-data-science"]
-      - NEO4J_server_memory_heap_initial__size=6G
-      - NEO4J_server_memory_heap_max__size=6G
+      - NEO4J_server_memory_heap_initial__size=4G
+      - NEO4J_server_memory_heap_max__size=4G
     volumes:
       - ./neo4j_db/data:/data
       - ./neo4j_db/logs:/logs
       - ./neo4j_db/import:/var/lib/neo4j/import
       - ./neo4j_db/plugins:/plugins
-
-  qdrant:
-    container_name: qdrant
-    image: qdrant/qdrant:latest
-    ports:
-      - "6333:6333"
-      - "6334:6334"
-    volumes:
-      - ./qdrant_data:/qdrant/storage
-
-  data-scraper:
-    container_name: data-scraper
-    platform: linux/amd64
-    build: ./data-scraper
-    ports:
-      - "8080:8080"
 
   #production
   # frontend:
@@ -50,7 +34,6 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile.dev
-    #image: frontend:latest
     working_dir: /app
     ports:
       - "4200:4200"
@@ -63,3 +46,11 @@ services:
     build: ./user-db
     ports:
       - "8090:8090"
+
+  neo4j-data-access:
+    container_name: neo4j-data-access
+    build: ./neo4j-data-access
+    ports:
+      - "8083:8083"
+    environment:
+      - neo4j.url=bolt://neo4j:7687
