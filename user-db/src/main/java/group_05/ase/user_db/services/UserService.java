@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class UserService {
@@ -27,6 +28,17 @@ public class UserService {
         }
 
         return users;
+    }
+
+    public UserDTO getUserById(UUID userId) {
+        if (userId == null) {
+            throw new IllegalArgumentException("User ID cannot be null");
+        }
+
+        UserEntity user = this.repository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
+
+        return new UserDTO(user.getId(), user.getSupabaseId(), user.getEmail(), user.getCreatedAt(), user.getDisplayName(), user.isActive());
     }
 
 }
