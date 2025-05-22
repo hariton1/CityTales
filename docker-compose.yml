@@ -47,3 +47,11 @@ services:
     build: ./user-db
     ports:
       - "8090:8090"
+
+  neo4j-data-access:
+    container_name: neo4j-data-access
+    build: ./neo4j-data-access
+    ports:
+      - "8083:8083"
+    environment:
+      - neo4j.url=bolt://neo4j:7687
