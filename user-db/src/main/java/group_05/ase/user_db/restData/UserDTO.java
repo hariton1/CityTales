@@ -38,6 +38,6 @@ public class UserDTO {
     @Getter
     @Setter
     @JsonProperty(required = true, value = "is_active")
-    private boolean isActive;
+    private Boolean isActive;
 
 }
