@@ -31,4 +31,17 @@ export class UserService {
     return this.httpClient.delete<void>(`${this.DOMAIN}/id=${id}`);
   }
 
+  public updateUser(user: UserDto) : Observable<UserDto> {
+    const payload = {
+      display_name: user.display_name,
+      email: user.email,
+      is_active: user.is_active
+    };
+
+    return this.httpClient.patch<UserDto>(`${this.DOMAIN}/id=${user.id}`, payload)
+      .pipe(map(updatedUser => {
+        return new UserDto(updatedUser.id, updatedUser.supabase_id, updatedUser.email, updatedUser.created_at, updatedUser.display_name, updatedUser.is_active);
+      }));
+  }
+
 }

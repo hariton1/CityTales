@@ -24,7 +24,7 @@ export const routes: Routes = [
     ]
   }
   ,
-  {   path: 'explore', component: ExploreLayoutComponent },
+  { path: 'explore', component: ExploreLayoutComponent },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: SignUpComponent },
   { path: 'onboarding', component: OnboardingComponent },
