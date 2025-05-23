@@ -19,7 +19,7 @@ public class QdrantService  {
 
     private String url = "localhost";
     private int port = 6334;
-    private int vectorDimension = 1536;
+    private int vectorDimension = 3072;
     private QdrantClient client;
 
     public QdrantService() {

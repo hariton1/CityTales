@@ -2,6 +2,7 @@ package group_05.ase.data_scraper.Service.persons;
 
 import group_05.ase.data_scraper.Config.Neo4jProperties;
 import group_05.ase.data_scraper.Entity.ViennaHistoryWikiPersonObject;
+import group_05.ase.data_scraper.Service.embeddings.QdrantService;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import org.neo4j.driver.*;
@@ -18,13 +19,17 @@ public class PersonRepository {
     private final String NEO4J_USER;
     private final String NEO4J_PASSWORD;
     private final String personsTableName = "WienGeschichteWikiPersons";
+    private final QdrantService qdrantService;
+
 
     private Driver driver;
 
-    public PersonRepository(Neo4jProperties properties){
+    public PersonRepository(Neo4jProperties properties, QdrantService qdrantService) {
         this.NEO4J_URL = properties.getUrl();
         this.NEO4J_USER = properties.getUser();
         this.NEO4J_PASSWORD = properties.getPassword();
+
+        this.qdrantService = qdrantService;
     }
 
     @PostConstruct
@@ -51,7 +56,6 @@ public class PersonRepository {
                         "MERGE (p:" + personsTableName + " {viennaHistoryWikiId: coalesce($viennaHistoryWikiId, 'N/A')}) " +
                                 "SET p.url = coalesce($url, 'N/A'), " +
                                 "    p.name = coalesce($name, 'N/A'), " +
-                                "    p.content = coalesce($content, 'N/A'), " +
                                 "    p.personName = coalesce($personName, 'N/A'), " +
                                 "    p.alternativeName = coalesce($alternativeName, 'N/A'), " +
                                 "    p.titles = coalesce($titles, 'N/A'), " +
@@ -70,12 +74,12 @@ public class PersonRepository {
                                 "    p.seeAlso = coalesce($seeAlso, 0.0), " +
                                 "    p.resource = coalesce($resource, 0.0), " +
                                 "    p.links = coalesce($links, []), " +
-                                "    p.imageUrls = coalesce($imageUrls, []) " +
+                                "    p.contentGerman = coalesce($contentGerman, 'N/A'), " +
+                                "    p.contentEnglish = coalesce($contentEnglish, 'N/A') " +
                                 "RETURN p.name",
                         parameters(
                                 "viennaHistoryWikiId", obj.getViennaHistoryWikiId(),
                                 "name", obj.getName(),
-                                "content", obj.getContent(),
                                 "url", obj.getUrl(),
                                 "personName", obj.getPersonName().orElse(null),
                                 "alternativeName", obj.getAlternativeName().orElse(null),
@@ -94,14 +98,20 @@ public class PersonRepository {
                                 "seeAlso", obj.getSeeAlso().orElse(null),
                                 "resource", obj.getResource().orElse(null),
                                 "links", obj.getLinks() != null ? obj.getLinks() : new ArrayList<>(),
-                                "imageUrls", obj.getImageUrls() != null ? obj.getImageUrls() : new ArrayList<>()
+                                "imageUrls", obj.getImageUrls() != null ? obj.getImageUrls() : new ArrayList<>(),
+                                "contentGerman", obj.getContentGerman(),
+                                "contentEnglish", obj.getContentEnglish()
                         )
                 );
                 return result.single().get(0).asString();
             });
-            // System.out.println("Created or updated Person: " + message);
+            System.out.println("Created or updated Person: " + message);
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void persistEmbedding(float[] embedding, int id) {
+        qdrantService.upsertEntry(embedding,personsTableName,id);
     }
 }
