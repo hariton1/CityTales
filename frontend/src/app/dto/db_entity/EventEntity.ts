@@ -17,4 +17,7 @@ export interface EventEntity {
 
   links :string[];
   imageUrls :string[];
+
+  contentGerman: string;
+  contentEnglish: string;
 }

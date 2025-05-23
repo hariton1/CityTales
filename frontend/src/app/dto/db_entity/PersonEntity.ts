@@ -20,4 +20,7 @@ export interface PersonEntity {
   resource: string;
   links: string[];
   imageUrls: string[];
+
+  contentGerman: string;
+  contentEnglish: string;
 }

@@ -28,9 +28,10 @@ public class DataScraperApplication {
 		// Scraper-Run: Note you can change the params and comment out sections that you already inserted
 
 		// Qdrant Setup:
-		qdrantService.deleteCollection("WienGeschichteWikiBuildings");
+		/*qdrantService.deleteCollection("WienGeschichteWikiBuildings");
 		qdrantService.deleteCollection("WienGeschichteWikiEvents");
 		qdrantService.deleteCollection("WienGeschichteWikiPersons");
+*/
 
 		qdrantService.createCollection("WienGeschichteWikiBuildings");
 		qdrantService.createCollection("WienGeschichteWikiEvents");
@@ -38,16 +39,18 @@ public class DataScraperApplication {
 
 		// Test runs
 		System.out.println("buildings: ");
-		buildingService.search(1);
+		buildingService.search(100);
 
 		System.out.println("persons: ");
-		personService.search(1);
+		personService.search(100);
 
+		System.out.println("events: ");
+		eventService.search(100);
 
-		/*
-		float[] interestedInMusic = openAiService.getEmbedding("Hotel");
+		linkService.createLinkages();
+
+		/*float[] interestedInMusic = openAiService.getEmbedding("Kaisertum");
 		System.out.println("matching: .................");
-		qdrantService.doMatching(interestedInMusic,"WienGeschichteWikiBuildings",3).forEach(x -> System.out.println(x));
-		*/
+		qdrantService.doMatching(interestedInMusic,"WienGeschichteWikiBuildings",3).forEach(x -> System.out.println(x));*/
 	}
 }

@@ -33,10 +33,9 @@ public class PersonService {
     public void search(int limit) {
         String currentUrl = personsSeeds;
         int totalLinks = 0;
-        int counter = 0;
-        int outer_counter = 0;
+        int persistedCount = 0;
 
-        while (currentUrl != null && outer_counter < limit) {
+        while (currentUrl != null && persistedCount < limit) {
             List<ViennaHistoryWikiPersonObject> entries = new ArrayList<>();
             try {
 
@@ -51,7 +50,7 @@ public class PersonService {
                         int pageLinkCount = 0;
 
                         List<ViennaHistoryWikiPersonObject> pageEntries = links.stream()
-                                .limit(4)
+                                .limit(20)
                                 .parallel()
                                 .map(link -> {
                                     return extractPersonInfos(link.attr("abs:href"), link.text());
@@ -66,13 +65,12 @@ public class PersonService {
                         totalLinks += pageLinkCount;
 
                         for (ViennaHistoryWikiPersonObject wgwo:entries) {
-                            /*if (counter >= limit) {
+                            if (persistedCount >= limit) {
                                 return;
-                            }*/
+                            }
                             personRepository.persistViennaHistoryWikiPersonObject(wgwo);
-                            counter++;
+                            persistedCount++;
                         }
-                        outer_counter++;
                     } else {
                         System.out.println("Category div not found on the current page.");
                     }
@@ -168,7 +166,7 @@ public class PersonService {
 
                 float[] embedding = openAiService.getEmbedding(wikiObject.getContentGerman());
                 personRepository.persistEmbedding(embedding, wikiObject.getViennaHistoryWikiId());
-                wikiObject.setContentEnglish(openAiService.getGermanToEnglishTranslation(wikiObject.getContentGerman()));
+                wikiObject.setContentEnglish("");
             }
 
             return wikiObject;
