@@ -8,14 +8,8 @@ import group_05.ase.data_scraper.Service.general.ContentService;
 import group_05.ase.data_scraper.Service.general.LinkService;
 import group_05.ase.data_scraper.Service.persons.PersonService;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ConfigurableApplicationContext;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @SpringBootApplication
 public class DataScraperApplication {
@@ -33,32 +27,27 @@ public class DataScraperApplication {
 
 		// Scraper-Run: Note you can change the params and comment out sections that you already inserted
 
+		// Qdrant Setup:
 		qdrantService.deleteCollection("WienGeschichteWikiBuildings");
+		qdrantService.deleteCollection("WienGeschichteWikiEvents");
+		qdrantService.deleteCollection("WienGeschichteWikiPersons");
+
 		qdrantService.createCollection("WienGeschichteWikiBuildings");
+		qdrantService.createCollection("WienGeschichteWikiEvents");
+		qdrantService.createCollection("WienGeschichteWikiPersons");
 
-		// Initialize Nodes*System.out.println("buildings: ");
-		buildingService.search(10);
+		// Test runs
+		System.out.println("buildings: ");
+		buildingService.search(1);
 
+		System.out.println("persons: ");
+		personService.search(1);
+
+
+		/*
 		float[] interestedInMusic = openAiService.getEmbedding("Hotel");
 		System.out.println("matching: .................");
 		qdrantService.doMatching(interestedInMusic,"WienGeschichteWikiBuildings",3).forEach(x -> System.out.println(x));
-
-		/*System.out.println("persons: ");
-		personService.search(2);
-		System.out.println("events: ");
-		eventService.search();
-
-		// Initialize Links
-		System.out.println("linking: ");
-		linkService.createLinkages();*/
-
-
-		// Testing AI stuff
-
-		/*ConfigurableApplicationContext run = new SpringApplicationBuilder(DataScraperApplication.class).web(WebApplicationType.NONE).run(args);
-		run.getBean(OpenAiService.class).doStuff();*/
-
-		// Testing qdrant stuff
-
+		*/
 	}
 }

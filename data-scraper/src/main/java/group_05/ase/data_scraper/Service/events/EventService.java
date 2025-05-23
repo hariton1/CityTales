@@ -1,6 +1,7 @@
 package group_05.ase.data_scraper.Service.events;
 
 import group_05.ase.data_scraper.Entity.ViennaHistoryWikiEventObject;
+import group_05.ase.data_scraper.Service.embeddings.OpenAiService;
 import group_05.ase.data_scraper.Service.general.ManualExtractorService;
 import group_05.ase.data_scraper.Service.general.ContentService;
 import org.jsoup.Jsoup;
@@ -24,12 +25,14 @@ public class EventService {
     private final EventRepository eventRepository;
     private final Set<String> allEvents = new HashSet<>();
     private final ContentService contentService;
+    private final OpenAiService openAiService;
 
 
-    public EventService(ManualExtractorService manualExtractorService, EventRepository wikiEventPersistenceService, ContentService contentService) {
+    public EventService(ManualExtractorService manualExtractorService, EventRepository wikiEventPersistenceService, ContentService contentService, OpenAiService openAiService) {
         this.manualExtractorService = manualExtractorService;
         this.eventRepository = wikiEventPersistenceService;
         this.contentService = contentService;
+        this.openAiService = openAiService;
     }
 
     public void search() {
@@ -68,7 +71,7 @@ public class EventService {
             }
 
             List<ViennaHistoryWikiEventObject> pageEntries = links.stream()
-                    .limit(200)
+                    .limit(4)
                     .parallel()
                     .map(link -> {
                         return extractEventInfos(link.attr("abs:href"), link.text());
@@ -101,9 +104,7 @@ public class EventService {
             // Extract all links from <p> tags and images from <img> tags & content
             wikiObject.setLinks(manualExtractorService.getLinks(doc));
             wikiObject.setImageUrls(manualExtractorService.getImageUrls(doc));
-            wikiObject.setContent(contentService.extractMainArticleText(doc));
-
-            System.out.println(wikiObject.getContent());
+            wikiObject.setContentGerman(contentService.extractMainArticleText(doc));
 
             Element table = doc.selectFirst("table.table.table-condensed.table-hover");
 
@@ -151,6 +152,14 @@ public class EventService {
                     }
                 }
             }
+            // Embeddings
+            if (wikiObject.getContentGerman() != null  && !wikiObject.getContentGerman().equals("")) {
+                System.out.println("Content!: " + wikiObject.getContentGerman());
+                float[] embedding = openAiService.getEmbedding(wikiObject.getContentGerman());
+                eventRepository.persistEmbedding(embedding,wikiObject.getViennaHistoryWikiId());
+                wikiObject.setContentEnglish(openAiService.getGermanToEnglishTranslation(wikiObject.getContentGerman()));
+            }
+
             return wikiObject;
 
         } catch (Exception e) {

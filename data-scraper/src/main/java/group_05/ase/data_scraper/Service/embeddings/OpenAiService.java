@@ -1,35 +1,26 @@
 package group_05.ase.data_scraper.Service.embeddings;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.embedding.EmbeddingResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class OpenAiService {
 
     @Autowired
     private EmbeddingModel embeddingModel;
-    public void doStuff() {
-        List<String> listL = new ArrayList<>();
-        listL.add("literature");
 
-        List<String> listM = new ArrayList<>();
-        listL.add("music");
-
-        List<String> listLP= new ArrayList<>();
-        listL.add("Mozart");
-
-        List<String> listMP= new ArrayList<>();
-        listL.add("Faust");
-
-        EmbeddingResponse r = embeddingModel.embedForResponse(listL);
-        System.out.println(r.getResult().getOutput().length);
-    }
+    @Autowired
+    private ChatModel chatModel;
 
     public float[] getEmbedding(String content) {
         List<String> contentList = new ArrayList<>();
@@ -37,5 +28,11 @@ public class OpenAiService {
 
         EmbeddingResponse r = embeddingModel.embedForResponse(contentList);
         return r.getResult().getOutput();
+    }
+
+    public String getGermanToEnglishTranslation(String germanText) {
+        String prompt = "Translate this German text to English and give me ONLY the result: \"" + germanText + "\"";
+        ChatResponse r = chatModel.call(new Prompt(prompt));
+        return r.getResult().getOutput().getContent();
     }
 }

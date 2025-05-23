@@ -2,7 +2,6 @@ package group_05.ase.data_scraper.Service.buildings;
 
 import group_05.ase.data_scraper.Entity.ViennaHistoryWikiBuildingObject;
 import group_05.ase.data_scraper.Service.embeddings.OpenAiService;
-import group_05.ase.data_scraper.Service.embeddings.QdrantService;
 import group_05.ase.data_scraper.Service.general.ManualExtractorService;
 import group_05.ase.data_scraper.Service.general.ContentService;
 import org.json.JSONArray;
@@ -14,9 +13,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class BuildingService {
@@ -54,7 +51,7 @@ public class BuildingService {
                         int pageLinkCount = 0;
 
                         List<ViennaHistoryWikiBuildingObject> pageEntries = links.stream()
-                                .limit(2)
+                                .limit(4)
                                 .parallel()
                                 .map(link -> {
                                     return extractBuildingInfos(link.attr("abs:href"), link.text());
@@ -69,9 +66,9 @@ public class BuildingService {
                         totalLinks += pageLinkCount;
 
                         for (ViennaHistoryWikiBuildingObject wgwo:entries) {
-                            if (counter >= limit) {
+                            /*if (counter >= limit) {
                                 return;
-                            }
+                            }*/
                             buildingRepository.persistViennaHistoryWikiBuildingObject(wgwo);
                             counter++;
                         }
@@ -112,8 +109,7 @@ public class BuildingService {
             // Extract all links from <p> tags and images from <img> tags  & content
             wikiObject.setLinks(manualExtractorService.getLinks(doc));
             wikiObject.setImageUrls(manualExtractorService.getImageUrls(doc));
-            wikiObject.setContent(contentService.extractMainArticleText(doc));
-            System.out.println(wikiObject.getContent());
+            wikiObject.setContentGerman(contentService.extractMainArticleText(doc));
 
             Element table = doc.selectFirst("table.table.table-condensed.table-hover");
 
@@ -160,10 +156,11 @@ public class BuildingService {
                 }
             }
             // Embeddings
-            if (wikiObject.getContent() != null  && !wikiObject.getContent().equals("")) {
-                System.out.println("Content!: " + wikiObject.getContent());
-                float[] embedding = openAiService.getEmbedding(wikiObject.getContent());
+            if (wikiObject.getContentGerman() != null  && !wikiObject.getContentGerman().equals("")) {
+                System.out.println("Content!: " + wikiObject.getContentGerman());
+                float[] embedding = openAiService.getEmbedding(wikiObject.getContentGerman());
                 buildingRepository.persistEmbedding(embedding,wikiObject.getViennaHistoryWikiId());
+                wikiObject.setContentEnglish(openAiService.getGermanToEnglishTranslation(wikiObject.getContentGerman()));
             }
 
             populateCoordinates(doc,wikiObject);

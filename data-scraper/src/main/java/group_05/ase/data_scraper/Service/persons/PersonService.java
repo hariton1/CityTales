@@ -1,6 +1,7 @@
 package group_05.ase.data_scraper.Service.persons;
 
 import group_05.ase.data_scraper.Entity.ViennaHistoryWikiPersonObject;
+import group_05.ase.data_scraper.Service.embeddings.OpenAiService;
 import group_05.ase.data_scraper.Service.general.ContentService;
 import group_05.ase.data_scraper.Service.general.ManualExtractorService;
 import org.jsoup.Jsoup;
@@ -9,9 +10,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class PersonService {
@@ -20,20 +19,24 @@ public class PersonService {
     private final PersonRepository personRepository;
     private final ManualExtractorService manualExtractorService;
     private final ContentService contentService;
+    private final OpenAiService openAiService;
 
 
-    public PersonService(PersonRepository wikiPersonPersistenceService, ManualExtractorService manualExtractorService, ContentService contentService) {
+
+    public PersonService(PersonRepository wikiPersonPersistenceService, ManualExtractorService manualExtractorService, ContentService contentService, OpenAiService openAiService) {
         this.personRepository = wikiPersonPersistenceService;
         this.manualExtractorService = manualExtractorService;
         this.contentService = contentService;
+        this.openAiService = openAiService;
     }
 
     public void search(int limit) {
         String currentUrl = personsSeeds;
         int totalLinks = 0;
         int counter = 0;
+        int outer_counter = 0;
 
-        while (currentUrl != null) {
+        while (currentUrl != null && outer_counter < limit) {
             List<ViennaHistoryWikiPersonObject> entries = new ArrayList<>();
             try {
 
@@ -48,10 +51,10 @@ public class PersonService {
                         int pageLinkCount = 0;
 
                         List<ViennaHistoryWikiPersonObject> pageEntries = links.stream()
-                                .limit(200)
+                                .limit(4)
                                 .parallel()
                                 .map(link -> {
-                                    return extractBuildingInfos(link.attr("abs:href"), link.text());
+                                    return extractPersonInfos(link.attr("abs:href"), link.text());
                                 })
                                 .filter(obj -> obj != null)
                                 .toList();
@@ -63,12 +66,13 @@ public class PersonService {
                         totalLinks += pageLinkCount;
 
                         for (ViennaHistoryWikiPersonObject wgwo:entries) {
-                            if (counter >= limit) {
+                            /*if (counter >= limit) {
                                 return;
-                            }
+                            }*/
                             personRepository.persistViennaHistoryWikiPersonObject(wgwo);
                             counter++;
                         }
+                        outer_counter++;
                     } else {
                         System.out.println("Category div not found on the current page.");
                     }
@@ -94,7 +98,7 @@ public class PersonService {
         }
     }
 
-    private ViennaHistoryWikiPersonObject extractBuildingInfos(String url, String text) {
+    private ViennaHistoryWikiPersonObject extractPersonInfos(String url, String text) {
         try {
             Document doc = Jsoup.connect(url).get();
 
@@ -105,9 +109,7 @@ public class PersonService {
             // Extract all links from <p> tags and images from <img> tags & content
             wikiObject.setLinks(manualExtractorService.getLinks(doc));
             wikiObject.setImageUrls(manualExtractorService.getImageUrls(doc));
-            wikiObject.setContent(contentService.extractMainArticleText(doc));
-
-            System.out.println(wikiObject.getContent());
+            wikiObject.setContentGerman(contentService.extractMainArticleText(doc));
 
             Element table = doc.selectFirst("table.table.table-condensed.table-hover");
 
@@ -159,6 +161,16 @@ public class PersonService {
                     }
                 }
             }
+
+            // Embeddings
+            if (wikiObject.getContentGerman() != null && !wikiObject.getContentGerman().isEmpty()) {
+                System.out.println("Content!: " + wikiObject.getContentGerman());
+
+                float[] embedding = openAiService.getEmbedding(wikiObject.getContentGerman());
+                personRepository.persistEmbedding(embedding, wikiObject.getViennaHistoryWikiId());
+                wikiObject.setContentEnglish(openAiService.getGermanToEnglishTranslation(wikiObject.getContentGerman()));
+            }
+
             return wikiObject;
 
         } catch (Exception e) {

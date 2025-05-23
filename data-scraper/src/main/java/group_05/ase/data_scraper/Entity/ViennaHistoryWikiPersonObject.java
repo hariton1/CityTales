@@ -41,5 +41,6 @@ public class ViennaHistoryWikiPersonObject {
     private List<String> links = new ArrayList<>();
     private List<String> imageUrls = new ArrayList<>();
 
-    private String content;
+    private String contentGerman;
+    private String contentEnglish;
 }
