@@ -20,6 +20,7 @@ import {UserService} from '../../../user_db.services/user.service';
 import {UserDto} from '../../../user_db.dto/user.dto';
 import {TuiResponsiveDialogService} from '@taiga-ui/addon-mobile';
 import {switchMap} from 'rxjs';
+import {TuiThemeColorService} from '@taiga-ui/cdk';
 
 @Component({
   selector: 'app-user-list',
@@ -47,11 +48,12 @@ export class UserListComponent implements OnInit {
     this.users = [];
   }
 
-  // header background turns blue when injecting dialogs :(
   private dialogs = inject(TuiResponsiveDialogService);
+  private readonly theme = inject(TuiThemeColorService);
   private alerts = inject(TuiAlertService);
 
   ngOnInit(): void {
+    this.theme.color = '#000000';
     this.userService.getAllUsers()
       .subscribe({
         next: (users) => {
