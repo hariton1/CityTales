@@ -2,10 +2,10 @@
   <div class="place-detail-card">
     <!-- Header with building information -->
     <div class="place-detail-header">
-      <h2 class="place-detail-title">{{selectedPlace.building.name}}</h2>
+      <h2 class="place-detail-title">{{selectedPlace.name}}</h2>
       <div class="place-location">
         <span class="coordinates">
-          {{ selectedPlace.building.latitude }}°N, {{ selectedPlace.building.longitude }}°E
+          {{ selectedPlace.latitude }}°N, {{ selectedPlace.longitude }}°E
         </span>
       </div>
 
@@ -28,30 +28,30 @@
       <div class="content-section">
         <h3>Building Information</h3>
         <div class="building-details">
-          <div class="detail-row" *ngIf="selectedPlace.building.name">
+          <div class="detail-row" *ngIf="selectedPlace.name">
             <span class="label">Name:</span>
-            <span class="value">{{ selectedPlace.building.name }}</span>
+            <span class="value">{{ selectedPlace.name }}</span>
           </div>
-          <div class="detail-row" *ngIf="selectedPlace.building.dateFrom">
+          <div class="detail-row" *ngIf="selectedPlace.dateFrom">
             <span class="label">Build in:</span>
-            <span class="value">{{ selectedPlace.building.dateFrom }}</span>
+            <span class="value">{{ selectedPlace.dateFrom }}</span>
           </div>
-          <div class="detail-row" *ngIf="selectedPlace.building.dateTo">
+          <div class="detail-row" *ngIf="selectedPlace.dateTo">
             <span class="label">Demolished in:</span>
-            <span class="value">{{ selectedPlace.building.dateTo }}</span>
+            <span class="value">{{ selectedPlace.dateTo }}</span>
           </div>
-          <div class="detail-row" *ngIf="selectedPlace.building.architect">
+          <div class="detail-row" *ngIf="selectedPlace.architect">
             <span class="label">Responsible Architect:</span>
-            <span class="value">{{ selectedPlace.building.architect }}</span>
+            <span class="value">{{ selectedPlace.architect }}</span>
           </div>
-          <div class="detail-row" *ngIf="selectedPlace.building.url">
+          <div class="detail-row" *ngIf="selectedPlace.url">
             <span class="label">Wiki URL:</span>
             <span class="value">
-              <a [href]="selectedPlace.building.url" target="_blank"> {{ selectedPlace.building.url }} </a>
+              <a [href]="selectedPlace.url" target="_blank"> {{ selectedPlace.url }} </a>
             </span>
           </div>
-          <div class="detail-row" *ngIf="selectedPlace.building.imageUrls.length > 0">
-            <img [src]="selectedPlace.building.imageUrls[0]" alt="Building image" class="building-image">
+          <div class="detail-row" *ngIf="selectedPlace.imageUrls.length > 0">
+            <img [src]="selectedPlace.imageUrls[1]" alt="Building image" class="building-image">
           </div>
 
           <div class="content-section" *ngIf="selectedPlace.linkedPersons?.length">
@@ -71,8 +71,8 @@
             <div class="related-items">
               <div class="related-item" *ngFor="let place of selectedPlace.linkedPlaces">
             <span class="value">
-              <a [href]="place.building.url" target="_blank" *ngIf="place.building.url">{{ place.building.name }}</a>
-              <span *ngIf="!place.building.url">{{ place.building.name }}</span>
+              <a [href]="place.url" target="_blank" *ngIf="place.url">{{ place.name }}</a>
+              <span *ngIf="!place.url">{{ place.name }}</span>
             </span>
               </div>
             </div>

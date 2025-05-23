@@ -11,10 +11,7 @@ import org.jsoup.select.Elements;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class EventService {
@@ -35,60 +32,56 @@ public class EventService {
         this.openAiService = openAiService;
     }
 
-    public void search() {
+    public void search(int limit) {
         try {
-            this.scrapeCategory(eventSeed);
+            int[] persistedCount = {0};  // mutable counter
+            this.scrapeCategory(eventSeed, limit, persistedCount);
             System.out.println("#Total events: " + allEvents.size());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public void scrapeCategory(String url) throws IOException {
+    public void scrapeCategory(String url, int limit, int[] persistedCount) throws IOException {
+        if (persistedCount[0] >= limit) return;
+
         Document doc = Jsoup.connect(url).get();
 
         // get sub-categories
         Element mwCategoriesDiv = doc.getElementById("mw-subcategories");
-
         if (mwCategoriesDiv != null) {
             Elements categoryLinks = mwCategoriesDiv.select("a[href^=\"/Kategorie:\"]");
-
             for (Element link : categoryLinks) {
+                if (persistedCount[0] >= limit) return;
                 String fullUrl = "https://www.geschichtewiki.wien.gv.at" + link.attr("href");
-                scrapeCategory(fullUrl);
+                scrapeCategory(fullUrl, limit, persistedCount);
             }
         }
 
         // get actual events
         Element mwPagesDiv = doc.getElementById("mw-pages");
-
         if (mwPagesDiv != null) {
             Elements links = mwPagesDiv.select("a");
 
-            for (Element link : links) {
-                String fullUrl = "https://www.geschichtewiki.wien.gv.at" + link.attr("href");
-                allEvents.add(fullUrl);
-            }
-
             List<ViennaHistoryWikiEventObject> pageEntries = links.stream()
-                    .limit(4)
+                    .limit(20) // Optional: cap how many links are processed per page
                     .parallel()
-                    .map(link -> {
-                        return extractEventInfos(link.attr("abs:href"), link.text());
-                    })
-                    .filter(obj -> obj != null)
+                    .map(link -> extractEventInfos(link.attr("abs:href"), link.text()))
+                    .filter(Objects::nonNull)
                     .toList();
 
-            for (ViennaHistoryWikiEventObject obj:pageEntries) {
+            for (ViennaHistoryWikiEventObject obj : pageEntries) {
+                if (persistedCount[0] >= limit) return;
                 eventRepository.persistViennaHistoryWikiEventObject(obj);
+                persistedCount[0]++;
             }
 
             // pagination
             Elements nextPageLinks = mwPagesDiv.select("a:contains(nächste Seite)");
-            if (!nextPageLinks.isEmpty()) {
+            if (!nextPageLinks.isEmpty() && persistedCount[0] < limit) {
                 String nextPageHref = nextPageLinks.first().attr("href");
                 String nextPageUrl = "https://www.geschichtewiki.wien.gv.at" + nextPageHref;
-                scrapeCategory(nextPageUrl);
+                scrapeCategory(nextPageUrl, limit, persistedCount);
             }
         }
     }
@@ -157,7 +150,7 @@ public class EventService {
                 System.out.println("Content!: " + wikiObject.getContentGerman());
                 float[] embedding = openAiService.getEmbedding(wikiObject.getContentGerman());
                 eventRepository.persistEmbedding(embedding,wikiObject.getViennaHistoryWikiId());
-                wikiObject.setContentEnglish(openAiService.getGermanToEnglishTranslation(wikiObject.getContentGerman()));
+                wikiObject.setContentEnglish("");
             }
 
             return wikiObject;

@@ -33,10 +33,9 @@ public class BuildingService {
     public void search(int limit) {
         String currentUrl = buildingSeeds;
         int totalLinks = 0;
-        int counter = 0;
-        int outer_counter = 0;
+        int persistedCount = 0;
 
-        while (currentUrl != null && outer_counter < limit) {
+        while (currentUrl != null && persistedCount < limit) {
             List<ViennaHistoryWikiBuildingObject> entries = new ArrayList<>();
             try {
 
@@ -51,7 +50,7 @@ public class BuildingService {
                         int pageLinkCount = 0;
 
                         List<ViennaHistoryWikiBuildingObject> pageEntries = links.stream()
-                                .limit(4)
+                                .limit(20)
                                 .parallel()
                                 .map(link -> {
                                     return extractBuildingInfos(link.attr("abs:href"), link.text());
@@ -66,13 +65,12 @@ public class BuildingService {
                         totalLinks += pageLinkCount;
 
                         for (ViennaHistoryWikiBuildingObject wgwo:entries) {
-                            /*if (counter >= limit) {
+                            if (persistedCount >= limit) {
                                 return;
-                            }*/
+                            }
                             buildingRepository.persistViennaHistoryWikiBuildingObject(wgwo);
-                            counter++;
+                            persistedCount++;
                         }
-                        outer_counter ++;
                     } else {
                         System.out.println("Category div not found on the current page.");
                     }
@@ -160,7 +158,7 @@ public class BuildingService {
                 System.out.println("Content!: " + wikiObject.getContentGerman());
                 float[] embedding = openAiService.getEmbedding(wikiObject.getContentGerman());
                 buildingRepository.persistEmbedding(embedding,wikiObject.getViennaHistoryWikiId());
-                wikiObject.setContentEnglish(openAiService.getGermanToEnglishTranslation(wikiObject.getContentGerman()));
+                wikiObject.setContentEnglish("");
             }
 
             populateCoordinates(doc,wikiObject);

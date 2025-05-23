@@ -3,6 +3,7 @@ import { HistoricalPlaceEntity} from '../../dto/db_entity/HistoricalPlaceEntity'
 import {HistoricPlaceDetailComponent} from '../historic-place-detail/historic-place-detail.component';
 import {HistoricPlacePreviewComponent} from '../historic-place-preview/historic-place-preview.component';
 import {NgIf} from '@angular/common';
+import {BuildingEntity} from '../../dto/db_entity/BuildingEntity';
 
 @Component({
   selector: 'app-sidebar',
@@ -17,7 +18,7 @@ import {NgIf} from '@angular/common';
 export class SidebarComponent {
 
   @Input() selectedPlace: any;
-  @Input() historicalPlaces: HistoricalPlaceEntity[] = [];
+  @Input() historicalPlaces: BuildingEntity[] = [];
   @Input() detailedView: boolean = false;
 
   @Output() setDetailedView: EventEmitter<boolean> = new EventEmitter<boolean>();
@@ -33,7 +34,7 @@ export class SidebarComponent {
     this.setDetailedView.emit(event);
   }
 
-  setHistoricalPlaces(places: HistoricalPlaceEntity[]): void {
+  setHistoricalPlaces(places: BuildingEntity[]): void {
     this.historicalPlaces = places;
     console.log(this.historicalPlaces);
   }

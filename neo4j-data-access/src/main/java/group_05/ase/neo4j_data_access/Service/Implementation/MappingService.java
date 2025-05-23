@@ -20,6 +20,8 @@ public class MappingService implements IMappingService {
 
         personEntity.setViennaHistoryWikiId(node.get("viennaHistoryWikiId").asInt());
         personEntity.setName(node.get("name").asString());
+        personEntity.setContentGerman(node.get("contentGerman").asString());
+        personEntity.setContentEnglish(node.get("contentEnglish").asString());
         personEntity.setUrl(node.get("url").asString());
         personEntity.setPersonName(Optional.ofNullable(getSafeString(node, "personName")));
         personEntity.setAlternativeName(Optional.ofNullable(getSafeString(node, "alternativeName")));
@@ -59,6 +61,8 @@ public class MappingService implements IMappingService {
 
         eventEntity.setViennaHistoryWikiId(node.get("viennaHistoryWikiId").asInt());
         eventEntity.setName(node.get("name").asString());
+        eventEntity.setContentGerman(node.get("contentGerman").asString());
+        eventEntity.setContentEnglish(node.get("contentEnglish").asString());
         eventEntity.setUrl(node.get("url").asString());
         eventEntity.setDateFrom(Optional.ofNullable(getSafeString(node, "dateFrom")));
         eventEntity.setDateTo(Optional.ofNullable(getSafeString(node, "dateTo")));
@@ -91,6 +95,8 @@ public class MappingService implements IMappingService {
 
         building.setViennaHistoryWikiId(node.get("viennaHistoryWikiId").asInt());
         building.setName(node.get("name").asString());
+        building.setContentGerman(node.get("contentGerman").asString());
+        building.setContentEnglish(node.get("contentEnglish").asString());
         building.setUrl(node.get("url").asString());
         building.setBuildingType(Optional.ofNullable( getSafeString(node, "buildingType")));
         building.setDateFrom(Optional.ofNullable( getSafeString(node, "dateFrom")));
