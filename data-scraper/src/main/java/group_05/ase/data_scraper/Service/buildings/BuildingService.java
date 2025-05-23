@@ -50,7 +50,7 @@ public class BuildingService {
                         int pageLinkCount = 0;
 
                         List<ViennaHistoryWikiBuildingObject> pageEntries = links.stream()
-                                .limit(20)
+                                .limit(200)
                                 .parallel()
                                 .map(link -> {
                                     return extractBuildingInfos(link.attr("abs:href"), link.text());

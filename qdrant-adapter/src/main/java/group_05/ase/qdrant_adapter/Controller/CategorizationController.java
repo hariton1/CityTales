@@ -2,6 +2,7 @@ package group_05.ase.qdrant_adapter.Controller;
 
 import group_05.ase.qdrant_adapter.Entity.MatchRequest;
 import group_05.ase.qdrant_adapter.Entity.UpsertEntryRequest;
+import group_05.ase.qdrant_adapter.Service.Implementation.OpenAiService;
 import group_05.ase.qdrant_adapter.Service.Interface.IEmbeddingsService;
 import group_05.ase.qdrant_adapter.Service.Interface.IVectorDBService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,15 +17,15 @@ import java.util.List;
 public class CategorizationController {
 
     private final IVectorDBService vectorDBService;
-    private final IEmbeddingsService embeddingsService;
+    private final OpenAiService openAiService;
 
     @Autowired
-    public CategorizationController(IVectorDBService vectorDBService, IEmbeddingsService embeddingsService) {
+    public CategorizationController(IVectorDBService vectorDBService, OpenAiService openAiService ) {
         this.vectorDBService = vectorDBService;
-        this.embeddingsService = embeddingsService;
+        this.openAiService = openAiService;
     }
 
-    @PostMapping("/init")
+/*    @PostMapping("/init")
     @ResponseBody
     public ResponseEntity<String> initializeCollections() {
         vectorDBService.createCollection("historicPersons");
@@ -50,13 +51,17 @@ public class CategorizationController {
         vectorDBService.upsertEntry(articleEmbedding, dto.getCollectionName(), dto.getWikiDataId());
         return ResponseEntity.ok("Entry upserted.");
     }
+    */
+
 
     @GetMapping("/match")
     @ResponseBody
-    public ResponseEntity<List<String>> matching(@RequestBody MatchRequest dto) {
+    public ResponseEntity<List<Integer>> matching(@RequestBody MatchRequest dto) {
 
-        List<Float> interestsVector = embeddingsService.getInterestsEmbedding(dto.getInterests());
-        System.out.println("interestVector:" + interestsVector.size());
-        return ResponseEntity.ok(vectorDBService.doMatching(interestsVector, dto.getCollectionName(), dto.getResultSize()));
+        String combinedInterests = String.join(", ", dto.getInterests());
+
+        float[] embedding = openAiService.getEmbedding(combinedInterests);
+        System.out.println("interestVector:" + embedding.length);
+        return ResponseEntity.ok(vectorDBService.doMatching(embedding, dto.getCollectionName(), dto.getResultSize()));
     }
 }

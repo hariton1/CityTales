@@ -28,10 +28,10 @@ public class DataScraperApplication {
 		// Scraper-Run: Note you can change the params and comment out sections that you already inserted
 
 		// Qdrant Setup:
-		/*qdrantService.deleteCollection("WienGeschichteWikiBuildings");
+		qdrantService.deleteCollection("WienGeschichteWikiBuildings");
 		qdrantService.deleteCollection("WienGeschichteWikiEvents");
 		qdrantService.deleteCollection("WienGeschichteWikiPersons");
-*/
+
 
 		qdrantService.createCollection("WienGeschichteWikiBuildings");
 		qdrantService.createCollection("WienGeschichteWikiEvents");
@@ -39,13 +39,13 @@ public class DataScraperApplication {
 
 		// Test runs
 		System.out.println("buildings: ");
-		buildingService.search(100);
+		buildingService.search(1000);
 
 		System.out.println("persons: ");
-		personService.search(100);
+		personService.search(1000);
 
 		System.out.println("events: ");
-		eventService.search(100);
+		eventService.search(1000);
 
 		linkService.createLinkages();
 
