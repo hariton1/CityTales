@@ -64,7 +64,7 @@ public class EventService {
             Elements links = mwPagesDiv.select("a");
 
             List<ViennaHistoryWikiEventObject> pageEntries = links.stream()
-                    .limit(20) // Optional: cap how many links are processed per page
+                    .limit(200) // Optional: cap how many links are processed per page
                     .parallel()
                     .map(link -> extractEventInfos(link.attr("abs:href"), link.text()))
                     .filter(Objects::nonNull)

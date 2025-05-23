@@ -50,7 +50,7 @@ public class PersonService {
                         int pageLinkCount = 0;
 
                         List<ViennaHistoryWikiPersonObject> pageEntries = links.stream()
-                                .limit(20)
+                                .limit(200)
                                 .parallel()
                                 .map(link -> {
                                     return extractPersonInfos(link.attr("abs:href"), link.text());
