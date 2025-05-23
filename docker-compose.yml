@@ -54,3 +54,11 @@ services:
       - "8083:8083"
     environment:
       - neo4j.url=bolt://neo4j:7687
+
+  openai-adapter:
+    container_name: openai-adapter
+    build: ./openai-adapter
+    ports:
+      - "8088:8088"
+    environment:
+      - OPENAI_API_KEY=***REMOVED***
