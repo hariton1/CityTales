@@ -28,7 +28,7 @@
         <tui-textfield>
           <label tuiLabel>Display Name</label>
           <input
-            formControlName="firstName"
+            formControlName="displayName"
             placeholder="John"
             tuiTextfield
             type="text"
@@ -118,15 +118,9 @@
     <footer>
       <button
         tuiButton
-        appearance="flat"
-        type="button"
-      >
-        Discard
-      </button>
-
-      <button
-        tuiButton
+        appearance="primary"
         type="submit"
+        (click)="onSubmit()"
       >
         <tui-icon
           icon="@tui.save"

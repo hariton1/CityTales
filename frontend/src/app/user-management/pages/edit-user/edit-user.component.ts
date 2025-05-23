@@ -19,7 +19,7 @@ import {
 import {TuiForm, TuiHeader} from '@taiga-ui/layout';
 import {TuiInputDateModule, TuiInputDateRangeModule} from '@taiga-ui/legacy';
 import {TuiDay} from '@taiga-ui/cdk';
-import {ActivatedRoute, ParamMap, RouterLink} from '@angular/router';
+import {ActivatedRoute, ParamMap, RouterLink, Router} from '@angular/router';
 import {UserService} from '../../../user_db.services/user.service';
 import {UserDto} from '../../../user_db.dto/user.dto';
 
@@ -59,7 +59,7 @@ export class EditUserComponent implements OnInit {
   // Use the parse method directly
   accountCreated: any = null;
 
-  constructor(readonly route: ActivatedRoute, readonly userService: UserService,) {
+  constructor(readonly route: ActivatedRoute, readonly userService: UserService, private router: Router) {
   }
 
   ngOnInit(): void {
@@ -79,7 +79,7 @@ export class EditUserComponent implements OnInit {
         this.user = user;
         console.log('User loaded: ' + this.user);
           this.editUserForm.patchValue({
-            firstName: this.user.display_name,
+            displayName: this.user.display_name,
             email: this.user.email,
             role: 'User', /* to be replaced with the actual role */
             status: this.user.is_active ? 'Active' : 'Blocked',
@@ -103,9 +103,34 @@ export class EditUserComponent implements OnInit {
     return monthNames[dateNumber];
   }
 
+  onSubmit(): void {
+    if (this.editUserForm.valid && this.user) {
+      const formValues = this.editUserForm.getRawValue();
+
+      const updatedUser = new UserDto(
+        this.user.id,
+        this.user.supabase_id,
+        formValues.email ?? '',
+        this.user.created_at,
+        formValues.displayName ?? '',
+        formValues.status === 'Active',
+      );
+
+      this.userService.updateUser(updatedUser)
+        .subscribe({
+          next: () => {
+            console.log('User updated successfully');
+            this.router.navigate(['admin/users']);
+          },
+          error: (error) => {
+            console.error('Error updating user:', error);
+          }
+        });
+    }
+  }
+
   protected editUserForm = new FormGroup({
-    firstName: new FormControl('', Validators.required),
-    lastName: new FormControl('', Validators.required),
+    displayName: new FormControl('', Validators.required),
     email: new FormControl({value: '', disabled: true}, Validators.required),
     role: new FormControl('', Validators.required),
     status: new FormControl('', Validators.required),

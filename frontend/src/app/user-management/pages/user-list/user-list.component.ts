@@ -3,30 +3,23 @@ import {
   TuiAlertService,
   TuiAutoColorPipe,
   TuiButton,
-  TuiDropdownDirective, TuiDropdownOpen,
-  TuiDropdownOptionsDirective,
   TuiInitialsPipe,
-  TuiLink, TuiTitle
+  TuiTitle
 } from '@taiga-ui/core';
 import {
   TUI_CONFIRM,
   TuiAvatar,
-  TuiBadge,
   TuiConfirmData,
-  TuiItemsWithMoreComponent,
-  TuiMore,
   TuiStatus
 } from '@taiga-ui/kit';
 import {TuiCell} from '@taiga-ui/layout';
-import {DatePipe, NgForOf, NgIf} from '@angular/common';
+import {DatePipe, NgForOf} from '@angular/common';
 import {TuiTable} from '@taiga-ui/addon-table';
-import {TuiItem} from '@taiga-ui/cdk';
 import {RouterLink} from '@angular/router';
 import {UserService} from '../../../user_db.services/user.service';
 import {UserDto} from '../../../user_db.dto/user.dto';
 import {TuiResponsiveDialogService} from '@taiga-ui/addon-mobile';
 import {switchMap} from 'rxjs';
-import {UUID} from 'node:crypto';
 
 @Component({
   selector: 'app-user-list',
@@ -36,18 +29,9 @@ import {UUID} from 'node:crypto';
     TuiAvatar,
     TuiCell,
     TuiStatus,
-    TuiItemsWithMoreComponent,
-    TuiBadge,
-    TuiDropdownDirective,
-    TuiLink,
     NgForOf,
-    NgIf,
     TuiTable,
-    TuiItem,
     TuiButton,
-    TuiMore,
-    TuiDropdownOptionsDirective,
-    TuiDropdownOpen,
     TuiTitle,
     RouterLink,
     DatePipe
@@ -63,6 +47,7 @@ export class UserListComponent implements OnInit {
     this.users = [];
   }
 
+  // header background turns blue when injecting dialogs :(
   private dialogs = inject(TuiResponsiveDialogService);
   private alerts = inject(TuiAlertService);
 
@@ -119,57 +104,4 @@ export class UserListComponent implements OnInit {
     this.userService.deleteUserById(id);
   }
 
-  protected readonly data = [
-    {
-      id: 1,
-      role: {
-        roleName: 'Moderator'
-      },
-      userData: {
-        firstName: 'John',
-        lastName: 'Cleese',
-        email: 'silly@walk.uk',
-      },
-      status: {
-        value: 'Active',
-        color: 'var(--tui-status-positive)',
-      },
-      interests: ['Some', 'items', 'displayed', 'here', 'and', 'can', 'overflow'],
-      createdAt: '2021-01-01'
-    },
-    {
-      id: 2,
-      role: {
-        roleName: 'User'
-      },
-      userData: {
-        firstName: 'Eric',
-        lastName: 'Idle',
-        email: 'cool@dude.com',
-      },
-      status: {
-        value: 'Blocked',
-        color: 'var(--tui-status-negative)',
-      },
-      interests: ['One', 'Item'],
-      createdAt: '2024-02-23'
-    },
-    {
-      id:3,
-      role: {
-        roleName: 'Contributor'
-      },
-      userData: {
-        firstName: 'Michael',
-        lastName: 'Palin',
-        email: 'its@man.com',
-      },
-      status: {
-        value: 'Active',
-        color: 'var(--tui-status-positive)',
-      },
-      interests: [],
-      createdAt: '2024-07-16'
-    },
-  ];
 }

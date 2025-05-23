@@ -58,11 +58,11 @@ public class UserService {
         }
 
         if (updatedValues.getEmail() != null) {
-            existingUser.setDisplayName(updatedValues.getDisplayName());
+            existingUser.setEmail(updatedValues.getEmail());
         }
 
         if (updatedValues.getIsActive() != null) {
-            existingUser.setActive(!updatedValues.getIsActive().equals(false));
+            existingUser.setActive(updatedValues.getIsActive());
         }
 
         UserEntity updatedUser = this.repository.save(existingUser);

@@ -66,9 +66,10 @@ public class UserController {
 
     @PatchMapping("/id={userId}")
     @ResponseStatus(HttpStatus.OK)
-    public void updateUserById(@PathVariable("userId") UUID userId, @RequestBody UserDTO updatedValues) {
+    public UserDTO updateUserById(@PathVariable("userId") UUID userId, @RequestBody UserDTO updatedValues) {
         try {
-            this.userService.updateUserById(userId, updatedValues);
+            logger.info("Updating user with ID {}: {}", userId, updatedValues);
+            return this.userService.updateUserById(userId, updatedValues);
         } catch (Exception e) {
             logger.error("Error updating user with ID {}: {}", userId, e.getMessage());
             throw new RuntimeException("Error updating user", e);

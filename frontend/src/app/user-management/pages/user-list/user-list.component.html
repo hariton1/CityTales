@@ -40,7 +40,9 @@
       </td>
       <!-- Third column -->
       <td tuiTd>
-        <span [tuiStatus]="'var(--tui-status-positive)'">{{ user.is_active ? 'Active' : 'Blocked' }}</span>
+        <span [tuiStatus]="user.is_active ? 'var(--tui-status-positive)' : 'var(--tui-status-negative)'">
+            {{ user.is_active ? 'Active' : 'Blocked' }}
+        </span>
       </td>
       <!-- Fourth column
       <td tuiTd>
@@ -89,7 +91,7 @@
                     <button
                       appearance="action"
                       iconStart="@tui.pencil"
-                      size="xs"
+                      size="s"
                       tuiIconButton
                       type="button"
                       [routerLink]="['/admin/users', user.id, 'edit']"
@@ -99,7 +101,7 @@
                     <button
                       appearance="action"
                       iconStart="@tui.trash"
-                      size="xs"
+                      size="s"
                       tuiIconButton
                       type="button"
                       (click)="handleDeleteClick(user)"
