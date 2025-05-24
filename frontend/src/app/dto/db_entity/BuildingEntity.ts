@@ -19,4 +19,6 @@ export interface BuildingEntity {
     longitude: number;
     links: string[];
     imageUrls: string[];
+    contentGerman: string;
+    contentEnglish: string;
 }
