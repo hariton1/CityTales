@@ -10,9 +10,9 @@ import java.util.UUID;
 @Repository
 public interface UserInterestRepository extends JpaRepository<UserInterestEntity, Integer> {
 
-    List<UserInterestEntity> findByUserId(UUID userId);
+    List<UserInterestEntity> findByUserIdOrderByInterestIdAsc(UUID userId);
 
-    List<UserInterestEntity> findByInterestId(int interestId);
+    List<UserInterestEntity> findByInterestIdOrderByInterestIdAsc(int interestId);
 
     UserInterestEntity findByUserIdAndInterestId(UUID userId, Integer interestId);
 
