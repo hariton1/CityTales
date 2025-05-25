@@ -28,7 +28,8 @@ public class InterestServiceTest {
     private final InterestEntity interestEntity = new InterestEntity (
             2,
             "music",
-            "the person is interested in music"
+            "the person is interested in music",
+            "Musik"
     );
 
     private final ArrayList<InterestEntity> interestEntities = new ArrayList<>(List.of(interestEntity));
@@ -41,7 +42,8 @@ public class InterestServiceTest {
         ArrayList<InterestDTO> interestDTOs = new ArrayList<>(interestService.getAllInterests());
 
         assertThat(interestDTOs.getFirst().getInterestId()).isEqualTo(interestEntity.getInterestId());
-        assertThat(interestDTOs.getFirst().getInterestName()).isEqualTo(interestEntity.getInterestName());
+        assertThat(interestDTOs.getFirst().getInterestNameEn()).isEqualTo(interestEntity.getInterestNameEn());
+        assertThat(interestDTOs.getFirst().getInterestNameDe()).isEqualTo(interestEntity.getInterestNameDe());
         assertThat(interestDTOs.getFirst().getDescription()).isEqualTo(interestEntity.getDescription());
 
         System.out.println("Test testGetAllInterests passed!");
@@ -56,7 +58,8 @@ public class InterestServiceTest {
         InterestDTO interestDTO = interestService.getInterestById(interestEntity.getInterestId());
 
         assertThat(interestDTO.getInterestId()).isEqualTo(interestEntity.getInterestId());
-        assertThat(interestDTO.getInterestName()).isEqualTo(interestEntity.getInterestName());
+        assertThat(interestDTO.getInterestNameEn()).isEqualTo(interestEntity.getInterestNameEn());
+        assertThat(interestDTO.getInterestNameDe()).isEqualTo(interestEntity.getInterestNameDe());
         assertThat(interestDTO.getDescription()).isEqualTo(interestEntity.getDescription());
 
         System.out.println("Test testGetInterestById passed!");
@@ -64,17 +67,34 @@ public class InterestServiceTest {
     }
 
     @Test
-    public void testGetInterestByName() {
+    public void testGetInterestByNameEn() {
 
-        when(interestRepository.findByInterestName(any(String.class))).thenReturn(interestEntity);
+        when(interestRepository.findByInterestNameEn(any(String.class))).thenReturn(interestEntity);
 
-        InterestDTO interestDTO = interestService.getInterestByName(interestEntity.getInterestName());
+        InterestDTO interestDTO = interestService.getInterestByNameEn(interestEntity.getInterestNameEn());
 
         assertThat(interestDTO.getInterestId()).isEqualTo(interestEntity.getInterestId());
-        assertThat(interestDTO.getInterestName()).isEqualTo(interestEntity.getInterestName());
+        assertThat(interestDTO.getInterestNameEn()).isEqualTo(interestEntity.getInterestNameEn());
+        assertThat(interestDTO.getInterestNameDe()).isEqualTo(interestEntity.getInterestNameDe());
         assertThat(interestDTO.getDescription()).isEqualTo(interestEntity.getDescription());
 
-        System.out.println("Test testGetInterestByName passed!");
+        System.out.println("Test testGetInterestByNameEn passed!");
+
+    }
+
+    @Test
+    public void testGetInterestByNameDe() {
+
+        when(interestRepository.findByInterestNameDe(any(String.class))).thenReturn(interestEntity);
+
+        InterestDTO interestDTO = interestService.getInterestByNameDe(interestEntity.getInterestNameDe());
+
+        assertThat(interestDTO.getInterestId()).isEqualTo(interestEntity.getInterestId());
+        assertThat(interestDTO.getInterestNameEn()).isEqualTo(interestEntity.getInterestNameEn());
+        assertThat(interestDTO.getInterestNameDe()).isEqualTo(interestEntity.getInterestNameDe());
+        assertThat(interestDTO.getDescription()).isEqualTo(interestEntity.getDescription());
+
+        System.out.println("Test testGetInterestByNameDe passed!");
 
     }
 
@@ -86,7 +106,8 @@ public class InterestServiceTest {
         ArrayList<InterestDTO> interestDTOs = new ArrayList<>(interestService.getInterestsByDescriptionLike(interestEntity.getDescription()));
 
         assertThat(interestDTOs.getFirst().getInterestId()).isEqualTo(interestEntity.getInterestId());
-        assertThat(interestDTOs.getFirst().getInterestName()).isEqualTo(interestEntity.getInterestName());
+        assertThat(interestDTOs.getFirst().getInterestNameEn()).isEqualTo(interestEntity.getInterestNameEn());
+        assertThat(interestDTOs.getFirst().getInterestNameDe()).isEqualTo(interestEntity.getInterestNameDe());
         assertThat(interestDTOs.getFirst().getDescription()).isEqualTo(interestEntity.getDescription());
 
         System.out.println("Test testGetInterestsByDescriptionLike passed!");
