@@ -1,8 +1,8 @@
 package group_05.ase.neo4j_data_access.Service.Implementation;
 
-import group_05.ase.neo4j_data_access.DTO.HistoricBuildingDTO;
-import group_05.ase.neo4j_data_access.DTO.HistoricEventDTO;
-import group_05.ase.neo4j_data_access.DTO.HistoricPersonDTO;
+import group_05.ase.neo4j_data_access.Entity.ViennaHistoryWikiBuildingObject;
+import group_05.ase.neo4j_data_access.Entity.ViennaHistoryWikiEventObject;
+import group_05.ase.neo4j_data_access.Entity.ViennaHistoryWikiPersonObject;
 import group_05.ase.neo4j_data_access.Service.Interface.ISearchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,7 +20,7 @@ public class SearchService implements ISearchService {
     private HistoricEventService historicEventService;
 
     @Override
-    public List<HistoricPersonDTO> searchPersonsWithKeyword(String query) {
+    public List<ViennaHistoryWikiPersonObject> searchPersonsWithKeyword(String query) {
 
         //TODO: Preprocess Query
         System.out.println(historicPersonService.getPersonsByPartialName(query));
@@ -28,7 +28,7 @@ public class SearchService implements ISearchService {
     }
 
     @Override
-    public List<HistoricBuildingDTO> searchPlacesWithKeyword(String query) {
+    public List<ViennaHistoryWikiBuildingObject> searchPlacesWithKeyword(String query) {
 
         //TODO: Preprocess Query
 
@@ -36,7 +36,7 @@ public class SearchService implements ISearchService {
     }
 
     @Override
-    public List<HistoricEventDTO> searchEventsWithKeyword(String query) {
+    public List<ViennaHistoryWikiEventObject> searchEventsWithKeyword(String query) {
         //TODO: Preprocess Query
 
         return historicEventService.getEventByPartialName(query);

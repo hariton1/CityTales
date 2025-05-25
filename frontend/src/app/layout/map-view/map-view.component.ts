@@ -5,6 +5,7 @@ import {HistoricalPlaceEntity} from '../../dto/db_entity/HistoricalPlaceEntity';
 import {UserLocationService} from '../../services/user-location.service';
 import {LocationService} from '../../services/location.service';
 import {EventEmitter} from '@angular/core';
+import {BuildingEntity} from '../../dto/db_entity/BuildingEntity';
 
 @Component({
   selector: 'app-map-view',
@@ -21,11 +22,11 @@ export class MapViewComponent implements OnInit{
               private userLocationService: UserLocationService) {
   }
 
-  @Output() selectPlaceEvent: EventEmitter<HistoricalPlaceEntity> = new EventEmitter<HistoricalPlaceEntity>();
-  @Output() populatePlacesEvent = new EventEmitter<HistoricalPlaceEntity[]>();
+  @Output() selectPlaceEvent: EventEmitter<BuildingEntity> = new EventEmitter<BuildingEntity>();
+  @Output() populatePlacesEvent = new EventEmitter<BuildingEntity[]>();
   @Output() setDetailedViewEvent: EventEmitter<boolean> = new EventEmitter<boolean>();
 
-  locationsNearby: HistoricalPlaceEntity[] = [];
+  locationsNearby: BuildingEntity[] = [];
 
   markers: any[] = [];
   center: google.maps.LatLngLiteral = {lat: 48.19865798950195, lng: 16.3714542388916};
@@ -117,27 +118,27 @@ export class MapViewComponent implements OnInit{
   // For testing in case navigator.geolocation breaks - happened to me for some reason...
   ngOnInit(): void {
 
-      this.locationService.getLocationsInRadius(this.center.lat, this.center.lng, 450).subscribe(locations => {
+      this.locationService.getLocationsInRadius(this.center.lat, this.center.lng, 100000).subscribe(locations => {
         this.locationsNearby = locations;
-        this.deleteAllUnwantedImageUrls();
+        /*this.deleteAllUnwantedImageUrls();*/
         this.addMarkersToMap(locations);
-        this.locationsNearby.forEach(location => {this.addAllRelatedEntities(location);});
+        /*this.locationsNearby.forEach(location => {this.addAllRelatedEntities(location);});*/
         this.populatePlacesEvent.emit(locations);
       });
   }
 
-  addMarkersToMap(locations: HistoricalPlaceEntity[]): void {
+  addMarkersToMap(locations: BuildingEntity[]): void {
     locations.forEach(location => {
-      this.markers.push({lat: location.building.latitude, lng: location.building.longitude});
+      this.markers.push({lat: location.latitude, lng: location.longitude});
     })
   }
 
-  openMarkerInfo(location: HistoricalPlaceEntity): void {
+  openMarkerInfo(location: BuildingEntity): void {
     this.selectPlaceEvent.emit(location);
     this.setDetailedViewEvent.emit(true);
   }
 
-  deleteAllUnwantedImageUrls(): void {
+  /*deleteAllUnwantedImageUrls(): void {
     this.locationsNearby.forEach(location => {
       location.building.imageUrls = location.building.imageUrls.filter(imageUrl => {
         return !(
@@ -148,11 +149,11 @@ export class MapViewComponent implements OnInit{
         );
       });
     });
-  }
+  }*/
 
-  addAllRelatedEntities(location: HistoricalPlaceEntity){
-    this.locationService.getLinkedLocations(location.building.viennaHistoryWikiId).subscribe(locations => {
-      location.linkedPlaces = locations;
+  /*addAllRelatedEntities(location: BuildingEntity){
+    this.locationService.getLinkedLocations(location.viennaHistoryWikiId).subscribe(locations => {
+      location. = locations;
     });
 
     this.locationService.getLinkedPersons(location.building.viennaHistoryWikiId).subscribe(persons => {
@@ -162,5 +163,5 @@ export class MapViewComponent implements OnInit{
     this.locationService.getLinkedEvents(location.building.viennaHistoryWikiId).subscribe(events => {
       location.linkedEvents = events;
     });
-  }
+  }*/
 }
