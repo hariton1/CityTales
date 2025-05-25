@@ -1,4 +1,4 @@
-package group05.ase.openai.adapter;
+package group05.ase.openai.adapter.Config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

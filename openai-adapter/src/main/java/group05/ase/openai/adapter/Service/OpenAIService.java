@@ -42,11 +42,11 @@ public class OpenAIService {
         return new EnrichmentResponse(summary, enrichedContent, tone);
     }
 
-    private String enforceEnglish(String prompt) {
+    protected String enforceEnglish(String prompt) {
         return prompt.endsWith(".") ? prompt + " Always respond in English." : prompt + ". Always respond in English.";
     }
 
-    private String callOpenAI(String systemPrompt, String content) {
+    protected String callOpenAI(String systemPrompt, String content) {
         Map<String, Object> body = Map.of(
                 "model", "gpt-4.1-nano",
                 "messages", List.of(
@@ -63,7 +63,7 @@ public class OpenAIService {
                 .bodyToMono(OpenAIResponseDTO.class)
                 .block();
 
-        logger.info("SERVICE: OpenAI response: {}", response.toString());
+        logger.info("SERVICE: OpenAI response: {}", response);
         return response.getChoices().get(0).getMessage().getContent();
     }
 }
