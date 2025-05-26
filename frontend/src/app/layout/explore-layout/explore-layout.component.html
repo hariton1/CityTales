@@ -2,19 +2,19 @@
   <div class="mobile-view-toggle">
     <tui-segmented [size]="'m'" [style.border-radius.rem]="10">
       <button
-        (click)="currentViewMobile = 'history'"
+        (click)="currentViewMobile = 'discover'"
       >
-        Discover
+        <tui-icon icon="@tui.telescope" [style.height.rem]="1.2" /> Discover
       </button>
       <button
         (click)="currentViewMobile = 'map'"
       >
-        Map
+        <tui-icon icon="@tui.map" [style.height.rem]="1.2" />Map
       </button>
     </tui-segmented>
   </div>
   <!-- Mobile: show only selected component -->
-  <ng-container *ngIf="currentViewMobile === 'history'">
+  <ng-container *ngIf="currentViewMobile === 'discover'">
     <app-sidebar [selectedPlace]="selectedPlace" [historicalPlaces]="historicalPlaces" [detailedView]="setDetailedView" (setDetailedView)="setDetailedViewEvent($event)"></app-sidebar>
   </ng-container>
 
