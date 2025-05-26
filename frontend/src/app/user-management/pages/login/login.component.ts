@@ -5,6 +5,8 @@ import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/
 import {TuiFieldErrorPipe, TuiPassword, TuiTooltip} from '@taiga-ui/kit';
 import {AsyncPipe} from '@angular/common';
 import {TuiInputModule} from '@taiga-ui/legacy';
+import { supabase } from '../../supabase.service'; // adjust the path if neededimport { supabase } from '../supabase.service'; // adjust the path if needed
+
 
 @Component({
   selector: 'app-login',
@@ -34,14 +36,28 @@ export class LoginComponent {
     passwordValue: new FormControl('', Validators.required),
   });
 
-  onSubmit(): void {
-    if (this.loginForm.valid) {
-      console.log('Form submitted with values:', this.loginForm.value);
-    } else {
-      console.log('Form is invalid');
+  async onSubmit(): Promise<void> {
+    if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();
+      return;
     }
+    const { email, passwordValue } = this.loginForm.value;
+
+    // Use Supabase to log in
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email!,
+      password: passwordValue!,
+    });
+
+    if (error) {
+      alert(error.message); // Show error to the user
+      return;
+    }
+    // Login successful, session info in data.session
+    alert('Login successful!');
+    // Optionally: redirect, store user info, etc.
   }
+
 
 
 }

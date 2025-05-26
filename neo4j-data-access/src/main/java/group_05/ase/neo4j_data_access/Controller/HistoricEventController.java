@@ -1,8 +1,8 @@
 package group_05.ase.neo4j_data_access.Controller;
 
-import group_05.ase.neo4j_data_access.DTO.HistoricBuildingDTO;
-import group_05.ase.neo4j_data_access.DTO.HistoricEventDTO;
-import group_05.ase.neo4j_data_access.DTO.HistoricPersonDTO;
+import group_05.ase.neo4j_data_access.Entity.ViennaHistoryWikiBuildingObject;
+import group_05.ase.neo4j_data_access.Entity.ViennaHistoryWikiEventObject;
+import group_05.ase.neo4j_data_access.Entity.ViennaHistoryWikiPersonObject;
 import group_05.ase.neo4j_data_access.Service.Interface.IHistoricEventService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,8 +23,8 @@ public class HistoricEventController {
     }
 
     @GetMapping("/by/id/{viennaHistoryWikiId}")
-    public ResponseEntity<HistoricEventDTO> getHistoricEventById(@PathVariable int viennaHistoryWikiId) {
-        HistoricEventDTO eventDTO = historicEventService.getEventById(viennaHistoryWikiId);
+    public ResponseEntity<ViennaHistoryWikiEventObject> getHistoricEventById(@PathVariable int viennaHistoryWikiId) {
+        ViennaHistoryWikiEventObject eventDTO = historicEventService.getEventById(viennaHistoryWikiId);
 
         if (eventDTO != null) {
             return ResponseEntity.ok(eventDTO);
@@ -34,8 +34,8 @@ public class HistoricEventController {
     }
 
     @GetMapping("/by/name/{partialName}")
-    public ResponseEntity<List<HistoricEventDTO>> getHistoricEventByPartialName(@PathVariable String partialName) {
-        List<HistoricEventDTO> events = historicEventService.getEventByPartialName(partialName);
+    public ResponseEntity<List<ViennaHistoryWikiEventObject>> getHistoricEventByPartialName(@PathVariable String partialName) {
+        List<ViennaHistoryWikiEventObject> events = historicEventService.getEventByPartialName(partialName);
         if (events.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
@@ -44,8 +44,8 @@ public class HistoricEventController {
     }
 
     @GetMapping("/links/events/by/id/{viennaHistoryWikiId}")
-    public ResponseEntity<List<HistoricEventDTO>> getLinkedEventsById(@PathVariable int viennaHistoryWikiId) {
-        List<HistoricEventDTO> events = historicEventService.getAllLinkedHistoricEventsById(viennaHistoryWikiId);
+    public ResponseEntity<List<ViennaHistoryWikiEventObject>> getLinkedEventsById(@PathVariable int viennaHistoryWikiId) {
+        List<ViennaHistoryWikiEventObject> events = historicEventService.getAllLinkedHistoricEventsById(viennaHistoryWikiId);
         if (events.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
@@ -53,8 +53,8 @@ public class HistoricEventController {
     }
 
     @GetMapping("/links/buildings/by/id/{viennaHistoryWikiId}")
-    public ResponseEntity<List<HistoricBuildingDTO>> getLinkedBuildingsById(@PathVariable int viennaHistoryWikiId) {
-        List<HistoricBuildingDTO> buildings = historicEventService.getAllLinkedHistoricBuildingsById(viennaHistoryWikiId);
+    public ResponseEntity<List<ViennaHistoryWikiBuildingObject>> getLinkedBuildingsById(@PathVariable int viennaHistoryWikiId) {
+        List<ViennaHistoryWikiBuildingObject> buildings = historicEventService.getAllLinkedHistoricBuildingsById(viennaHistoryWikiId);
         if (buildings.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
@@ -62,8 +62,8 @@ public class HistoricEventController {
     }
 
     @GetMapping("/links/persons/by/id/{viennaHistoryWikiId}")
-    public ResponseEntity<List<HistoricPersonDTO>> getLinkedPersonsById(@PathVariable int viennaHistoryWikiId) {
-        List<HistoricPersonDTO> persons = historicEventService.getAllLinkedHistoricPersonsById(viennaHistoryWikiId);
+    public ResponseEntity<List<ViennaHistoryWikiPersonObject>> getLinkedPersonsById(@PathVariable int viennaHistoryWikiId) {
+        List<ViennaHistoryWikiPersonObject> persons = historicEventService.getAllLinkedHistoricPersonsById(viennaHistoryWikiId);
         if (persons.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
