@@ -1,0 +1,26 @@
+@import '@taiga-ui/core/styles/taiga-ui-local.less';
+@media @tui-mobile-interval {
+  .desktop { display: none; }
+}
+
+/* tablet: 769px-1024px */
+@media @tui-tablet-interval {
+  .desktop { display: none; }
+}
+
+/* desktop: > 1024px */
+@media @tui-desktop-interval {
+  .mobile { display: none; }
+}
+
+@media @tui-desktop-lg-min {
+  .mobile { display: none; }
+}
+
+.centered-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  padding: 4em 0;
+}
