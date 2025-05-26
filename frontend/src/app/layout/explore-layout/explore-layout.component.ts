@@ -6,6 +6,7 @@ import {BuildingEntity} from '../../dto/db_entity/BuildingEntity';
 import {TuiSegmented} from '@taiga-ui/kit';
 import {BreakpointObserver, Breakpoints} from '@angular/cdk/layout';
 import {NgIf} from '@angular/common';
+import {TuiIcon} from '@taiga-ui/core';
 
 @Component({
   selector: 'app-explore-layout',
@@ -13,14 +14,15 @@ import {NgIf} from '@angular/common';
     SidebarComponent,
     MapViewComponent,
     TuiSegmented,
-    NgIf
+    NgIf,
+    TuiIcon
   ],
   templateUrl: './explore-layout.component.html',
   styleUrl: './explore-layout.component.less'
 })
 export class ExploreLayoutComponent implements OnInit {
 
-  currentViewMobile: 'history' | 'map' = 'history';
+  currentViewMobile: 'discover' | 'map' = 'discover';
   isMobile = false;
 
   selectedPlace: BuildingEntity | null = null;
@@ -35,6 +37,7 @@ export class ExploreLayoutComponent implements OnInit {
       .observe([Breakpoints.HandsetPortrait, Breakpoints.HandsetLandscape])
       .subscribe(result => {
         this.isMobile = result.matches;
+        this.currentViewMobile = 'discover';
       });
   }
 
