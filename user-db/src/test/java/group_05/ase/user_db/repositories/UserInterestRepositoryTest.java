@@ -21,7 +21,7 @@ public class UserInterestRepositoryTest {
 
     private final UserInterestEntity userInterestEntity = new UserInterestEntity (
             UUID.fromString("f5599c8c-166b-495c-accc-65addfaa572b"),
-            2,
+            5,
             null,
             1
     );
@@ -29,7 +29,7 @@ public class UserInterestRepositoryTest {
     @Test
     public void testFindByUserId() {
 
-        ArrayList<UserInterestEntity> tmp = new ArrayList<>(userInterestRepository.findByUserId(UUID.fromString("f5599c8c-166b-495c-accc-65addfaa572b")));
+        ArrayList<UserInterestEntity> tmp = new ArrayList<>(userInterestRepository.findByUserIdOrderByInterestIdAsc(this.userInterestEntity.getUserId()));
 
         assertThat(tmp).isNotNull();
         assertThat(tmp.getFirst().getUserId()).isEqualTo(userInterestEntity.getUserId());
@@ -43,7 +43,7 @@ public class UserInterestRepositoryTest {
     @Test
     public void testFindByInterestId() {
 
-        ArrayList<UserInterestEntity> tmp = new ArrayList<>(userInterestRepository.findByInterestId(2));
+        ArrayList<UserInterestEntity> tmp = new ArrayList<>(userInterestRepository.findByInterestIdOrderByInterestIdAsc(this.userInterestEntity.getInterestId()));
 
         assertThat(tmp).isNotNull();
         assertThat(tmp.getFirst().getUserId()).isEqualTo(userInterestEntity.getUserId());
@@ -57,7 +57,7 @@ public class UserInterestRepositoryTest {
     @Test
     public void testFindByUserIdAndInterestId() {
 
-        UserInterestEntity tmp = userInterestRepository.findByUserIdAndInterestId(UUID.fromString("f5599c8c-166b-495c-accc-65addfaa572b"), 2);
+        UserInterestEntity tmp = userInterestRepository.findByUserIdAndInterestId(this.userInterestEntity.getUserId(), this.userInterestEntity.getInterestId());
 
         assertThat(tmp).isNotNull();
         assertThat(tmp.getUserId()).isEqualTo(userInterestEntity.getUserId());

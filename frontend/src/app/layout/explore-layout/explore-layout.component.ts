@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import {SidebarComponent} from '../sidebar/sidebar.component';
 import {MapViewComponent} from '../map-view/map-view.component';
 import {HistoricalPlaceEntity} from '../../dto/db_entity/HistoricalPlaceEntity';
+import {BuildingEntity} from '../../dto/db_entity/BuildingEntity';
 
 @Component({
   selector: 'app-explore-layout',
@@ -14,15 +15,15 @@ import {HistoricalPlaceEntity} from '../../dto/db_entity/HistoricalPlaceEntity';
 })
 export class ExploreLayoutComponent {
 
-  selectedPlace: HistoricalPlaceEntity | null = null;
-  historicalPlaces: HistoricalPlaceEntity[] = [];
+  selectedPlace: BuildingEntity | null = null;
+  historicalPlaces: BuildingEntity[] = [];
   setDetailedView: boolean = false;
 
-  setSelectedPlace(place: HistoricalPlaceEntity) {
+  setSelectedPlace(place: BuildingEntity) {
     this.selectedPlace = place;
   }
 
-  setHistoricalPlaces(places: HistoricalPlaceEntity[]) {
+  setHistoricalPlaces(places: BuildingEntity[]) {
     this.historicalPlaces = places;
   }
 

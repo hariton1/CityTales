@@ -37,6 +37,10 @@ public class ViennaHistoryWikiPersonObject {
     private Optional<String> estate = Optional.empty();
     private Optional<String> seeAlso = Optional.empty();
     private Optional<String> resource = Optional.empty();
+
     private List<String> links = new ArrayList<>();
     private List<String> imageUrls = new ArrayList<>();
+
+    private String contentGerman;
+    private String contentEnglish;
 }
