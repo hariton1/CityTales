@@ -1,10 +1,9 @@
-import {Component, OnInit, Output} from '@angular/core';
+import {Component, OnInit, Output, EventEmitter} from '@angular/core';
 import {GoogleMapsModule} from '@angular/google-maps';
 import {CommonModule} from '@angular/common';
 import {HistoricalPlaceEntity} from '../../dto/db_entity/HistoricalPlaceEntity';
 import {UserLocationService} from '../../services/user-location.service';
 import {LocationService} from '../../services/location.service';
-import {EventEmitter} from '@angular/core';
 import {BuildingEntity} from '../../dto/db_entity/BuildingEntity';
 
 @Component({
@@ -14,7 +13,7 @@ import {BuildingEntity} from '../../dto/db_entity/BuildingEntity';
     CommonModule
   ],
   templateUrl: './map-view.component.html',
-  styleUrl: './map-view.component.scss'
+  styleUrl: './map-view.component.less'
 })
 export class MapViewComponent implements OnInit{
 
@@ -38,6 +37,13 @@ export class MapViewComponent implements OnInit{
     minZoom: 4,
     zoomControl: true,
     clickableIcons: true,
+    streetViewControl: false,
+    fullscreenControl: false,
+    mapTypeControl: true,
+    mapTypeControlOptions: {
+      style: google.maps.MapTypeControlStyle.DROPDOWN_MENU, // or .HORIZONTAL_BAR
+      position: google.maps.ControlPosition.TOP_RIGHT       // e.g., BOTTOM_LEFT, TOP_CENTER, etc.
+    },
     styles: [
       {
         "featureType": "poi",
@@ -72,6 +78,26 @@ export class MapViewComponent implements OnInit{
             "visibility": "off"
           }
         ]
+      },
+      {
+        featureType: 'poi.medical',
+        stylers: [{ visibility: 'off' }]
+      },
+      {
+        featureType: 'poi.attraction',
+        stylers: [{ visibility: 'off' }]
+      },
+      {
+        featureType: 'poi.park',
+        stylers: [{ visibility: 'off' }]
+      },
+      {
+        featureType: 'poi.sports_complex',
+        stylers: [{ visibility: 'off' }]
+      },
+      {
+        featureType: 'poi.school',
+        stylers: [{ visibility: 'off' }]
       }
     ]
   };
