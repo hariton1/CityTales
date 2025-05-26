@@ -16,8 +16,10 @@ public class InterestEntity {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "interestIdSeq")
     private int interestId;
 
-    private String interestName;
+    private String interestNameEn;
 
     private String description;
+
+    private String interestNameDe;
 
 }

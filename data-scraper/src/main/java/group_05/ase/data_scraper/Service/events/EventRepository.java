@@ -2,6 +2,7 @@ package group_05.ase.data_scraper.Service.events;
 
 import group_05.ase.data_scraper.Config.Neo4jProperties;
 import group_05.ase.data_scraper.Entity.ViennaHistoryWikiEventObject;
+import group_05.ase.data_scraper.Service.embeddings.QdrantService;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import org.neo4j.driver.*;
@@ -20,11 +21,14 @@ public class EventRepository {
     private final String NEO4J_PASSWORD;
     private final String eventTableName = "WienGeschichteWikiEvents";
     private Driver driver;
+    private final QdrantService qdrantService;
 
-    public EventRepository(Neo4jProperties properties) {
+
+    public EventRepository(Neo4jProperties properties, QdrantService qdrantService) {
         this.NEO4J_URL = properties.getUrl();
         this.NEO4J_USER = properties.getUser();
         this.NEO4J_PASSWORD = properties.getPassword();
+        this.qdrantService = qdrantService;
     }
 
     @PostConstruct
@@ -51,6 +55,8 @@ public class EventRepository {
                         "MERGE (e:"+eventTableName+" {viennaHistoryWikiId: coalesce($viennaHistoryWikiId, 'N/A')}) " +
                                 "SET e.url = coalesce($url, 'N/A'), " +
                                 "    e.name = coalesce($name, 'N/A'), " +
+                                "    e.contentGerman = coalesce($contentGerman, 'N/A'), " +
+                                "    e.contentEnglish = coalesce($contentEnglish, 'N/A'), " +
                                 "    e.typeOfEvent = coalesce($typeOfEvent, 'N/A'), " +
                                 "    e.dateFrom = coalesce($dateFrom, 'N/A'), " +
                                 "    e.dateTo = coalesce($dateTo, 'N/A'), " +
@@ -69,6 +75,8 @@ public class EventRepository {
                         parameters(
                                 "viennaHistoryWikiId", obj.getViennaHistoryWikiId(),
                                 "name", obj.getName(),
+                                "contentGerman", obj.getContentGerman(),
+                                "contentEnglish", obj.getContentEnglish(),
                                 "url", obj.getUrl(),
                                 "typeOfEvent", obj.getTypeOfEvent().orElse(null),
                                 "dateFrom", obj.getDateFrom().orElse(null),
@@ -87,10 +95,13 @@ public class EventRepository {
                 );
                 return result.single().get(0).asString();
             });
-            // System.out.println("Created or updated Event: " + message);
+            System.out.println("Created or updated Event: " + message);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    public void persistEmbedding(float[] embedding, int id) {
+        qdrantService.upsertEntry(embedding,eventTableName,id);
+    }
 }
