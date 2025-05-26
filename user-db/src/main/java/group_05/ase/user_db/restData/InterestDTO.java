@@ -15,11 +15,16 @@ public class InterestDTO {
     @Getter
     @Setter
     @JsonProperty(required = true, value = "interest_name")
-    private String interestName;
+    private String interestNameEn;
 
     @Getter
     @Setter
     @JsonProperty(required = true, value = "description")
     private String description;
+
+    @Getter
+    @Setter
+    @JsonProperty(required = true, value = "interest_name_de")
+    private String interestNameDe;
 
 }

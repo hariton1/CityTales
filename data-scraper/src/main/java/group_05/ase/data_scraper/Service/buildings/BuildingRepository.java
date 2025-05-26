@@ -2,6 +2,7 @@ package group_05.ase.data_scraper.Service.buildings;
 
 import group_05.ase.data_scraper.Config.Neo4jProperties;
 import group_05.ase.data_scraper.Entity.ViennaHistoryWikiBuildingObject;
+import group_05.ase.data_scraper.Service.embeddings.QdrantService;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import org.neo4j.driver.*;
@@ -19,11 +20,15 @@ public class BuildingRepository {
     private final String NEO4J_PASSWORD;
     private Driver driver;
     private final String buildingTableName = "WienGeschichteWikiBuildings";
+    private final QdrantService qdrantService;
 
-    public BuildingRepository(Neo4jProperties properties){
+
+    public BuildingRepository(Neo4jProperties properties, QdrantService qdrantService){
         this.NEO4J_URL = properties.getUrl();
         this.NEO4J_USER = properties.getUser();
         this.NEO4J_PASSWORD = properties.getPassword();
+
+        this.qdrantService = qdrantService;
     }
 
     @PostConstruct
@@ -47,7 +52,7 @@ public class BuildingRepository {
         try (Session session = driver.session()) {
             String message = session.writeTransaction(tx -> {
                 Result result = tx.run(
-                        "MERGE (b:"+buildingTableName+" {viennaHistoryWikiId: coalesce($viennaHistoryWikiId, 'N/A')}) " +
+                        "MERGE (b:" + buildingTableName + " {viennaHistoryWikiId: $viennaHistoryWikiId}) " +
                                 "SET b.url = coalesce($url, 'N/A'), " +
                                 "    b.name = coalesce($name, 'N/A'), " +
                                 "    b.buildingType = coalesce($buildingType, 'N/A'), " +
@@ -59,7 +64,6 @@ public class BuildingRepository {
                                 "    b.entryNumber = coalesce($entryNumber, 'N/A'), " +
                                 "    b.architect = coalesce($architect, 'N/A'), " +
                                 "    b.famousResidents = coalesce($famousResidents, 'N/A'), " +
-                                "    b.viennaHistoryWikiId = coalesce($viennaHistoryWikiId, 'N/A'), " +
                                 "    b.gnd = coalesce($gnd, 'N/A'), " +
                                 "    b.wikidataId = coalesce($wikidataId, 'N/A'), " +
                                 "    b.seeAlso = coalesce($seeAlso, 'N/A'), " +
@@ -67,12 +71,14 @@ public class BuildingRepository {
                                 "    b.latitude = $latitude, " +
                                 "    b.longitude = $longitude, " +
                                 "    b.links = coalesce($links, []), " +
-                                "    b.imageUrls = coalesce($imageUrls, []) " +
+                                "    b.imageUrls = coalesce($imageUrls, []), " +
+                                "    b.contentGerman = coalesce($contentGerman, 'N/A'), " +
+                                "    b.contentEnglish = coalesce($contentEnglish, 'N/A') " +
                                 "RETURN b.name",
                         parameters(
                                 "viennaHistoryWikiId", obj.getViennaHistoryWikiId(),
-                                "name", obj.getName(),
                                 "url", obj.getUrl(),
+                                "name", obj.getName(),
                                 "buildingType", obj.getBuildingType().orElse(null),
                                 "dateFrom", obj.getDateFrom().orElse(null),
                                 "dateTo", obj.getDateTo().orElse(null),
@@ -89,14 +95,22 @@ public class BuildingRepository {
                                 "latitude", obj.getLatitude().orElse(null),
                                 "longitude", obj.getLongitude().orElse(null),
                                 "links", obj.getLinks() != null ? obj.getLinks() : new ArrayList<>(),
-                                "imageUrls", obj.getImageUrls() != null ? obj.getImageUrls() : new ArrayList<>()
+                                "imageUrls", obj.getImageUrls() != null ? obj.getImageUrls() : new ArrayList<>(),
+                                "contentGerman", obj.getContentGerman(),
+                                "contentEnglish", obj.getContentEnglish()
                         )
                 );
                 return result.single().get(0).asString();
             });
-            // System.out.println("Created or updated Building: " + message);
+            System.out.println("Created or updated Building: " + message);
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+
+
+    public void persistEmbedding(float[] embedding, int id) {
+        qdrantService.upsertEntry(embedding,buildingTableName,id);
     }
 }

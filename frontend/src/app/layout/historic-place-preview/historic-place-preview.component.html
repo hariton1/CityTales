@@ -4,11 +4,11 @@
       tuiAppearance="floating"
       tuiCardLarge
       class="card-with-background"
-      [style.backgroundImage]="place.building.imageUrls[0] ? 'url(' + place.building.imageUrls[0] + ')' : 'none'"
+      [style.backgroundImage]="place.imageUrls[1] ? 'url(' + place.imageUrls[1] + ')' : 'none'"
 
     >
       <header tuiHeader>
-        <h2 tuiTitle>{{place.building.name}}</h2>
+        <h2 tuiTitle>{{place.name}}</h2>
       </header>
 
 
