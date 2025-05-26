@@ -1,6 +1,4 @@
-package group_05.ase.qdrant_adapter.Service.Implementation;
-
-import group_05.ase.qdrant_adapter.Service.Interface.IVectorDBService;
+package group_05.ase.data_scraper.Service.embeddings;
 
 import io.qdrant.client.QdrantClient;
 import io.qdrant.client.QdrantGrpcClient;
@@ -17,9 +15,9 @@ import static io.qdrant.client.QueryFactory.nearest;
 import static io.qdrant.client.VectorsFactory.vectors;
 
 @Service
-public class QdrantService implements IVectorDBService {
+public class QdrantService  {
 
-    private String url = "qdrant";
+    private String url = "localhost";
     private int port = 6334;
     private int vectorDimension = 3072;
     private QdrantClient client;
@@ -28,7 +26,6 @@ public class QdrantService implements IVectorDBService {
         this.client = new QdrantClient(QdrantGrpcClient.newBuilder(url,port,false).build());
     }
 
-    @Override
     public void createCollection(String collectionName) {
         try {
             client.createCollectionAsync(collectionName,
@@ -40,7 +37,6 @@ public class QdrantService implements IVectorDBService {
         }
     }
 
-    @Override
     public void deleteCollection(String collectionName) {
         try {
             client.deleteCollectionAsync(collectionName).get();
@@ -52,9 +48,7 @@ public class QdrantService implements IVectorDBService {
         }
     }
 
-    @Override
-    public void upsertEntry(List<Float> vector, String collectionName, String wikiDataId) {
-        int id = mapWikiDataIdToQdrantId(wikiDataId);
+    public void upsertEntry(float[] vector, String collectionName, int id) {
         Points.PointStruct p = Points.PointStruct.newBuilder().setId(id(id)).setVectors(vectors(vector)).build();
         List<Points.PointStruct> points = List.of(p);
 
@@ -67,6 +61,8 @@ public class QdrantService implements IVectorDBService {
         }
     }
 
+
+    // Todo: use later on in another service
     public ArrayList<Integer> doMatching(float[] interests, String collectionName, int resultSize) {
         try {
             List<Points.ScoredPoint> searchResult =
@@ -91,19 +87,5 @@ public class QdrantService implements IVectorDBService {
         } catch (ExecutionException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private int mapWikiDataIdToQdrantId(String wikiDataId) {
-        if (wikiDataId == null || !wikiDataId.startsWith("Q")) {
-            throw new IllegalArgumentException("Invalid Wikidata ID: " + wikiDataId);
-        }
-        return Integer.parseInt(wikiDataId.substring(1));
-    }
-
-    private String mapQdrantIdToWikiDataId(int qdrantId) {
-        if (qdrantId < 0) {
-            throw new IllegalArgumentException("Invalid Qdrant ID: " + qdrantId);
-        }
-        return "Q" + qdrantId;
     }
 }

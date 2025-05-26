@@ -53,7 +53,7 @@ public class UserInterestServiceTest {
     @Test
     public void testGetUserInterestsByUserId() {
 
-        when(userInterestRepository.findByUserId(any(UUID.class))).thenReturn(userInterestEntities);
+        when(userInterestRepository.findByUserIdOrderByInterestIdAsc(any(UUID.class))).thenReturn(userInterestEntities);
 
         ArrayList<UserInterestDTO> userInterestDTOs = new ArrayList<>(userInterestService.getUserInterestsByUserId(userInterestEntity.getUserId()));
 
@@ -68,7 +68,7 @@ public class UserInterestServiceTest {
     @Test
     public void testGetUserInterestsByInterestId() {
 
-        when(userInterestRepository.findByInterestId(any(int.class))).thenReturn(userInterestEntities);
+        when(userInterestRepository.findByInterestIdOrderByInterestIdAsc(any(int.class))).thenReturn(userInterestEntities);
 
         ArrayList<UserInterestDTO> userInterestDTOs = new ArrayList<>(userInterestService.getUserInterestsByInterestId(userInterestEntity.getInterestId()));
 
