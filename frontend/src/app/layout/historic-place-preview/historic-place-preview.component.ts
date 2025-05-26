@@ -5,6 +5,7 @@ import {TuiCardLarge} from '@taiga-ui/layout';
 import {HistoricalPlaceEntity} from '../../dto/db_entity/HistoricalPlaceEntity';
 import {UserLocationService} from '../../services/user-location.service';
 import {LocationService} from '../../services/location.service';
+import {BuildingEntity} from '../../dto/db_entity/BuildingEntity';
 
 
 @Component({
@@ -18,11 +19,11 @@ import {LocationService} from '../../services/location.service';
 })
 export class HistoricPlacePreviewComponent {
 
-  @Input() historicalPlaces: HistoricalPlaceEntity[] = [];
-  @Output() selectPlaceEvent: EventEmitter<HistoricalPlaceEntity> = new EventEmitter<HistoricalPlaceEntity>();
+  @Input() historicalPlaces: BuildingEntity[] = [];
+  @Output() selectPlaceEvent: EventEmitter<BuildingEntity> = new EventEmitter<BuildingEntity>();
   @Output() setDetailedViewEvent: EventEmitter<boolean> = new EventEmitter<boolean>();
 
-  onDetailsClick(place: HistoricalPlaceEntity) {
+  onDetailsClick(place: BuildingEntity) {
     this.selectPlaceEvent.emit(place);
     this.setDetailedViewEvent.emit(true);
   }

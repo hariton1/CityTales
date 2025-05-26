@@ -2,3 +2,4 @@
 .env
 neo4j_db
 qdrant_data
+*.iml

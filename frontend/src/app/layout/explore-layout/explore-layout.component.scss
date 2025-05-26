@@ -6,10 +6,9 @@
 
 app-sidebar {
   width: 35%;
-  background-color: #f0f0f0;   /* light gray for sidebar */
+  background-color: var(--tui-background-base-alt);   /* light gray for sidebar */
 }
 
 app-map-view {
   flex: 1;
-  background-color: #e0e7ff;   /* pale blue for map area */
 }

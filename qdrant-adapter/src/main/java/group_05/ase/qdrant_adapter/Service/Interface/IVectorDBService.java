@@ -6,5 +6,5 @@ public interface IVectorDBService {
     void createCollection(String collectionName);
     void deleteCollection(String collectionName);
     void upsertEntry(List<Float> vector, String collectionName, String wikiDataId);
-    List<String> doMatching(List<Float> interests, String collectionName, int resultSize);
+    List<Integer> doMatching(float[] interests, String collectionName, int resultSize);
 }

@@ -19,9 +19,9 @@ import static io.qdrant.client.VectorsFactory.vectors;
 @Service
 public class QdrantService implements IVectorDBService {
 
-    private String url = "localhost";
+    private String url = "qdrant";
     private int port = 6334;
-    private int vectorDimension = 1536;
+    private int vectorDimension = 3072;
     private QdrantClient client;
 
     public QdrantService() {
@@ -67,8 +67,7 @@ public class QdrantService implements IVectorDBService {
         }
     }
 
-    @Override
-    public ArrayList<String> doMatching(List<Float> interests, String collectionName, int resultSize) {
+    public ArrayList<Integer> doMatching(float[] interests, String collectionName, int resultSize) {
         try {
             List<Points.ScoredPoint> searchResult =
                     client.queryAsync(Points.QueryPoints.newBuilder()
@@ -76,17 +75,16 @@ public class QdrantService implements IVectorDBService {
                             .setLimit(resultSize)
                             .setQuery(nearest(interests))
                             .build()).get();
-            ArrayList<String> wikiDataIds = new ArrayList<>();
+            ArrayList<Integer> wikiIds = new ArrayList<>();
 
             if (searchResult != null && !searchResult.isEmpty()) {
                 for (Points.ScoredPoint scoredPoint : searchResult) {
-                    long qdrantId = scoredPoint.getId().getNum();
-                    String wikiDataId = mapQdrantIdToWikiDataId((int) qdrantId);
-                    wikiDataIds.add(wikiDataId);
+                    int qdrantId = (int) scoredPoint.getId().getNum();
+                    wikiIds.add(qdrantId);
                 }
             }
 
-            return wikiDataIds;
+            return wikiIds;
 
         } catch (InterruptedException e) {
             throw new RuntimeException(e);

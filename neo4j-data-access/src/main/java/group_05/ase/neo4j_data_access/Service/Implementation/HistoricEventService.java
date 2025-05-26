@@ -1,9 +1,6 @@
 package group_05.ase.neo4j_data_access.Service.Implementation;
 
 import group_05.ase.neo4j_data_access.Config.Neo4jProperties;
-import group_05.ase.neo4j_data_access.DTO.HistoricBuildingDTO;
-import group_05.ase.neo4j_data_access.DTO.HistoricEventDTO;
-import group_05.ase.neo4j_data_access.DTO.HistoricPersonDTO;
 import group_05.ase.neo4j_data_access.Entity.ViennaHistoryWikiBuildingObject;
 import group_05.ase.neo4j_data_access.Entity.ViennaHistoryWikiEventObject;
 import group_05.ase.neo4j_data_access.Entity.ViennaHistoryWikiPersonObject;
@@ -12,17 +9,12 @@ import group_05.ase.neo4j_data_access.Service.Interface.IMappingService;
 import group_05.ase.neo4j_data_access.Service.Interface.IWikipediaExtractorService;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import org.neo4j.driver.*;
 import org.neo4j.driver.Record;
 import org.neo4j.driver.exceptions.NoSuchRecordException;
 import org.neo4j.driver.types.Node;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,7 +56,7 @@ public class HistoricEventService implements IHistoricEventService {
 
 
     @Override
-    public HistoricEventDTO getEventById(int viennaHistoryWikiId) {
+    public ViennaHistoryWikiEventObject getEventById(int viennaHistoryWikiId) {
         try (Session session = driver.session()) {
             String query = "MATCH (p:WienGeschichteWikiEvents {viennaHistoryWikiId: $viennaHistoryWikiId}) RETURN p";
             Record record = session.executeRead(tx ->
@@ -73,9 +65,7 @@ public class HistoricEventService implements IHistoricEventService {
             Node node = record.get("p").asNode();
             ViennaHistoryWikiEventObject entity = mappingService.mapNodeToEventEntity(node);
 
-            // preliminary content fetching
-            String content = extractMainArticleText(entity.getUrl());
-            return new HistoricEventDTO(entity,content);
+            return entity;
 
         } catch (NoSuchRecordException e) {
             System.err.println("WienGeschichteWikiPersons with ID " + viennaHistoryWikiId + " not found.");
@@ -84,8 +74,8 @@ public class HistoricEventService implements IHistoricEventService {
     }
 
     @Override
-    public List<HistoricEventDTO> getEventByPartialName(String partialName) {
-        List<HistoricEventDTO> eventDTOs = new ArrayList<>();
+    public List<ViennaHistoryWikiEventObject> getEventByPartialName(String partialName) {
+        List<ViennaHistoryWikiEventObject> eventDTOs = new ArrayList<>();
 
         try (Session session = driver.session()) {
             String query = "MATCH (p:WienGeschichteWikiEvents) " +
@@ -100,10 +90,7 @@ public class HistoricEventService implements IHistoricEventService {
                 Node node = record.get("p").asNode();
                 ViennaHistoryWikiEventObject entity = mappingService.mapNodeToEventEntity(node);
 
-                // preliminary content fetching
-                String content = extractMainArticleText(entity.getUrl());
-                HistoricEventDTO dto = new HistoricEventDTO(entity, content);
-                eventDTOs.add(dto);
+                eventDTOs.add(entity);
             }
 
         } catch (Exception e) {
@@ -114,8 +101,8 @@ public class HistoricEventService implements IHistoricEventService {
     }
 
     @Override
-    public List<HistoricEventDTO> getAllLinkedHistoricEventsById(int viennaHistoryWikiId) {
-        List<HistoricEventDTO> linkedEvents = new ArrayList<>();
+    public List<ViennaHistoryWikiEventObject> getAllLinkedHistoricEventsById(int viennaHistoryWikiId) {
+        List<ViennaHistoryWikiEventObject> linkedEvents = new ArrayList<>();
 
         try (Session session = driver.session()) {
             String query = "MATCH (p:WienGeschichteWikiEvents {viennaHistoryWikiId: $viennaHistoryWikiId})-[:HAS_LINK_TO]->(linked:WienGeschichteWikiEvents) " +
@@ -129,10 +116,7 @@ public class HistoricEventService implements IHistoricEventService {
                 Node linkedNode = record.get("linked").asNode();
                 ViennaHistoryWikiEventObject entity = mappingService.mapNodeToEventEntity(linkedNode);
 
-                //preliminary content fetching
-                String content = extractMainArticleText(entity.getUrl());;
-                HistoricEventDTO dto = new HistoricEventDTO(entity, content);
-                linkedEvents.add(dto);
+                linkedEvents.add(entity);
             }
 
         } catch (Exception e) {
@@ -143,8 +127,8 @@ public class HistoricEventService implements IHistoricEventService {
     }
 
     @Override
-    public List<HistoricBuildingDTO> getAllLinkedHistoricBuildingsById(int viennaHistoryWikiId) {
-        List<HistoricBuildingDTO> linkedBuildings = new ArrayList<>();
+    public List<ViennaHistoryWikiBuildingObject> getAllLinkedHistoricBuildingsById(int viennaHistoryWikiId) {
+        List<ViennaHistoryWikiBuildingObject> linkedBuildings = new ArrayList<>();
 
         try (Session session = driver.session()) {
             String query = "MATCH (p:WienGeschichteWikiEvents {viennaHistoryWikiId: $viennaHistoryWikiId})-[:HAS_LINK_TO]->(linked:WienGeschichteWikiBuildings) " +
@@ -158,10 +142,7 @@ public class HistoricEventService implements IHistoricEventService {
                 Node linkedNode = record.get("linked").asNode();
                 ViennaHistoryWikiBuildingObject entity = mappingService.mapNodeToHistoricalBuildingEntity(linkedNode);
 
-                //preliminary content fetching
-                String content = extractMainArticleText(entity.getUrl());;
-                HistoricBuildingDTO dto = new HistoricBuildingDTO(entity, content);
-                linkedBuildings.add(dto);
+                linkedBuildings.add(entity);
             }
 
         } catch (Exception e) {
@@ -172,8 +153,8 @@ public class HistoricEventService implements IHistoricEventService {
     }
 
     @Override
-    public List<HistoricPersonDTO> getAllLinkedHistoricPersonsById(int viennaHistoryWikiId) {
-        List<HistoricPersonDTO> linkedPersons = new ArrayList<>();
+    public List<ViennaHistoryWikiPersonObject> getAllLinkedHistoricPersonsById(int viennaHistoryWikiId) {
+        List<ViennaHistoryWikiPersonObject> linkedPersons = new ArrayList<>();
 
         try (Session session = driver.session()) {
             String query = "MATCH (p:WienGeschichteWikiEvents {viennaHistoryWikiId: $viennaHistoryWikiId})-[:HAS_LINK_TO]->(linked:WienGeschichteWikiPersons) " +
@@ -187,10 +168,7 @@ public class HistoricEventService implements IHistoricEventService {
                 Node linkedNode = record.get("linked").asNode();
                 ViennaHistoryWikiPersonObject entity = mappingService.mapNodeToPersonEntity(linkedNode);
 
-                //preliminary content fetching
-                String content = extractMainArticleText(entity.getUrl());;
-                HistoricPersonDTO dto = new HistoricPersonDTO(entity, content);
-                linkedPersons.add(dto);
+                linkedPersons.add(entity);
             }
 
         } catch (Exception e) {
@@ -198,42 +176,4 @@ public class HistoricEventService implements IHistoricEventService {
         }
         return linkedPersons;
     }
-
-    private String extractMainArticleText(String url) {
-        StringBuilder textContent = new StringBuilder();
-
-        try {
-            Document doc = Jsoup.connect(url).get();
-
-            Element contentDiv = doc.selectFirst("div.mw-parser-output");
-
-            if (contentDiv != null) {
-                Elements paragraphs = contentDiv.select("p");
-
-                for (Element paragraph : paragraphs) {
-                    String text = paragraph.text().trim();
-                    if (!text.isEmpty()) {
-                        textContent.append(text).append("\n\n");
-                    }
-                }
-            } else {
-                System.err.println("Main content div not found.");
-            }
-
-        } catch (IOException e) {
-            System.err.println("Error fetching URL: " + e.getMessage());
-        }
-
-        String[] parts = textContent.toString().split("\n", 7);
-        if (parts.length < 7) {
-            return "";
-        } else {
-            String rest = parts[6];
-            rest = rest.replaceAll("\n", "");
-            return rest;
-        }
-    }
-
-
-
 }

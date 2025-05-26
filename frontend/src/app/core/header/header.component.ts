@@ -1,12 +1,13 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-import {TuiButton, TuiIcon} from '@taiga-ui/core';
-import {TuiSegmented} from '@taiga-ui/kit';
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
+import {TuiButton, TuiIcon, TUI_DARK_MODE, TUI_DARK_MODE_KEY} from '@taiga-ui/core';
+import {TuiSegmented, TuiSwitch} from '@taiga-ui/kit';
 
 import {TuiHeaderComponent, TuiLogoComponent} from '@taiga-ui/layout';
 import {RouterLink, RouterLinkActive} from '@angular/router';
 
 import {SearchService} from '../../services/search.service'
 import {HistoricalPlaceEntity} from '../../dto/db_entity/HistoricalPlaceEntity';
+import {BuildingEntity} from '../../dto/db_entity/BuildingEntity';
 
 @Component({
   selector: 'app-header',
@@ -26,7 +27,7 @@ import {HistoricalPlaceEntity} from '../../dto/db_entity/HistoricalPlaceEntity';
 export class HeaderComponent {
   constructor(private searchService: SearchService) {}
 
-  filteredLocationList: HistoricalPlaceEntity[] = [];
+  filteredLocationList: BuildingEntity[] = [];
 
 
   getResults(query: string) {
@@ -35,7 +36,7 @@ export class HeaderComponent {
         return;
     }
     this.searchService.searchLocation(query).subscribe({
-      next: (locations: HistoricalPlaceEntity[]) => {
+      next: (locations: BuildingEntity[]) => {
         this.filteredLocationList = locations;
         console.log(locations);
         console.log("Received locations!")
