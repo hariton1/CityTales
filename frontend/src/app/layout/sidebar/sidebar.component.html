@@ -16,7 +16,7 @@
     Enrich Content
   </button>
 </tui-loader>
--->
+
 
 <div tuiPlatform="web" class="content" *ngIf="enrichmentStarted && !enrichmentLoading">
   <div
@@ -54,6 +54,11 @@
     </span>
   </section>
 
+</div>
+-->
+
+<div class="notification-button-container" *ngIf="!isMobile">
+  <app-notification-inbox (selectPlaceEvent)="setSelectedPlace($event)"></app-notification-inbox>
 </div>
 
 <div class="place-detail-container" *ngIf="detailedView">

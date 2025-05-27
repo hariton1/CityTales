@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import { HistoricalPlaceEntity} from '../../dto/db_entity/HistoricalPlaceEntity';
 import {HistoricPlaceDetailComponent} from '../historic-place-detail/historic-place-detail.component';
 import {HistoricPlacePreviewComponent} from '../historic-place-preview/historic-place-preview.component';
@@ -8,6 +8,8 @@ import {EnrichmentService} from '../../services/enrichment.service';
 import {TuiPlatform} from '@taiga-ui/cdk';
 import {TuiAppearance, TuiButton, TuiIcon, TuiLoader, TuiTitle} from '@taiga-ui/core';
 import {TuiCardLarge, TuiHeader} from '@taiga-ui/layout';
+import {NotificationInboxComponent} from '../../core/notification-inbox/notification-inbox.component';
+import {BreakpointObserver, Breakpoints} from '@angular/cdk/layout';
 
 @Component({
   selector: 'app-sidebar',
@@ -22,12 +24,13 @@ import {TuiCardLarge, TuiHeader} from '@taiga-ui/layout';
     TuiTitle,
     TuiIcon,
     TuiButton,
-    TuiLoader
+    TuiLoader,
+    NotificationInboxComponent
   ],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.less'
 })
-export class SidebarComponent {
+export class SidebarComponent implements OnInit{
 
   @Input() selectedPlace: any;
   @Input() historicalPlaces: BuildingEntity[] = [];
@@ -39,8 +42,18 @@ export class SidebarComponent {
   enrichedContent: string = '';
   enrichmentStarted = false;
   enrichmentLoading = false;
+  isMobile = false;
 
-  constructor(readonly EnrichmentService: EnrichmentService) {
+  constructor(readonly EnrichmentService: EnrichmentService,
+              readonly breakpointObserver: BreakpointObserver) {
+  }
+
+  ngOnInit() {
+    this.breakpointObserver
+      .observe([Breakpoints.HandsetPortrait, Breakpoints.HandsetLandscape])
+      .subscribe(result => {
+        this.isMobile = result.matches;
+      });
   }
 
   onClick(tone: string): void {
