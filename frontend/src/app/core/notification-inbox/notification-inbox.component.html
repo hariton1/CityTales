@@ -1,1 +1,26 @@
-<p>notification-inbox works!</p>
+<button
+  tuiButton
+  tuiChevron
+  type="button"
+  [tuiDropdown]="dropdownContent"
+  [tuiDropdownManual]="open"
+  [tuiObscuredEnabled]="open"
+  (click)="onClick()"
+  (tuiActiveZoneChange)="onActiveZone($event)"
+  (tuiObscured)="onObscured($event)"
+>
+  Choose
+  <ng-template #dropdownContent>
+    <ul class="notification-inbox-dropdown" *ngIf="notifications.length > 0">
+      <li *ngFor="let notification of notifications">
+        <a (click)="openNotification(notification.building)">
+          {{notification.building.name}}
+          {{notification.distance}} meters away
+        </a>
+      </li>
+    </ul>
+    <div *ngIf="notifications.length === 0">
+      No notifications to show
+    </div>
+  </ng-template>
+</button>
