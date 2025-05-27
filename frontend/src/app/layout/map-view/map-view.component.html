@@ -14,6 +14,11 @@
         <div class="circle-wrapper">
           <div *ngFor="let loc of combinedLocations; let i = index"
                class="circle-building"
+               [ngClass]="{
+           'building-bg': loc.type === 'building',
+           'person-bg': loc.type === 'person',
+           'event-bg': loc.type === 'event'
+         }"
                [style.transform]="getCirclePosition(i, combinedLocations.length)">
             <img [src]="loc?.imageUrls?.[1]" alt="{{ loc?.name || 'Unnamed' }}" class="building-image" />
           </div>
