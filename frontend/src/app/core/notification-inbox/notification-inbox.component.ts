@@ -1,12 +1,11 @@
 import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import {TuiButton, TuiDropdownDirective, TuiDropdownManual, TuiIcon, TuiScrollbar} from '@taiga-ui/core';
-import {TuiBadgedContentComponent, TuiBadgeNotification, TuiChevron} from '@taiga-ui/kit';
+import {TuiBadgedContentComponent, TuiBadgeNotification} from '@taiga-ui/kit';
 import {TuiActiveZone, TuiObscured} from '@taiga-ui/cdk';
 import {UserLocationService} from '../../services/user-location.service';
 import {BuildingEntity} from '../../dto/db_entity/BuildingEntity';
 import {Subscription} from 'rxjs';
 import {NgForOf, NgIf} from '@angular/common';
-import {RouterLink} from '@angular/router';
 
 interface Notification {
   building: BuildingEntity;
@@ -18,14 +17,12 @@ interface Notification {
   selector: 'app-notification-inbox',
   imports: [
     TuiButton,
-    TuiChevron,
     TuiDropdownDirective,
     TuiObscured,
     TuiDropdownManual,
     TuiActiveZone,
     NgIf,
     NgForOf,
-    RouterLink,
     TuiIcon,
     TuiScrollbar,
     TuiBadgedContentComponent,
