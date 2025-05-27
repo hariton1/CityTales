@@ -1,3 +1,8 @@
+import {HistoricalPersonEntity} from './HistoricalPersonEntity';
+import {HistoricalEventEntity} from './HistoricalEventEntity';
+import {PersonEntity} from './PersonEntity';
+import {EventEntity} from './EventEntity';
+
 export interface BuildingEntity {
     viennaHistoryWikiId: string;
     url: string;
@@ -22,4 +27,6 @@ export interface BuildingEntity {
     contentGerman: string;
     contentEnglish: string;
     relatedBuildings: BuildingEntity[];
+    relatedPersons: PersonEntity[];
+    relatedEvents: EventEntity[];
 }

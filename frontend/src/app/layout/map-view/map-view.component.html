@@ -10,12 +10,12 @@
 
   <map-info-window #infoWindow>
     <div class="info-content" *ngIf="hoveredLocation as location">
-      <ng-container *ngIf="location.relatedBuildings && location.relatedBuildings.length > 0; else noRelated">
+      <ng-container *ngIf="combinedLocations && combinedLocations.length > 0; else noRelated">
         <div class="circle-wrapper">
-          <div *ngFor="let building of location.relatedBuildings; let i = index"
+          <div *ngFor="let loc of combinedLocations; let i = index"
                class="circle-building"
-               [style.transform]="getCirclePosition(i, location.relatedBuildings.length)">
-            <img [src]="building?.imageUrls?.[1]" alt="{{ building?.name || 'Unnamed' }}" class="building-image" />
+               [style.transform]="getCirclePosition(i, combinedLocations.length)">
+            <img [src]="loc?.imageUrls?.[1]" alt="{{ loc?.name || 'Unnamed' }}" class="building-image" />
           </div>
         </div>
       </ng-container>

@@ -28,6 +28,7 @@ export class MapViewComponent implements OnInit{
 
   locationsNearby: BuildingEntity[] = [];
   hoveredLocation: BuildingEntity | null = null;
+  combinedLocations: any[] = [];
 
   markers: any[] = [];
   center: google.maps.LatLngLiteral = {lat: 48.19865798950195, lng: 16.3714542388916};
@@ -135,6 +136,9 @@ export class MapViewComponent implements OnInit{
   }
 
   detailAction(marker: MapMarker, location: BuildingEntity): void {
+    console.log("events: " + location.relatedEvents)
+    this.combinedLocations = this.getCombinedItems(location);
+
     this.hoveredLocation = location;
     this.infoWindow.open(marker);
 
@@ -181,5 +185,16 @@ export class MapViewComponent implements OnInit{
     const x = radius * Math.cos(angle);
     const y = radius * Math.sin(angle);
     return `translate(${x}px, ${y}px)`;
+  }
+
+  getCombinedItems(location: any): any[] {
+    const combined = [
+      ...(location.relatedBuildings || []),
+      ...(location.relatedPersons || []),
+      ...(location.relatedEvents || [])
+    ];
+
+    console.log('Combined related items:', combined);
+    return combined;
   }
 }
