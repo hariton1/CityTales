@@ -35,8 +35,25 @@
         Sign Up
       </button>
 
-      <button appearance="primary" tuiButton type="button" routerLink="login">
+      <button
+        *ngIf="!loggedIn"
+        appearance="primary"
+        tuiButton
+        type="button"
+        routerLink="login"
+      >
         Login
+      </button>
+
+      <!-- Show Logout if logged in -->
+      <button
+        *ngIf="loggedIn"
+        appearance="primary"
+        tuiButton
+        type="button"
+        (click)="logout()"
+      >
+        Logout
       </button>
     </div>
 
