@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-import {TuiButton, TuiIcon} from '@taiga-ui/core';
-import {TuiSegmented} from '@taiga-ui/kit';
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
+import {TuiButton, TuiIcon, TUI_DARK_MODE, TUI_DARK_MODE_KEY} from '@taiga-ui/core';
+import {TuiSegmented, TuiSwitch} from '@taiga-ui/kit';
 
 import {TuiHeaderComponent, TuiLogoComponent} from '@taiga-ui/layout';
 import {RouterLink, RouterLinkActive} from '@angular/router';

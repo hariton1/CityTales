@@ -69,3 +69,11 @@ services:
     build: ./qdrant-adapter
     ports:
       - "8081:8081"
+
+  openai-adapter:
+    container_name: openai-adapter
+    build: ./openai-adapter
+    ports:
+      - "8088:8088"
+    environment:
+      - OPENAI_API_KEY=***REMOVED***
