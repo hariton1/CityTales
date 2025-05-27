@@ -69,3 +69,11 @@ services:
     build: ./qdrant-adapter
     ports:
       - "8081:8081"
+
+  openai-adapter:
+    container_name: openai-adapter
+    build: ./openai-adapter
+    ports:
+      - "8088:8088"
+    environment:
+      - OPENAI_API_KEY=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

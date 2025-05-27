@@ -1,3 +1,59 @@
+<tui-loader
+  class="loader"
+  [inheritColor]="true"
+  [overlay]="true"
+  [showLoader]="enrichmentLoading"
+>
+  <button
+    appearance="primary"
+    tuiButton
+    type="button"
+    class="tui-space_top-3"
+    (click)="onClick('tour')"
+    [disabled]="enrichmentLoading"
+  >
+    Enrich Content
+  </button>
+</tui-loader>
+
+<div tuiPlatform="web" class="content" *ngIf="enrichmentStarted && !enrichmentLoading">
+  <div
+    tuiAppearance="floating"
+    tuiCardLarge="normal"
+  >
+    <header tuiHeader>
+      <h3 tuiTitle class="tui-text_h3">
+        Franziskanerkirche
+        <span tuiSubtitle>
+          <tui-icon
+          icon="@tui.landmark"
+          [style.height.rem]="1.2"
+        /> Built: 1607</span>
+      </h3>
+    </header>
+  </div>
+  <section class="place-summary">
+    <header tuiHeader class="tui-space_top-3 tui-space_bottom-3">
+      <span class="tui-text_h6">
+        Quick Facts & Highlights
+      </span>
+    </header>
+    <span class="place-summary-text">
+      {{ summary }}
+    </span>
+
+    <header tuiHeader class="tui-space_top-5 tui-space_bottom-3">
+      <span class="tui-text_h6">
+        Deep Dive into the Franziskanerkirche
+      </span>
+    </header>
+    <span class="place-summary-text">
+      {{ enrichedContent }}
+    </span>
+  </section>
+
+</div>
+
 <div class="place-detail-container" *ngIf="detailedView">
   <app-historic-place-detail [selectedPlace]="selectedPlace" (setDetailEvent)="setDetailEvent($event)"></app-historic-place-detail>
 </div>
@@ -6,3 +62,5 @@
   <app-historic-place-preview [historicalPlaces]="historicalPlaces" (selectPlaceEvent)="setSelectedPlace($event)" (setDetailedViewEvent)="setDetailEvent($event)"></app-historic-place-preview>
 
 </div>
+
+
