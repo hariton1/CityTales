@@ -77,7 +77,6 @@ google-map {
   font-weight: 600;
   color: #333;
   text-align: center;
-  padding: 8px;
   word-break: break-word;
 }
 
@@ -89,9 +88,10 @@ google-map {
 }
 
 .building-image {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;  /* make image circular */
-  object-fit: cover;   /* cover entire circle */
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
   box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  display: block;
 }
