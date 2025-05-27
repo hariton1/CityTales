@@ -188,12 +188,11 @@ export class MapViewComponent implements OnInit{
   }
 
   getCombinedItems(location: any): any[] {
-    const combined = [
-      ...(location.relatedBuildings || []),
-      ...(location.relatedPersons || []),
-      ...(location.relatedEvents || [])
-    ];
+    const buildings = (location.relatedBuildings || []).map((item: any) => ({ ...item, type: 'building' }));
+    const persons = (location.relatedPersons || []).map((item: any) => ({ ...item, type: 'person' }));
+    const events = (location.relatedEvents || []).map((item: any) => ({ ...item, type: 'event' }));
 
+    const combined = [...buildings, ...persons, ...events];
     console.log('Combined related items:', combined);
     return combined;
   }
