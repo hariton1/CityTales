@@ -7,6 +7,7 @@ import {TuiSegmented} from '@taiga-ui/kit';
 import {BreakpointObserver, Breakpoints} from '@angular/cdk/layout';
 import {NgIf} from '@angular/common';
 import {TuiIcon} from '@taiga-ui/core';
+import {NotificationInboxComponent} from '../../core/notification-inbox/notification-inbox.component';
 
 @Component({
   selector: 'app-explore-layout',
@@ -15,7 +16,8 @@ import {TuiIcon} from '@taiga-ui/core';
     MapViewComponent,
     TuiSegmented,
     NgIf,
-    TuiIcon
+    TuiIcon,
+    NotificationInboxComponent
   ],
   templateUrl: './explore-layout.component.html',
   styleUrl: './explore-layout.component.less'
