@@ -74,6 +74,7 @@ public class PersonRepository {
                                 "    p.seeAlso = coalesce($seeAlso, 0.0), " +
                                 "    p.resource = coalesce($resource, 0.0), " +
                                 "    p.links = coalesce($links, []), " +
+                                "    p.imageUrls = coalesce($imageUrls, []), " +
                                 "    p.contentGerman = coalesce($contentGerman, 'N/A'), " +
                                 "    p.contentEnglish = coalesce($contentEnglish, 'N/A') " +
                                 "RETURN p.name",
