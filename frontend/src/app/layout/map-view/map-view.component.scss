@@ -13,24 +13,6 @@ google-map {
   display: none !important;
 }
 
-.info-content {
-  width: 100px;            /* Fixed width */
-  height: 100px;           /* Fixed height */
-  border-radius: 50%;      /* Makes it circular */
-  background-color: white; /* Background color */
-  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-  display: flex;           /* Flexbox for centering */
-  align-items: center;     /* Vertical center */
-  justify-content: center; /* Horizontal center */
-  text-align: center;      /* Center text */
-  padding: 10px;
-  font-size: 14px;
-  font-weight: 600;
-  color: #333;
-  user-select: none;       /* Prevent text selection */
-  pointer-events: none;    /* Prevent interactions if desired */
-}
-
 ::ng-deep .gm-style-iw {
   background-color: transparent !important;
   box-shadow: none !important;
@@ -59,4 +41,57 @@ google-map {
   margin: 0 !important;
   padding: 0 !important;
   border: none !important;
+}
+
+.info-content {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  pointer-events: none;
+  user-select: none;
+  transform: translate(-40px, 65px);
+}
+
+.circle-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.circle-building {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: #333;
+  text-align: center;
+  padding: 8px;
+  word-break: break-word;
+}
+
+.no-related {
+  font-style: italic;
+  color: #666;
+  text-align: center;
+  margin-top: 1em;
+}
+
+.building-image {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;  /* make image circular */
+  object-fit: cover;   /* cover entire circle */
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
 }
