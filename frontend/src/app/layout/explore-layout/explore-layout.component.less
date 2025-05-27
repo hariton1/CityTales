@@ -1,0 +1,57 @@
+@import '@taiga-ui/core/styles/taiga-ui-local.less';
+
+:host {
+  display: flex;
+  height: calc(100vh - 48px);  /* full viewport minus header */
+  overflow: hidden;
+}
+
+@media @tui-mobile-interval {
+  app-sidebar {
+    width: 100%;
+    background-color: #f0f0f0;
+  }
+}
+
+@media @tui-tablet-interval {
+  app-sidebar {
+    width: 50%;
+    background-color: #f0f0f0;
+  }
+}
+
+@media @tui-desktop-interval {
+  app-sidebar {
+    width: 45%;
+    background-color: #f0f0f0;
+  }
+}
+
+@media @tui-desktop-lg-min {
+  app-sidebar {
+    width: 35%;
+    background-color: #f0f0f0;
+  }
+}
+
+app-map-view {
+  flex: 1;
+}
+
+.mobile-view-toggle {
+  position: fixed;
+  top: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border:  1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 10rem;
+}
+
+.explore-content-mobile{
+  padding-top: 2rem;
+}
