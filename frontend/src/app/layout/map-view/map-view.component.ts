@@ -144,7 +144,7 @@ export class MapViewComponent implements OnInit{
   // For testing in case navigator.geolocation breaks - happened to me for some reason...
   ngOnInit(): void {
 
-      this.locationService.getLocationsInRadius(this.center.lat, this.center.lng, 100000).subscribe(locations => {
+      this.locationService.getLocationsInRadius(this.center.lat, this.center.lng, 500).subscribe(locations => {
         this.locationsNearby = locations;
         /*this.deleteAllUnwantedImageUrls();*/
         this.addMarkersToMap(locations);
