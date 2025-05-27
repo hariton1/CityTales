@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import {LocationService} from './location.service';
 import {BuildingEntity} from '../dto/db_entity/BuildingEntity';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -25,7 +26,10 @@ export class UserLocationService {
 
   private watchId: number | null = null;
   private lastSentAt = 0; //last request sent to backend
-  private historicalPlacesNearby: BuildingEntity[] = [];
+  private currentPosition: { lat: number, lng: number } | null = null;
+
+  private historicalPlacesSubject = new BehaviorSubject<BuildingEntity[]>([]);
+  public historicalPlaces$ = this.historicalPlacesSubject.asObservable();
 
   startTracking(): void {
     const radius = 300; //default radius in meters
@@ -39,12 +43,17 @@ export class UserLocationService {
         const now = Date.now();
         if (now - this.lastSentAt > 20000) {
           this.lastSentAt = now;
+
+          this.currentPosition = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          };
           //send location to backend
           this.locationService
             .getLocationsInRadius(position.coords.latitude, position.coords.longitude, radius)
             .subscribe(historicalPlaces => {
               console.log(historicalPlaces.length);
-              this.historicalPlacesNearby = historicalPlaces;
+              this.historicalPlacesSubject.next(historicalPlaces);
             })
         }
       },
@@ -58,6 +67,38 @@ export class UserLocationService {
       }
     );
   }
+
+  calculateDistanceToBuilding(building: BuildingEntity): number {
+    // Check if user location and building location are available
+    if (!this.currentPosition || building.longitude === undefined || building.latitude === undefined) {
+      return 0;
+    }
+
+    // Get coordinates
+    const userLat = this.currentPosition.lat;
+    const userLng = this.currentPosition.lng;
+    const buildingLat = building.latitude;
+    const buildingLng = building.longitude;
+
+    // Calculate distance using Haversine formula
+    const R = 6371;
+    const dLat = this.deg2rad(buildingLat - userLat);
+    const dLon = this.deg2rad(buildingLng - userLng);
+    const a =
+      Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(this.deg2rad(userLat)) * Math.cos(this.deg2rad(buildingLat)) *
+      Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    const distanceInKm = R * c;
+
+    //return distance in meters
+    return Math.round(distanceInKm * 1000);
+  }
+
+  private deg2rad(deg: number): number {
+    return deg * (Math.PI/180);
+  }
+
 
   //Stop tracking the user's location
   stopTracking(): void {
