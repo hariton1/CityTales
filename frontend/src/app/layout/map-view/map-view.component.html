@@ -5,7 +5,13 @@
   [zoom]="zoom"
   [options]="options"
 >
-  <map-marker *ngFor="let location of locationsNearby" [position]="{lat: location.latitude, lng: location.longitude}" [options]="markerOptions" (mapClick)="openMarkerInfo(location)"></map-marker>
+  <map-marker #marker="mapMarker" *ngFor="let location of locationsNearby" [position]="{lat: location.latitude, lng: location.longitude}" [options]="markerOptions" (mapClick)="openMarkerInfo(location)" (mapMouseover)="openInfoWindow(marker, location)" (mapMouseout)="closeInfoWindow()"></map-marker>
   <map-marker [position]="center" [options]="locationMarkerOptions"></map-marker>
+
+  <map-info-window #infoWindow>
+    <div class="info-content">
+      <h4>{{ hoveredLocation?.name }}</h4>
+    </div>
+  </map-info-window>
 
 </google-map>

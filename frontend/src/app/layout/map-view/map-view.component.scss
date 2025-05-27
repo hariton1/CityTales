@@ -8,3 +8,55 @@ google-map {
   height: 100%;
   width: 100%;
 }
+
+.gm-style-iw > button.gm-ui-hover-effect {
+  display: none !important;
+}
+
+.info-content {
+  width: 100px;            /* Fixed width */
+  height: 100px;           /* Fixed height */
+  border-radius: 50%;      /* Makes it circular */
+  background-color: white; /* Background color */
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  display: flex;           /* Flexbox for centering */
+  align-items: center;     /* Vertical center */
+  justify-content: center; /* Horizontal center */
+  text-align: center;      /* Center text */
+  padding: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  user-select: none;       /* Prevent text selection */
+  pointer-events: none;    /* Prevent interactions if desired */
+}
+
+::ng-deep .gm-style-iw {
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  overflow: visible !important;
+}
+
+::ng-deep .gm-style-iw > div {
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  overflow: visible !important;
+}
+
+::ng-deep .gm-style-iw-tc::after {
+  content: none !important;
+  display: none !important;
+}
+
+::ng-deep button.gm-ui-hover-effect {
+  opacity: 0 !important;       /* Hide visually */
+  pointer-events: none !important; /* Disable clicks */
+  width: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+}

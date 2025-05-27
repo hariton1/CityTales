@@ -1,7 +1,6 @@
-import {Component, OnInit, Output} from '@angular/core';
-import {GoogleMapsModule} from '@angular/google-maps';
+import {Component, OnInit, Output, ViewChild} from '@angular/core';
+import {GoogleMapsModule, MapInfoWindow, MapMarker} from '@angular/google-maps';
 import {CommonModule} from '@angular/common';
-import {HistoricalPlaceEntity} from '../../dto/db_entity/HistoricalPlaceEntity';
 import {UserLocationService} from '../../services/user-location.service';
 import {LocationService} from '../../services/location.service';
 import {EventEmitter} from '@angular/core';
@@ -25,12 +24,22 @@ export class MapViewComponent implements OnInit{
   @Output() selectPlaceEvent: EventEmitter<BuildingEntity> = new EventEmitter<BuildingEntity>();
   @Output() populatePlacesEvent = new EventEmitter<BuildingEntity[]>();
   @Output() setDetailedViewEvent: EventEmitter<boolean> = new EventEmitter<boolean>();
+  @ViewChild(MapInfoWindow) infoWindow: any;
 
   locationsNearby: BuildingEntity[] = [];
+  hoveredLocation: BuildingEntity | null = null;
 
   markers: any[] = [];
   center: google.maps.LatLngLiteral = {lat: 48.19865798950195, lng: 16.3714542388916};
   zoom = 15;
+
+  imageUrl = 'https://angular.io/assets/images/logos/angular/angular.svg';
+  imageBounds: google.maps.LatLngBoundsLiteral = {
+    east: 10,
+    north: 10,
+    south: -10,
+    west: -10,
+  };
 
   options: google.maps.MapOptions = {
     mapTypeId: google.maps.MapTypeId.ROADMAP,
@@ -164,4 +173,14 @@ export class MapViewComponent implements OnInit{
       location.linkedEvents = events;
     });
   }*/
+
+  openInfoWindow(marker: MapMarker, location: BuildingEntity) {
+    this.hoveredLocation = location;
+    this.infoWindow.open(marker);
+  }
+
+  closeInfoWindow() {
+    this.infoWindow.close();
+    this.hoveredLocation = null;
+  }
 }
