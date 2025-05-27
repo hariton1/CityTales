@@ -1,4 +1,4 @@
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {SERVER_ADDRESS} from '../globals';
 import {Injectable} from '@angular/core';
@@ -29,15 +29,78 @@ export class UserHistoriesService {
     return this.httpClient.get<UserHistoryDto[]>(this.DOMAIN + 'article_id=' + article_id);
   }
 
-  public createNewUserHistory(user_interest: UserHistoryDto) {
-    this.httpClient.post(this.DOMAIN + 'create', {
-      body: JSON.stringify(user_interest)
-    })
+  public createNewUserHistory(user_history: UserHistoryDto) {
+    // Get the Date object
+    const date = user_history.getOpenDt();
+
+    // Format as YYYY-MM-DDTHH:mm:ss.000+00:00
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+
+    // Format the date string exactly as required by the backend
+    const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.000+02:00`;
+
+    const userHistoryToSend = {
+      user_id: user_history.getUserId(),
+      interest_id: user_history.getInterestId(),
+      open_dt: formattedDate,
+      article_id: user_history.getArticleId()
+    };
+
+    return this.httpClient.post<UserHistoryDto>(
+      this.DOMAIN + 'create',
+      userHistoryToSend,
+      {
+        headers: new HttpHeaders({
+          'Content-Type': 'application/json'
+        })
+      }
+    );
   }
 
-  public updateUserHistory(user_interest: UserHistoryDto) {
-    this.httpClient.put(this.DOMAIN + 'update', {
-      body: JSON.stringify(user_interest)
-    })
+  public updateUserHistory(user_history: UserHistoryDto) {
+    // Get the Date object
+    const openDate = user_history.getOpenDt();
+    const closeDate = user_history.getOpenDt();
+
+    // Format as YYYY-MM-DDTHH:mm:ss.000+00:00
+    const year = openDate.getFullYear();
+    const yearC = closeDate.getFullYear();
+    const month = String(openDate.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+    const monthC = String(closeDate.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+    const day = String(openDate.getDate()).padStart(2, '0');
+    const dayC = String(closeDate.getDate()).padStart(2, '0');
+    const hours = String(openDate.getHours()).padStart(2, '0');
+    const hoursC = String(closeDate.getHours()).padStart(2, '0');
+    const minutes = String(openDate.getMinutes()).padStart(2, '0');
+    const minutesC = String(closeDate.getMinutes()).padStart(2, '0');
+    const seconds = String(openDate.getSeconds()).padStart(2, '0');
+    const secondsC = String(closeDate.getSeconds()).padStart(2, '0');
+
+    // Format the date string exactly as required by the backend
+    const formattedOpenDate = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.000+02:00`;
+    const formattedCloseDate = `${yearC}-${monthC}-${dayC}T${hoursC}:${minutesC}:${secondsC}.000+02:00`;
+
+    const userHistoryToSend = {
+      user_id: user_history.getUserId(),
+      interest_id: user_history.getInterestId(),
+      open_dt: formattedOpenDate,
+      close_dt: formattedCloseDate,
+      article_id: user_history.getArticleId()
+    };
+
+    return this.httpClient.put<UserHistoryDto>(
+      this.DOMAIN + 'update',
+      userHistoryToSend,
+      {
+        headers: new HttpHeaders({
+          'Content-Type': 'application/json'
+        })
+      }
+    );
   }
 }

@@ -21,4 +21,5 @@ export interface BuildingEntity {
     imageUrls: string[];
     contentGerman: string;
     contentEnglish: string;
+    userHistoryId: number;
 }
