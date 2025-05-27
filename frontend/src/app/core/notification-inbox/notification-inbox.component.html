@@ -1,7 +1,17 @@
+<tui-badged-content>
+  <tui-badge-notification
+    size="m"
+    tuiSlot="top"
+    appearance="accent"
+    *ngIf="notifications.length > 0"
+  >
+    {{this.notifications.length}}
+  </tui-badge-notification>
 <button
   tuiButton
-  tuiChevron
+  size="m"
   type="button"
+  class="notification-button"
   [tuiDropdown]="dropdownContent"
   [tuiDropdownManual]="open"
   [tuiObscuredEnabled]="open"
@@ -9,18 +19,29 @@
   (tuiActiveZoneChange)="onActiveZone($event)"
   (tuiObscured)="onObscured($event)"
 >
-  Choose
+  <tui-icon icon="@tui.inbox" [style.height.rem]="1.2" />
   <ng-template #dropdownContent>
+    <tui-scrollbar>
     <ul class="notification-inbox-dropdown" *ngIf="notifications.length > 0">
-      <li *ngFor="let notification of notifications">
-        <a (click)="openNotification(notification.building)">
-          {{notification.building.name}}
-          {{notification.distance}} meters away
-        </a>
+      <li *ngFor="let notification of notifications" class="notification-item">
+          <div class="notification-avatar">
+            <tui-icon icon="@tui.landmark" [style.height.rem]="1.2" />
+          </div>
+          <div class="notification-content">
+            <p class="notification-text">
+              <strong>{{notification.building.name}}</strong> is a
+              <span>{{notification.building.buildingType}}</span>
+            </p>
+            <p class="notification-text">located <span class="notification-distance">{{notification.distance}} meters away</span></p>
+            <p class="notification-time"><tui-icon icon="@tui.clock" [style.height.rem]="1" />{{ notification.createdAt.getHours() }}:{{ notification.createdAt.getMinutes() }}</p>
+          </div>
       </li>
+
     </ul>
+    </tui-scrollbar>
     <div *ngIf="notifications.length === 0">
       No notifications to show
     </div>
   </ng-template>
 </button>
+</tui-badged-content>

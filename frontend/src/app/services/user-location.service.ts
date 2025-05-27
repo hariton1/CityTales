@@ -69,12 +69,10 @@ export class UserLocationService {
   }
 
   calculateDistanceToBuilding(building: BuildingEntity): number {
-    // Check if user location and building location are available
     if (!this.currentPosition || building.longitude === undefined || building.latitude === undefined) {
       return 0;
     }
 
-    // Get coordinates
     const userLat = this.currentPosition.lat;
     const userLng = this.currentPosition.lng;
     const buildingLat = building.latitude;

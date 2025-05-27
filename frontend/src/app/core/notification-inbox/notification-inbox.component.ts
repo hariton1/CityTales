@@ -1,6 +1,6 @@
 import {Component, EventEmitter, OnInit, Output} from '@angular/core';
-import {TuiButton, TuiDropdownDirective, TuiDropdownManual} from '@taiga-ui/core';
-import {TuiChevron} from '@taiga-ui/kit';
+import {TuiButton, TuiDropdownDirective, TuiDropdownManual, TuiIcon, TuiScrollbar} from '@taiga-ui/core';
+import {TuiBadgedContentComponent, TuiBadgeNotification, TuiChevron} from '@taiga-ui/kit';
 import {TuiActiveZone, TuiObscured} from '@taiga-ui/cdk';
 import {UserLocationService} from '../../services/user-location.service';
 import {BuildingEntity} from '../../dto/db_entity/BuildingEntity';
@@ -11,7 +11,7 @@ import {RouterLink} from '@angular/router';
 interface Notification {
   building: BuildingEntity;
   distance: number;
-  date: Date;
+  createdAt: Date;
 }
 
 @Component({
@@ -25,10 +25,14 @@ interface Notification {
     TuiActiveZone,
     NgIf,
     NgForOf,
-    RouterLink
+    RouterLink,
+    TuiIcon,
+    TuiScrollbar,
+    TuiBadgedContentComponent,
+    TuiBadgeNotification
   ],
   templateUrl: './notification-inbox.component.html',
-  styleUrl: './notification-inbox.component.scss'
+  styleUrl: './notification-inbox.component.less'
 })
 export class NotificationInboxComponent implements OnInit{
   buildings: BuildingEntity[] = [];
@@ -52,13 +56,12 @@ export class NotificationInboxComponent implements OnInit{
 
           // Create notifications for each building
           buildings.forEach(building => {
-            // Calculate distance if available from userLocationService
             const distance = this.userLocationService.calculateDistanceToBuilding(building) ?? 0;
 
             const notification: Notification = {
               building: building,
               distance: distance,
-              date: new Date()
+              createdAt: new Date(),
             };
 
             if (!this.notifications
