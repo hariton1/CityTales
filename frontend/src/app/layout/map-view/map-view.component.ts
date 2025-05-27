@@ -33,14 +33,6 @@ export class MapViewComponent implements OnInit{
   center: google.maps.LatLngLiteral = {lat: 48.19865798950195, lng: 16.3714542388916};
   zoom = 15;
 
-  imageUrl = 'https://angular.io/assets/images/logos/angular/angular.svg';
-  imageBounds: google.maps.LatLngBoundsLiteral = {
-    east: 10,
-    north: 10,
-    south: -10,
-    west: -10,
-  };
-
   options: google.maps.MapOptions = {
     mapTypeId: google.maps.MapTypeId.ROADMAP,
     maxZoom: 20,
@@ -142,7 +134,10 @@ export class MapViewComponent implements OnInit{
     })
   }
 
-  openMarkerInfo(location: BuildingEntity): void {
+  detailAction(marker: MapMarker, location: BuildingEntity): void {
+    this.hoveredLocation = location;
+    this.infoWindow.open(marker);
+
     this.selectPlaceEvent.emit(location);
     this.setDetailedViewEvent.emit(true);
   }
@@ -174,13 +169,17 @@ export class MapViewComponent implements OnInit{
     });
   }*/
 
-  openInfoWindow(marker: MapMarker, location: BuildingEntity) {
-    this.hoveredLocation = location;
-    this.infoWindow.open(marker);
-  }
-
   closeInfoWindow() {
     this.infoWindow.close();
     this.hoveredLocation = null;
+  }
+
+  // Returns CSS translate(x, y) string to position each circle around the center in a circle layout
+  getCirclePosition(index: number, total: number): string {
+    const radius = 60;
+    const angle = (2 * Math.PI / total) * index - Math.PI / 2;
+    const x = radius * Math.cos(angle);
+    const y = radius * Math.sin(angle);
+    return `translate(${x}px, ${y}px)`;
   }
 }

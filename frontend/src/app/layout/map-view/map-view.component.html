@@ -5,13 +5,26 @@
   [zoom]="zoom"
   [options]="options"
 >
-  <map-marker #marker="mapMarker" *ngFor="let location of locationsNearby" [position]="{lat: location.latitude, lng: location.longitude}" [options]="markerOptions" (mapClick)="openMarkerInfo(location)" (mapMouseover)="openInfoWindow(marker, location)" (mapMouseout)="closeInfoWindow()"></map-marker>
+  <map-marker #marker="mapMarker" *ngFor="let location of locationsNearby" [position]="{lat: location.latitude, lng: location.longitude}" [options]="markerOptions" (mapClick)="detailAction(marker, location)" (mapMouseout)="closeInfoWindow()"></map-marker>
   <map-marker [position]="center" [options]="locationMarkerOptions"></map-marker>
 
   <map-info-window #infoWindow>
-    <div class="info-content">
-      <h4>{{ hoveredLocation?.name }}</h4>
+    <div class="info-content" *ngIf="hoveredLocation as location">
+      <ng-container *ngIf="location.relatedBuildings && location.relatedBuildings.length > 0; else noRelated">
+        <div class="circle-wrapper">
+          <div *ngFor="let building of location.relatedBuildings; let i = index"
+               class="circle-building"
+               [style.transform]="getCirclePosition(i, location.relatedBuildings.length)">
+            <img [src]="building?.imageUrls?.[1]" alt="{{ building?.name || 'Unnamed' }}" class="building-image" />
+          </div>
+        </div>
+      </ng-container>
+
+      <ng-template #noRelated>
+        <p class="no-related">No related buildings found.</p>
+      </ng-template>
     </div>
   </map-info-window>
+
 
 </google-map>

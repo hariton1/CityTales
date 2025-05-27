@@ -103,7 +103,8 @@ public class HistoricBuildingService implements IHistoricBuildingService {
                             "WHERE p.latitude IS NOT NULL AND p.longitude IS NOT NULL " +
                             "WITH p, point({latitude: p.latitude, longitude: p.longitude}) AS placePoint, targetPoint " +
                             "WHERE point.distance(placePoint, targetPoint) <= $radius " +
-                            "RETURN p";
+                            "OPTIONAL MATCH (p)-[:HAS_LINK_TO]->(related:WienGeschichteWikiBuildings) " +
+                            "RETURN p, collect(related) AS relatedBuildings";
 
 
             List<org.neo4j.driver.Record> records = session.readTransaction(tx ->
@@ -111,8 +112,19 @@ public class HistoricBuildingService implements IHistoricBuildingService {
             );
 
             for (Record record : records) {
-                Node node = record.get("p").asNode();
-                places.add(convertToDTO(node));
+                System.out.println("checking records");
+                Node mainNode = record.get("p").asNode();
+                List<Node> relatedNodes = record.get("relatedBuildings").asList(Value::asNode);
+
+                ViennaHistoryWikiBuildingObject mainObj = convertToDTO(mainNode);
+
+                List<ViennaHistoryWikiBuildingObject> related = new ArrayList<>();
+                for (Node relatedNode : relatedNodes) {
+                    related.add(convertToDTO(relatedNode));
+                }
+
+                mainObj.setRelatedBuildings(related);
+                places.add(mainObj);
             }
 
         } catch (Exception e) {
