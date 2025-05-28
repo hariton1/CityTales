@@ -29,10 +29,19 @@ export class MapViewComponent implements OnInit{
   locationsNearby: BuildingEntity[] = [];
   hoveredLocation: BuildingEntity | null = null;
   combinedLocations: any[] = [];
+  hoveredRelatedName: string | null = null;
+
+  polylineOptions: google.maps.PolylineOptions = {
+    strokeColor: 'blue',
+    strokeOpacity: 1.0,
+    strokeWeight: 2,
+  };
 
   markers: any[] = [];
   center: google.maps.LatLngLiteral = {lat: 48.19865798950195, lng: 16.3714542388916};
   zoom = 15;
+
+  polylines: google.maps.LatLngLiteral[][] = [];
 
   options: google.maps.MapOptions = {
     mapTypeId: google.maps.MapTypeId.ROADMAP,
@@ -144,6 +153,8 @@ export class MapViewComponent implements OnInit{
 
     this.selectPlaceEvent.emit(location);
     this.setDetailedViewEvent.emit(true);
+
+    this.generatePolylines(location);
   }
 
   /*deleteAllUnwantedImageUrls(): void {
@@ -195,5 +206,37 @@ export class MapViewComponent implements OnInit{
     const combined = [...buildings, ...persons, ...events];
     console.log('Combined related items:', combined);
     return combined;
+  }
+
+  generatePolylines(location: BuildingEntity): void {
+    this.polylines = [];
+
+    const center = {
+      lat: location.latitude,
+      lng: location.longitude
+    };
+
+    this.combinedLocations.forEach(loc => {
+      if (loc.latitude && loc.longitude) {
+        const related = {
+          lat: loc.latitude,
+          lng: loc.longitude
+        };
+
+        this.polylines.push([center, related]);
+      }
+    });
+
+    console.log(this.polylines)
+  }
+
+  onCircleMouseEnter(name: string): void {
+    this.hoveredRelatedName = name;
+    console.log('Hovered name:', name);
+  }
+
+  onCircleMouseLeave(): void {
+    console.log('Hover left');
+    this.hoveredRelatedName = null;
   }
 }

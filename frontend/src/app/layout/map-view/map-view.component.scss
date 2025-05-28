@@ -27,6 +27,7 @@ google-map {
   overflow: visible !important;
 }
 
+// little arrow attached to the infobox
 ::ng-deep .gm-style-iw-tc::after {
   content: none !important;
   display: none !important;
@@ -49,7 +50,8 @@ google-map {
   height: 160px;
   pointer-events: none;
   user-select: none;
-  transform: translate(-40px, 65px);
+  // transform: translate(-40px, 65px);
+  border: 1px black;
 }
 
 .circle-wrapper {
@@ -98,7 +100,7 @@ google-map {
 }
 
 .building-bg {
-  background-color: yellow;
+  background-color: blue;
 }
 
 .person-bg {
@@ -106,5 +108,29 @@ google-map {
 }
 
 .event-bg {
-  background-color: dodgerblue;
+  background-color: yellow;
+}
+
+.hover-name {
+  text-align: center;
+  margin-top: 0.5rem;
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+}
+
+.hover-label {
+  position: absolute;
+  top: -24px; // Adjust as needed
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  pointer-events: none;
+  z-index: 10;
 }
