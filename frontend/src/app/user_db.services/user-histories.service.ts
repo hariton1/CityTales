@@ -1,5 +1,5 @@
 import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {Observable} from 'rxjs';
+import {map, Observable} from 'rxjs';
 import {SERVER_ADDRESS} from '../globals';
 import {Injectable} from '@angular/core';
 import {UUID} from 'node:crypto';
@@ -29,7 +29,7 @@ export class UserHistoriesService {
     return this.httpClient.get<UserHistoryDto[]>(this.DOMAIN + 'article_id=' + article_id);
   }
 
-  public createNewUserHistory(user_history: UserHistoryDto) {
+  public createNewUserHistory(user_history: UserHistoryDto): Observable<UserHistoryDto> {
     // Get the Date object
     const date = user_history.getOpenDt();
 
@@ -51,7 +51,7 @@ export class UserHistoriesService {
       article_id: user_history.getArticleId()
     };
 
-    return this.httpClient.post<UserHistoryDto>(
+    return this.httpClient.post<any>(
       this.DOMAIN + 'create',
       userHistoryToSend,
       {
@@ -59,6 +59,16 @@ export class UserHistoriesService {
           'Content-Type': 'application/json'
         })
       }
+    ).pipe(
+      map(response => new UserHistoryDto(
+        response.user_history_id,
+        response.user_id,
+        response.article_id,
+        response.open_dt,
+        response.close_dt,
+        response.interest_id
+      ))
+
     );
   }
 
@@ -86,6 +96,7 @@ export class UserHistoriesService {
     const formattedCloseDate = `${yearC}-${monthC}-${dayC}T${hoursC}:${minutesC}:${secondsC}.000+02:00`;
 
     const userHistoryToSend = {
+      user_history_id: user_history.getUserHistoryId(),
       user_id: user_history.getUserId(),
       interest_id: user_history.getInterestId(),
       open_dt: formattedOpenDate,
