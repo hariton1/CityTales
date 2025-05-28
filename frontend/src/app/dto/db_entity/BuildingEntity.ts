@@ -1,3 +1,5 @@
+import {UserHistoryDto} from '../../user_db.dto/user-history.dto';
+
 export interface BuildingEntity {
     viennaHistoryWikiId: string;
     url: string;
@@ -21,4 +23,5 @@ export interface BuildingEntity {
     imageUrls: string[];
     contentGerman: string;
     contentEnglish: string;
+    userHistoryEntry: UserHistoryDto;
 }
