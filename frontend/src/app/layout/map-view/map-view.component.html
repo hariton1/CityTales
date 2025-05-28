@@ -12,16 +12,26 @@
     <div class="info-content" *ngIf="hoveredLocation as location">
       <ng-container *ngIf="combinedLocations && combinedLocations.length > 0; else noRelated">
         <div class="circle-wrapper">
-          <div *ngFor="let loc of combinedLocations; let i = index"
-               class="circle-building"
-               [ngClass]="{
-           'building-bg': loc.type === 'building',
-           'person-bg': loc.type === 'person',
-           'event-bg': loc.type === 'event'
-         }"
-               [style.transform]="getCirclePosition(i, combinedLocations.length)">
+          <div
+            *ngFor="let loc of combinedLocations; let i = index"
+            class="circle-building"
+            [ngClass]="{
+    'building-bg': loc.type === 'building',
+    'person-bg': loc.type === 'person',
+    'event-bg': loc.type === 'event'
+  }"
+            [style.transform]="getCirclePosition(i, combinedLocations.length)"
+            (mouseenter)="onCircleMouseEnter(loc.name)"
+            (mouseleave)="onCircleMouseLeave()"
+          >
+            <div class="hover-label" *ngIf="hoveredRelatedName === loc.name">
+              {{ loc.name }}
+            </div>
             <img [src]="loc?.imageUrls?.[1]" alt="{{ loc?.name || 'Unnamed' }}" class="building-image" />
           </div>
+        </div>
+        <div *ngIf="hoveredRelatedName" class="hover-name">
+          {{ hoveredRelatedName }}
         </div>
       </ng-container>
 
@@ -30,6 +40,10 @@
       </ng-template>
     </div>
   </map-info-window>
-
+  <map-polyline
+    *ngFor="let line of polylines"
+    [path]="line"
+    [options]="polylineOptions">
+  </map-polyline>
 
 </google-map>
