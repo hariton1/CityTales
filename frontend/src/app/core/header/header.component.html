@@ -4,57 +4,80 @@
         CityTales
     </span>
 
-    <tui-segmented [size]="'m'" class="main-nav-desktop">
-      <a routerLink="/explore" >🌎 Explore</a>
-      <a routerLinkActive  href="#">🧭 Tours</a>
-      <a routerLink="/feedback">Contribute</a>
-      <a routerLinkActive href="#">For Educators</a>
-      <a routerLinkActive href="#">About</a>
-<!--      <a routerLink="/onboarding" >Onboarding</a>-->
-    </tui-segmented>
+  <tui-segmented [size]="'m'" class="main-nav-desktop">
+    <a routerLink="/explore">🌎 Explore</a>
+    <a routerLinkActive href="#">🧭 Tours</a>
+    <a routerLink="/feedback">Contribute</a>
+    <a routerLinkActive href="#">For Educators</a>
+    <a routerLinkActive href="#">About</a>
+    <!--      <a routerLink="/onboarding" >Onboarding</a>-->
+  </tui-segmented>
 
-  <input type="text" placeholder="Search for sites/people" #filter>
-  <button class="primary" type="button" (click)="getResults(filter.value)">Search</button>
+  <tui-textfield (pointerdown.capture.stop)="(0)">
+    <input
+      tuiSearchHotkey
+      [formControl]="control"
+      [tuiInputSearch]="search"
+      [(tuiInputSearchOpen)]="open"
+    />
 
-    <div class="auth_buttons">
-      <button
-        appearance="secondary"
-        size="s"
-        tuiButton
-        type="button"
-        routerLink="admin/users"
-      >
-        <tui-icon
-          icon="@tui.users"
-          [style.height.rem]="1"
-        />
-        User Management
-      </button>
+    <ng-template #search>
+      <tui-search-results [results]="(results$ | async)!">
+        <tui-search-history [popular]="lastSearches"/>
+        <ng-template let-item>
+          <a
+            tuiCell
+            [href]="item.building.url"
+          >
+            <span tuiTitle>
+	                            {{ item.building.name }}
+	                        </span>
+          </a>
+        </ng-template>
+      </tui-search-results>
+    </ng-template>
+  </tui-textfield>
 
-      <button appearance="flat" tuiButton type="button" routerLink="register">
-        Sign Up
-      </button>
 
-      <button
-        *ngIf="!loggedIn"
-        appearance="primary"
-        tuiButton
-        type="button"
-        routerLink="login"
-      >
-        Login
-      </button>
+  <div class="auth_buttons">
+    <button
+      appearance="secondary"
+      size="s"
+      tuiButton
+      type="button"
+      routerLink="admin/users"
+    >
+      <tui-icon
+        icon="@tui.users"
+        [style.height.rem]="1"
+      />
+      User Management
+    </button>
 
-      <!-- Show Logout if logged in -->
-      <button
-        *ngIf="loggedIn"
-        appearance="primary"
-        tuiButton
-        type="button"
-        (click)="logout()"
-      >
-        Logout
-      </button>
-    </div>
+    <button appearance="flat" tuiButton type="button" routerLink="register">
+      Sign Up
+    </button>
+
+    <button
+      *ngIf="!loggedIn"
+      appearance="primary"
+      tuiButton
+      type="button"
+      routerLink="login"
+    >
+      Login
+    </button>
+
+    <!-- Show Logout if logged in -->
+    <button
+      *ngIf="loggedIn"
+      appearance="primary"
+      tuiButton
+      type="button"
+      (click)="logout()"
+    >
+      Logout
+    </button>
+  </div>
 
 </header>
