@@ -110,16 +110,14 @@ export class MapViewComponent implements OnInit{
     }
   }
 
-  /*ngOnInit(): void {
+/*  ngOnInit(): void {
     var location = this.userLocationService.getPosition();
 
     location.then(position => {
       this.center = {lat: position.lat, lng: position.lng};
       this.locationService.getLocationsInRadius(position.lat, position.lng, 2000).subscribe(locations => {
         this.locationsNearby = locations;
-        this.deleteAllUnwantedImageUrls();
         this.addMarkersToMap(locations);
-        this.locationsNearby.forEach(location => {this.addAllRelatedEntities(location);});
         this.populatePlacesEvent.emit(locations);
       })
     })
@@ -131,9 +129,7 @@ export class MapViewComponent implements OnInit{
 
       this.locationService.getLocationsInRadius(this.center.lat, this.center.lng, 100000).subscribe(locations => {
         this.locationsNearby = locations;
-        /*this.deleteAllUnwantedImageUrls();*/
         this.addMarkersToMap(locations);
-        /*this.locationsNearby.forEach(location => {this.addAllRelatedEntities(location);});*/
         this.populatePlacesEvent.emit(locations);
       });
   }
@@ -157,36 +153,10 @@ export class MapViewComponent implements OnInit{
     this.generatePolylines(location);
   }
 
-  /*deleteAllUnwantedImageUrls(): void {
-    this.locationsNearby.forEach(location => {
-      location.building.imageUrls = location.building.imageUrls.filter(imageUrl => {
-        return !(
-          imageUrl.includes('wgw_logo_10') ||
-          imageUrl.includes('RDF') ||
-          imageUrl.includes('https://www.geschichtewiki.wien.gv.at/KnowledgeWiki.png') ||
-          imageUrl.includes('logo_footer')
-        );
-      });
-    });
-  }*/
-
-  /*addAllRelatedEntities(location: BuildingEntity){
-    this.locationService.getLinkedLocations(location.viennaHistoryWikiId).subscribe(locations => {
-      location. = locations;
-    });
-
-    this.locationService.getLinkedPersons(location.building.viennaHistoryWikiId).subscribe(persons => {
-      location.linkedPersons = persons;
-    });
-
-    this.locationService.getLinkedEvents(location.building.viennaHistoryWikiId).subscribe(events => {
-      location.linkedEvents = events;
-    });
-  }*/
-
   closeInfoWindow() {
     this.infoWindow.close();
     this.hoveredLocation = null;
+    this.polylines = [];
   }
 
   // Returns CSS translate(x, y) string to position each circle around the center in a circle layout
@@ -238,5 +208,12 @@ export class MapViewComponent implements OnInit{
   onCircleMouseLeave(): void {
     console.log('Hover left');
     this.hoveredRelatedName = null;
+  }
+
+  onCircleClick(loc: BuildingEntity): void {
+    console.log('Clicked related location:', loc);
+
+    this.selectPlaceEvent.emit(loc);
+    this.setDetailedViewEvent.emit(true);
   }
 }
