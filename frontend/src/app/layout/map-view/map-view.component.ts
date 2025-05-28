@@ -150,8 +150,8 @@ export class MapViewComponent implements OnInit{
 
     this.userHistoriesService.createNewUserHistory(location.userHistoryEntry).subscribe({
       next: (results) => {
-        location.userHistoryEntry.setUserHistoryId(results.getUserHistoryId());
         console.log('New user history entry created successfully', results);
+        location.userHistoryEntry.setUserHistoryId(results.getUserHistoryId());
         this.alerts
           .open('Your new user history entry is saved', {label: 'Success!', appearance: 'success', autoClose: 3000})
           .subscribe();
