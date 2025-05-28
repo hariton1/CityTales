@@ -2,8 +2,8 @@ import {UUID} from 'node:crypto';
 
 export class UserPointDto {
   private user_point_id: number;
-  private user_id: UUID;
-  private points: number;
+  public user_id: UUID;
+  public points: number;
   private earnedAt: Date;
 
   constructor(user_point_id: number, user_id: UUID, points: number, earnedAt: Date) {

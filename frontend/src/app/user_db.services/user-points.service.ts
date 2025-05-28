@@ -6,9 +6,9 @@ import {UUID} from 'node:crypto';
 import {UserPointDto} from '../user_db.dto/user-point.dto';
 
 @Injectable({providedIn: 'root'})
-export class UserHistoriesService {
+export class UserPointsService {
 
-  private DOMAIN = SERVER_ADDRESS + 'userHistories/';
+  private DOMAIN = SERVER_ADDRESS + 'userPoints';
 
   constructor(private httpClient: HttpClient) {
   }
