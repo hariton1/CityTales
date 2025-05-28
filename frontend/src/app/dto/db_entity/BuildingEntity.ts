@@ -1,5 +1,4 @@
-import {HistoricalPersonEntity} from './HistoricalPersonEntity';
-import {HistoricalEventEntity} from './HistoricalEventEntity';
+import {UserHistoryDto} from '../../user_db.dto/user-history.dto';
 import {PersonEntity} from './PersonEntity';
 import {EventEntity} from './EventEntity';
 
@@ -26,7 +25,10 @@ export interface BuildingEntity {
     imageUrls: string[];
     contentGerman: string;
     contentEnglish: string;
+
     relatedBuildings: BuildingEntity[];
     relatedPersons: PersonEntity[];
     relatedEvents: EventEntity[];
+
+    userHistoryEntry: UserHistoryDto;
 }
