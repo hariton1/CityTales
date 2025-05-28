@@ -4,13 +4,15 @@ import {SERVER_ADDRESS} from '../globals';
 import {Injectable} from '@angular/core';
 import {UUID} from 'node:crypto';
 import {UserHistoryDto} from '../user_db.dto/user-history.dto';
+import {UtilitiesService} from '../services/utilities.service';
 
 @Injectable({providedIn: 'root'})
 export class UserHistoriesService {
 
   private DOMAIN = SERVER_ADDRESS + 'userHistories/';
 
-  constructor(private httpClient: HttpClient) {
+  constructor(private httpClient: HttpClient,
+              private utilitiesService: UtilitiesService) {
   }
 
   public getAllUserHistories(): Observable<UserHistoryDto[]> {
@@ -47,7 +49,7 @@ export class UserHistoriesService {
     const userHistoryToSend = {
       user_id: user_history.getUserId(),
       interest_id: user_history.getInterestId(),
-      open_dt: formattedDate,
+      open_dt: this.utilitiesService.formatDate(user_history.getOpenDt()),
       article_id: user_history.getArticleId()
     };
 
@@ -99,8 +101,8 @@ export class UserHistoriesService {
       user_history_id: user_history.getUserHistoryId(),
       user_id: user_history.getUserId(),
       interest_id: user_history.getInterestId(),
-      open_dt: formattedOpenDate,
-      close_dt: formattedCloseDate,
+      open_dt: this.utilitiesService.formatDate(user_history.getOpenDt()),
+      close_dt: this.utilitiesService.formatDate(user_history.getCloseDt()),
       article_id: user_history.getArticleId()
     };
 
