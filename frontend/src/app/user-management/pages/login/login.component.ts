@@ -5,7 +5,8 @@ import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/
 import {TuiFieldErrorPipe, TuiPassword, TuiTooltip} from '@taiga-ui/kit';
 import {AsyncPipe} from '@angular/common';
 import {TuiInputModule} from '@taiga-ui/legacy';
-import { supabase } from '../../supabase.service'; // adjust the path if neededimport { supabase } from '../supabase.service'; // adjust the path if needed
+import { supabase } from '../../supabase.service';
+import {Router} from '@angular/router'; // adjust the path if neededimport { supabase } from '../supabase.service'; // adjust the path if needed
 
 
 @Component({
@@ -35,7 +36,15 @@ export class LoginComponent {
     email: new FormControl('', Validators.required),
     passwordValue: new FormControl('', Validators.required),
   });
+  constructor(private router: Router) {}
 
+  async ngOnInit(): Promise<void> {
+    const { data: { session } } = await supabase.auth.getSession();
+    // If session and token exists, skip login
+    if (session && session.access_token) {
+      this.router.navigate(['/explore']);
+    }
+  }
   async onSubmit(): Promise<void> {
     if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();
@@ -43,19 +52,24 @@ export class LoginComponent {
     }
     const { email, passwordValue } = this.loginForm.value;
 
-    // Use Supabase to log in
     const { data, error } = await supabase.auth.signInWithPassword({
       email: email!,
       password: passwordValue!,
     });
 
     if (error) {
-      alert(error.message); // Show error to the user
+      alert(error.message);
       return;
     }
     // Login successful, session info in data.session
     alert('Login successful!');
-    // Optionally: redirect, store user info, etc.
+    // --- Log the JWT here ---
+    if (data.session) {
+      console.log('JWT:', data.session.access_token);
+    } else {
+      console.log('No session returned from Supabase.');
+    }
+     this.router.navigate(['/explore']);
   }
 
 
