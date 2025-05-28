@@ -75,7 +75,7 @@ export class UserHistoriesService {
   public updateUserHistory(user_history: UserHistoryDto) {
     // Get the Date object
     const openDate = user_history.getOpenDt();
-    const closeDate = user_history.getOpenDt();
+    const closeDate = user_history.getCloseDt();
 
     // Format as YYYY-MM-DDTHH:mm:ss.000+00:00
     const year = openDate.getFullYear();
