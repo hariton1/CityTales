@@ -147,7 +147,7 @@ public class EventService {
             }
             // Embeddings
             if (wikiObject.getContentGerman() != null  && !wikiObject.getContentGerman().equals("")) {
-                System.out.println("Content!: " + wikiObject.getContentGerman());
+                // System.out.println("Content!: " + wikiObject.getContentGerman());
                 float[] embedding = openAiService.getEmbedding(wikiObject.getContentGerman());
                 eventRepository.persistEmbedding(embedding,wikiObject.getViennaHistoryWikiId());
                 wikiObject.setContentEnglish("");
