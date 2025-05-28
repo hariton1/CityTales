@@ -1,1 +1,26 @@
-<p>leaderboard works!</p>
+<div class="leaderboard-container">
+  <h2 class="tui-text_heading-3">🏆 Global Leaderboard</h2>
+
+  <table class="leaderboard-table">
+    <thead>
+    <tr>
+      <th>#</th>
+      <th>Name</th>
+      <th class="text-right">Points</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let player of leaderboard; index as i">
+      <td>{{ i + 1 }}</td>
+      <td>
+        {{ player.name }}
+        <span *ngIf="i === 0" class="badge gold">🥇 Gold</span>
+        <span *ngIf="i === 1" class="badge silver">🥈 Silver</span>
+        <span *ngIf="i === 2" class="badge bronze">🥉 Bronze</span>
+      </td>
+      <td class="text-right">{{ player.points }}</td>
+    </tr>
+    </tbody>
+
+  </table>
+</div>
