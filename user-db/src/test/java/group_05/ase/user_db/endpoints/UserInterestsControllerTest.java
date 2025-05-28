@@ -5,6 +5,7 @@ import group_05.ase.user_db.restData.UserInterestDTO;
 import group_05.ase.user_db.services.UserInterestService;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,11 +20,11 @@ import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
 public class UserInterestsControllerTest {
@@ -108,6 +109,23 @@ public class UserInterestsControllerTest {
 
         System.out.println("Test testDeleteUserInterest not provided!");
 
+    }
+
+    @Test
+    void getOwnUserInterests_authenticated_shouldReturn200() throws Exception {
+        String userId = UUID.randomUUID().toString();
+
+        mockMvc.perform(get("/userInterests/me")
+                        .with(jwt().jwt(jwt -> jwt.claim("sub", userId)))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void getOwnUserInterests_unauthenticated_shouldReturn401() throws Exception {
+        mockMvc.perform(get("/userInterests/me")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnauthorized());
     }
 
 }
