@@ -75,7 +75,7 @@ public class UserHistoryService {
 
     }
 
-    public void saveNewUserHistory(UserHistoryDTO userHistoryDTO) {
+    public UserHistoryDTO saveNewUserHistory(UserHistoryDTO userHistoryDTO) {
 
         UserHistoryEntity tmp = new UserHistoryEntity();
 
@@ -84,13 +84,16 @@ public class UserHistoryService {
         tmp.setOpenDt(userHistoryDTO.getOpenDt());
         tmp.setInterestId(userHistoryDTO.getInterestId());
 
-        this.repository.save(tmp);
+        UserHistoryEntity insertedUserHistory = this.repository.save(tmp);
 
         UserInterestEntity userInterest = this.userInterestRepository.findByUserIdAndInterestId(userHistoryDTO.getUserId(), userHistoryDTO.getInterestId());
 
         userInterest.setInterestWeight(userInterest.getInterestWeight() + weightIncrease);
 
         this.userInterestRepository.save(userInterest);
+
+        return new UserHistoryDTO(insertedUserHistory.getUserHistoryId(), insertedUserHistory.getUserId(), insertedUserHistory.getArticleId(),
+                insertedUserHistory.getOpenDt(), insertedUserHistory.getCloseDt(), insertedUserHistory.getInterestId());
 
     }
 
