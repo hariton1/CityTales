@@ -1,7 +1,6 @@
 import {Component, inject, OnInit, Output} from '@angular/core';
 import {GoogleMapsModule} from '@angular/google-maps';
 import {CommonModule} from '@angular/common';
-import {HistoricalPlaceEntity} from '../../dto/db_entity/HistoricalPlaceEntity';
 import {UserLocationService} from '../../services/user-location.service';
 import {LocationService} from '../../services/location.service';
 import {EventEmitter} from '@angular/core';
