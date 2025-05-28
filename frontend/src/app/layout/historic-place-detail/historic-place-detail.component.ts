@@ -38,13 +38,9 @@ export class HistoricPlaceDetailComponent {
   @Output() setDetailEvent: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   closeDetail():void{
-    this.userHistoriesService.updateUserHistory(new UserHistoryDto(
-      this._selectedPlace.userHistoryId,
-      "f5599c8c-166b-495c-accc-65addfaa572b",
-      Number(this._selectedPlace.viennaHistoryWikiId),
-      new Date(),
-      new Date(),
-      2)).subscribe({
+    this._selectedPlace.userHistoryEntry.setCloseDt(new Date());
+
+    this.userHistoriesService.updateUserHistory(this._selectedPlace.userHistoryEntry).subscribe({
         next: (results) => {
           console.log('User history entry updated successfully', results);
           this.alerts

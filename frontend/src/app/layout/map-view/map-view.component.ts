@@ -140,15 +140,17 @@ export class MapViewComponent implements OnInit{
   }
 
   openMarkerInfo(location: BuildingEntity): void {
-    this.userHistoriesService.createNewUserHistory(new UserHistoryDto(
+    location.userHistoryEntry = new UserHistoryDto(
       -1,
       "f5599c8c-166b-495c-accc-65addfaa572b",
       Number(location.viennaHistoryWikiId),
       new Date(),
       new Date(0),
-      2)).subscribe({
+      2);
+
+    this.userHistoriesService.createNewUserHistory(location.userHistoryEntry).subscribe({
       next: (results) => {
-        location.userHistoryId = results.getUserHistoryId();
+        location.userHistoryEntry.setUserHistoryId(results.getUserHistoryId());
         console.log('New user history entry created successfully', results);
         this.alerts
           .open('Your new user history entry is saved', {label: 'Success!', appearance: 'success', autoClose: 3000})
