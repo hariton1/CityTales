@@ -39,13 +39,13 @@ public class DataScraperApplication {
 
 		// Test runs
 		System.out.println("buildings: ");
-		buildingService.search(1000);
+		buildingService.search(2000);
 
 		System.out.println("persons: ");
-		personService.search(1000);
+		personService.search(2000);
 
 		System.out.println("events: ");
-		eventService.search(1000);
+		eventService.search(2000);
 
 		linkService.createLinkages();
 

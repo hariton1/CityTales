@@ -103,7 +103,12 @@ public class HistoricBuildingService implements IHistoricBuildingService {
                             "WHERE p.latitude IS NOT NULL AND p.longitude IS NOT NULL " +
                             "WITH p, point({latitude: p.latitude, longitude: p.longitude}) AS placePoint, targetPoint " +
                             "WHERE point.distance(placePoint, targetPoint) <= $radius " +
-                            "RETURN p";
+                            "OPTIONAL MATCH (p)-[:HAS_LINK_TO]->(related:WienGeschichteWikiBuildings) " +
+                            "OPTIONAL MATCH (p)-[:HAS_LINK_TO]->(person:WienGeschichteWikiPersons) " +
+                            "OPTIONAL MATCH (p)-[:HAS_LINK_TO]->(event:WienGeschichteWikiEvents) " +
+                            "RETURN p, collect(DISTINCT related) AS relatedBuildings, " +
+                            "collect(DISTINCT person) AS relatedPersons, " +
+                            "collect(DISTINCT event) AS relatedEvents";
 
 
             List<org.neo4j.driver.Record> records = session.readTransaction(tx ->
@@ -111,8 +116,34 @@ public class HistoricBuildingService implements IHistoricBuildingService {
             );
 
             for (Record record : records) {
-                Node node = record.get("p").asNode();
-                places.add(convertToDTO(node));
+                System.out.println("checking records");
+                Node mainNode = record.get("p").asNode();
+
+                ViennaHistoryWikiBuildingObject mainObj = convertToDTO(mainNode);
+
+                List<Node> relatedNodes = record.get("relatedBuildings").asList(Value::asNode);
+                List<ViennaHistoryWikiBuildingObject> related = new ArrayList<>();
+                for (Node relatedNode : relatedNodes) {
+                    related.add(convertToDTO(relatedNode));
+                }
+
+                List<Node> personNodes = record.get("relatedPersons").asList(Value::asNode);
+                List<ViennaHistoryWikiPersonObject> relatedPersons = new ArrayList<>();
+                for (Node personNode : personNodes) {
+                    relatedPersons.add(mappingService.mapNodeToPersonEntity(personNode));
+                }
+
+                List<Node> eventNodes = record.get("relatedEvents").asList(Value::asNode);
+                List<ViennaHistoryWikiEventObject> relatedEvents = new ArrayList<>();
+                for (Node eventNode : eventNodes) {
+                    relatedEvents.add(mappingService.mapNodeToEventEntity(eventNode));
+                }
+
+                mainObj.setRelatedBuildings(related);
+                mainObj.setRelatedPersons(relatedPersons);
+                mainObj.setRelatedEvents(relatedEvents);
+
+                places.add(mainObj);
             }
 
         } catch (Exception e) {
@@ -126,8 +157,6 @@ public class HistoricBuildingService implements IHistoricBuildingService {
         ViennaHistoryWikiBuildingObject entity = mappingService.mapNodeToHistoricalBuildingEntity(node);
         return entity;
     }
-
-
 
     @Override
     public List<ViennaHistoryWikiEventObject> getAllLinkedHistoricEventsById(int viennaHistoryWikiId) {

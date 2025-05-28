@@ -1,12 +1,12 @@
 :host {
   display: flex;
   height: calc(100vh - 48px);  /* full viewport minus header */
-  overflow: hidden;
 }
 
 app-sidebar {
   width: 35%;
   background-color: var(--tui-background-base-alt);   /* light gray for sidebar */
+  overflow-y: auto;
 }
 
 app-map-view {
