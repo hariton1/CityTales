@@ -71,16 +71,15 @@ export class UserListComponent implements OnInit {
   protected handleDeleteClick(user: UserDto): void {
     // Use getters to ensure we get the values correctly
     const id = user.id;
-    const displayName = user.display_name;
-    this.confirmDelete(id, displayName);
+    const email = user.email;
+    this.confirmDelete(id,email);
   }
 
-  protected confirmDelete(userId: string, displayName: string): void {
+  protected confirmDelete(userId: string,email: string): void {
     console.log(userId);
-    console.log(displayName);
     const data: TuiConfirmData = {
       content:
-        '<strong> ' + displayName  +' </strong> will be deleted. This action cannot be undone!',
+        '<strong> ' + email +' </strong> will be deleted. This action cannot be undone!',
       yes: 'Yes',
       no: 'No',
     };
