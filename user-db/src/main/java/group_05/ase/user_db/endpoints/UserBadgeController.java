@@ -44,7 +44,7 @@ public class UserBadgeController {
     @ResponseStatus(HttpStatus.OK)
     public List<UserBadgeDTO> getAllUserBadges(@PathVariable("article_id") int article_id) {
         try {
-            return this.userBadgeService.getUserBadgesBaArticleId(article_id);
+            return this.userBadgeService.getUserBadgesByArticleId(article_id);
         } catch (Exception e) {
             return new ArrayList<UserBadgeDTO>(); //"An internal server error occurred => " + e.getMessage();
         }
