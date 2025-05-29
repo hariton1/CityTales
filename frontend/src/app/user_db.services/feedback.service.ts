@@ -4,13 +4,15 @@ import {SERVER_ADDRESS} from '../globals';
 import {Injectable} from '@angular/core';
 import {FeedbackDto} from '../user_db.dto/feedback.dto';
 import {UUID} from 'node:crypto';
+import {UtilitiesService} from '../services/utilities.service';
 
 @Injectable({providedIn: 'root'})
 export class FeedbackService {
 
   private DOMAIN = SERVER_ADDRESS + 'feedbacks/';
 
-  constructor(private httpClient: HttpClient) {
+  constructor(private httpClient: HttpClient,
+              private utilitiesService: UtilitiesService) {
   }
 
   public getAllFeedbacks(): Observable<FeedbackDto[]> {
@@ -34,24 +36,11 @@ export class FeedbackService {
   }
 
   public createNewFeedback(feedback: FeedbackDto) {
-    // Get the Date object
-    const date = feedback.getCreDat();
-
-    // Format as YYYY-MM-DDTHH:mm:ss.000+00:00
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
-    const day = String(date.getDate()).padStart(2, '0');
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    const seconds = String(date.getSeconds()).padStart(2, '0');
-
-    // Format the date string exactly as required by the backend
-    const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.000+02:00`;
 
     const feedbackToSend = {
       user_id: feedback.getUserId(),
       article_id: feedback.getArticleId(),
-      cre_dat: formattedDate,
+      cre_dat: this.utilitiesService.formatDate(feedback.getCreDat()),
       rating: feedback.getRating(),
       fb_content: feedback.getFbContent()
     };
