@@ -1,9 +1,10 @@
 package group_05.ase.user_db.services;
 
+import group_05.ase.user_db.entities.ArticleWeightEntity;
 import group_05.ase.user_db.entities.UserHistoryEntity;
-import group_05.ase.user_db.entities.UserInterestEntity;
+import group_05.ase.user_db.repositories.ArticleWeightRepository;
 import group_05.ase.user_db.repositories.UserHistoryRepository;
-import group_05.ase.user_db.repositories.UserInterestRepository;
+import group_05.ase.user_db.restData.ArticleWeightDTO;
 import group_05.ase.user_db.restData.UserHistoryDTO;
 
 import org.springframework.stereotype.Service;
@@ -16,12 +17,15 @@ import java.util.UUID;
 public class UserHistoryService {
 
     private final UserHistoryRepository repository;
-    private final UserInterestRepository userInterestRepository;
+    private final ArticleWeightRepository articleWeightRepository;
+    private final ArticleWeightService articleWeightService;
     private final float weightIncrease = 0.01F;
 
-    public UserHistoryService(UserHistoryRepository repository, UserInterestRepository userInterestRepository) {
+    public UserHistoryService(UserHistoryRepository repository, ArticleWeightRepository articleWeightRepository,
+                              ArticleWeightService articleWeightService) {
         this.repository = repository;
-        this.userInterestRepository = userInterestRepository;
+        this.articleWeightRepository = articleWeightRepository;
+        this.articleWeightService = articleWeightService;
     }
 
     public List<UserHistoryDTO> getAllUserHistories() {
@@ -50,7 +54,7 @@ public class UserHistoryService {
     public List<UserHistoryDTO> getUserHistoriesByUserId(UUID userId) {
 
         ArrayList<UserHistoryDTO> userHistories = new ArrayList<>();
-        List<UserHistoryEntity> tmp = this.repository.findAllByUserId(userId);
+        List<UserHistoryEntity> tmp = this.repository.findAllByUserIdOrderByUserHistoryIdAsc(userId);
 
         for(UserHistoryEntity userHistory : tmp) {
             userHistories.add(new UserHistoryDTO(userHistory.getUserHistoryId(), userHistory.getUserId(), userHistory.getArticleId(),
@@ -86,11 +90,16 @@ public class UserHistoryService {
 
         UserHistoryEntity insertedUserHistory = this.repository.save(tmp);
 
-        UserInterestEntity userInterest = this.userInterestRepository.findByUserIdAndInterestId(userHistoryDTO.getUserId(), userHistoryDTO.getInterestId());
+        /* *** update article weight *** */
+        ArticleWeightEntity articleWeightEntity = this.articleWeightRepository.findByArticleId(userHistoryDTO.getArticleId());
 
-        userInterest.setInterestWeight(userInterest.getInterestWeight() + weightIncrease);
-
-        this.userInterestRepository.save(userInterest);
+        if(articleWeightEntity != null) {
+            articleWeightEntity.setWeight(articleWeightEntity.getWeight() + weightIncrease);
+            this.articleWeightRepository.save(articleWeightEntity);
+        } else {
+            this.articleWeightService.saveNewArticleWeight(new ArticleWeightDTO(-1, userHistoryDTO.getArticleId(), weightIncrease));
+        }
+        /* ***************************** */
 
         return new UserHistoryDTO(insertedUserHistory.getUserHistoryId(), insertedUserHistory.getUserId(), insertedUserHistory.getArticleId(),
                 insertedUserHistory.getOpenDt(), insertedUserHistory.getCloseDt(), insertedUserHistory.getInterestId());
