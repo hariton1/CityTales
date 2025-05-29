@@ -8,6 +8,7 @@ import {TourService} from '../../../services/tour.service';
 import {supabase} from '../../../user-management/supabase.service';
 import {GoogleMap} from '@angular/google-maps';
 import {BuildingEntity} from '../../../dto/db_entity/BuildingEntity';
+import {BehaviorSubject} from 'rxjs';
 
 @Component({
   selector: 'app-tour-layout-component',
@@ -21,10 +22,20 @@ export class TourLayoutComponent {
 
   private locationService: LocationService;
   private tourService: TourService;
+  private userId: string | null = "";
 
   constructor(locationService: LocationService, tourService: TourService) {
     this.locationService = locationService;
     this.tourService = tourService;
+
+    supabase.auth.getSession().then(({data}) => {
+      const userId = data.session?.user?.id ?? null;
+      console.log(userId);
+      this.userId = userId;
+  })}
+
+  getUserId(): string | null {
+    return this.userId;
   }
 
 
@@ -42,11 +53,6 @@ export class TourLayoutComponent {
 
 
   createTour(){
-    var userId: string | undefined = "";
-    this.getUser().then(user => {
-      userId = user.data.session?.access_token
-      console.log(user.data.session);})
-
     //create tour in backend
 
     if(!this.startMarker || !this.endMarker){
@@ -62,7 +68,7 @@ export class TourLayoutComponent {
       this.endMarker?.getPosition()?.lat()!,
       this.endMarker?.getPosition()?.lng()!,
       this.selectedBuildings,
-      userId!
+      this.getUserId()!
     ).subscribe(tour => {
       this.tourDistance = (tour.distance / 1000).toFixed(2);
       this.tourDuration = (tour.durationEstimate /3600).toFixed(2);
@@ -71,10 +77,6 @@ export class TourLayoutComponent {
 
 
     }
-
-  async getUser(){
-    return await supabase.auth.getSession();
-  }
 
   //Map logic
 
