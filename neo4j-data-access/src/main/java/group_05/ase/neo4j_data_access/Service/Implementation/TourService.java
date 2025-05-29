@@ -22,15 +22,44 @@ public class TourService implements ITourService {
     ObjectMapper mapper = new ObjectMapper();
 
     @Override
-    public TourObject createTour(GeographicPoint2d start, GeographicPoint2d end, String name, Optional<Double> maxDistance, Optional<Double> maxDuration) {
-        return null;
+    public TourObject createTour(String name, String description, double start_lat, double start_lng, double end_lat, double end_lng, List<ViennaHistoryWikiBuildingObject> stops, String userId) {
+        TourObject tour = new TourObject();
+        tour.setStartLat(start_lat);
+        tour.setStartLng(start_lng);
+        tour.setEndLat(end_lat);
+        tour.setEndLng(end_lng);
+        tour.setName(name);
+        tour.setDescription(description);
+        tour.setStops(stops);
+
+
+        System.out.println(tour.toString());
+
+        Map<String, Double> lengthDuration = getLengthDurationOfTour(tour);
+        tour.setDistance(lengthDuration.get("distance"));
+        tour.setDurationEstimate(lengthDuration.get("duration"));
+
+        //persist in database
+
+        System.out.println("Tour created: " + tour.toString());
+
+        return tour;
     }
 
     @Override
-    public TourObject createTourBasedOnLocation(GeographicPoint2d location, String name, Optional<Double> maxDistance, Optional<Double> maxDuration) {
-        List<ViennaHistoryWikiBuildingObject> buildingsInRadius = historicBuildingService.findHistoricalBuildingWithinRadius(location.getLatitude(), location.getLongitude(), maxDistance.orElse(3000.0));
-        return null;
+    public Map<String, Double> getDurationDistanceEstimate(double start_lat, double start_lng, double end_lat, double end_lng, List<ViennaHistoryWikiBuildingObject> stops) {
+        List<GeographicPoint2d> points = new ArrayList<>();
+        if(start_lat != 0.0 && start_lng != 0.0) {
+            points.add(new GeographicPoint2d(start_lat, start_lng) );
+        }
+        stops.forEach(stop -> points.add(new GeographicPoint2d(stop.getLatitude().get(), stop.getLongitude().get())));
+        System.out.println("Stops: " + stops.toString());
+        if(end_lat != 0.0 && end_lng != 0.0) {
+            points.add(new GeographicPoint2d(end_lat, end_lng) );
+        }
+        System.out.println("Estimate for points: " + points.toString());
 
+        return accessOpenRoutingService(points, "foot-walking");
     }
 
     @Override
@@ -45,9 +74,9 @@ public class TourService implements ITourService {
 
     private Map<String, Double> getLengthDurationOfTour(TourObject tour){
         List<GeographicPoint2d> stops = new ArrayList<>();
-        stops.add(tour.getStart());
-        tour.getStops().forEach(stop -> stops.add(new GeographicPoint2d(stop.getStop().getLatitude().orElse(0.0), stop.getStop().getLongitude().orElse(0.0) )));
-
+        stops.add(new GeographicPoint2d(tour.getStartLat(), tour.getStartLng()) );
+        tour.getStops().forEach(stop -> stops.add(new GeographicPoint2d(stop.getLatitude().orElse(0.0), stop.getLongitude().orElse(0.0))));
+        stops.add(new GeographicPoint2d(tour.getEndLat(), tour.getEndLng()));
         return accessOpenRoutingService(stops, "foot-walking");
     }
 
