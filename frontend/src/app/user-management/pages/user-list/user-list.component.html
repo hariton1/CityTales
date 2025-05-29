@@ -29,21 +29,20 @@
       <td tuiTd>
         <div [tuiCell]="'m'">
           <tui-avatar
-            [src]="user.display_name | tuiInitials"
-            [style.background]="user.display_name | tuiAutoColor"
+            [src]="user.email | tuiInitials"
+            [style.background]="user.email | tuiAutoColor"
           />
           <span tuiTitle>
-                        {{ user.display_name }}
-            <span tuiSubtitle>{{ user.email }}</span>
-                    </span>
+                        {{ user.email }}
+          </span>
         </div>
       </td>
       <!-- Third column -->
-      <td tuiTd>
-        <span [tuiStatus]="user.is_active ? 'var(--tui-status-positive)' : 'var(--tui-status-negative)'">
+<!--      <td tuiTd>
+        <span [tuiStatus]="user.is_active ? 'var(&#45;&#45;tui-status-positive)' : 'var(&#45;&#45;tui-status-negative)'">
             {{ user.is_active ? 'Active' : 'Blocked' }}
         </span>
-      </td>
+      </td>-->
       <!-- Fourth column
       <td tuiTd>
         <tui-items-with-more [style.gap.rem]="0.25">
