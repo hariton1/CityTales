@@ -53,6 +53,18 @@ public class UserController {
         }
     }
 
+    @GetMapping("/email/id={userId}")
+    @ResponseStatus(HttpStatus.OK)
+    public String getUserEmailById(@PathVariable("userId") UUID userId) {
+        try {
+            UserDTO userDTO = this.userService.getUserById(userId);
+            return userDTO.getEmail();
+        } catch (Exception e) {
+            logger.error("Error fetching username with ID {}: {}", userId, e.getMessage());
+            throw new RuntimeException("Error fetching username", e);
+        }
+    }
+
     @DeleteMapping("/id={userId}")
     @ResponseStatus(HttpStatus.OK)
     public void deleteUserById(@PathVariable("userId") UUID userId) {
@@ -75,5 +87,4 @@ public class UserController {
             throw new RuntimeException("Error updating user", e);
         }
     }
-
 }
