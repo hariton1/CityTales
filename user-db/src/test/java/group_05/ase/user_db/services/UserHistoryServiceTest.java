@@ -1,9 +1,9 @@
 package group_05.ase.user_db.services;
 
+import group_05.ase.user_db.entities.ArticleWeightEntity;
 import group_05.ase.user_db.entities.UserHistoryEntity;
-import group_05.ase.user_db.entities.UserInterestEntity;
+import group_05.ase.user_db.repositories.ArticleWeightRepository;
 import group_05.ase.user_db.repositories.UserHistoryRepository;
-import group_05.ase.user_db.repositories.UserInterestRepository;
 import group_05.ase.user_db.restData.UserHistoryDTO;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,7 +25,7 @@ public class UserHistoryServiceTest {
     @Mock
     UserHistoryRepository userHistoryRepository;
     @Mock
-    UserInterestRepository userInterestRepository;
+    ArticleWeightRepository articleWeightRepository;
 
     @InjectMocks
     UserHistoryService userHistoryService;
@@ -85,7 +85,7 @@ public class UserHistoryServiceTest {
     @Test
     public void testGetUserHistoriesByUserId() {
 
-        when(userHistoryRepository.findAllByUserId(any(UUID.class))).thenReturn(userHistoryEntities);
+        when(userHistoryRepository.findAllByUserIdOrderByUserHistoryIdAsc(any(UUID.class))).thenReturn(userHistoryEntities);
 
         ArrayList<UserHistoryDTO> userHistoryDTOs = new ArrayList<>(userHistoryService.getUserHistoriesByUserId(userHistoryEntity.getUserId()));
 
@@ -118,7 +118,7 @@ public class UserHistoryServiceTest {
     public void testSaveNewUserHistory() {
 
         when(userHistoryRepository.save(any(UserHistoryEntity.class))).thenReturn(userHistoryEntity);
-        when(userInterestRepository.findByUserIdAndInterestId(any(UUID.class), any(int.class))).thenReturn(new UserInterestEntity());
+        when(articleWeightRepository.findByArticleId(any(int.class))).thenReturn(new ArticleWeightEntity());
 
         UserHistoryDTO userHistoryDTO = userHistoryService.saveNewUserHistory(this.userHistoryDTO);
 

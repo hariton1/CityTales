@@ -31,7 +31,7 @@ public class UserBadgeController {
 
     @GetMapping("/user_id={userId}")
     @ResponseStatus(HttpStatus.OK)
-    public List<UserBadgeDTO> getAllUserBadges(@PathVariable("userId") UUID userId) {
+    public List<UserBadgeDTO> getUserBadgesByUserId(@PathVariable("userId") UUID userId) {
         try {
             return this.userBadgeService.getUserBadgesByUserId(userId);
         } catch (Exception e) {
@@ -39,11 +39,11 @@ public class UserBadgeController {
         }
     }
 
-    @GetMapping("/article_id={article_id}")
+    @GetMapping("/article_id={articleId}")
     @ResponseStatus(HttpStatus.OK)
-    public List<UserBadgeDTO> getAllUserBadges(@PathVariable("article_id") int article_id) {
+    public List<UserBadgeDTO> getUserBadgesBaArticleId(@PathVariable("articleId") int articleId) {
         try {
-            return this.userBadgeService.getUserBadgesBaArticleId(article_id);
+            return this.userBadgeService.getUserBadgesByArticleId(articleId);
         } catch (Exception e) {
             return new ArrayList<UserBadgeDTO>(); //"An internal server error occurred => " + e.getMessage();
         }
@@ -51,7 +51,7 @@ public class UserBadgeController {
 
     @PostMapping("/create")
     @ResponseStatus(HttpStatus.CREATED)
-    public UserBadgeDTO createNewUserHistory(@RequestBody UserBadgeDTO userBadgeDTO) {
+    public UserBadgeDTO createNewBadge(@RequestBody UserBadgeDTO userBadgeDTO) {
         try {
             return this.userBadgeService.saveNewBadge(userBadgeDTO);
         } catch (Exception e) {
