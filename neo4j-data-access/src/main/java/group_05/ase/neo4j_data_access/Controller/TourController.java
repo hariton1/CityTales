@@ -3,14 +3,11 @@ package group_05.ase.neo4j_data_access.Controller;
 import group_05.ase.neo4j_data_access.Entity.Tour.CreateTourRequestDTO;
 import group_05.ase.neo4j_data_access.Entity.Tour.DurationDistanceEstimateDTO;
 import group_05.ase.neo4j_data_access.Entity.Tour.TourObject;
-import group_05.ase.neo4j_data_access.Entity.ViennaHistoryWikiBuildingObject;
 import group_05.ase.neo4j_data_access.Service.Interface.ITourService;
-import org.springframework.data.neo4j.types.GeographicPoint2d;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
 
 @RestController

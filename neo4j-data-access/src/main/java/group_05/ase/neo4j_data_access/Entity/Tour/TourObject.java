@@ -3,7 +3,6 @@ package group_05.ase.neo4j_data_access.Entity.Tour;
 
 import group_05.ase.neo4j_data_access.Entity.ViennaHistoryWikiBuildingObject;
 import lombok.*;
-import org.springframework.data.neo4j.types.GeographicPoint2d;
 
 import java.util.List;
 

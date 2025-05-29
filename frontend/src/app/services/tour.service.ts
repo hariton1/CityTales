@@ -1,9 +1,8 @@
 import {Injectable} from '@angular/core';
-import {HttpClient, HttpParams} from '@angular/common/http';
+import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {BACKEND_ADDRESS} from '../globals';
 import {TourEntity} from '../dto/tour_entity/TourEntity';
-import {HistoricalPlaceEntity} from '../dto/db_entity/HistoricalPlaceEntity';
 import {BuildingEntity} from '../dto/db_entity/BuildingEntity';
 
 @Injectable({

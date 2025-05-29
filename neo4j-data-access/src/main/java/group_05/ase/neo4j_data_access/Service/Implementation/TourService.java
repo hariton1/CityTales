@@ -7,11 +7,17 @@ import group_05.ase.neo4j_data_access.Entity.Tour.TourObject;
 import group_05.ase.neo4j_data_access.Entity.ViennaHistoryWikiBuildingObject;
 import group_05.ase.neo4j_data_access.Service.Interface.ITourService;
 import org.springframework.data.neo4j.types.GeographicPoint2d;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class TourService implements ITourService {
@@ -53,11 +59,9 @@ public class TourService implements ITourService {
             points.add(new GeographicPoint2d(start_lat, start_lng) );
         }
         stops.forEach(stop -> points.add(new GeographicPoint2d(stop.getLatitude().get(), stop.getLongitude().get())));
-        System.out.println("Stops: " + stops.toString());
         if(end_lat != 0.0 && end_lng != 0.0) {
             points.add(new GeographicPoint2d(end_lat, end_lng) );
         }
-        System.out.println("Estimate for points: " + points.toString());
 
         return accessOpenRoutingService(points, "foot-walking");
     }
@@ -87,7 +91,6 @@ public class TourService implements ITourService {
         String url = "https://api.openrouteservice.org/v2/directions/" + mode + "/json";
 
         List<List<Double>> coordinates = points.stream().map(point -> List.of(point.getLongitude(), point.getLatitude())).toList();
-        System.out.println(coordinates.toString());
 
 
         Map<String, Object> payload = new HashMap<>();
