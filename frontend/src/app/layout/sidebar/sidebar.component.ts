@@ -93,7 +93,7 @@ export class SidebarComponent {
 
   setSelectedPlace(place: any) {
     this.selectedPlace = place;
-    console.log(place.building.name);
+    console.log(place.name);
   }
 
   setDetailEvent(event: boolean): void {
