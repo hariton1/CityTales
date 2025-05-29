@@ -1,1 +1,8 @@
-<p>badges works!</p>
+<div class="badges-container">
+  <h2>User Badges</h2>
+
+    <div class="badge-card" *ngFor="let badge of this.badges">
+      <p><strong>Badge ID:</strong> {{ badge.user_badge_id }}</p>
+      <p><strong>Article ID:</strong> {{ badge.article_id }}</p>
+    </div>
+  </div>

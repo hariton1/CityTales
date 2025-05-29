@@ -32,6 +32,7 @@ public class UserBadgeController {
     @GetMapping("/user_id={userId}")
     @ResponseStatus(HttpStatus.OK)
     public List<UserBadgeDTO> getAllUserBadges(@PathVariable("userId") UUID userId) {
+        System.out.println("user_id of badges: " + userId);
         try {
             return this.userBadgeService.getUserBadgesByUserId(userId);
         } catch (Exception e) {
