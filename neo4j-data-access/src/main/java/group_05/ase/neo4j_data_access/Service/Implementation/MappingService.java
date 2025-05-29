@@ -1,5 +1,6 @@
 package group_05.ase.neo4j_data_access.Service.Implementation;
 
+import group_05.ase.neo4j_data_access.Entity.CombinedObject;
 import group_05.ase.neo4j_data_access.Entity.ViennaHistoryWikiBuildingObject;
 import group_05.ase.neo4j_data_access.Entity.ViennaHistoryWikiEventObject;
 import group_05.ase.neo4j_data_access.Entity.ViennaHistoryWikiPersonObject;
@@ -127,6 +128,22 @@ public class MappingService implements IMappingService {
         } else {
             building.setLinks(new ArrayList<>());
         }
+
+        if (node.containsKey("imageUrls")) {
+            building.setImageUrls(node.get("imageUrls").asList(Value::asString));
+        } else {
+            building.setImageUrls(new ArrayList<>());
+        }
+
+        return building;
+    }
+
+    public CombinedObject mapNodeToCombinedObject(Node node) {
+        CombinedObject building = new CombinedObject();
+
+        building.setViennaHistoryWikiId(node.get("viennaHistoryWikiId").asInt());
+        building.setUrl(node.get("url").asString());
+        building.setName(node.get("name").asString());
 
         if (node.containsKey("imageUrls")) {
             building.setImageUrls(node.get("imageUrls").asList(Value::asString));

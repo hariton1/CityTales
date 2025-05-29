@@ -1,0 +1,42 @@
+<div class="leaderboard-container">
+  <div>
+    <h2 class="header-with-icon">
+      🏆 {{ isFriends ? 'Friends' : 'Global' }} Leaderboard
+    </h2>
+
+
+    <label class="switch-label">
+      <span class="switch-label-text">
+        {{ isFriends ? 'Show Global' : 'Show Friends' }}
+      </span>
+      <input
+        tuiSwitch
+        type="checkbox"
+        [(ngModel)]="isFriends"
+        [showIcons]="true"
+        [size]="getSize(true)"
+      />
+    </label>
+  </div>
+  <table class="leaderboard-table">
+    <thead>
+    <tr>
+      <th>#</th>
+      <th>Name</th>
+      <th class="text-right">Points</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let player of leaderboard; index as i">
+      <td>{{ i + 1 }}</td>
+      <td>
+        {{ player.name }}
+        <span *ngIf="i === 0" class="badge gold">🥇</span>
+        <span *ngIf="i === 1" class="badge silver">🥈</span>
+        <span *ngIf="i === 2" class="badge bronze">🥉</span>
+      </td>
+      <td class="text-right">{{ player.points }}</td>
+    </tr>
+    </tbody>
+  </table>
+</div>
