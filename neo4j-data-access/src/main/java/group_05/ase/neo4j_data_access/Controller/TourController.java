@@ -1,14 +1,17 @@
 package group_05.ase.neo4j_data_access.Controller;
 
+import group_05.ase.neo4j_data_access.Entity.Tour.CreateTourRequestDTO;
+import group_05.ase.neo4j_data_access.Entity.Tour.DurationDistanceEstimateDTO;
+import group_05.ase.neo4j_data_access.Entity.Tour.TourObject;
 import group_05.ase.neo4j_data_access.Entity.ViennaHistoryWikiBuildingObject;
-import group_05.ase.neo4j_data_access.Entity.ViennaHistoryWikiEventObject;
-import group_05.ase.neo4j_data_access.Entity.ViennaHistoryWikiPersonObject;
 import group_05.ase.neo4j_data_access.Service.Interface.ITourService;
+import org.springframework.data.neo4j.types.GeographicPoint2d;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import group_05.ase.neo4j_data_access.Service.Interface.ISearchService;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/tour")
@@ -18,5 +21,42 @@ public class TourController {
 
     public TourController(ITourService tourService) {
         this.tourService = tourService;
+        System.out.println("TourController created");
+    }
+
+
+    @PostMapping(value = "/createTour", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<TourObject> createTour(@RequestBody CreateTourRequestDTO request) {
+
+        TourObject tour = tourService.createTour(request.getName(),
+                request.getDescription(),
+                request.getStart_lat(),
+                request.getStart_long(),
+                request.getEnd_lat(),
+                request.getEnd_long(),
+                request.getStops(),
+                request.getUserId());
+
+        if (tour == null) {return ResponseEntity.noContent().build();}
+        return ResponseEntity.ok(tour);
+    }
+
+    @PostMapping(value = "/durationDistanceEstimate", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<Map<String, Double>> getDurationDistanceEstimate(@RequestBody DurationDistanceEstimateDTO request) {
+
+        System.out.println("Received request: " + request.toString());
+
+        Map<String, Double> result = tourService.getDurationDistanceEstimate(
+                request.getStart_lat(),
+                request.getStart_lng(),
+                request.getEnd_lat(),
+                request.getEnd_lng(),
+                request.getStops()
+        );
+
+        if (result == null) {return ResponseEntity.noContent().build();}
+        return ResponseEntity.ok(result);
     }
 }

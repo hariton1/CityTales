@@ -37,8 +37,8 @@ export class TourLayoutComponent {
 
   tourName = new FormControl('');
   tourDescription = new FormControl('');
-  tourDuration: number = 0;
-  tourDistance: number = 0;
+  tourDuration: string = "0";
+  tourDistance: string = "0";
 
 
   createTour(){
@@ -63,7 +63,11 @@ export class TourLayoutComponent {
       this.endMarker?.getPosition()?.lng()!,
       this.selectedBuildings,
       userId!
-    )
+    ).subscribe(tour => {
+      this.tourDistance = (tour.distance / 1000).toFixed(2);
+      this.tourDuration = (tour.durationEstimate /3600).toFixed(2);
+    }
+    );
 
 
     }
@@ -83,7 +87,7 @@ export class TourLayoutComponent {
   startMarker: google.maps.Marker | null = null;
   endMarker: google.maps.Marker | null = null;
 
-  selectedBuildings: any[] = [];
+  selectedBuildings: BuildingEntity[] = [];
 
   buildingData: BuildingEntity[] = [];
 
@@ -112,8 +116,6 @@ export class TourLayoutComponent {
         this.markers.push(marker);
 
       });
-      console.log("Markers: "+ this.markers)
-
     })
   }
 
@@ -142,10 +144,16 @@ export class TourLayoutComponent {
       });
       this.mode = null;
     }
+
+    this.updateEstimate()
+
   }
 
   addBuildingToRoute(building: any) {
       this.selectedBuildings.push(building);
+      console.log(building.latitude);
+    console.log(building.longitude);
+      this.updateEstimate()
   }
 
   clearRoute() {
@@ -154,6 +162,7 @@ export class TourLayoutComponent {
     if (this.endMarker) this.endMarker.setMap(null);
     this.startMarker = null;
     this.endMarker = null;
+    this.updateEstimate()
   }
 
   deleteStopFromTour(building: any){
@@ -161,7 +170,40 @@ export class TourLayoutComponent {
     if(index > -1){
       this.selectedBuildings.splice(index, 1);
     }
+    this.updateEstimate()
   }
 
+  updateEstimate(){
+    var availablePoints = 0;
+    if(this.startMarker) {
+      availablePoints++;
+    }
+    if(this.endMarker) {
+      availablePoints++;
+    }
+    if(this.selectedBuildings.length > 0){
+      availablePoints += this.selectedBuildings.length;
+    }
 
+    console.log(availablePoints);
+
+    if(availablePoints < 2){
+      this.tourDuration = "0";
+      this.tourDistance = "0";
+      return
+    }
+
+
+    this.tourService.getDurationDistanceEstimate(
+      this.startMarker?.getPosition()?.lat()!,
+      this.startMarker?.getPosition()?.lng()!,
+      this.endMarker?.getPosition()?.lat()!,
+      this.endMarker?.getPosition()?.lng()!,
+      this.selectedBuildings
+    ).subscribe(estimate => {
+      this.tourDuration = (estimate.duration/1000).toFixed(2);
+      this.tourDistance = (estimate.distance/3600).toFixed(2);
+    })
+
+  }
 }

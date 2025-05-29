@@ -1,27 +1,22 @@
 package group_05.ase.neo4j_data_access.Entity.Tour;
 
-
 import group_05.ase.neo4j_data_access.Entity.ViennaHistoryWikiBuildingObject;
 import lombok.*;
-import org.springframework.data.neo4j.types.GeographicPoint2d;
 
 import java.util.List;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @ToString
-public class TourObject {
-
+public class CreateTourRequestDTO {
     private String name;
     private String description;
-    private double startLat;
-    private double startLng;
-    private double endLat;
-    private double endLng;
+    private double start_lat;
+    private double start_long;
+    private double end_lat;
+    private double end_long;
     private List<ViennaHistoryWikiBuildingObject> stops;
-    private double distance;
-    private double durationEstimate;
-
+    private String userId;
 }

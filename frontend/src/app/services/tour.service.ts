@@ -4,6 +4,7 @@ import {Observable} from 'rxjs';
 import {BACKEND_ADDRESS} from '../globals';
 import {TourEntity} from '../dto/tour_entity/TourEntity';
 import {HistoricalPlaceEntity} from '../dto/db_entity/HistoricalPlaceEntity';
+import {BuildingEntity} from '../dto/db_entity/BuildingEntity';
 
 @Injectable({
   providedIn: 'root'
@@ -19,18 +20,41 @@ export class TourService {
                     start_long: number,
                     end_lat: number,
                     end_long: number,
-                    stops: HistoricalPlaceEntity[],
+                    stops: BuildingEntity[],
                     userId: string): Observable<TourEntity> {
-    const params = new HttpParams().set('name', name)
-      .set("description", description)
-      .set("start_lat", start_lat.toString())
-      .set("start_long", start_long.toString())
-      .set("end_lat", end_lat.toString())
-      .set("end_long", end_long.toString())
-      .set("stops", JSON.stringify(stops))
-      .set("userId", userId);
-    return this.httpClient.get<TourEntity>(BACKEND_ADDRESS + 'api/tour/createTour', {
-      params: params
-    });
+    const body = {
+      name,
+      description,
+      start_lat,
+      start_long,
+      end_lat,
+      end_long,
+      stops,
+      userId
+    };
+    return this.httpClient.post<TourEntity>(BACKEND_ADDRESS + 'api/tour/createTour', body);
   }
+
+  public getDurationDistanceEstimate(start_lat: number,
+                                     start_lng: number,
+                                     end_lat: number,
+                                     end_lng: number,
+                                     stops: BuildingEntity[]) {
+    const body = {
+      start_lat,
+      start_lng,
+      end_lat,
+      end_lng,
+      stops
+    };
+
+    console.log("Request body: " + body.start_lng);
+    console.log("Request body: " + body.start_lat);
+    console.log("Request body: " + body.end_lat);
+    console.log("Request body: " + body.end_lng);
+    console.log("Request body: " + body.stops.toString());
+
+    return this.httpClient.post<any>(BACKEND_ADDRESS + 'api/tour/durationDistanceEstimate', body);
+  }
+
 }
