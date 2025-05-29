@@ -1,9 +1,9 @@
 .leaderboard-container {
   background: var(--tui-base-02);
   border-radius: 1rem;
-  padding: 2rem;
   max-width: 600px;
-  margin: 2rem auto;
+  margin: auto;
+  padding: 1rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
 }
 
@@ -47,14 +47,6 @@
   color: white;
   vertical-align: middle;
 }
-
-.header-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem; /* space below the header */
-}
-
 .switch-label {
   display: flex;
   align-items: center;
@@ -66,4 +58,11 @@
   font-weight: 600;
   color: var(--tui-text-03);
   font-size: 1rem;
+}
+
+.header-with-icon {
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem; /* space between emoji and text */
 }

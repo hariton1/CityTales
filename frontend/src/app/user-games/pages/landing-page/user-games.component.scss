@@ -1,13 +1,17 @@
 .dashboard-container {
-  display: flex;
-  gap: 20px;          // space between components
-  justify-content: center;  // center horizontally (optional)
-  align-items: flex-start;  // align tops
-  flex-wrap: nowrap;  // prevent wrapping; set to wrap if needed
+  display: flex !important;
+  flex-direction: row !important;
+  width: 100vw;
+  gap: 20px;
+  padding: 10px;
+  box-sizing: border-box;
+}
 
-  > app-leaderboard,
-  > app-badges {
-    flex: 1 1 50%;   // each takes about half width, grows/shrinks equally
-    min-width: 300px; // minimum width so they don’t shrink too much on small screens
-  }
+app-leaderboard,
+app-badges,
+app-xp-tracker {
+  flex-grow: 1;
+  flex-shrink: 1;
+  flex-basis: 0;
+  min-width: 0;
 }
