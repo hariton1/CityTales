@@ -2,16 +2,17 @@ import {Component, EventEmitter, inject, Input, Output} from '@angular/core';
 import {CommonModule, NgIf} from '@angular/common';
 import {PersonService} from '../../services/person.service';
 import {HistoricalPersonEntity} from '../../dto/db_entity/HistoricalPersonEntity';
-import {TuiAlertService, TuiScrollbar} from '@taiga-ui/core';
-import {UserHistoryDto} from '../../user_db.dto/user-history.dto';
+import {TuiAlertService, TuiIcon, TuiScrollbar} from '@taiga-ui/core';
 import {UserHistoriesService} from '../../user_db.services/user-histories.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-historic-place-detail',
   imports: [
     NgIf,
     CommonModule,
-    TuiScrollbar
+    TuiScrollbar,
+    TuiIcon
   ],
   templateUrl: './historic-place-detail.component.html',
   styleUrl: './historic-place-detail.component.scss'
@@ -21,7 +22,8 @@ export class HistoricPlaceDetailComponent {
   private readonly alerts = inject(TuiAlertService);
 
   constructor(private personService: PersonService,
-              private userHistoriesService: UserHistoriesService) {
+              private userHistoriesService: UserHistoriesService,
+              private router: Router) {
   }
 
   private associatedPersons: HistoricalPersonEntity[] = [];
@@ -54,4 +56,15 @@ export class HistoricPlaceDetailComponent {
 
     this.setDetailEvent.emit(false);
   }
+
+  navigateToFeedback(): void {
+    this.closeDetail();
+
+    this.router.navigate(['/feedback'], {
+      queryParams: {
+        wikiId: this.selectedPlace.viennaHistoryWikiId
+      }
+    });
+  }
+
 }
