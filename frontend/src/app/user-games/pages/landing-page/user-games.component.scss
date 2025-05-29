@@ -1,0 +1,13 @@
+.dashboard-container {
+  display: flex;
+  gap: 20px;          // space between components
+  justify-content: center;  // center horizontally (optional)
+  align-items: flex-start;  // align tops
+  flex-wrap: nowrap;  // prevent wrapping; set to wrap if needed
+
+  > app-leaderboard,
+  > app-badges {
+    flex: 1 1 50%;   // each takes about half width, grows/shrinks equally
+    min-width: 300px; // minimum width so they don’t shrink too much on small screens
+  }
+}
