@@ -1,19 +1,46 @@
-<div class="layout-container tui-space_vertical-5">
+<div class="layout-container tui-space_vertical-5" xmlns="http://www.w3.org/1999/html">
   <!-- Recommended Tours Panel -->
   <section tuiAppearance="neutral" class="recommended-section">
     <h3 tuiTitle class="tui-text_h4">Recommended Tours</h3>
 
-    <div class="tour-cards tui-space_vertical-3">
+    <div class="tour-scroll-container">
       <ng-container *ngFor="let tour of recommendedTours">
-        <div class="tour-card">
-          <div tuiHeader class="tui-space_bottom-2">
-            <h4 tuiTitle class="tui-text_h5">{{ tour.name }}</h4>
-            <span tuiSubtitle>{{ tour.duration }}</span>
+        <div class="tour-card-horizontal">
+          <div class="tour-card-header">
+            <h4 tuiTitle class="tui-text_h6">{{ tour.name }}</h4>
+            <span tuiSubtitle>Estim. Duration: {{ tour.duration }}</span>
           </div>
-          <p class="tui-text_body">{{ tour.description }}</p>
+          <p class="tui-text_body tui-space_top-1">{{ tour.description }}</p>
         </div>
       </ng-container>
     </div>
+  </section>
+
+  <section tuiAppearance="neutral" class="map-section">
+
+  <google-map height="500px" width="100%"
+              [center]="center"
+              [zoom]="zoom"
+              (mapClick)="onMapClick($event)">
+  </google-map>
+
+  <div class="controls">
+    <button tuiButton class="control-button" (click)="mode = 'start'">Set Start</button>
+    <button tuiButton class="control-button" (click)="mode = 'end'">Set End</button>
+    <button tuiButton class="control-button" (click)="clearRoute()">Clear</button>
+
+    <h4>Selected Tour</h4>
+    <ol>
+      <li *ngFor="let b of selectedBuildings">{{ b.name }}
+        <button tuiButton size="xs" (click)="deleteStopFromTour(b)" class="tour-delete-button">Delete</button>
+      </li>
+    </ol>
+
+  </div>
+
+    <h4>Total distance of tour: {{tourDistance}}km</h4>
+    <h4>Estim. walking time of tour: {{tourDuration}}h</h4>
+
   </section>
 
   <!-- Create Your Own Tour Section -->
@@ -21,17 +48,24 @@
     <h3 tuiTitle class="tui-text_h4">Create Your Own Tour</h3>
 
     <div class="tui-space_vertical-3">
-      <tui-input
-        [formControl]="tourName"
-        placeholder="Enter tour name"
-        class="tui-block"
-      ></tui-input>
+      <tui-textfield>
+        <input
+          tuiTextfield
+          [formControl]="tourName"
+          placeholder="Enter tour name"
+          class="tui-block"
+        />
+      </tui-textfield>
 
-      <tui-textarea
-        [formControl]="tourDescription"
-        placeholder="Describe your tour"
-        class="tui-block"
-      ></tui-textarea>
+      <tui-textfield>
+  <textarea
+    tuiTextfield
+    [formControl]="tourDescription"
+    placeholder="Describe your tour"
+    class="tui-block"
+    rows="3"
+  ></textarea>
+      </tui-textfield>
 
       <button
         tuiButton
@@ -39,7 +73,7 @@
         appearance="primary"
         size="m"
         (click)="createTour()"
-        [disabled]="!tourName.value || !tourDescription.value"
+        [disabled]="!tourName.value || !tourDescription.value || selectedBuildings.length === 0"
       >
         Create Tour
       </button>
