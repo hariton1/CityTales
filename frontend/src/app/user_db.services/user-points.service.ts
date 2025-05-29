@@ -21,8 +21,8 @@ export class UserPointsService {
     return this.httpClient.get<UserPointDto>(this.DOMAIN + 'id=' + user_history_id);
   }
 
-  public getUserPointsByUserId(user_id: UUID): Observable<UserPointDto[]> {
-    return this.httpClient.get<UserPointDto[]>(this.DOMAIN + 'user_id=' + user_id);
+  public getUserPointsByUserId(user_id: string): Observable<UserPointDto[]> {
+    return this.httpClient.get<UserPointDto[]>(this.DOMAIN + '/user_id=' + user_id);
   }
 
   public createNewPoints(user_point: UserPointDto) {

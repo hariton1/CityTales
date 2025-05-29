@@ -55,8 +55,6 @@ export class BadgesComponent implements OnInit{
         }
       });
     });
-
-
   }
 
   retrieveUserID() {
