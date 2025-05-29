@@ -15,7 +15,7 @@ import {BehaviorSubject, distinctUntilChanged, forkJoin, map, Observable, of, sw
 import {TUI_FALSE_HANDLER, tuiClamp, tuiRound} from '@taiga-ui/cdk';
 import {FeedbackDto} from '../../../user_db.dto/feedback.dto';
 import {FeedbackService} from '../../../user_db.services/feedback.service';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 
 @Component({
   selector: 'app-feedback',
@@ -46,11 +46,11 @@ export class FeedbackComponent implements OnInit {
   wikiId: string | null = null;
 
   constructor(private feeedbackService: FeedbackService,
-              private route: ActivatedRoute) {
+              private route: ActivatedRoute,
+              private router: Router) {
   }
 
   ngOnInit(): void {
-    // Method 1: Snapshot (simpler but doesn't react to parameter changes)
     this.wikiId = this.route.snapshot.queryParamMap.get('wikiId');
     console.log(`Processing feedback for wikiId: ${this.wikiId}`);
   }
@@ -79,7 +79,7 @@ export class FeedbackComponent implements OnInit {
     let newFeedbackDto = new FeedbackDto(
       -1,
       'f5599c8c-166b-495c-accc-65addfaa572b',
-      1,
+      Number(this.wikiId),
       this.value,
       this.form.value.fb_content ?? '',
       new Date()
@@ -102,6 +102,9 @@ export class FeedbackComponent implements OnInit {
     } else {
       console.log('No new feedback to create');
     }
+
+    this.router.navigate(['/explore']);
+
   }
 
   protected readonly tuiRound = tuiRound;
