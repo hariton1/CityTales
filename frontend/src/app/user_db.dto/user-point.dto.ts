@@ -1,16 +1,16 @@
 import {UUID} from 'node:crypto';
 
 export class UserPointDto {
-  private user_point_id: number;
-  private user_id: UUID;
-  private points: number;
-  private earnedAt: Date;
+  public user_point_id: number;
+  public user_id: UUID;
+  public points: number;
+  public cre_dat: Date;
 
-  constructor(user_point_id: number, user_id: UUID, points: number, earnedAt: Date) {
+  constructor(user_point_id: number, user_id: UUID, points: number, cre_dat: Date) {
     this.user_point_id = user_point_id;
     this.user_id = user_id;
     this.points = points;
-    this.earnedAt = earnedAt;
+    this.cre_dat = cre_dat;
   }
 
   public getUserPointId(): number {
@@ -38,10 +38,10 @@ export class UserPointDto {
   }
 
   public getEarnedAt(): Date {
-    return this.earnedAt;
+    return this.cre_dat;
   }
 
   public setEarnedAt(value: Date): void {
-    this.earnedAt = value;
+    this.cre_dat = value;
   }
 }

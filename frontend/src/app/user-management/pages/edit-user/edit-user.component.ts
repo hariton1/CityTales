@@ -79,10 +79,8 @@ export class EditUserComponent implements OnInit {
         this.user = user;
         console.log('User loaded: ' + this.user);
           this.editUserForm.patchValue({
-            displayName: this.user.display_name,
             email: this.user.email,
             role: 'User', /* to be replaced with the actual role */
-            status: this.user.is_active ? 'Active' : 'Blocked',
             birthday: TuiDay.currentLocal() /* to be replaced with the actual birthday */
           });
         const createdDate = new Date(this.user.created_at);
@@ -109,11 +107,8 @@ export class EditUserComponent implements OnInit {
 
       const updatedUser = new UserDto(
         this.user.id,
-        this.user.supabase_id,
         formValues.email ?? '',
-        this.user.created_at,
-        formValues.displayName ?? '',
-        formValues.status === 'Active',
+        this.user.created_at
       );
 
       this.userService.updateUser(updatedUser)
