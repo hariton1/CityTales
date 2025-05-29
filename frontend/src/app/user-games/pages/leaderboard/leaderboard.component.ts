@@ -10,7 +10,6 @@ import {UserService} from '../../../user_db.services/user.service';
 
 @Component({
   selector: 'app-leaderboard',
-  standalone: true,
   imports: [CommonModule, TuiSwitch, FormsModule],
   templateUrl: './leaderboard.component.html',
   styleUrls: ['./leaderboard.component.scss'],
@@ -57,10 +56,7 @@ export class LeaderboardComponent implements OnInit{
       });
   }
 
-
-
-
-isFriends = false;
+  isFriends = false;
 
   globalLeaderboard: any[] = [];
   friendsLeaderboard: any[] = [];
