@@ -1,3 +1,5 @@
+<div class="header-container">
+
 <tui-loader
   class="loader"
   [inheritColor]="true"
@@ -14,7 +16,35 @@
   >
     Enrich Content
   </button>
+
 </tui-loader>
+
+<tui-textfield (pointerdown.capture.stop)="(0)" class="search-field">
+  <input
+    placeholder="Search for an entitiy..."
+    [formControl]="control"
+    [tuiInputSearch]="search"
+    [(tuiInputSearchOpen)]="open"
+  />
+
+  <ng-template #search>
+    <tui-search-results [results]="results$ | async">
+      <tui-search-history [popular]="lastSearches"/>
+      <ng-template let-item>
+        <a
+          tuiCell
+          (click)="onItemClick(item)"
+        >
+            <span tuiTitle>
+	                            {{ item.name }}
+	                        </span>
+        </a>
+      </ng-template>
+    </tui-search-results>
+  </ng-template>
+</tui-textfield>
+
+</div>
 
 <div tuiPlatform="web" class="content" *ngIf="enrichmentStarted && !enrichmentLoading">
   <div
