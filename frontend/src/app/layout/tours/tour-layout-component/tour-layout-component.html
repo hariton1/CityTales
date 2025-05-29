@@ -1,1 +1,48 @@
-<p>tour-layout-component works!</p>
+<div class="layout-container tui-space_vertical-5">
+  <!-- Recommended Tours Panel -->
+  <section tuiAppearance="neutral" class="recommended-section">
+    <h3 tuiTitle class="tui-text_h4">Recommended Tours</h3>
+
+    <div class="tour-cards tui-space_vertical-3">
+      <ng-container *ngFor="let tour of recommendedTours">
+        <div class="tour-card">
+          <div tuiHeader class="tui-space_bottom-2">
+            <h4 tuiTitle class="tui-text_h5">{{ tour.name }}</h4>
+            <span tuiSubtitle>{{ tour.duration }}</span>
+          </div>
+          <p class="tui-text_body">{{ tour.description }}</p>
+        </div>
+      </ng-container>
+    </div>
+  </section>
+
+  <!-- Create Your Own Tour Section -->
+  <section tuiAppearance="white" class="create-section tui-space_top-5">
+    <h3 tuiTitle class="tui-text_h4">Create Your Own Tour</h3>
+
+    <div class="tui-space_vertical-3">
+      <tui-input
+        [formControl]="tourName"
+        placeholder="Enter tour name"
+        class="tui-block"
+      ></tui-input>
+
+      <tui-textarea
+        [formControl]="tourDescription"
+        placeholder="Describe your tour"
+        class="tui-block"
+      ></tui-textarea>
+
+      <button
+        tuiButton
+        type="button"
+        appearance="primary"
+        size="m"
+        (click)="createTour()"
+        [disabled]="!tourName.value || !tourDescription.value"
+      >
+        Create Tour
+      </button>
+    </div>
+  </section>
+</div>
