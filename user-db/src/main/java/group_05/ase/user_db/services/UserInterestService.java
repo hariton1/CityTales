@@ -3,7 +3,6 @@ package group_05.ase.user_db.services;
 import group_05.ase.user_db.entities.UserInterestEntity;
 import group_05.ase.user_db.repositories.UserInterestRepository;
 import group_05.ase.user_db.restData.UserInterestDTO;
-
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;

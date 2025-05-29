@@ -2,7 +2,6 @@ package group_05.ase.user_db.endpoints;
 
 import group_05.ase.user_db.restData.InterestDTO;
 import group_05.ase.user_db.services.InterestService;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
