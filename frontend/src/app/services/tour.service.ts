@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {BACKEND_ADDRESS} from '../globals';
+import {BACKEND_ADDRESS, SERVER_ADDRESS} from '../globals';
 import {TourEntity} from '../dto/tour_entity/TourEntity';
 import {BuildingEntity} from '../dto/db_entity/BuildingEntity';
 
@@ -55,5 +55,9 @@ export class TourService {
 
     return this.httpClient.post<any>(BACKEND_ADDRESS + 'api/tour/durationDistanceEstimate', body);
   }
+
+
+
+
 
 }

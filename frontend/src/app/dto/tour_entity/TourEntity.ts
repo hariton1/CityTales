@@ -1,13 +1,15 @@
-import {TourStopEntity} from './TourStopEntity';
+import {BuildingEntity} from '../db_entity/BuildingEntity';
 
 export interface TourEntity {
+  id: number,
   name: string,
+  description: string,
   start_lat: number,
-  start_long: number,
+  start_lng: number,
   end_lat: number,
-  end_long: number,
-  end: GeolocationPosition,
-  stops: TourStopEntity[],
+  end_lng: number,
+  stops: BuildingEntity[],
   distance: number,
-  durationEstimate: number
+  durationEstimate: number,
+  userId: string
 }
