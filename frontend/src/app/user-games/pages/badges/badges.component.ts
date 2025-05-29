@@ -14,8 +14,7 @@ export class BadgesComponent implements OnInit{
   userId: string | null = null;
   badges: UserBadgeDTO[] = [];
 
-
-  constructor(private userBadgeService: UserBadgesService) {
+  constructor(private userBadgeService: UserBadgesService, ) {
   }
 
   ngOnInit() {
