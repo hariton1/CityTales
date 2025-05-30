@@ -1,5 +1,26 @@
 @import '@taiga-ui/styles/taiga-ui-global';
 
+.header-container {
+  display: flex;
+  justify-content: space-between; /* Space between button and search field */
+  align-items: center;            /* Align them vertically in the middle */
+  margin-bottom: 1rem;            /* Space between header and the preview container */
+}
+
+.search-field {
+  flex-grow: 1; /* Makes the search field grow to take remaining space */
+  max-width: 500px; /* Optional: limit the width of the search field */
+}
+
+.enrich-button {
+  margin-right: 2rem;
+  margin-left: 2rem;/* Add space to the right of the button */
+}
+
+.loader {
+  display: inline-block;
+}
+
 :host {
   display: block;
   position: relative;
