@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -15,8 +16,8 @@ import java.util.UUID;
 
 public class TourEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Integer id;
     String name;
     String description;
     Double start_lat;

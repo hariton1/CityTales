@@ -12,6 +12,6 @@ public interface TourRepository extends JpaRepository<TourEntity, Integer> {
 
     TourEntity findByName(String name);
     List<TourEntity> findAllByUserId(String userId);
-    TourEntity findAllById(UUID tourId);
+    TourEntity findAllById(Integer tourId);
 
 }

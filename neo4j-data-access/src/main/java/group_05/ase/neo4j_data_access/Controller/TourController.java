@@ -26,12 +26,13 @@ public class TourController {
     @ResponseBody
     public ResponseEntity<TourObject> createTour(@RequestBody CreateTourRequestDTO request) {
 
+
         TourObject tour = tourService.createTour(request.getName(),
                 request.getDescription(),
                 request.getStart_lat(),
-                request.getStart_long(),
+                request.getStart_lng(),
                 request.getEnd_lat(),
-                request.getEnd_long(),
+                request.getEnd_lng(),
                 request.getStops(),
                 request.getUserId());
 
