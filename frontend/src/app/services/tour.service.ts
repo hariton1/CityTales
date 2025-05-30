@@ -4,6 +4,7 @@ import {Observable} from 'rxjs';
 import {BACKEND_ADDRESS, SERVER_ADDRESS} from '../globals';
 import {TourEntity} from '../dto/tour_entity/TourEntity';
 import {BuildingEntity} from '../dto/db_entity/BuildingEntity';
+import {TourDto} from '../dto/tour.dto';
 
 @Injectable({
   providedIn: 'root'
@@ -56,7 +57,20 @@ export class TourService {
     return this.httpClient.post<any>(BACKEND_ADDRESS + 'api/tour/durationDistanceEstimate', body);
   }
 
+  public createTourInDB(tour: TourDto)
+  {
+    return this.httpClient.post(SERVER_ADDRESS + 'tours/createTour', TourDto.ofTourDTo(tour))
+  }
 
+  public getToursForUserId(userId: string): Observable<TourEntity[]>
+  {
+    return this.httpClient.get<TourEntity[]>(SERVER_ADDRESS + 'tours/user/id=' + userId);
+  }
+
+  public deleteTourById(tourId: number): void {
+    var response = this.httpClient.delete(SERVER_ADDRESS + 'tours/id=' + tourId);
+    response.subscribe(data => console.log(data));
+  }
 
 
 

@@ -14,9 +14,9 @@ public class CreateTourRequestDTO {
     private String name;
     private String description;
     private double start_lat;
-    private double start_long;
+    private double start_lng;
     private double end_lat;
-    private double end_long;
+    private double end_lng;
     private List<ViennaHistoryWikiBuildingObject> stops;
     private String userId;
 }

@@ -6,14 +6,15 @@ import {CommonModule} from '@angular/common';
 import {LocationService} from '../../../services/location.service';
 import {TourService} from '../../../services/tour.service';
 import {supabase} from '../../../user-management/supabase.service';
-import {GoogleMap} from '@angular/google-maps';
+import {GoogleMap, MapPolyline} from '@angular/google-maps';
 import {BuildingEntity} from '../../../dto/db_entity/BuildingEntity';
 import {BehaviorSubject} from 'rxjs';
+import {TourDto} from '../../../dto/tour.dto';
 
 @Component({
   selector: 'app-tour-layout-component',
   imports: [TuiButton,
-    TuiInputModule, ReactiveFormsModule, CommonModule, GoogleMap, TuiTextfield],
+    TuiInputModule, ReactiveFormsModule, CommonModule, GoogleMap, TuiTextfield, MapPolyline],
   templateUrl: './tour-layout-component.html',
   standalone: true,
   styleUrl: './tour-layout-component.scss'
@@ -22,22 +23,31 @@ export class TourLayoutComponent {
 
   private locationService: LocationService;
   private tourService: TourService;
-  private userId: string | null = "";
+  private userId: string | null = null;
 
   constructor(locationService: LocationService, tourService: TourService) {
     this.locationService = locationService;
     this.tourService = tourService;
-
-    supabase.auth.getSession().then(({data}) => {
-      const userId = data.session?.user?.id ?? null;
-      console.log(userId);
+    this.getUserId().then(userId => {
       this.userId = userId;
-  })}
-
-  getUserId(): string | null {
-    return this.userId;
+      console.log('async user id ' + userId);
+      this.tourService.getToursForUserId(userId!).subscribe(tours => {
+        this.userTours = tours.map(tour => TourDto.fromTourEntity(tour))
+        console.log("User tours length: " + this.userTours.length);
+        this.userTours.forEach(tour => {console.log(tour.getId())})
+      })
+    })
   }
 
+  async getUserId(): Promise<string | null> {
+    const { data } = await supabase.auth.getSession();
+    const userId = data.session?.user?.id ?? null;
+    return userId;
+  }
+
+
+
+  userTours: TourDto[] = [];
 
 
   recommendedTours = [
@@ -60,7 +70,8 @@ export class TourLayoutComponent {
       return;
     }
 
-    this.tourService.createTour(
+    var tour: TourDto = new TourDto(
+      1,
       this.tourName.getRawValue()!,
       this.tourDescription.getRawValue()!,
       this.startMarker?.getPosition()?.lat()!,
@@ -68,14 +79,19 @@ export class TourLayoutComponent {
       this.endMarker?.getPosition()?.lat()!,
       this.endMarker?.getPosition()?.lng()!,
       this.selectedBuildings,
-      this.getUserId()!
-    ).subscribe(tour => {
-      this.tourDistance = (tour.distance / 1000).toFixed(2);
-      this.tourDuration = (tour.durationEstimate /3600).toFixed(2);
-    }
-    );
+      +this.tourDistance,
+      +this.tourDuration,
+      this.userId ?? 'NONE');
 
 
+      this.tourDistance = (tour.getDistance() / 1000).toFixed(2);
+      this.tourDuration = (tour.getDurationEstimate() /3600).toFixed(2);
+      if(tour.getUserId() !== 'NONE') {
+        this.tourService.createTourInDB(tour);
+        console.log("Tour created successfully!");
+      } else {
+        alert("Tour could not be created! No user logged in. Please log in to create a tour.");
+      }
     }
 
   //Map logic
@@ -94,6 +110,14 @@ export class TourLayoutComponent {
   buildingData: BuildingEntity[] = [];
 
   markers: google.maps.Marker[] = [];
+
+  polylinePath: google.maps.LatLngLiteral[] = [];
+  polylineOptions: google.maps.PolylineOptions = {
+    strokeColor: '#000000',
+    strokeOpacity: 1.0,
+    strokeWeight: 3,
+    clickable: false
+  };
 
   ngAfterViewInit() {
     if (!this.map?.googleMap) {
@@ -148,14 +172,14 @@ export class TourLayoutComponent {
     }
 
     this.updateEstimate()
+    this.updatePolylinePath();
 
   }
 
   addBuildingToRoute(building: any) {
       this.selectedBuildings.push(building);
-      console.log(building.latitude);
-    console.log(building.longitude);
       this.updateEstimate()
+    this.updatePolylinePath()
   }
 
   clearRoute() {
@@ -165,6 +189,7 @@ export class TourLayoutComponent {
     this.startMarker = null;
     this.endMarker = null;
     this.updateEstimate()
+    this.updatePolylinePath()
   }
 
   deleteStopFromTour(building: any){
@@ -173,7 +198,17 @@ export class TourLayoutComponent {
       this.selectedBuildings.splice(index, 1);
     }
     this.updateEstimate()
+    this.updatePolylinePath()
   }
+
+  deleteTour(tour: TourDto): void{
+    console.log(tour.getId())
+    this.tourService.deleteTourById(tour.getId());
+    this.userTours = this.userTours.filter(t => t.getId() !== tour.getId());
+    alert("Tour deleted successfully!");
+  }
+
+
 
   updateEstimate(){
     var availablePoints = 0;
@@ -206,6 +241,23 @@ export class TourLayoutComponent {
       this.tourDuration = (estimate.duration/1000).toFixed(2);
       this.tourDistance = (estimate.distance/3600).toFixed(2);
     })
+  }
 
+  updatePolylinePath(): void {
+    var coords: google.maps.LatLngLiteral[] = [];
+    if(this.startMarker) {
+      coords.unshift({lat: this.startMarker.getPosition()?.lat()!, lng: this.startMarker.getPosition()?.lng()!});
+    }
+    this.selectedBuildings.forEach(building => {
+      coords.push({lat: building.latitude, lng: building.longitude});
+    })
+
+    if(this.endMarker) {
+      coords.push({lat: this.endMarker.getPosition()?.lat()!, lng: this.endMarker.getPosition()?.lng()!});
+    }
+
+    this.polylinePath = coords;
+    console.log("Updated polyline path!")
+    console.log(this.polylinePath.toString());
   }
 }

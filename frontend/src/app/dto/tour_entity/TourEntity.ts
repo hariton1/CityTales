@@ -1,5 +1,3 @@
-import {BuildingEntity} from '../db_entity/BuildingEntity';
-
 export interface TourEntity {
   id: number,
   name: string,
@@ -8,7 +6,7 @@ export interface TourEntity {
   start_lng: number,
   end_lat: number,
   end_lng: number,
-  stops: BuildingEntity[],
+  stops: string,
   distance: number,
   durationEstimate: number,
   userId: string

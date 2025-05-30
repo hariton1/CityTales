@@ -2,7 +2,6 @@
   <!-- Recommended Tours Panel -->
   <section tuiAppearance="neutral" class="recommended-section">
     <h3 tuiTitle class="tui-text_h4">Recommended Tours</h3>
-
     <div class="tour-scroll-container">
       <ng-container *ngFor="let tour of recommendedTours">
         <div class="tour-card-horizontal">
@@ -16,12 +15,32 @@
     </div>
   </section>
 
+  <!-- User Tour Panel -->
+  <section tuiAppearance="neutral" class="recommended-section">
+    <h3 tuiTitle class="tui-text_h4">Your Tours</h3>
+    <div *ngIf="userTours.length > 0" class="tour-scroll-container">
+      <ng-container *ngFor="let tour of userTours">
+        <div class="tour-card-horizontal">
+          <div class="tour-card-header">
+            <h4 tuiTitle class="tui-text_h6">{{ tour.getName() }}</h4>
+            <span tuiSubtitle>Estim. Duration: {{ tour.getDurationEstimate() }}</span>
+
+          </div>
+          <p class="tui-text_body tui-space_top-1">{{ tour.getDescription() }}</p>
+        </div>
+        <button tuiButton size="xs" (click)="deleteTour(tour)" class="slide-tour-delete-button">Delete</button>
+      </ng-container>
+    </div>
+  </section>
+
+
   <section tuiAppearance="neutral" class="map-section">
 
   <google-map height="500px" width="100%"
               [center]="center"
               [zoom]="zoom"
               (mapClick)="onMapClick($event)">
+    <map-polyline [path]="polylinePath" [options]="polylineOptions"></map-polyline>
   </google-map>
 
   <div class="controls">
