@@ -3,7 +3,7 @@
   <section tuiAppearance="neutral" class="recommended-section">
     <h3 tuiTitle class="tui-text_h4">Recommended Tours</h3>
     <div class="tour-scroll-container">
-      <ng-container *ngFor="let tour of recommendedTours">
+      <ng-container *ngFor="let tour of recommendedTours")>
         <div class="tour-card-horizontal">
           <div class="tour-card-header">
             <h4 tuiTitle class="tui-text_h6">{{ tour.name }}</h4>
@@ -20,7 +20,7 @@
     <h3 tuiTitle class="tui-text_h4">Your Tours</h3>
     <div *ngIf="userTours.length > 0" class="tour-scroll-container">
       <ng-container *ngFor="let tour of userTours">
-        <div class="tour-card-horizontal">
+        <div class="tour-card-horizontal" (click)="onTourCardClick(tour)">
           <div class="tour-card-header">
             <h4 tuiTitle class="tui-text_h6">{{ tour.getName() }}</h4>
             <span tuiSubtitle>Estim. Duration: {{ tour.getDurationEstimate() }}</span>

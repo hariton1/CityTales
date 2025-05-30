@@ -1,4 +1,5 @@
 import {Component, ViewChild} from '@angular/core';
+import {Router} from '@angular/router';
 import {FormControl, ReactiveFormsModule} from '@angular/forms';
 import {TuiButton, TuiTextfield} from '@taiga-ui/core';
 import {TuiInputModule} from '@taiga-ui/legacy';
@@ -22,11 +23,13 @@ export class TourLayoutComponent {
 
   private locationService: LocationService;
   private tourService: TourService;
+  private router: Router;
   private userId: string | null = null;
 
-  constructor(locationService: LocationService, tourService: TourService) {
+  constructor(locationService: LocationService, tourService: TourService, router: Router) {
     this.locationService = locationService;
     this.tourService = tourService;
+    this.router = router;
     this.getUserId().then(userId => {
       this.userId = userId;
       console.log('async user id ' + userId);
@@ -142,6 +145,10 @@ export class TourLayoutComponent {
 
       });
     })
+  }
+
+  onTourCardClick(tour: TourDto):void{
+    this.router.navigateByUrl("/tours/" + tour.getId());
   }
 
   onMapClick(event: google.maps.MapMouseEvent) {
