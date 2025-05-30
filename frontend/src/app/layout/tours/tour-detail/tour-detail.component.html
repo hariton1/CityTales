@@ -1,1 +1,62 @@
-<p>tour-detail works!</p>
+<div class="tour-detail-container tui-space_vertical-5">
+
+  <div class="tour-header tui-space_vertical-3">
+    <h3 tuiTitle class="tui-text_h4">Edit Tour</h3>
+
+    <tui-textfield>
+      <input
+        tuiTextfield
+        [formControl]="nameControl"
+        placeholder="Tour name"
+        class="tui-block"
+      />
+    </tui-textfield>
+
+    <tui-textfield>
+      <textarea
+        tuiTextfield
+        [formControl]="descriptionControl"
+        placeholder="Tour description"
+        class="tui-block"
+        rows="3"
+      ></textarea>
+    </tui-textfield>
+
+    <button tuiButton appearance="primary" size="m" (click)="saveChanges()">Save Changes</button>
+    <button tuiButton appearance="danger" size="s" (click)="deleteTour()">Delete Tour</button>
+  </div>
+
+  <div class="tour-detail-layout">
+    <!-- Left: Vertical list of stops -->
+    <div class="tour-stops-list">
+      <h4>Tour Stops</h4>
+      <ul class="stops-list">
+        <li *ngFor="let stop of tour.getStops()">
+          <div class="stop-item">
+            <div class="stop-dot"></div>
+            <div class="stop-content">
+              {{ stop.name }}
+              <button tuiButton size="xs" (click)="deleteStop(stop)">Delete</button>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Right: Google Map with markers -->
+    <div class="tour-map-container">
+      <google-map
+        [center]="getMapCenter()"
+        [zoom]="14"
+        height="600px"
+        width="100%">
+        <map-marker
+          *ngFor="let stop of tour.getStops()"
+          [position]="{ lat: stop.latitude, lng: stop.longitude }"
+          [label]="stop.name">
+        </map-marker>
+      </google-map>
+    </div>
+  </div>
+</div>
+

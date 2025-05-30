@@ -67,6 +67,11 @@ export class TourService {
     return this.httpClient.get<TourEntity[]>(SERVER_ADDRESS + 'tours/user/id=' + userId);
   }
 
+  public getTourForTourId(tourId: number): Observable<TourEntity>
+  {
+    return this.httpClient.get<TourEntity>(SERVER_ADDRESS + 'tours/tour/id=' + tourId);
+  }
+
   public deleteTourById(tourId: number): void {
     var response = this.httpClient.delete(SERVER_ADDRESS + 'tours/id=' + tourId);
     response.subscribe(data => console.log(data));
