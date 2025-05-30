@@ -4,13 +4,15 @@ import {SERVER_ADDRESS} from '../globals';
 import {Injectable} from '@angular/core';
 import {UserInterestDto} from '../user_db.dto/user-interest.dto';
 import {UUID} from 'node:crypto';
+import {UtilitiesService} from '../services/utilities.service';
 
 @Injectable({providedIn: 'root'})
 export class UserInterestsService {
 
   private DOMAIN = SERVER_ADDRESS + 'userInterests/';
 
-  constructor(private httpClient: HttpClient) {
+  constructor(private httpClient: HttpClient,
+              private utilitiesService: UtilitiesService) {
   }
 
   public getAllUserInterests(): Observable<UserInterestDto[]> {
@@ -32,24 +34,11 @@ export class UserInterestsService {
   }
 
   public createNewUserInterest(user_interest: UserInterestDto): Observable<UserInterestDto> {
-    // Get the Date object
-    const date = user_interest.getCreDat();
-
-    // Format as YYYY-MM-DDTHH:mm:ss.000+00:00
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
-    const day = String(date.getDate()).padStart(2, '0');
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    const seconds = String(date.getSeconds()).padStart(2, '0');
-
-    // Format the date string exactly as required by the backend
-    const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.000+02:00`;
 
     const userInterestToSend = {
       user_id: user_interest.getUserId(),
       interest_id: user_interest.getInterestId(),
-      cre_dat: formattedDate,
+      cre_dat: this.utilitiesService.formatDate(user_interest.getCreDat()),
       interest_weight: user_interest.getInterestWeight()
     };
 
