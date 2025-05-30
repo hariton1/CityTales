@@ -20,6 +20,7 @@ import java.util.UUID;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -122,7 +123,18 @@ public class UserHistoriesControllerTest {
     @Test
     public void testCreateNewUserHistory() throws Exception {
 
-        System.out.println("Test testCreateNewUserHistory not provided!");
+        when(userHistoryService.saveNewUserHistory(any(UserHistoryDTO.class))).thenReturn(userHistoryDTO);
+
+        mockMvc.perform(post("/userHistories/create")
+                        .content(mapper.writeValueAsString(userHistoryDTO))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.user_history_id").value(userHistoryDTO.getUserHistoryId()))
+                .andExpect(jsonPath("$.user_id").value(userHistoryDTO.getUserId().toString()))
+                .andExpect(jsonPath("$.article_id").value(userHistoryDTO.getArticleId()))
+                .andExpect(jsonPath("$.interest_id").value(userHistoryDTO.getInterestId()));
+
+        System.out.println("Test testCreateNewUserHistory passed!");
 
     }
 

@@ -162,7 +162,7 @@ public class PersonService {
 
             // Embeddings
             if (wikiObject.getContentGerman() != null && !wikiObject.getContentGerman().isEmpty()) {
-                System.out.println("Content!: " + wikiObject.getContentGerman());
+                // System.out.println("Content!: " + wikiObject.getContentGerman());
 
                 float[] embedding = openAiService.getEmbedding(wikiObject.getContentGerman());
                 personRepository.persistEmbedding(embedding, wikiObject.getViennaHistoryWikiId());

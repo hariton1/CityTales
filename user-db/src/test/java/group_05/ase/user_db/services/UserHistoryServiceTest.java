@@ -1,6 +1,8 @@
 package group_05.ase.user_db.services;
 
+import group_05.ase.user_db.entities.ArticleWeightEntity;
 import group_05.ase.user_db.entities.UserHistoryEntity;
+import group_05.ase.user_db.repositories.ArticleWeightRepository;
 import group_05.ase.user_db.repositories.UserHistoryRepository;
 import group_05.ase.user_db.restData.UserHistoryDTO;
 import org.junit.Test;
@@ -22,11 +24,22 @@ public class UserHistoryServiceTest {
 
     @Mock
     UserHistoryRepository userHistoryRepository;
+    @Mock
+    ArticleWeightRepository articleWeightRepository;
 
     @InjectMocks
     UserHistoryService userHistoryService;
 
     private final UserHistoryEntity userHistoryEntity = new UserHistoryEntity (
+            1,
+            UUID.fromString("f5599c8c-166b-495c-accc-65addfaa572b"),
+            1,
+            null,
+            null,
+            2
+    );
+
+    private final UserHistoryDTO userHistoryDTO = new UserHistoryDTO (
             1,
             UUID.fromString("f5599c8c-166b-495c-accc-65addfaa572b"),
             1,
@@ -72,7 +85,7 @@ public class UserHistoryServiceTest {
     @Test
     public void testGetUserHistoriesByUserId() {
 
-        when(userHistoryRepository.findAllByUserId(any(UUID.class))).thenReturn(userHistoryEntities);
+        when(userHistoryRepository.findAllByUserIdOrderByUserHistoryIdAsc(any(UUID.class))).thenReturn(userHistoryEntities);
 
         ArrayList<UserHistoryDTO> userHistoryDTOs = new ArrayList<>(userHistoryService.getUserHistoriesByUserId(userHistoryEntity.getUserId()));
 
@@ -104,7 +117,17 @@ public class UserHistoryServiceTest {
     @Test
     public void testSaveNewUserHistory() {
 
-        System.out.println("Test testSaveNewUserHistory not provided.");
+        when(userHistoryRepository.save(any(UserHistoryEntity.class))).thenReturn(userHistoryEntity);
+        when(articleWeightRepository.findByArticleId(any(int.class))).thenReturn(new ArticleWeightEntity());
+
+        UserHistoryDTO userHistoryDTO = userHistoryService.saveNewUserHistory(this.userHistoryDTO);
+
+        assertThat(userHistoryDTO.getUserHistoryId()).isEqualTo(userHistoryEntity.getUserHistoryId());
+        assertThat(userHistoryDTO.getUserId()).isEqualTo(userHistoryEntity.getUserId());
+        assertThat(userHistoryDTO.getArticleId()).isEqualTo(userHistoryEntity.getArticleId());
+        assertThat(userHistoryDTO.getInterestId()).isEqualTo(userHistoryEntity.getInterestId());
+
+        System.out.println("Test testSaveNewUserHistory passed.");
 
     }
 

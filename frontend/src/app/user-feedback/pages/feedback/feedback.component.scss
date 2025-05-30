@@ -6,7 +6,7 @@
   justify-content: space-between;
   align-items: center;
   max-inline-size: 18rem;
-  padding: 0 0.25rem;
+  padding: 0.25rem 0;
   gap: 0.5rem;
 }
 
@@ -20,4 +20,18 @@
 
 .plus {
   border-radius: 0 5px 5px 0;
+}
+
+.textAreaContainerCtrl {
+  height: 200px;
+  width: 400px;
+}
+
+.textAreaCtrl {
+  height: 180px;
+  width: 400px;
+}
+
+.save-button {
+  margin-top: 1rem;
 }
