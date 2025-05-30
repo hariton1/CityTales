@@ -39,7 +39,7 @@ public class UserBadgeService {
     public List<UserBadgeDTO> getUserBadgesByUserId(UUID userId) {
 
         ArrayList<UserBadgeDTO> userBadges = new ArrayList<>();
-        List<UserBadgeEntity> tmp = this.repository.findAllByUserId(userId);
+        List<UserBadgeEntity> tmp = this.repository.findAllByUserIdOrderByUserBadgeIdAsc(userId);
 
         for(UserBadgeEntity userBadge : tmp) {
             userBadges.add(new UserBadgeDTO(
@@ -54,10 +54,10 @@ public class UserBadgeService {
 
     }
 
-    public List<UserBadgeDTO> getUserBadgesBaArticleId(int articleId) {
+    public List<UserBadgeDTO> getUserBadgesByArticleId(int articleId) {
 
         ArrayList<UserBadgeDTO> userBadges = new ArrayList<>();
-        List<UserBadgeEntity> tmp = this.repository.findAllByArticleId(articleId);
+        List<UserBadgeEntity> tmp = this.repository.findAllByArticleIdOrderByUserBadgeIdAsc(articleId);
 
         for(UserBadgeEntity userBadge : tmp) {
             userBadges.add(new UserBadgeDTO(

@@ -17,11 +17,6 @@ public class UserDTO {
 
     @Getter
     @Setter
-    @JsonProperty(required = true, value = "supabase_id")
-    private UUID supabaseId;
-
-    @Getter
-    @Setter
     @JsonProperty(required = true, value = "email")
     private String email;
 
@@ -29,15 +24,4 @@ public class UserDTO {
     @Setter
     @JsonProperty(required = true, value = "created_at")
     private LocalDateTime createdAt;
-
-    @Getter
-    @Setter
-    @JsonProperty(required = true, value = "display_name")
-    private String displayName;
-
-    @Getter
-    @Setter
-    @JsonProperty(required = true, value = "is_active")
-    private Boolean isActive;
-
 }
