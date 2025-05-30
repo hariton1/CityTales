@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {
   TuiButton,
   TuiHint,
@@ -15,6 +15,7 @@ import {BehaviorSubject, distinctUntilChanged, forkJoin, map, Observable, of, sw
 import {TUI_FALSE_HANDLER, tuiClamp, tuiRound} from '@taiga-ui/cdk';
 import {FeedbackDto} from '../../../user_db.dto/feedback.dto';
 import {FeedbackService} from '../../../user_db.services/feedback.service';
+import {ActivatedRoute, Router} from '@angular/router';
 
 @Component({
   selector: 'app-feedback',
@@ -36,14 +37,24 @@ import {FeedbackService} from '../../../user_db.services/feedback.service';
   templateUrl: './feedback.component.html',
   styleUrl: './feedback.component.scss'
 })
-export class FeedbackComponent {
+export class FeedbackComponent implements OnInit {
 
   protected min = 0;
   protected max = 100;
   protected value = 100;
 
-  constructor(private feeedbackService: FeedbackService) {
+  wikiId: string | null = null;
+
+  constructor(private feeedbackService: FeedbackService,
+              private route: ActivatedRoute,
+              private router: Router) {
   }
+
+  ngOnInit(): void {
+    this.wikiId = this.route.snapshot.queryParamMap.get('wikiId');
+    console.log(`Processing feedback for wikiId: ${this.wikiId}`);
+  }
+
 
   protected readonly active$ = new BehaviorSubject(false);
   protected readonly showHint$ = this.active$.pipe(
@@ -68,7 +79,7 @@ export class FeedbackComponent {
     let newFeedbackDto = new FeedbackDto(
       -1,
       'f5599c8c-166b-495c-accc-65addfaa572b',
-      1,
+      Number(this.wikiId),
       this.value,
       this.form.value.fb_content ?? '',
       new Date()
@@ -91,6 +102,9 @@ export class FeedbackComponent {
     } else {
       console.log('No new feedback to create');
     }
+
+    this.router.navigate(['/explore']);
+
   }
 
   protected readonly tuiRound = tuiRound;
