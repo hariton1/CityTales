@@ -42,7 +42,7 @@ public class TourController {
 
     @GetMapping("/tour/id={tourId}")
     @ResponseStatus(HttpStatus.OK)
-    public TourDTO getToursByTourId(@PathVariable("tourId") UUID tourId) {
+    public TourDTO getToursByTourId(@PathVariable("tourId") Integer tourId) {
         try {
             return this.tourService.findTourByTourId(tourId);
         } catch (Exception e) {
@@ -70,9 +70,9 @@ public class TourController {
         }
     }
 
-    @PostMapping("/createTrip")
+    @PostMapping("/createTour")
     @ResponseStatus(HttpStatus.OK)
-    public void createTrip(@RequestBody TourDTO tourDTO) {
+    public void createTour(@RequestBody TourDTO tourDTO) {
         try {
             this.tourService.createTour(tourDTO);
         } catch (Exception e) {

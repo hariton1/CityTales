@@ -23,7 +23,8 @@ public class TourService {
         List<TourEntity> entities = this.tourRepository.findAll();
 
         for (TourEntity entity : entities) {
-            tours.add(new TourDTO(entity.getName(),
+            tours.add(new TourDTO(entity.getId(),
+                    entity.getName(),
                     entity.getDescription(),
                     entity.getStart_lat(),
                     entity.getStart_lng(),
@@ -42,7 +43,9 @@ public class TourService {
         List<TourEntity> entities = this.tourRepository.findAllByUserId(userId);
 
         for (TourEntity entity : entities) {
-            tours.add(new TourDTO(entity.getName(),
+            tours.add(new TourDTO(
+                    entity.getId(),
+                    entity.getName(),
                     entity.getDescription(),
                     entity.getStart_lat(),
                     entity.getStart_lng(),
@@ -56,10 +59,12 @@ public class TourService {
         return tours;
     }
 
-    public TourDTO findTourByTourId(UUID tourId) {
+    public TourDTO findTourByTourId(Integer tourId) {
         TourEntity entity = this.tourRepository.findAllById(tourId);
 
-        return new TourDTO(entity.getName(),
+        return new TourDTO(
+                entity.getId(),
+                entity.getName(),
                     entity.getDescription(),
                     entity.getStart_lat(),
                     entity.getStart_lng(),
@@ -74,7 +79,8 @@ public class TourService {
     public TourDTO findTourByName(String name) {
         TourEntity entity = this.tourRepository.findByName(name);
 
-        return new TourDTO(entity.getName(),
+        return new TourDTO(entity.getId(),
+                entity.getName(),
                     entity.getDescription(),
                     entity.getStart_lat(),
                     entity.getStart_lng(),
@@ -105,6 +111,8 @@ public class TourService {
         tourEntity.setDistance(tourDTO.getDistance());
         tourEntity.setDurationEstimate(tourDTO.getDurationEstimate());
         tourEntity.setUserId(tourDTO.getUserId());
+
+        System.out.println("tourEntity: " + tourEntity);
 
         this.tourRepository.save(tourEntity);
     }
@@ -157,7 +165,7 @@ public class TourService {
 
         TourEntity updatedTour = this.tourRepository.save(existingTour);
 
-        return new TourDTO(updatedTour.getName(), updatedTour.getDescription(), updatedTour.getStart_lat(), updatedTour.getStart_lng(), updatedTour.getEnd_lat(), updatedTour.getEnd_lng(), updatedTour.getStops(), updatedTour.getDistance(), updatedTour.getDurationEstimate(), updatedTour.getUserId());
+        return new TourDTO(id, updatedTour.getName(), updatedTour.getDescription(), updatedTour.getStart_lat(), updatedTour.getStart_lng(), updatedTour.getEnd_lat(), updatedTour.getEnd_lng(), updatedTour.getStops(), updatedTour.getDistance(), updatedTour.getDurationEstimate(), updatedTour.getUserId());
 
 
     }

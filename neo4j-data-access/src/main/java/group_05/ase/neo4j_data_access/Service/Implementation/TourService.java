@@ -37,15 +37,11 @@ public class TourService implements ITourService {
         tour.setName(name);
         tour.setDescription(description);
         tour.setStops(stops);
-
-
-        System.out.println(tour.toString());
+        tour.setUserId(userId);
 
         Map<String, Double> lengthDuration = getLengthDurationOfTour(tour);
         tour.setDistance(lengthDuration.get("distance"));
         tour.setDurationEstimate(lengthDuration.get("duration"));
-
-        //persist in database
 
         System.out.println("Tour created: " + tour.toString());
 
