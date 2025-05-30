@@ -8,7 +8,6 @@ import {TourService} from '../../../services/tour.service';
 import {supabase} from '../../../user-management/supabase.service';
 import {GoogleMap, MapPolyline} from '@angular/google-maps';
 import {BuildingEntity} from '../../../dto/db_entity/BuildingEntity';
-import {BehaviorSubject} from 'rxjs';
 import {TourDto} from '../../../dto/tour.dto';
 
 @Component({

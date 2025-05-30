@@ -1,4 +1,3 @@
-import {UserAccountDto} from './user-account.dto';
 import {BuildingEntity} from './db_entity/BuildingEntity';
 import {TourEntity} from './tour_entity/TourEntity';
 
