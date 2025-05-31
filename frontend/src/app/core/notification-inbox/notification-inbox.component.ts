@@ -6,6 +6,7 @@ import {UserLocationService} from '../../services/user-location.service';
 import {BuildingEntity} from '../../dto/db_entity/BuildingEntity';
 import {Subscription} from 'rxjs';
 import {NgForOf, NgIf} from '@angular/common';
+import {UserService} from '../../services/user.service';
 
 interface Notification {
   building: BuildingEntity;
@@ -41,7 +42,8 @@ export class NotificationInboxComponent implements OnInit{
 
   protected open = false;
 
-  constructor(readonly userLocationService: UserLocationService) {
+  constructor(readonly userLocationService: UserLocationService,
+              private userService: UserService) {
   }
 
   ngOnInit() {
@@ -79,6 +81,7 @@ export class NotificationInboxComponent implements OnInit{
   }
 
   openNotification(building: BuildingEntity): void {
+    building = this.userService.enterHistoricNodeAlert(building);
     this.selectPlaceEvent.emit(building);
     this.setDetailedViewEvent.emit(true);
   }
