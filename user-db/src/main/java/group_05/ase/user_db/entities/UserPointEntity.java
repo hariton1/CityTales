@@ -26,4 +26,6 @@ public class UserPointEntity {
 
     private LocalDateTime earnedAt;
 
+    private int articleId;
+
 }

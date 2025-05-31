@@ -36,4 +36,9 @@ public class UserPointDTO {
     @JsonDeserialize(using = CustomTimestampDeserializer.class)
     private LocalDateTime earnedAt;
 
+    @Getter
+    @Setter
+    @JsonProperty(value = "article_id")
+    private int articleId;
+
 }
