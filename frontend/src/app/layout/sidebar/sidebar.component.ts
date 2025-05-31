@@ -1,5 +1,4 @@
 import {Component, EventEmitter, Input, Output, ViewChild, ElementRef, HostListener} from '@angular/core';
-import { HistoricalPlaceEntity} from '../../dto/db_entity/HistoricalPlaceEntity';
 import {HistoricPlaceDetailComponent} from '../historic-place-detail/historic-place-detail.component';
 import {HistoricPlacePreviewComponent} from '../historic-place-preview/historic-place-preview.component';
 import {NgIf, CommonModule} from '@angular/common';
@@ -12,13 +11,7 @@ import {TuiAppearance, TuiButton, TuiIcon, TuiLoader, TuiTitle, TuiTextfield} fr
 import {TuiCardLarge, TuiHeader, TuiCell, TuiInputSearch} from '@taiga-ui/layout';
 import {debounceTime, filter, Observable, switchMap} from 'rxjs';
 import {SearchService} from '../../services/search.service';
-import {UserHistoryDto} from '../../user_db.dto/user-history.dto';
-import {UserPointDto} from '../../user_db.dto/user-point.dto';
-import {UserHistoriesService} from '../../user_db.services/user-histories.service';
-import {UserPointsService} from '../../user_db.services/user-points.service';
-import {UserBadgeDTO} from '../../user_db.dto/user-badge.dto';
-import {UserBadgesService} from '../../user_db.services/user-badges.service';
-import {UtilitiesService} from '../../services/utilities.service';
+import {UserService} from '../../services/user.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -58,10 +51,7 @@ export class SidebarComponent {
   enrichmentLoading = false;
 
   constructor(readonly EnrichmentService: EnrichmentService, readonly searchService: SearchService,
-              private userHistoriesService: UserHistoriesService,
-              private userPointsService: UserPointsService,
-              private userBadgeService: UserBadgesService,
-              private utilitiesService: UtilitiesService) {
+              private userService: UserService) {
   }
 
   onClick(tone: string): void {
@@ -183,65 +173,7 @@ export class SidebarComponent {
     if(item.latitude != null && item.longitude != null){
       this.selectedPlace = item;
 
-      this.selectedPlace = this.utilitiesService.enterHistoricNode(this.selectedPlace);
-      /*this.selectedPlace.userHistoryEntry = new UserHistoryDto(
-        -1,
-        "f5599c8c-166b-495c-accc-65addfaa572b",
-        Number(this.selectedPlace.viennaHistoryWikiId),
-        new Date(),
-        new Date(0),
-        2);
-
-      let newUserPointsEntry = new UserPointDto(
-        -1,
-        "f5599c8c-166b-495c-accc-65addfaa572b",
-        1,
-        new Date()
-      );
-
-      let newBadgeEntry = new UserBadgeDTO(
-        -1,
-        "f5599c8c-166b-495c-accc-65addfaa572b",
-        Number(this.selectedPlace.viennaHistoryWikiId),
-        new Date()
-      );
-
-      this.userHistoriesService.createNewUserHistory(this.selectedPlace.userHistoryEntry).subscribe({
-        next: (results) => {
-          console.log('New user history entry created successfully', results);
-          this.selectedPlace.userHistoryEntry.setUserHistoryId(results.getUserHistoryId());
-          /*this.alerts
-            .open('Your new user history entry is saved', {label: 'Success!', appearance: 'success', autoClose: 3000})
-            .subscribe();* /
-        },
-        error: (err) => {
-          console.error('Error creating user history entry:', err);
-        }
-      });
-
-      this.userPointsService.createNewPoints(newUserPointsEntry).subscribe({
-        next: (results) => {
-          console.log('New user points entry created successfully', results);
-          /*this.alerts
-            .open('Your new user history entry is saved', {label: 'Success!', appearance: 'success', autoClose: 3000})
-            .subscribe();* /
-        },
-        error: (err) => {
-          console.error('Error creating user points entry:', err);
-        }
-      });
-
-      this.userBadgeService.createUserBadge(newBadgeEntry).subscribe({
-        next: (results) => {
-          console.log('New badge entry created successfully', results);
-          /*this.alerts
-            .open('Your new user history entry is saved', {label: 'Success!', appearance: 'success', autoClose: 3000})
-            .subscribe();* /
-        },
-        error: (err) => {
-          console.error('Error creating badge entry:', err);
-        }
-      });*/
+      this.selectedPlace = this.userService.enterHistoricNode(this.selectedPlace);
 
       this.detailedView = true;
       this.open = false;
