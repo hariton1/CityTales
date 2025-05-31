@@ -12,6 +12,10 @@ import {TuiAppearance, TuiButton, TuiIcon, TuiLoader, TuiTitle, TuiTextfield} fr
 import {TuiCardLarge, TuiHeader, TuiCell, TuiInputSearch} from '@taiga-ui/layout';
 import {debounceTime, filter, Observable, switchMap} from 'rxjs';
 import {SearchService} from '../../services/search.service';
+import {UserHistoryDto} from '../../user_db.dto/user-history.dto';
+import {UserPointDto} from '../../user_db.dto/user-point.dto';
+import {UserHistoriesService} from '../../user_db.services/user-histories.service';
+import {UserPointsService} from '../../user_db.services/user-points.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -50,7 +54,9 @@ export class SidebarComponent {
   enrichmentStarted = false;
   enrichmentLoading = false;
 
-  constructor(readonly EnrichmentService: EnrichmentService, readonly searchService: SearchService) {
+  constructor(readonly EnrichmentService: EnrichmentService, readonly searchService: SearchService,
+              private userHistoriesService: UserHistoriesService,
+              private userPointsService: UserPointsService) {
   }
 
   onClick(tone: string): void {
@@ -171,6 +177,47 @@ export class SidebarComponent {
     //check if item is a building
     if(item.latitude != null && item.longitude != null){
       this.selectedPlace = item;
+
+      this.selectedPlace.userHistoryEntry = new UserHistoryDto(
+        -1,
+        "f5599c8c-166b-495c-accc-65addfaa572b",
+        Number(this.selectedPlace.viennaHistoryWikiId),
+        new Date(),
+        new Date(0),
+        2);
+
+      let newUserPointsEntry = new UserPointDto(
+        -1,
+        "f5599c8c-166b-495c-accc-65addfaa572b",
+        1,
+        new Date()
+      );
+
+      this.userHistoriesService.createNewUserHistory(this.selectedPlace.userHistoryEntry).subscribe({
+        next: (results) => {
+          console.log('New user history entry created successfully', results);
+          this.selectedPlace.userHistoryEntry.setUserHistoryId(results.getUserHistoryId());
+          /*this.alerts
+            .open('Your new user history entry is saved', {label: 'Success!', appearance: 'success', autoClose: 3000})
+            .subscribe();*/
+        },
+        error: (err) => {
+          console.error('Error creating user history entry:', err);
+        }
+      });
+
+      this.userPointsService.createNewPoints(newUserPointsEntry).subscribe({
+        next: (results) => {
+          console.log('New user points entry created successfully', results);
+          /*this.alerts
+            .open('Your new user history entry is saved', {label: 'Success!', appearance: 'success', autoClose: 3000})
+            .subscribe();*/
+        },
+        error: (err) => {
+          console.error('Error creating user points entry:', err);
+        }
+      });
+
       this.detailedView = true;
       this.open = false;
     } else {
