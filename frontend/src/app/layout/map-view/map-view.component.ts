@@ -12,6 +12,7 @@ import {UserPointDto} from '../../user_db.dto/user-point.dto';
 import {UserPointsService} from '../../user_db.services/user-points.service';
 import {UserBadgeDTO} from '../../user_db.dto/user-badge.dto';
 import {UserBadgesService} from '../../user_db.services/user-badges.service';
+import {UtilitiesService} from '../../services/utilities.service';
 
 @Component({
   selector: 'app-map-view',
@@ -30,7 +31,8 @@ export class MapViewComponent implements OnInit{
               private userLocationService: UserLocationService,
               private userHistoriesService: UserHistoriesService,
               private userPointsService: UserPointsService,
-              private userBadgeService: UserBadgesService) {
+              private userBadgeService: UserBadgesService,
+              private utilitiesService: UtilitiesService) {
   }
 
   @Output() selectPlaceEvent: EventEmitter<BuildingEntity> = new EventEmitter<BuildingEntity>();
@@ -154,7 +156,8 @@ export class MapViewComponent implements OnInit{
 
   detailAction(marker: MapMarker, location: BuildingEntity): void {
 
-    location.userHistoryEntry = new UserHistoryDto(
+    location = this.utilitiesService.enterHistoricNode(location);
+    /*location.userHistoryEntry = new UserHistoryDto(
       -1,
       "f5599c8c-166b-495c-accc-65addfaa572b",
       Number(location.viennaHistoryWikiId),
@@ -182,7 +185,7 @@ export class MapViewComponent implements OnInit{
         location.userHistoryEntry.setUserHistoryId(results.getUserHistoryId());
         /*this.alerts
           .open('Your new user history entry is saved', {label: 'Success!', appearance: 'success', autoClose: 3000})
-          .subscribe();*/
+          .subscribe();* /
       },
       error: (err) => {
         console.error('Error creating user history entry:', err);
@@ -194,7 +197,7 @@ export class MapViewComponent implements OnInit{
         console.log('New user points entry created successfully', results);
         /*this.alerts
           .open('Your new user history entry is saved', {label: 'Success!', appearance: 'success', autoClose: 3000})
-          .subscribe();*/
+          .subscribe();* /
       },
       error: (err) => {
         console.error('Error creating user points entry:', err);
@@ -206,12 +209,12 @@ export class MapViewComponent implements OnInit{
         console.log('New badge entry created successfully', results);
         /*this.alerts
           .open('Your new user history entry is saved', {label: 'Success!', appearance: 'success', autoClose: 3000})
-          .subscribe();*/
+          .subscribe();* /
       },
       error: (err) => {
         console.error('Error creating badge entry:', err);
       }
-    });
+    });*/
 
     this.combinedLocations = this.getCombinedItems(location);
 
