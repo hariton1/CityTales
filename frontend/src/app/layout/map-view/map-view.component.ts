@@ -14,7 +14,7 @@ import {UserService} from '../../services/user.service';
     CommonModule
   ],
   templateUrl: './map-view.component.html',
-  styleUrl: './map-view.component.scss'
+  styleUrl: './map-view.component.less'
 })
 export class MapViewComponent implements OnInit{
 
