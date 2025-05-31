@@ -45,9 +45,9 @@ export class HistoricPlaceDetailComponent {
     this.userHistoriesService.updateUserHistory(this._selectedPlace.userHistoryEntry).subscribe({
         next: (results) => {
           console.log('User history entry updated successfully', results);
-          this.alerts
+          /*this.alerts
             .open('Your user history entry is updated', {label: 'Success!', appearance: 'success', autoClose: 3000})
-            .subscribe();
+            .subscribe();*/
         },
         error: (err) => {
           console.error('Error updating user history entry:', err);
