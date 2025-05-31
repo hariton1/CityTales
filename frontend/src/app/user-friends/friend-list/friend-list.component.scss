@@ -1,0 +1,15 @@
+.friend-list {
+  font-family: Arial, sans-serif;
+  padding: 1rem;
+}
+
+.friend-list ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.friend-list li {
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  border-bottom: 1px solid #ccc;
+}
