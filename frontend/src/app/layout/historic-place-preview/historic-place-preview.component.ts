@@ -9,6 +9,7 @@ import {UserPointsService} from '../../user_db.services/user-points.service';
 import {UserPointDto} from '../../user_db.dto/user-point.dto';
 import {UserBadgeDTO} from '../../user_db.dto/user-badge.dto';
 import {UserBadgesService} from '../../user_db.services/user-badges.service';
+import {UtilitiesService} from '../../services/utilities.service';
 
 
 @Component({
@@ -30,11 +31,13 @@ export class HistoricPlacePreviewComponent {
 
   constructor(private userHistoriesService: UserHistoriesService,
               private userPointsService: UserPointsService,
-              private userBadgeService: UserBadgesService) {
+              private userBadgeService: UserBadgesService,
+              private utilitiesService: UtilitiesService) {
   }
 
   onDetailsClick(place: BuildingEntity) {
-    place.userHistoryEntry = new UserHistoryDto(
+    place = this.utilitiesService.enterHistoricNode(place);
+    /*place.userHistoryEntry = new UserHistoryDto(
       -1,
       "f5599c8c-166b-495c-accc-65addfaa572b",
       Number(place.viennaHistoryWikiId),
@@ -62,7 +65,7 @@ export class HistoricPlacePreviewComponent {
         place.userHistoryEntry.setUserHistoryId(results.getUserHistoryId());
         /*this.alerts
           .open('Your new user history entry is saved', {label: 'Success!', appearance: 'success', autoClose: 3000})
-          .subscribe();*/
+          .subscribe();* /
       },
       error: (err) => {
         console.error('Error creating user history entry:', err);
@@ -74,7 +77,7 @@ export class HistoricPlacePreviewComponent {
         console.log('New user points entry created successfully', results);
         /*this.alerts
           .open('Your new user history entry is saved', {label: 'Success!', appearance: 'success', autoClose: 3000})
-          .subscribe();*/
+          .subscribe();* /
       },
       error: (err) => {
         console.error('Error creating user points entry:', err);
@@ -86,12 +89,12 @@ export class HistoricPlacePreviewComponent {
         console.log('New badge entry created successfully', results);
         /*this.alerts
           .open('Your new user history entry is saved', {label: 'Success!', appearance: 'success', autoClose: 3000})
-          .subscribe();*/
+          .subscribe();* /
       },
       error: (err) => {
         console.error('Error creating badge entry:', err);
       }
-    });
+    });*/
 
     this.selectPlaceEvent.emit(place);
     this.setDetailedViewEvent.emit(true);

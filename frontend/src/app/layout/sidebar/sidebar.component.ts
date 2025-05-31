@@ -18,6 +18,7 @@ import {UserHistoriesService} from '../../user_db.services/user-histories.servic
 import {UserPointsService} from '../../user_db.services/user-points.service';
 import {UserBadgeDTO} from '../../user_db.dto/user-badge.dto';
 import {UserBadgesService} from '../../user_db.services/user-badges.service';
+import {UtilitiesService} from '../../services/utilities.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -59,7 +60,8 @@ export class SidebarComponent {
   constructor(readonly EnrichmentService: EnrichmentService, readonly searchService: SearchService,
               private userHistoriesService: UserHistoriesService,
               private userPointsService: UserPointsService,
-              private userBadgeService: UserBadgesService) {
+              private userBadgeService: UserBadgesService,
+              private utilitiesService: UtilitiesService) {
   }
 
   onClick(tone: string): void {
@@ -181,7 +183,8 @@ export class SidebarComponent {
     if(item.latitude != null && item.longitude != null){
       this.selectedPlace = item;
 
-      this.selectedPlace.userHistoryEntry = new UserHistoryDto(
+      this.selectedPlace = this.utilitiesService.enterHistoricNode(this.selectedPlace);
+      /*this.selectedPlace.userHistoryEntry = new UserHistoryDto(
         -1,
         "f5599c8c-166b-495c-accc-65addfaa572b",
         Number(this.selectedPlace.viennaHistoryWikiId),
@@ -209,7 +212,7 @@ export class SidebarComponent {
           this.selectedPlace.userHistoryEntry.setUserHistoryId(results.getUserHistoryId());
           /*this.alerts
             .open('Your new user history entry is saved', {label: 'Success!', appearance: 'success', autoClose: 3000})
-            .subscribe();*/
+            .subscribe();* /
         },
         error: (err) => {
           console.error('Error creating user history entry:', err);
@@ -221,7 +224,7 @@ export class SidebarComponent {
           console.log('New user points entry created successfully', results);
           /*this.alerts
             .open('Your new user history entry is saved', {label: 'Success!', appearance: 'success', autoClose: 3000})
-            .subscribe();*/
+            .subscribe();* /
         },
         error: (err) => {
           console.error('Error creating user points entry:', err);
@@ -233,12 +236,12 @@ export class SidebarComponent {
           console.log('New badge entry created successfully', results);
           /*this.alerts
             .open('Your new user history entry is saved', {label: 'Success!', appearance: 'success', autoClose: 3000})
-            .subscribe();*/
+            .subscribe();* /
         },
         error: (err) => {
           console.error('Error creating badge entry:', err);
         }
-      });
+      });*/
 
       this.detailedView = true;
       this.open = false;
