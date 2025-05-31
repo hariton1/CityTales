@@ -1,1 +1,12 @@
-<p>friend-list works!</p>
+<div *ngIf="friendInfoList.length > 0; else noFriends">
+  <ul>
+    <li *ngFor="let friend of friendInfoList">
+      <strong>Email:</strong> {{ friend.email }}<br>
+      <strong>Became Friends On:</strong> {{ friend.becameFriendsOn }}
+    </li>
+  </ul>
+</div>
+
+<ng-template #noFriends>
+  <p>No friends found.</p>
+</ng-template>
