@@ -4,13 +4,13 @@ export class UserPointDto {
   public user_point_id: number;
   public user_id: UUID;
   public points: number;
-  public cre_dat: Date;
+  public earned_at: Date;
 
-  constructor(user_point_id: number, user_id: UUID, points: number, cre_dat: Date) {
+  constructor(user_point_id: number, user_id: UUID, points: number, earned_at: Date) {
     this.user_point_id = user_point_id;
     this.user_id = user_id;
     this.points = points;
-    this.cre_dat = cre_dat;
+    this.earned_at = earned_at;
   }
 
   public getUserPointId(): number {
@@ -38,10 +38,10 @@ export class UserPointDto {
   }
 
   public getEarnedAt(): Date {
-    return this.cre_dat;
+    return this.earned_at;
   }
 
   public setEarnedAt(value: Date): void {
-    this.cre_dat = value;
+    this.earned_at = value;
   }
 }

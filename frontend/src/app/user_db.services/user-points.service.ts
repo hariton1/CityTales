@@ -10,7 +10,7 @@ import {UtilitiesService} from '../services/utilities.service';
 @Injectable({providedIn: 'root'})
 export class UserPointsService {
 
-  private DOMAIN = SERVER_ADDRESS + 'userPoints/';
+  private DOMAIN = SERVER_ADDRESS + 'userPoints';
 
   constructor(private httpClient: HttpClient,
               private utilitiesService: UtilitiesService) {
@@ -21,11 +21,11 @@ export class UserPointsService {
   }
 
   public getUserPointById(user_history_id: number): Observable<UserPointDto> {
-    return this.httpClient.get<UserPointDto>(this.DOMAIN + 'id=' + user_history_id);
+    return this.httpClient.get<UserPointDto>(this.DOMAIN + '/id=' + user_history_id);
   }
 
   public getUserPointsByUserId(user_id: string): Observable<UserPointDto[]> {
-    return this.httpClient.get<UserPointDto[]>(this.DOMAIN + 'user_id=' + user_id);
+    return this.httpClient.get<UserPointDto[]>(this.DOMAIN + '/user_id=' + user_id);
   }
 
   public createNewPoints(user_point: UserPointDto): Observable<UserPointDto> {
@@ -36,7 +36,7 @@ export class UserPointsService {
     };
 
     return this.httpClient.post<UserPointDto>(
-      this.DOMAIN + 'create',
+      this.DOMAIN + '/create',
       userPointsToSend,
       {
         headers: new HttpHeaders({
