@@ -1,9 +1,8 @@
-import {Component, inject, OnInit, Output, ViewChild} from '@angular/core';
+import {Component, inject, OnInit, Output, ViewChild, EventEmitter} from '@angular/core';
 import {GoogleMapsModule, MapInfoWindow, MapMarker} from '@angular/google-maps';
 import {CommonModule} from '@angular/common';
 import {UserLocationService} from '../../services/user-location.service';
 import {LocationService} from '../../services/location.service';
-import {EventEmitter} from '@angular/core';
 import {BuildingEntity} from '../../dto/db_entity/BuildingEntity';
 import {TuiAlertService} from '@taiga-ui/core';
 import {UserService} from '../../services/user.service';
@@ -54,6 +53,13 @@ export class MapViewComponent implements OnInit{
     minZoom: 4,
     zoomControl: true,
     clickableIcons: true,
+    streetViewControl: false,
+    fullscreenControl: false,
+    mapTypeControl: true,
+    mapTypeControlOptions: {
+      style: google.maps.MapTypeControlStyle.DROPDOWN_MENU, // or .HORIZONTAL_BAR
+      position: google.maps.ControlPosition.TOP_RIGHT       // e.g., BOTTOM_LEFT, TOP_CENTER, etc.
+    },
     styles: [
       {
         "featureType": "poi",
@@ -88,6 +94,26 @@ export class MapViewComponent implements OnInit{
             "visibility": "off"
           }
         ]
+      },
+      {
+        featureType: 'poi.medical',
+        stylers: [{ visibility: 'off' }]
+      },
+      {
+        featureType: 'poi.attraction',
+        stylers: [{ visibility: 'off' }]
+      },
+      {
+        featureType: 'poi.park',
+        stylers: [{ visibility: 'off' }]
+      },
+      {
+        featureType: 'poi.sports_complex',
+        stylers: [{ visibility: 'off' }]
+      },
+      {
+        featureType: 'poi.school',
+        stylers: [{ visibility: 'off' }]
       }
     ]
   };
@@ -132,7 +158,7 @@ export class MapViewComponent implements OnInit{
   // For testing in case navigator.geolocation breaks - happened to me for some reason...
   ngOnInit(): void {
 
-      this.locationService.getLocationsInRadius(this.center.lat, this.center.lng, 100000).subscribe(locations => {
+      this.locationService.getLocationsInRadius(this.center.lat, this.center.lng, 500).subscribe(locations => {
         this.locationsNearby = locations;
         this.addMarkersToMap(locations);
         this.populatePlacesEvent.emit(locations);

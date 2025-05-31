@@ -1,5 +1,6 @@
 <div class="header-container">
 
+<!-- Enrich Content Button
 <tui-loader
   class="loader"
   [inheritColor]="true"
@@ -82,6 +83,11 @@
     </span>
   </section>
 
+</div>
+-->
+
+<div class="notification-button-container" *ngIf="!isMobile">
+  <app-notification-inbox (selectPlaceEvent)="setSelectedPlace($event)"></app-notification-inbox>
 </div>
 
 <div class="place-detail-container" *ngIf="detailedView">
