@@ -16,6 +16,8 @@ import {UserHistoryDto} from '../../user_db.dto/user-history.dto';
 import {UserPointDto} from '../../user_db.dto/user-point.dto';
 import {UserHistoriesService} from '../../user_db.services/user-histories.service';
 import {UserPointsService} from '../../user_db.services/user-points.service';
+import {UserBadgeDTO} from '../../user_db.dto/user-badge.dto';
+import {UserBadgesService} from '../../user_db.services/user-badges.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -56,7 +58,8 @@ export class SidebarComponent {
 
   constructor(readonly EnrichmentService: EnrichmentService, readonly searchService: SearchService,
               private userHistoriesService: UserHistoriesService,
-              private userPointsService: UserPointsService) {
+              private userPointsService: UserPointsService,
+              private userBadgeService: UserBadgesService) {
   }
 
   onClick(tone: string): void {
@@ -193,6 +196,13 @@ export class SidebarComponent {
         new Date()
       );
 
+      let newBadgeEntry = new UserBadgeDTO(
+        -1,
+        "f5599c8c-166b-495c-accc-65addfaa572b",
+        Number(this.selectedPlace.viennaHistoryWikiId),
+        new Date()
+      );
+
       this.userHistoriesService.createNewUserHistory(this.selectedPlace.userHistoryEntry).subscribe({
         next: (results) => {
           console.log('New user history entry created successfully', results);
@@ -215,6 +225,18 @@ export class SidebarComponent {
         },
         error: (err) => {
           console.error('Error creating user points entry:', err);
+        }
+      });
+
+      this.userBadgeService.createUserBadge(newBadgeEntry).subscribe({
+        next: (results) => {
+          console.log('New badge entry created successfully', results);
+          /*this.alerts
+            .open('Your new user history entry is saved', {label: 'Success!', appearance: 'success', autoClose: 3000})
+            .subscribe();*/
+        },
+        error: (err) => {
+          console.error('Error creating badge entry:', err);
         }
       });
 

@@ -7,6 +7,8 @@ import {UserHistoryDto} from '../../user_db.dto/user-history.dto';
 import {UserHistoriesService} from '../../user_db.services/user-histories.service';
 import {UserPointsService} from '../../user_db.services/user-points.service';
 import {UserPointDto} from '../../user_db.dto/user-point.dto';
+import {UserBadgeDTO} from '../../user_db.dto/user-badge.dto';
+import {UserBadgesService} from '../../user_db.services/user-badges.service';
 
 
 @Component({
@@ -27,7 +29,8 @@ export class HistoricPlacePreviewComponent {
   @Output() setDetailedViewEvent: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   constructor(private userHistoriesService: UserHistoriesService,
-              private userPointsService: UserPointsService) {
+              private userPointsService: UserPointsService,
+              private userBadgeService: UserBadgesService) {
   }
 
   onDetailsClick(place: BuildingEntity) {
@@ -43,6 +46,13 @@ export class HistoricPlacePreviewComponent {
       -1,
       "f5599c8c-166b-495c-accc-65addfaa572b",
       1,
+      new Date()
+    );
+
+    let newBadgeEntry = new UserBadgeDTO(
+      -1,
+      "f5599c8c-166b-495c-accc-65addfaa572b",
+      Number(place.viennaHistoryWikiId),
       new Date()
     );
 
@@ -68,6 +78,18 @@ export class HistoricPlacePreviewComponent {
       },
       error: (err) => {
         console.error('Error creating user points entry:', err);
+      }
+    });
+
+    this.userBadgeService.createUserBadge(newBadgeEntry).subscribe({
+      next: (results) => {
+        console.log('New badge entry created successfully', results);
+        /*this.alerts
+          .open('Your new user history entry is saved', {label: 'Success!', appearance: 'success', autoClose: 3000})
+          .subscribe();*/
+      },
+      error: (err) => {
+        console.error('Error creating badge entry:', err);
       }
     });
 
