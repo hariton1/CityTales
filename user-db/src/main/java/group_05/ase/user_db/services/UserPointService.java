@@ -25,7 +25,7 @@ public class UserPointService {
 
         for(UserPointEntity userPoint : tmp) {
             userPoints.add(new UserPointDTO(userPoint.getUserPointId(), userPoint.getUserId(),
-                    userPoint.getPoints(), userPoint.getEarnedAt()));
+                    userPoint.getPoints(), userPoint.getEarnedAt(), userPoint.getArticleId()));
         }
 
         return userPoints;
@@ -36,7 +36,7 @@ public class UserPointService {
 
         UserPointEntity tmp = this.repository.findByUserPointId(userPointId);
 
-        return new UserPointDTO(tmp.getUserPointId(), tmp.getUserId(), tmp.getPoints(), tmp.getEarnedAt());
+        return new UserPointDTO(tmp.getUserPointId(), tmp.getUserId(), tmp.getPoints(), tmp.getEarnedAt(), tmp.getArticleId());
 
     }
 
@@ -47,7 +47,7 @@ public class UserPointService {
 
         for(UserPointEntity userPoint : tmp) {
             userPoints.add(new UserPointDTO(userPoint.getUserPointId(), userPoint.getUserId(),
-                    userPoint.getPoints(), userPoint.getEarnedAt()));
+                    userPoint.getPoints(), userPoint.getEarnedAt(), userPoint.getArticleId()));
         }
 
         return userPoints;
@@ -56,13 +56,22 @@ public class UserPointService {
 
     public void saveNewPoints(UserPointDTO userPointDTO) {
 
-        UserPointEntity tmp = new UserPointEntity();
+        UserPointEntity tmp = this.repository.findByUserIdAndArticleIdAndDay(
+                userPointDTO.getUserId(),
+                userPointDTO.getArticleId(),
+                userPointDTO.getEarnedAt(),
+                userPointDTO.getPoints());
 
-        tmp.setUserId(userPointDTO.getUserId());
-        tmp.setPoints(userPointDTO.getPoints());
-        tmp.setEarnedAt(userPointDTO.getEarnedAt());
+        if(tmp == null) {
+            tmp = new UserPointEntity();
 
-        this.repository.save(tmp);
+            tmp.setUserId(userPointDTO.getUserId());
+            tmp.setPoints(userPointDTO.getPoints());
+            tmp.setEarnedAt(userPointDTO.getEarnedAt());
+            tmp.setArticleId(userPointDTO.getArticleId());
+
+            this.repository.save(tmp);
+        }
 
     }
 
