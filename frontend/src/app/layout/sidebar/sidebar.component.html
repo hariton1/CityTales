@@ -1,5 +1,6 @@
 <div class="header-container">
 
+<!-- Enrich Content Button
 <tui-loader
   class="loader"
   [inheritColor]="true"
@@ -18,34 +19,39 @@
   </button>
 
 </tui-loader>
+-->
 
-<tui-textfield (pointerdown.capture.stop)="(0)" class="search-field">
-  <input
-    placeholder="Search for an entitiy..."
-    [formControl]="control"
-    [tuiInputSearch]="search"
-    [(tuiInputSearchOpen)]="open"
-  />
+  <tui-textfield (pointerdown.capture.stop)="(0)" class="search-field">
+    <input
+      placeholder="Search for an entitiy..."
+      [formControl]="control"
+      [tuiInputSearch]="search"
+      [(tuiInputSearchOpen)]="open"
+    />
 
-  <ng-template #search>
-    <tui-search-results [results]="results$ | async">
-      <tui-search-history [popular]="lastSearches"/>
-      <ng-template let-item>
-        <a
-          tuiCell
-          (click)="onItemClick(item)"
-        >
-            <span tuiTitle>
-	                            {{ item.name }}
-	                        </span>
-        </a>
-      </ng-template>
-    </tui-search-results>
-  </ng-template>
-</tui-textfield>
+    <ng-template #search>
+      <tui-search-results [results]="results$ | async">
+        <tui-search-history [popular]="lastSearches"/>
+        <ng-template let-item>
+          <a
+            tuiCell
+            (click)="onItemClick(item)"
+          >
+              <span tuiTitle>
+                                {{ item.name }}
+                            </span>
+          </a>
+        </ng-template>
+      </tui-search-results>
+    </ng-template>
+  </tui-textfield>
 
+  <div class="notification-button-container" *ngIf="!isMobile">
+    <app-notification-inbox (selectPlaceEvent)="setSelectedPlace($event)"></app-notification-inbox>
+  </div>
 </div>
 
+<!-- Enrich Content Block
 <div tuiPlatform="web" class="content" *ngIf="enrichmentStarted && !enrichmentLoading">
   <div
     tuiAppearance="floating"
@@ -83,6 +89,9 @@
   </section>
 
 </div>
+-->
+
+
 
 <div class="place-detail-container" *ngIf="detailedView">
   <app-historic-place-detail [selectedPlace]="selectedPlace" (setDetailEvent)="setDetailEvent($event)"></app-historic-place-detail>

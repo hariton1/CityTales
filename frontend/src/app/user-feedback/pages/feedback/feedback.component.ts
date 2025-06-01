@@ -45,7 +45,7 @@ export class FeedbackComponent implements OnInit {
 
   wikiId: string | null = null;
 
-  constructor(private feeedbackService: FeedbackService,
+  constructor(private feedbackService: FeedbackService,
               private route: ActivatedRoute,
               private router: Router) {
   }
@@ -88,7 +88,7 @@ export class FeedbackComponent implements OnInit {
 
     const createRequests: Observable<any>[] = [];
 
-    createRequests.push(this.feeedbackService.createNewFeedback(newFeedbackDto));
+    createRequests.push(this.feedbackService.createNewFeedback(newFeedbackDto));
 
     if (createRequests.length > 0) {
       forkJoin(createRequests).subscribe({

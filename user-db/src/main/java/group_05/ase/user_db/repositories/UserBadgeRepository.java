@@ -14,4 +14,6 @@ public interface UserBadgeRepository extends JpaRepository<UserBadgeEntity, Inte
 
     List<UserBadgeEntity> findAllByArticleIdOrderByUserBadgeIdAsc(int articleId);
 
+    UserBadgeEntity findByUserIdAndArticleId(UUID userId, int articleI);
+
 }
