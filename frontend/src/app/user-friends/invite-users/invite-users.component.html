@@ -1,20 +1,31 @@
-<h3>Confirmed Friends</h3>
-<ul>
-  <li *ngFor="let f of confirmedFriends">
-    {{ f.user.email }} — Friends since {{ f.since | date: 'shortDate' }}
-  </li>
-</ul>
+<div class="friend-status-container">
+  <div class="status-section">
+    <h3 class="header-with-icon">✅ Confirmed Friends</h3>
+    <ul class="status-list">
+      <li *ngFor="let f of confirmedFriends" class="status-entry">
+        <span class="status-email">{{ f.user.email }}</span>
+        <span class="status-date">Friends since {{ f.since | date: 'shortDate' }}</span>
+      </li>
+    </ul>
+  </div>
 
-<h3>Sent Invites</h3>
-<ul>
-  <li *ngFor="let f of sentInvites">
-    {{ f.user.email }} — Invited on {{ f.since | date: 'shortDate' }}
-  </li>
-</ul>
+  <div class="status-section">
+    <h3 class="header-with-icon">📤 Sent Invites</h3>
+    <ul class="status-list">
+      <li *ngFor="let f of sentInvites" class="status-entry">
+        <span class="status-email">{{ f.user.email }}</span>
+        <span class="status-date">Invited on {{ f.since | date: 'shortDate' }}</span>
+      </li>
+    </ul>
+  </div>
 
-<h3>Received Invites</h3>
-<ul>
-  <li *ngFor="let f of receivedInvites">
-    {{ f.user.email }} — Invited you on {{ f.since | date: 'shortDate' }}
-  </li>
-</ul>
+  <div class="status-section">
+    <h3 class="header-with-icon">📥 Received Invites</h3>
+    <ul class="status-list">
+      <li *ngFor="let f of receivedInvites" class="status-entry">
+        <span class="status-email">{{ f.user.email }}</span>
+        <span class="status-date">Invited you on {{ f.since | date: 'shortDate' }}</span>
+      </li>
+    </ul>
+  </div>
+</div>
