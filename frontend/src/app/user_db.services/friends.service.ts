@@ -25,7 +25,7 @@ export class FriendsService {
     return this.httpClient.get<FriendsDto[]>(this.DOMAIN + 'friend_one=' + friend_one);
   }
 
-  public getFriendsByFriendTwo(friend_two: UUID): Observable<FriendsDto[]> {
+  public getFriendsByFriendTwo(friend_two: string): Observable<FriendsDto[]> {
     return this.httpClient.get<FriendsDto[]>(this.DOMAIN + 'friend_two=' + friend_two);
   }
 
