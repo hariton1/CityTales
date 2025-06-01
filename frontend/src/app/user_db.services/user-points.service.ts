@@ -33,6 +33,7 @@ export class UserPointsService {
       user_id: user_point.getUserId(),
       points: user_point.getPoints(),
       earned_at: this.utilitiesService.formatDate(user_point.getEarnedAt()),
+      article_id: user_point.getArticleId()
     };
 
     return this.httpClient.post<UserPointDto>(

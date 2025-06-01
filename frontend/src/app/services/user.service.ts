@@ -207,7 +207,8 @@ export class UserService {
       -1,
       "f5599c8c-166b-495c-accc-65addfaa572b",
       1,
-      new Date()
+      new Date(),
+      Number(node.viennaHistoryWikiId)
     );
 
     this.userHistoriesService.createNewUserHistory(node.userHistoryEntry).subscribe({
@@ -253,7 +254,8 @@ export class UserService {
       -1,
       "f5599c8c-166b-495c-accc-65addfaa572b",
       2,
-      new Date()
+      new Date(),
+      Number(node.viennaHistoryWikiId)
     );
 
     let newBadgeEntry = new UserBadgeDTO(

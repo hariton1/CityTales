@@ -25,6 +25,12 @@
         <p>{{ selectedPlace.contentGerman }}</p>
       </div>
 
+      <div>
+        <button class="feedback-button" appearance="secondary" size="m" tuiButton type="button" (click)="navigateToFeedback()">
+          <tui-icon icon="@tui.message-circle-plus" [style.height.rem]="1"/> Give us feedback
+        </button>
+      </div>
+
       <div class="content-section">
         <h3>Building Information</h3>
         <div class="building-details">
@@ -88,12 +94,6 @@
             </span>
               </div>
             </div>
-          </div>
-
-          <div>
-            <button appearance="secondary" size="m" tuiButton type="button" (click)="navigateToFeedback()">
-              <tui-icon icon="@tui.message-circle-plus" [style.height.rem]="1"/> Give us feedback
-            </button>
           </div>
         </div>
       </div>
