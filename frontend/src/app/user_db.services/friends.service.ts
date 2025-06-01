@@ -29,10 +29,8 @@ export class FriendsService {
     return this.httpClient.get<FriendsDto[]>(this.DOMAIN + 'friend_two=' + friend_two);
   }
 
-  public createNewFriendsPair(friend: FriendsDto) {
-    this.httpClient.post(this.DOMAIN + 'create', {
-      body: JSON.stringify(friend)
-    })
+  public createNewFriendsPair(friend: FriendsDto): Observable<any> {
+    return this.httpClient.post(this.DOMAIN + 'create', friend);
   }
 
   public deleteFriendsPair(friend: FriendsDto) {
