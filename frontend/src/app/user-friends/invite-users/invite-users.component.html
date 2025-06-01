@@ -1,1 +1,20 @@
-<p>invite-users works!</p>
+<h3>Confirmed Friends</h3>
+<ul>
+  <li *ngFor="let f of confirmedFriends">
+    {{ f.user.email }} — Friends since {{ f.since | date: 'shortDate' }}
+  </li>
+</ul>
+
+<h3>Sent Invites</h3>
+<ul>
+  <li *ngFor="let f of sentInvites">
+    {{ f.user.email }} — Invited on {{ f.since | date: 'shortDate' }}
+  </li>
+</ul>
+
+<h3>Received Invites</h3>
+<ul>
+  <li *ngFor="let f of receivedInvites">
+    {{ f.user.email }} — Invited you on {{ f.since | date: 'shortDate' }}
+  </li>
+</ul>
