@@ -1,1 +1,18 @@
-<p>search-users works!</p>
+<div class="user-list">
+  <h2>Users</h2>
+
+  <div *ngIf="!users || users.length === 0">
+    No users found.
+  </div>
+
+  <ul *ngIf="users && users.length > 0">
+    <li *ngFor="let user of users">
+      <strong>ID:</strong> {{ user.id }} <br />
+      <strong>Email:</strong> {{ user.email }} <br />
+      <button (click)="sendFriendInvite(user)">
+        📨 Send Invite
+      </button>
+      <hr />
+    </li>
+  </ul>
+</div>
