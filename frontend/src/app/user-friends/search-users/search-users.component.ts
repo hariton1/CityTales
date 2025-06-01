@@ -2,6 +2,9 @@ import {Component, OnInit} from '@angular/core';
 import {UserService} from '../../user_db.services/user.service';
 import {UserDto} from '../../user_db.dto/user.dto';
 import {CommonModule} from '@angular/common';
+import {FriendsService} from '../../user_db.services/friends.service';
+import {FriendsDto} from '../../user_db.dto/friends.dto';
+import {UUID} from 'node:crypto';
 
 @Component({
   selector: 'app-search-users',
@@ -12,12 +15,21 @@ import {CommonModule} from '@angular/common';
 export class SearchUsersComponent implements OnInit{
 
   protected users : UserDto[];
+  userId: string | null = null;
 
-  constructor(private userService: UserService) {
+  constructor(private userService: UserService, private friendsService: FriendsService) {
     this.users = [];
   }
   ngOnInit() {
+    this.retrieveUserID();
     this.retrieveUsers();
+  }
+
+  retrieveUserID(): void {
+    const stored = localStorage.getItem("user_uuid");
+    if (stored) {
+      this.userId = stored;
+    }
   }
 
   retrieveUsers() {
@@ -36,7 +48,25 @@ export class SearchUsersComponent implements OnInit{
   }
 
   sendFriendInvite(user: UserDto): void {
-    console.log(`Sending friend invite to ${user.email}`);
-    // Implement the real logic here, e.g., via userService.sendFriendInvite(user.id)
+    if (!this.userId) {
+      console.error('User ID not loaded');
+      return;
+    }
+
+    const invite = new FriendsDto(
+      0, // ID, assuming the backend will generate it
+      this.userId as UUID,
+      user.id,
+      new Date()
+    );
+
+    this.friendsService.createNewFriendsPair(invite).subscribe({
+      next: () => {
+        console.log(`Friend invite sent to ${user.email}`);
+      },
+      error: (err) => {
+        console.error('Failed to send friend invite:', err);
+      }
+    });
   }
 }
