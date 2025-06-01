@@ -8,6 +8,7 @@ import {OnboardingComponent} from './user-interests/onboarding/onboarding.compon
 import {EditInterestsComponent} from './user-interests/edit-interests/edit-interests.component';
 import {FeedbackComponent} from './user-feedback/pages/feedback/feedback.component';
 import {UserGamesComponent} from './user-games/pages/landing-page/user-games.component';
+import {NotificationInboxComponent} from './core/notification-inbox/notification-inbox.component';
 
 export const routes: Routes = [
   {
@@ -32,5 +33,6 @@ export const routes: Routes = [
   { path: 'feedback', component: FeedbackComponent },
   { path: 'edit-interests', component: EditInterestsComponent },
   { path: 'scoreboard', component: UserGamesComponent },
+  { path: 'inbox', component: NotificationInboxComponent },
   { path: '', redirectTo: '/explore', pathMatch: 'full' } //default page, to be changed
 ];

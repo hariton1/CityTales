@@ -30,7 +30,8 @@ public class UserPointServiceTest {
             1,
             UUID.fromString("f5599c8c-166b-495c-accc-65addfaa572b"),
             1,
-            null
+            null,
+            -1
     );
 
     private final ArrayList<UserPointEntity> userPointEntities = new ArrayList<>(List.of(userPointEntity));
@@ -45,6 +46,7 @@ public class UserPointServiceTest {
         assertThat(userPointDTOs.getFirst().getUserPointId()).isEqualTo(userPointEntity.getUserPointId());
         assertThat(userPointDTOs.getFirst().getUserId()).isEqualTo(userPointEntity.getUserId());
         assertThat(userPointDTOs.getFirst().getPoints()).isEqualTo(userPointEntity.getPoints());
+        assertThat(userPointDTOs.getFirst().getArticleId()).isEqualTo(userPointEntity.getArticleId());
 
         System.out.println("Test testGetAllUserPoints passed!");
 
@@ -60,6 +62,7 @@ public class UserPointServiceTest {
         assertThat(userPointDTO.getUserPointId()).isEqualTo(userPointEntity.getUserPointId());
         assertThat(userPointDTO.getUserId()).isEqualTo(userPointEntity.getUserId());
         assertThat(userPointDTO.getPoints()).isEqualTo(userPointEntity.getPoints());
+        assertThat(userPointDTO.getArticleId()).isEqualTo(userPointEntity.getArticleId());
 
         System.out.println("Test testGetUserPointById passed!");
 
@@ -75,6 +78,7 @@ public class UserPointServiceTest {
         assertThat(userPointDTOs.getFirst().getUserPointId()).isEqualTo(userPointEntity.getUserPointId());
         assertThat(userPointDTOs.getFirst().getUserId()).isEqualTo(userPointEntity.getUserId());
         assertThat(userPointDTOs.getFirst().getPoints()).isEqualTo(userPointEntity.getPoints());
+        assertThat(userPointDTOs.getFirst().getArticleId()).isEqualTo(userPointEntity.getArticleId());
 
         System.out.println("Test testGetUserPointsByUserId passed!");
 

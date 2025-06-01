@@ -38,7 +38,8 @@ public class UserPointControllerTest {
             1,
             UUID.fromString("f5599c8c-166b-495c-accc-65addfaa572b"),
             1,
-            null
+            null,
+            -1
     );
 
     private final ArrayList<UserPointDTO> userPointDTOs = new ArrayList<>(List.of(userPointDTO));
@@ -54,7 +55,8 @@ public class UserPointControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].user_point_id").value(userPointDTO.getUserPointId()))
                 .andExpect(jsonPath("$[0].user_id").value(userPointDTO.getUserId().toString()))
-                .andExpect(jsonPath("$[0].points").value(userPointDTO.getPoints()));
+                .andExpect(jsonPath("$[0].points").value(userPointDTO.getPoints()))
+                .andExpect(jsonPath("$[0].article_id").value(userPointDTO.getArticleId()));
 
         System.out.println("Test testGetAllUserPoints passed!");
     }
@@ -70,7 +72,8 @@ public class UserPointControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.user_point_id").value(userPointDTO.getUserPointId()))
                 .andExpect(jsonPath("$.user_id").value(userPointDTO.getUserId().toString()))
-                .andExpect(jsonPath("$.points").value(userPointDTO.getPoints()));
+                .andExpect(jsonPath("$.points").value(userPointDTO.getPoints()))
+                .andExpect(jsonPath("$.article_id").value(userPointDTO.getArticleId()));
 
         System.out.println("Test testGetUserPointById passed!");
     }
@@ -86,7 +89,8 @@ public class UserPointControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].user_point_id").value(userPointDTO.getUserPointId()))
                 .andExpect(jsonPath("$[0].user_id").value(userPointDTO.getUserId().toString()))
-                .andExpect(jsonPath("$[0].points").value(userPointDTO.getPoints()));
+                .andExpect(jsonPath("$[0].points").value(userPointDTO.getPoints()))
+                .andExpect(jsonPath("$[0].article_id").value(userPointDTO.getArticleId()));
 
         System.out.println("Test testGetUserPointsByUserId passed!");
     }
