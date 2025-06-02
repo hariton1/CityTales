@@ -29,7 +29,6 @@ class FriendsRepositoryTest {
         testEntity = new FriendsEntity();
         testEntity.setFriendOne(uuid1);
         testEntity.setFriendTwo(uuid2);
-        // creDat NICHT notwendig wegen @PrePersist
         friendsRepository.save(testEntity);
     }
 
