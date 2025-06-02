@@ -22,7 +22,8 @@
 }
 
 :host {
-  display: block;
+  display: flex;
+  flex-direction: column;
   position: relative;
 }
 
@@ -36,4 +37,12 @@
 
 .place-summary-text {
   font: var(--tui-font-text-m) !important;
+}
+
+.notification-button-container {
+  position: sticky;
+  top: 1.5rem; /* distance from top as you scroll */
+  margin-left: auto; /* pushes it to the right */
+  margin-right: 1rem; /* spacing from right edge */
+  z-index: 10;
 }
