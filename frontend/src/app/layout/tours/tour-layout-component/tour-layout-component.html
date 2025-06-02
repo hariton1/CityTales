@@ -100,3 +100,68 @@
     </div>
   </section>
 </div>
+
+
+<section tuiAppearance="neutral" class="advanced-tour-section tui-space_top-5">
+  <h3 tuiTitle class="tui-text_h4">Advanced Tour Generator</h3>
+
+  <!-- Min and Max Distance Slider -->
+  <div class="tui-space_vertical-3">
+    <label tuiLabel>Min Distance (km): {{ minDistance }}</label>
+    <input tuiSlider
+           type="range"
+      [min]="0.0"
+      [max]="50"
+      [step]="0.2"
+      [(ngModel)]="minDistance"
+    >
+
+    <label tuiLabel>Max Distance (km): {{ maxDistance }}</label>
+    <input
+      tuiSlider
+      type="range"
+      min="minDistance"
+      min="0"
+      max="50"
+      step="0.2"
+      [(ngModel)]="maxDistance"
+    >
+  </div>
+
+  <!-- Min Sites to See -->
+  <div class="tui-space_vertical-3">
+    <label tuiLabel>Minimum Sites to Visit: {{ minSites }}</label>
+    <input
+      tuiSlider
+      type="range"
+      max="20"
+      step="1"
+      [(ngModel)]="minSites"
+    />
+  </div>
+
+  <!-- Generate Button -->
+  <div class="tui-space_top-3">
+    <button tuiButton appearance="primary" size="m" (click)="generateAdvancedTours()">
+      Generate Advanced Tours
+    </button>
+  </div>
+
+  <!-- Display Generated Tours -->
+  <div class="tui-space_top-5" *ngIf="generatedTours.length > 0">
+    <h3 tuiTitle class="tui-text_h4">Generated Tours</h3>
+    <div class="tour-scroll-container">
+      <ng-container *ngFor="let tour of generatedTours">
+        <div class="tour-card-horizontal" (click)="onGeneratedTourClick(tour)">
+          <div class="tour-card-header">
+            <h4 tuiTitle class="tui-text_h6">{{ tour.getName() }}</h4>
+            <span tuiSubtitle>Distance: {{ tour.getDistance() / 1000 }} km</span>
+            <span tuiSubtitle>Duration: {{ tour.getDurationEstimate() / 3600 }} 0h</span>
+          </div>
+          <p class="tui-text_body tui-space_top-1">{{ tour.getDescription() }}</p>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</section>
+

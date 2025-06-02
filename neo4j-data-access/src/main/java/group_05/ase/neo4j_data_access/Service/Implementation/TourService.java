@@ -4,12 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.google.ortools.Loader;
-import com.google.ortools.linearsolver.MPConstraint;
-import com.google.ortools.linearsolver.MPObjective;
-import com.google.ortools.linearsolver.MPSolver;
-import com.google.ortools.linearsolver.MPVariable;
 import group_05.ase.neo4j_data_access.Entity.Tour.CreateTourRequestDTO;
 import group_05.ase.neo4j_data_access.Entity.Tour.MatchRequest;
 import group_05.ase.neo4j_data_access.Entity.Tour.TourObject;
@@ -55,15 +49,24 @@ public class TourService implements ITourService {
         //HTTP Request to QDRANT for related articles
 
         List<Integer> buildings_wikidata_ids = getEntititesFromQdrant(interest_ids, "WienGeschichteWikiBuildings");
-        //List<Integer> events_wikidata_ids = getEntititesFromQdrant(interest_ids, "WienGeschichteWikiEvents");
-        //List<Integer> persons_wikidata_ids = getEntititesFromQdrant(interest_ids, "WienGeschichteWikiPersons");
+        List<Integer> events_wikidata_ids = getEntititesFromQdrant(interest_ids, "WienGeschichteWikiEvents");
+        List<Integer> persons_wikidata_ids = getEntititesFromQdrant(interest_ids, "WienGeschichteWikiPersons");
+
+        Set<Integer> related_building_wikidata_ids = new HashSet<>();
+        for(Integer event_id: events_wikidata_ids){
+            this.historicEventService.getAllLinkedHistoricBuildingsById(event_id).forEach(event -> related_building_wikidata_ids.add(event.getViennaHistoryWikiId()));
+        }
+
+        for(Integer event_id: persons_wikidata_ids){
+            this.historicPersonService.getAllLinkedHistoricBuildingsById(event_id).forEach(person -> related_building_wikidata_ids.add(person.getViennaHistoryWikiId()));
+        }
 
 
-        //For now: Just look at places
+        System.out.println("Direct buildungs size: " + buildings_wikidata_ids.size());
+        System.out.println("Realted buildings size: " + related_building_wikidata_ids.size());
 
-        System.out.println(buildings_wikidata_ids);
-        //System.out.println(events_wikidata_ids);
-        //System.out.println(persons_wikidata_ids);
+        buildings_wikidata_ids.addAll(related_building_wikidata_ids);
+        buildings_wikidata_ids = buildings_wikidata_ids.stream().distinct().toList();
 
         List<GeographicPoint2d> stops = new ArrayList<>();
         stops.add(new GeographicPoint2d(dto.getStart_lat(), dto.getStart_lng()));
@@ -94,7 +97,6 @@ public class TourService implements ITourService {
         List<List<GeographicPoint2d>> routes = findRoutesBFS(stops, distanceMatrix, dto.getMinDistance(), dto.getMaxDistance(), dto.getMinIntermediateStops(), MAX_ROUTES);
         List<TourObject> tours = routes.stream().map(route -> buildTourObject(route, dto.getUserId(), building_dict)).toList();
 
-        System.out.println("Tours: " + tours);
         return tours;
     }
 

@@ -76,3 +76,14 @@
 .tui-block {
   padding: 8px 16px;
 }
+
+.advanced-tour-section tui-space_top-5{
+  padding: 10px;
+}
+
+.tour-scroll-container {
+  display: flex;
+  overflow-x: auto;
+  gap: 1rem;
+  padding: 1rem;
+}
