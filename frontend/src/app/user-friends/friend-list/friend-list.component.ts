@@ -1,19 +1,33 @@
 import {Component, OnInit} from '@angular/core';
-import {CommonModule} from '@angular/common';
+import {CommonModule, DatePipe} from '@angular/common';
 import {FriendsService} from '../../user_db.services/friends.service';
 import {FriendsDto} from '../../user_db.dto/friends.dto';
 import {UserService} from '../../user_db.services/user.service';
 import {UserDto} from '../../user_db.dto/user.dto';
+import {TuiTable} from '@taiga-ui/addon-table';
+import {TuiAutoColorPipe, TuiButton, TuiInitialsPipe, TuiTitle} from '@taiga-ui/core';
+import {TuiAvatar, TuiStatus} from '@taiga-ui/kit';
+import {TuiCell} from '@taiga-ui/layout';
 
 interface Friend {
   email: string;
-  becameFriendsOn: Date;
+  becameFriendsOn: Date | null;
 }
 
 @Component({
   selector: 'app-friend-list',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule,
+    TuiTable,
+    TuiInitialsPipe,
+    TuiAutoColorPipe,
+    TuiStatus,
+    TuiButton,
+    TuiTitle,
+    TuiInitialsPipe,
+    TuiCell,
+    TuiAvatar,
+    DatePipe],
   templateUrl: './friend-list.component.html',
   styleUrl: './friend-list.component.scss'
 })
@@ -73,8 +87,9 @@ export class FriendListComponent implements OnInit {
         next: (user: UserDto) => {
           const friend: Friend = {
             email: user.email,
-            becameFriendsOn: sentDto.cre_dat
+            becameFriendsOn: this.sanitizeDate(sentDto.cre_dat)
           };
+          console.log(sentDto.cre_dat)
           this.friendInfoList.push(friend);
         },
         error: (err) => {
@@ -82,5 +97,13 @@ export class FriendListComponent implements OnInit {
         }
       });
     });
+  }
+
+  sanitizeDate(raw: string | Date): Date | null {
+    if (raw instanceof Date) return raw;
+
+    const cleaned = raw.replace(/\s?(AM|PM)/, '');
+    const date = new Date(cleaned);
+    return isNaN(date.getTime()) ? null : date;
   }
 }
