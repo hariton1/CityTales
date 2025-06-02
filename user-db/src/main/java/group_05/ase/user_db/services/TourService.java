@@ -111,16 +111,14 @@ public class TourService {
         tourEntity.setDurationEstimate(tourDTO.getDurationEstimate());
         tourEntity.setUserId(tourDTO.getUserId());
 
-        System.out.println("tourEntity: " + tourEntity);
-
         this.tourRepository.save(tourEntity);
     }
 
 
     public TourDTO updateTourById(Integer id, TourDTO updatedValues) {
+
         TourEntity existingTour = this.tourRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Tour not found"));
-        this.tourRepository.deleteById(id);
 
         if (updatedValues.getName() != null) {
             existingTour.setName(updatedValues.getName());

@@ -22,8 +22,8 @@
       ></textarea>
     </tui-textfield>
 
-    <button tuiButton appearance="primary" size="m" (click)="saveChanges()">Save Changes</button>
-    <button tuiButton appearance="danger" size="s" (click)="deleteTour()">Delete Tour</button>
+    <button tuiButton  size="m" (click)="saveChanges()">Save Changes</button>
+    <button tuiButton  size="s" (click)="deleteTour()">Delete Tour</button>
   </div>
 
   <div class="tour-detail-layout">
@@ -31,6 +31,14 @@
     <div class="tour-stops-list">
       <h4>Tour Stops</h4>
       <ul class="stops-list">
+        <li>
+          <div class="stop-item">
+            <div class="stop-dot"></div>
+            <div class="stop-content">
+              Start
+            </div>
+          </div>
+        </li>
         <li *ngFor="let stop of tour.getStops()">
           <div class="stop-item">
             <div class="stop-dot"></div>
@@ -40,7 +48,20 @@
             </div>
           </div>
         </li>
+        <li>
+          <div class="stop-item">
+            <div class="stop-dot"></div>
+            <div class="stop-content">
+              Stop
+            </div>
+          </div>
+        </li>
       </ul>
+    </div>
+
+    <div class="tour-summary tui-space_top-3">
+      <p><strong>Total Distance:</strong> {{ tour.getDistance() }} km</p>
+      <p><strong>Estimated Duration:</strong> {{ tour.getDurationEstimate() }} hours</p>
     </div>
 
     <!-- Right: Google Map with markers -->
@@ -52,9 +73,17 @@
         width="100%">
         <map-marker
           *ngFor="let stop of tour.getStops()"
-          [position]="{ lat: stop.latitude, lng: stop.longitude }"
-          [label]="stop.name">
+          [position]="{ lat: stop.latitude, lng: stop.longitude }">
         </map-marker>
+        <map-marker
+        [position]="this.start"
+        [icon]="'http://maps.google.com/mapfiles/ms/icons/green-dot.png'">
+        </map-marker>
+        <map-marker
+          [position]="this.end"
+          [icon]="'http://maps.google.com/mapfiles/ms/icons/red-dot.png'">>
+        </map-marker>
+        <map-polyline [path]="polylinePath" [options]="polylineOptions"></map-polyline>
       </google-map>
     </div>
   </div>
