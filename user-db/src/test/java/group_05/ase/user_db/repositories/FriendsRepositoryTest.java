@@ -1,71 +1,55 @@
 package group_05.ase.user_db.repositories;
 
 import group_05.ase.user_db.entities.FriendsEntity;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
-@RunWith(SpringRunner.class)
-@DataJpaTest()
-public class FriendsRepositoryTest {
+@DataJpaTest
+class FriendsRepositoryTest {
 
     @Autowired
-    FriendsRepository friendsRepository;
+    private FriendsRepository friendsRepository;
 
-    private final FriendsEntity friendsEntity = new FriendsEntity(
-            1,
-            UUID.fromString("f5599c8c-166b-495c-accc-65addfaa572b"),
-            UUID.fromString("f5599c8c-166b-495c-accc-65addfaa572b"),
-            null
-    );
+    private UUID uuid1;
+    private UUID uuid2;
+    private FriendsEntity testEntity;
 
-    @Test
-    public void testFindByFriendsId() {
+    @BeforeEach
+    void setUp() {
+        uuid1 = UUID.fromString("f5599c8c-166b-495c-accc-65addfaa572b");
+        uuid2 = UUID.fromString("5be46711-4f9c-468b-a6dc-0dce03f3b318");
 
-        FriendsEntity tmp = friendsRepository.findByFriendsId(1);
-
-        assertThat(tmp).isNotNull();
-        assertThat(tmp.getFriendsId()).isEqualTo(friendsEntity.getFriendsId());
-        assertThat(tmp.getFriendOne()).isEqualTo(friendsEntity.getFriendOne());
-        assertThat(tmp.getFriendTwo()).isEqualTo(friendsEntity.getFriendTwo());
-
-        System.out.println("Test testFindByFriendsId passed!");
-
+        testEntity = new FriendsEntity();
+        testEntity.setFriendOne(uuid1);
+        testEntity.setFriendTwo(uuid2);
+        // creDat NICHT notwendig wegen @PrePersist
+        friendsRepository.save(testEntity);
     }
 
     @Test
-    public void testFindByFriendOne() {
-
-        ArrayList<FriendsEntity> tmp = new ArrayList<>(friendsRepository.findByFriendOne(UUID.fromString("f5599c8c-166b-495c-accc-65addfaa572b")));
-
-        assertThat(tmp).isNotNull();
-        assertThat(tmp.getFirst().getFriendsId()).isEqualTo(friendsEntity.getFriendsId());
-        assertThat(tmp.getFirst().getFriendOne()).isEqualTo(friendsEntity.getFriendOne());
-        assertThat(tmp.getFirst().getFriendTwo()).isEqualTo(friendsEntity.getFriendTwo());
-
-        System.out.println("Test testFindByFriendOne passed!");
-
+    void testFindByFriendsId() {
+        FriendsEntity found = friendsRepository.findByFriendsId(testEntity.getFriendsId());
+        assertThat(found).isNotNull();
+        assertThat(found.getFriendOne()).isEqualTo(uuid1);
+        assertThat(found.getFriendTwo()).isEqualTo(uuid2);
     }
 
     @Test
-    public void testFindByFriendTwo() {
-
-        ArrayList<FriendsEntity> tmp = new ArrayList<>(friendsRepository.findByFriendOne(UUID.fromString("f5599c8c-166b-495c-accc-65addfaa572b")));
-
-        assertThat(tmp).isNotNull();
-        assertThat(tmp.getFirst().getFriendsId()).isEqualTo(friendsEntity.getFriendsId());
-        assertThat(tmp.getFirst().getFriendOne()).isEqualTo(friendsEntity.getFriendOne());
-        assertThat(tmp.getFirst().getFriendTwo()).isEqualTo(friendsEntity.getFriendTwo());
-
-        System.out.println("Test testFindByFriendTwo passed!");
-
+    void testFindByFriendOne() {
+        List<FriendsEntity> found = friendsRepository.findByFriendOne(uuid1);
+        assertThat(found).extracting(FriendsEntity::getFriendsId).contains(testEntity.getFriendsId());
     }
 
+    @Test
+    void testFindByFriendTwo() {
+        List<FriendsEntity> found = friendsRepository.findByFriendTwo(uuid2);
+        assertThat(found).extracting(FriendsEntity::getFriendsId).contains(testEntity.getFriendsId());
+    }
 }

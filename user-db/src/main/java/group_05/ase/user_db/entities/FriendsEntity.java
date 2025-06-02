@@ -16,14 +16,17 @@ import java.util.UUID;
 public class FriendsEntity {
 
     @Id
-    @SequenceGenerator(name = "friendsIdSeq", sequenceName = "seq_friends_id", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "friendsIdSeq")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int friendsId;
 
     private UUID friendOne;
-
     private UUID friendTwo;
-
     private LocalDateTime creDat;
 
+    @PrePersist
+    public void prePersist() {
+        if (creDat == null) {
+            creDat = LocalDateTime.now();
+        }
+    }
 }
