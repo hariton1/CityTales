@@ -3,6 +3,9 @@ package group_05.ase.neo4j_data_access.Controller;
 import group_05.ase.neo4j_data_access.Entity.ViennaHistoryWikiBuildingObject;
 import group_05.ase.neo4j_data_access.Entity.ViennaHistoryWikiEventObject;
 import group_05.ase.neo4j_data_access.Entity.ViennaHistoryWikiPersonObject;
+import group_05.ase.neo4j_data_access.Entity.FunFactObject;
+import group_05.ase.neo4j_data_access.Service.Implementation.FunFactExtractorService;
+import group_05.ase.neo4j_data_access.Service.Implementation.HistoricBuildingService;
 import group_05.ase.neo4j_data_access.Service.Interface.IHistoricPersonService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,9 +20,13 @@ import java.util.List;
 public class HistoricPersonController {
 
     private final IHistoricPersonService historicPersonService;
+    private final FunFactExtractorService funFactExtractorService;
+    private final HistoricBuildingService historicBuildingService;
 
-    public HistoricPersonController(IHistoricPersonService historicPersonService ) {
+    public HistoricPersonController(IHistoricPersonService historicPersonService, FunFactExtractorService funFactExtractorService, HistoricBuildingService historicBuildingService) {
         this.historicPersonService = historicPersonService;
+        this.funFactExtractorService = funFactExtractorService;
+        this.historicBuildingService = historicBuildingService;
     }
 
     @GetMapping("/by/id/{viennaHistoryWikiId}")
@@ -69,4 +76,35 @@ public class HistoricPersonController {
         }
         return ResponseEntity.ok(events);
     }
+
+    @GetMapping("/funfact/by/id/{viennaHistoryWikiId}")
+    public ResponseEntity<String> getFunFactById(@PathVariable int viennaHistoryWikiId) {
+        ViennaHistoryWikiBuildingObject buildingById = historicBuildingService.getBuildingById(viennaHistoryWikiId);
+        if (buildingById == null || buildingById.getContentEnglish() == null || buildingById.getContentEnglish().isBlank()) {
+            return ResponseEntity.notFound().build();
+        }
+        String funFact = funFactExtractorService.extractFunFact(buildingById.getContentEnglish());
+        return ResponseEntity.ok(funFact);
+    }
+
+    @GetMapping("/funfact/dto/by/id/{viennaHistoryWikiId}")
+    public ResponseEntity<FunFactObject> getFunFactDtoById(@PathVariable int viennaHistoryWikiId) {
+        ViennaHistoryWikiBuildingObject buildingById = historicBuildingService.getBuildingById(viennaHistoryWikiId);
+        if (buildingById == null || buildingById.getContentEnglish() == null || buildingById.getContentEnglish().isBlank()) {
+            return ResponseEntity.notFound().build();
+        }
+        String funFact = funFactExtractorService.extractFunFact(buildingById.getContentEnglish());
+        return ResponseEntity.ok(new FunFactObject(buildingById.getName(), funFact));
+    }
+
+    @GetMapping("/funfact/tfidf/by/id/{viennaHistoryWikiId}")
+    public ResponseEntity<FunFactObject> getFunFactTFIDFById(@PathVariable int viennaHistoryWikiId) {
+        ViennaHistoryWikiBuildingObject buildingById = historicBuildingService.getBuildingById(viennaHistoryWikiId);
+        if (buildingById == null || buildingById.getContentEnglish() == null || buildingById.getContentEnglish().isBlank()) {
+            return ResponseEntity.notFound().build();
+        }
+        String funFact = funFactExtractorService.extractFunFactTFIDF(buildingById.getContentEnglish());
+        return ResponseEntity.ok(new FunFactObject(buildingById.getName(), funFact));
+    }
 }
+
