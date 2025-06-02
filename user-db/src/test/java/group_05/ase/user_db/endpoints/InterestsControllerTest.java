@@ -127,7 +127,7 @@ class InterestsControllerTest {
         doNothing().when(interestService).saveNewInterest(any(InterestDTO.class));
 
         mockMvc.perform(post("/interests/create")
-                        .with(csrf()) // <--- WICHTIG!
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(interestDTO)))
                 .andExpect(status().isCreated());
