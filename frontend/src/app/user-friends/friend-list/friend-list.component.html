@@ -1,19 +1,44 @@
-<div class="friend-list-container">
+<div class="centered-wrapper">
   <h2 class="header-with-icon">👥 Friend List</h2>
 
-  <div *ngIf="friendInfoList.length > 0; else noFriends">
-    <ul class="friend-list">
-      <li *ngFor="let friend of friendInfoList">
-        <div class="friend-entry">
-          <div class="friend-label">📧 Email:</div>
-          <div class="friend-value">{{ friend.email }}</div>
+  <ng-container *ngIf="friendInfoList.length > 0; else noFriends">
+    <table
+      tuiTable
+      [size]="'m'"
+      [style.width.rem]="70"
+      class="friend-table"
+    >
+      <thead>
+      <tr>
+        <th tuiTh>Email</th>
+        <th tuiTh>Became Friends On</th>
+      </tr>
+      </thead>
 
-          <div class="friend-label">📅 Became Friends On:</div>
-          <div class="friend-value">{{ friend.becameFriendsOn }}</div>
-        </div>
-      </li>
-    </ul>
-  </div>
+      <tbody tuiTbody>
+      <tr *ngFor="let friend of friendInfoList">
+        <!-- Email with avatar -->
+        <td tuiTd>
+          <div [tuiCell]="'m'">
+            <tui-avatar
+              [src]="friend.email | tuiInitials"
+              [style.background]="friend.email | tuiAutoColor"
+            ></tui-avatar>
+            <span tuiTitle>{{ friend.email }}</span>
+          </div>
+        </td>
+
+        <!-- Date -->
+        <td tuiTd>
+            <span tuiTitle>
+              {{ friend.becameFriendsOn | date: 'dd.MM.yyyy' }}
+            </span>
+        </td>
+
+      </tr>
+      </tbody>
+    </table>
+  </ng-container>
 
   <ng-template #noFriends>
     <p class="no-friends-text">No friends found.</p>
