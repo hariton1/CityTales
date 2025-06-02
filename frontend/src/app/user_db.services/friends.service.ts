@@ -21,23 +21,24 @@ export class FriendsService {
     return this.httpClient.get<FriendsDto>(this.DOMAIN + 'id=' + friends_id);
   }
 
-  public getFriendsByFriendOne(friend_one: UUID): Observable<FriendsDto[]> {
+  public getFriendsByFriendOne(friend_one: string): Observable<FriendsDto[]> {
     return this.httpClient.get<FriendsDto[]>(this.DOMAIN + 'friend_one=' + friend_one);
   }
 
-  public getFriendsByFriendTwo(friend_two: UUID): Observable<FriendsDto[]> {
+  public getFriendsByFriendTwo(friend_two: string): Observable<FriendsDto[]> {
     return this.httpClient.get<FriendsDto[]>(this.DOMAIN + 'friend_two=' + friend_two);
   }
 
-  public createNewFriendsPair(friend: FriendsDto) {
-    this.httpClient.post(this.DOMAIN + 'create', {
-      body: JSON.stringify(friend)
-    })
+  public createNewFriendsPair(friend: FriendsDto): Observable<any> {
+    return this.httpClient.post(this.DOMAIN + 'create', friend);
   }
 
   public deleteFriendsPair(friend: FriendsDto) {
-    this.httpClient.delete(this.DOMAIN + 'delete', {
-      body: JSON.stringify(friend)
-    })
+    return this.httpClient.request('DELETE', this.DOMAIN + 'delete', {
+      body: friend,
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
   }
 }

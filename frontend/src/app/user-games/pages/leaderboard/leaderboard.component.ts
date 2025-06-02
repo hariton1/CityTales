@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, Inject, OnInit, PLATFORM_ID} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {TuiSwitch, tuiSwitchOptionsProvider} from '@taiga-ui/kit';
 import {TuiSizeS} from '@taiga-ui/core';
@@ -6,6 +6,7 @@ import {FormsModule} from '@angular/forms';
 import {UserPointsService} from '../../../user_db.services/user-points.service';
 import {forkJoin, map, switchMap} from 'rxjs';
 import {UserService} from '../../../user_db.services/user.service';
+import {FriendsService} from '../../../user_db.services/friends.service';
 
 
 @Component({
@@ -18,10 +19,28 @@ import {UserService} from '../../../user_db.services/user.service';
   ],
 })
 export class LeaderboardComponent implements OnInit{
-  constructor(private userPointsService: UserPointsService, private userService: UserService) {
+  constructor(
+    private userPointsService: UserPointsService,
+    private userService: UserService,
+    private friendsService: FriendsService) {
   }
 
+  isFriends = false;
+  userId: string | null = null;
+
+  globalLeaderboard: any[] = [];
+  friendsLeaderboard: any[] = [];
+  currentUserEmail!: string;
+
   ngOnInit() {
+
+    this.retrieveUserID();
+    if (this.userId) {
+      this.userService.getUserById(this.userId).subscribe(user => {
+        this.currentUserEmail = user.email;
+      });
+    }
+
     this.userPointsService.getAllUserPoints()
       .pipe(
         switchMap(pointsArray => {
@@ -53,13 +72,53 @@ export class LeaderboardComponent implements OnInit{
       )
       .subscribe(globalLeaderboard => {
         this.globalLeaderboard = globalLeaderboard;
+
+        if (!this.userId || !this.currentUserEmail) return;
+
+        const sentMap = new Map<string, any>();
+        const receivedMap = new Map<string, any>();
+
+        this.friendsService.getFriendsByFriendOne(this.userId).subscribe({
+          next: sentList => {
+            sentList.forEach(dto => sentMap.set(dto.friend_two, dto));
+
+            this.friendsService.getFriendsByFriendTwo(this.userId!).subscribe({
+              next: receivedList => {
+                receivedList.forEach(dto => receivedMap.set(dto.friend_one, dto));
+
+                const confirmedIds = [...sentMap.keys()].filter(id =>
+                  receivedMap.has(id)
+                );
+
+                const friendEmailRequests = confirmedIds.map(id =>
+                  this.userService.getUserById(id).pipe(
+                    map(user => user.email)
+                  )
+                );
+
+                forkJoin(friendEmailRequests).subscribe(friendEmails => {
+                  const emailSet = new Set(friendEmails);
+                  emailSet.add(this.currentUserEmail); // Ensure current user is included
+
+                  this.friendsLeaderboard = globalLeaderboard.filter(entry =>
+                    emailSet.has(entry.name)
+                  );
+                });
+              },
+              error: err => console.error('Error fetching received invites:', err)
+            });
+          },
+          error: err => console.error('Error fetching sent invites:', err)
+        });
       });
   }
 
-  isFriends = false;
-
-  globalLeaderboard: any[] = [];
-  friendsLeaderboard: any[] = [];
+  retrieveUserID(): void {
+    const stored = localStorage.getItem("user_uuid");
+    if (stored) {
+      this.userId = stored;
+    }
+  }
 
   get leaderboard() {
     return this.isFriends ? this.friendsLeaderboard : this.globalLeaderboard;

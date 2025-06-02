@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, Inject, OnInit, PLATFORM_ID} from '@angular/core';
 import {UserBadgesService} from '../../../user_db.services/user-badges.service';
 import {UserBadgeDTO} from '../../../user_db.dto/user-badge.dto';
 import {CommonModule} from '@angular/common';
@@ -18,7 +18,10 @@ export class BadgesComponent implements OnInit{
   badges: (UserBadgeDTO & { articleDetails?: Combined })[] = [];
 
 
-  constructor(private userBadgeService: UserBadgesService,private combinedService: CombinedService) {
+  constructor(
+    private userBadgeService: UserBadgesService,
+    private combinedService: CombinedService
+  ) {
   }
 
   ngOnInit() {
