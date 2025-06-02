@@ -10,7 +10,6 @@ import {supabase} from '../../../user-management/supabase.service';
 import {GoogleMap, MapPolyline} from '@angular/google-maps';
 import {BuildingEntity} from '../../../dto/db_entity/BuildingEntity';
 import {TourDto} from '../../../dto/tour.dto';
-
 @Component({
   selector: 'app-tour-layout-component',
   imports: [TuiButton,
@@ -89,8 +88,13 @@ export class TourLayoutComponent {
       this.tourDistance = (tour.getDistance() / 1000).toFixed(2);
       this.tourDuration = (tour.getDurationEstimate() /3600).toFixed(2);
       if(tour.getUserId() !== 'NONE') {
-        this.tourService.createTourInDB(tour);
-        console.log("Tour created successfully!");
+        console.log(tour.getUserId())
+        this.tourService.createTourInDB(tour).subscribe({
+          next: tour => {
+            console.log("Tour created successfully!");},
+          error: any => {console.log("An error occured when saving tour to the DB! ")}});
+        this.userTours.push(tour);
+        this.resetInterface();
       } else {
         alert("Tour could not be created! No user logged in. Please log in to create a tour.");
       }
@@ -265,5 +269,17 @@ export class TourLayoutComponent {
     this.polylinePath = coords;
     console.log("Updated polyline path!")
     console.log(this.polylinePath.toString());
+  }
+
+  resetInterface(): void {
+    this.selectedBuildings = []
+    this.startMarker = null;
+    this.endMarker = null;
+    this.polylinePath = [];
+    this.tourName.reset()
+    this.tourDescription.reset();
+    this.tourDuration = "0";
+    this.tourDistance = "0";
+    this.updatePolylinePath()
   }
 }

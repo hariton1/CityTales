@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {Observable} from 'rxjs';
+import {catchError, Observable} from 'rxjs';
 import {BACKEND_ADDRESS, SERVER_ADDRESS} from '../globals';
 import {TourEntity} from '../dto/tour_entity/TourEntity';
 import {BuildingEntity} from '../dto/db_entity/BuildingEntity';
@@ -59,7 +59,7 @@ export class TourService {
 
   public createTourInDB(tour: TourDto)
   {
-    return this.httpClient.post(SERVER_ADDRESS + 'tours/createTour', TourDto.ofTourDTo(tour))
+    return this.httpClient.post(SERVER_ADDRESS + 'tours/createTour', TourDto.ofTourDTo(tour));
   }
 
   public getToursForUserId(userId: string): Observable<TourEntity[]>
@@ -77,6 +77,8 @@ export class TourService {
     response.subscribe(data => console.log(data));
   }
 
-
-
+  public updateTour(tour: TourDto): Observable<Object> {
+    console.log(TourDto.ofTourDTo(tour).id)
+    return this.httpClient.patch(SERVER_ADDRESS + 'tours/id=' + tour.getId(), TourDto.ofTourDTo(tour))
+  }
 }
