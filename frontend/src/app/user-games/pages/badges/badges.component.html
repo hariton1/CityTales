@@ -1,0 +1,23 @@
+<div class="badges-container">
+  <h2 class="header-with-icon">
+    🏅 User Badges
+  </h2>
+
+  <div class="badge-card" *ngFor="let badge of badges">
+    <div class="badge-image-wrapper" *ngIf="badge.articleDetails as details">
+      <img
+        *ngIf="details.imageUrls && details.imageUrls.length > 1"
+        [src]="details.imageUrls[1]"
+        alt="Article Image"
+        class="badge-article-image"
+      />
+      <div class="badge-icon">🏅</div>
+    </div>
+
+    <div class="badge-text">
+      <p><strong>Badge ID:</strong> {{ badge.getUserBadgeId() }}</p>
+      <p><strong>Article Name:</strong> {{ badge.articleDetails?.name }}</p>
+      <p *ngIf="badge.getEarnedAt()"><strong>Earned At:</strong> {{ badge.getEarnedAt() | date:'medium' }}</p>
+    </div>
+  </div>
+</div>

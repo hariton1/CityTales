@@ -3,41 +3,55 @@
     <span tuiNavigationLogo>
         CityTales
     </span>
-
     <tui-segmented [size]="'m'" class="main-nav-desktop">
       <a routerLink="/explore" >🌎 Explore</a>
       <a routerLinkActive  href="#">🧭 Tours</a>
-      <a routerLink="/feedback">Contribute</a>
+      <!-- <a routerLink="/feedback">Contribute</a> -->
       <a routerLinkActive href="#">For Educators</a>
       <a routerLinkActive href="#">About</a>
-<!--      <a routerLink="/onboarding" >Onboarding</a>-->
+      <a routerLinkActive href="/scoreboard">Scoreboard</a>
+      <!-- <a routerLink="/onboarding" >Onboarding</a> -->
     </tui-segmented>
 
-  <input type="text" placeholder="Search for sites/people" #filter>
-  <button class="primary" type="button" (click)="getResults(filter.value)">Search</button>
+  <div class="auth_buttons">
+    <button
+      appearance="secondary"
+      size="s"
+      tuiButton
+      type="button"
+      routerLink="admin/users"
+    >
+      <tui-icon
+        icon="@tui.users"
+        [style.height.rem]="1"
+      />
+      User Management
+    </button>
 
-    <div class="auth_buttons">
-      <button
-        appearance="secondary"
-        size="s"
-        tuiButton
-        type="button"
-        routerLink="admin/user-list"
-      >
-        <tui-icon
-          icon="@tui.users"
-          [style.height.rem]="1"
-        />
-        User Management
-      </button>
+    <button appearance="flat" tuiButton type="button" routerLink="register">
+      Sign Up
+    </button>
 
-      <button appearance="flat" tuiButton type="button" routerLink="register">
-        Sign Up
-      </button>
+    <button
+      *ngIf="!loggedIn"
+      appearance="primary"
+      tuiButton
+      type="button"
+      routerLink="login"
+    >
+      Login
+    </button>
 
-      <button appearance="primary" tuiButton type="button" routerLink="login">
-        Login
-      </button>
-    </div>
+    <!-- Show Logout if logged in -->
+    <button
+      *ngIf="loggedIn"
+      appearance="primary"
+      tuiButton
+      type="button"
+      (click)="logout()"
+    >
+      Logout
+    </button>
+  </div>
 
 </header>

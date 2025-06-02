@@ -46,7 +46,7 @@ public class UserHistoryRepositoryTest {
     @Test
     public void testFindAllByUserId() {
 
-        ArrayList<UserHistoryEntity> tmp = new ArrayList<>(userHistoryRepository.findAllByUserId(UUID.fromString("f5599c8c-166b-495c-accc-65addfaa572b")));
+        ArrayList<UserHistoryEntity> tmp = new ArrayList<>(userHistoryRepository.findAllByUserIdOrderByUserHistoryIdAsc(UUID.fromString("f5599c8c-166b-495c-accc-65addfaa572b")));
 
         assertThat(tmp).isNotNull();
         assertThat(tmp.getFirst().getUserHistoryId()).isEqualTo(userHistoryEntity.getUserHistoryId());

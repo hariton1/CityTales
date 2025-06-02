@@ -39,4 +39,7 @@ public class ViennaHistoryWikiBuildingObject {
 
     private List<String> links = new ArrayList<>();
     private List<String> imageUrls = new ArrayList<>();
+
+    private String contentGerman;
+    private String contentEnglish;
 }

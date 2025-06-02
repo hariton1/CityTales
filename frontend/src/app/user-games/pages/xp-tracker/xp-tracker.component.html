@@ -1,0 +1,14 @@
+<div class="user-points-container">
+  <h2 class="header-with-icon">
+    📈 XP Tracker
+  </h2>
+
+  <ul class="points-list">
+    <li *ngFor="let point of userPoints" class="point-card">
+      <div class="point-value">⭐ {{ point.points }}</div>
+      <div class="point-info">
+        <p><strong>Earned At:</strong> {{ point.earned_at }}</p>
+      </div>
+    </li>
+  </ul>
+</div>

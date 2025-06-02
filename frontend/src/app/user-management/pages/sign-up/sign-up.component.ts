@@ -6,6 +6,9 @@ import {TuiFieldErrorPipe, TuiPassword, TuiTooltip} from '@taiga-ui/kit';
 import {AsyncPipe} from '@angular/common';
 import {TuiInputModule, TuiInputDateModule} from '@taiga-ui/legacy';
 import {TuiDay} from '@taiga-ui/cdk';
+import { supabase } from '../../supabase.service';
+import {Router} from '@angular/router';
+
 
 @Component({
   selector: 'app-sign-up',
@@ -39,14 +42,36 @@ export class SignUpComponent {
     passwordValue: new FormControl('', Validators.required),
     birthday: new FormControl(TuiDay.fromLocalNativeDate(new Date()), Validators.required)
   });
+  constructor(private router: Router) {}
 
-  onSubmit(): void {
-    const signupFormValuesJSON = JSON.stringify(this.signupForm.value);
-    if (this.signupForm.valid) {
-      console.log('Sign-up Form submitted with values:', signupFormValuesJSON);
-    } else {
-      console.log('Sign-up form is invalid');
-      this.signupForm.markAllAsTouched();
+  async onSubmit(): Promise<void> {
+    if (this.signupForm.invalid) {
+    this.signupForm.markAllAsTouched();
+    return;
+  }
+  const { email, passwordValue, firstName, lastName, birthday } = this.signupForm.value;
+  console.log('About to call Supabase:', email, passwordValue, firstName, lastName, birthday);
+
+  const { data, error } = await supabase.auth.signUp({
+    email: email!,
+    password: passwordValue!,
+    options: {
+      data: {
+        first_name: firstName,
+        last_name: lastName,
+        birthday: birthday?.toString() // or birthday?.toLocalNativeDate().toISOString() for better format
+      }
     }
+  });
+
+  console.log('Supabase result:', { data, error });
+
+  if (error) {
+    alert(error.message);
+    return;
+  }
+  alert('Signup successful! Please check your email to confirm your account.');
+  this.router.navigate(['/login']);
   }
 }
+

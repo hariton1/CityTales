@@ -39,11 +39,21 @@ public class InterestsController {
         }
     }
 
-    @GetMapping("/name={interestName}")
+    @GetMapping("/name={interestNameEn}")
     @ResponseStatus(HttpStatus.OK)
-    public InterestDTO getInterestByName(@PathVariable("interestName") String interestName) {
+    public InterestDTO getInterestByNameEn(@PathVariable("interestNameEn") String interestNameEn) {
         try {
-            return this.interestService.getInterestByName(interestName);
+            return this.interestService.getInterestByNameEn(interestNameEn);
+        } catch (Exception e) {
+            return new InterestDTO();//"An internal server error occurred => " + e.getMessage();
+        }
+    }
+
+    @GetMapping("/de/name={interestNameDe}")
+    @ResponseStatus(HttpStatus.OK)
+    public InterestDTO getInterestByNameDe(@PathVariable("interestNameDe") String interestNameDe) {
+        try {
+            return this.interestService.getInterestByNameDe(interestNameDe);
         } catch (Exception e) {
             return new InterestDTO();//"An internal server error occurred => " + e.getMessage();
         }
