@@ -34,8 +34,11 @@ export class FriendsService {
   }
 
   public deleteFriendsPair(friend: FriendsDto) {
-    this.httpClient.delete(this.DOMAIN + 'delete', {
-      body: JSON.stringify(friend)
-    })
+    return this.httpClient.request('DELETE', this.DOMAIN + 'delete', {
+      body: friend,
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
   }
 }

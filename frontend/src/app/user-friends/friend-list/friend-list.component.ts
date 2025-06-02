@@ -8,10 +8,12 @@ import {TuiTable} from '@taiga-ui/addon-table';
 import {TuiAutoColorPipe, TuiButton, TuiInitialsPipe, TuiTitle} from '@taiga-ui/core';
 import {TuiAvatar, TuiStatus} from '@taiga-ui/kit';
 import {TuiCell} from '@taiga-ui/layout';
+import {UUID} from 'node:crypto';
 
 interface Friend {
   email: string;
   becameFriendsOn: Date | null;
+  id: UUID;
 }
 
 @Component({
@@ -87,7 +89,8 @@ export class FriendListComponent implements OnInit {
         next: (user: UserDto) => {
           const friend: Friend = {
             email: user.email,
-            becameFriendsOn: this.sanitizeDate(sentDto.cre_dat)
+            becameFriendsOn: this.sanitizeDate(sentDto.cre_dat),
+            id: user.id
           };
           console.log(sentDto.cre_dat)
           this.friendInfoList.push(friend);
@@ -102,8 +105,27 @@ export class FriendListComponent implements OnInit {
   sanitizeDate(raw: string | Date): Date | null {
     if (raw instanceof Date) return raw;
 
-    const cleaned = raw.replace(/\s?(AM|PM)/, '');
+    const cleaned = raw.replace(/\s?(am|pm)/, '');
     const date = new Date(cleaned);
     return isNaN(date.getTime()) ? null : date;
+  }
+
+  removeFriend(friend: Friend) {
+    console.log(friend)
+
+    const del1 = this.receivedMap.get(friend.id);
+    const del2 = this.sentMap.get(friend.id);
+
+    del1!.cre_dat = this.sanitizeDate(del1!.cre_dat)!;
+    del2!.cre_dat = this.sanitizeDate(del2!.cre_dat)!;
+
+    this.friendsService.deleteFriendsPair(del1!).subscribe({
+      next: () => console.log('One way: Deleted successfully'),
+      error: (err) => console.error('Error deleting:', err)
+      });
+    this.friendsService.deleteFriendsPair(del2!).subscribe({
+      next: () => console.log('Two way: Deleted successfully'),
+      error: (err) => console.error('Error deleting:', err)
+    });
   }
 }
