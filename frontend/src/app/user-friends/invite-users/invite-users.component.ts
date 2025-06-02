@@ -8,6 +8,7 @@ import {TuiTable} from '@taiga-ui/addon-table';
 import {TuiAutoColorPipe, TuiButton, TuiInitialsPipe, TuiTitle} from '@taiga-ui/core';
 import {TuiAvatar, TuiStatus} from '@taiga-ui/kit';
 import {TuiCell} from '@taiga-ui/layout';
+import {UUID} from 'node:crypto';
 
 interface Invite {
   user: UserDto;
@@ -121,14 +122,28 @@ export class InviteUsersComponent implements OnInit{
   }
 
   takeBackInvite(user: UserDto) {
-    
   }
 
   acceptInvite(user: UserDto) {
-    
+    const dto = this.receivedInviteMap.get(user.id);
+    console.log(dto);
+
+    const update = new FriendsDto(10,this.userId as UUID,user.id,new Date());
+    console.log(update)
+    this.friendsService.createNewFriendsPair(update).subscribe({
+      next: () => {
+        console.log(`Friend invite sent to ${user.email}`);
+        window.location.reload();
+      },
+      error: (err) => {
+        console.error('Failed to send friend invite:', err);
+      }
+    });
   }
 
   declineInvite(user: UserDto) {
-    
+    const dto = this.receivedInviteMap.get(user.id);
+    console.log(dto)
+    this.friendsService.deleteFriendsPair(dto!);
   }
 }

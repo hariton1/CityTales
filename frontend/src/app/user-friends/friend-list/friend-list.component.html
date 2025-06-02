@@ -12,6 +12,7 @@
       <tr>
         <th tuiTh>Email</th>
         <th tuiTh>Became Friends On</th>
+        <th tuiTh>Actions</th>
       </tr>
       </thead>
 
@@ -34,7 +35,17 @@
               {{ friend.becameFriendsOn | date: 'dd.MM.yyyy' }}
             </span>
         </td>
-
+        <td tuiTd>
+          <button
+            tuiIconButton
+            iconStart="@tui.trash"
+            appearance="error"
+            size="s"
+            (click)="removeFriend(friend)"
+          >
+            Remove Friend
+          </button>
+        </td>
       </tr>
       </tbody>
     </table>
