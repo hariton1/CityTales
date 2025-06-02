@@ -1,31 +1,65 @@
-<div class="friend-status-container">
-  <div class="status-section">
-    <h3 class="header-with-icon">✅ Confirmed Friends</h3>
-    <ul class="status-list">
-      <li *ngFor="let f of confirmedFriends" class="status-entry">
-        <span class="status-email">{{ f.user.email }}</span>
-        <span class="status-date">Friends since {{ f.since | date: 'shortDate' }}</span>
-      </li>
-    </ul>
-  </div>
+<div class="centered-wrapper">
+  <h2 class="header-with-icon">📩 Invites</h2>
 
-  <div class="status-section">
-    <h3 class="header-with-icon">📤 Sent Invites</h3>
-    <ul class="status-list">
-      <li *ngFor="let f of sentInvites" class="status-entry">
-        <span class="status-email">{{ f.user.email }}</span>
-        <span class="status-date">Invited on {{ f.since | date: 'shortDate' }}</span>
-      </li>
-    </ul>
-  </div>
+  <table tuiTable [size]="'m'" [style.width.rem]="70" class="friend-invites-table">
+    <thead>
+    <tr>
+      <th tuiTh>Actions</th>
+      <th tuiTh>Email</th>
+      <th tuiTh>Status</th>
+    </tr>
+    </thead>
+    <tbody tuiTbody>
+    <tr *ngFor="let f of receivedInvites">
+      <td tuiTd>
+        <div style="display: flex; gap: 8px;">
+          <button
+            tuiIconButton
+            iconStart="@tui.check"
+            appearance="primary"
+            size="s"
+            (click)="acceptInvite(f.user)"
+          >
+            Accept
+          </button>
+          <button
+            tuiIconButton
+            iconStart="@tui.trash"
+            appearance="error"
+            size="s"
+            (click)="declineInvite(f.user)"
+          >
+            Decline
+          </button>
+        </div>
+      </td>
+      <td tuiTd>
+        <div [tuiCell]="'m'">
+          <span tuiTitle>{{ f.user.email }}</span>
+        </div>
+      </td>
+      <td tuiTd>Received Invite</td>
+    </tr>
 
-  <div class="status-section">
-    <h3 class="header-with-icon">📥 Received Invites</h3>
-    <ul class="status-list">
-      <li *ngFor="let f of receivedInvites" class="status-entry">
-        <span class="status-email">{{ f.user.email }}</span>
-        <span class="status-date">Invited you on {{ f.since | date: 'shortDate' }}</span>
-      </li>
-    </ul>
-  </div>
+    <tr *ngFor="let f of sentInvites">
+      <td tuiTd>
+        <button
+          tuiIconButton
+          iconStart="@tui.trash"
+          appearance="error"
+          size="s"
+          (click)="takeBackInvite(f.user)"
+        >
+          Take Back
+        </button>
+      </td>
+      <td tuiTd>
+        <div [tuiCell]="'m'">
+          <span tuiTitle>{{ f.user.email }}</span>
+        </div>
+      </td>
+      <td tuiTd>Sent Invite</td>
+    </tr>
+    </tbody>
+  </table>
 </div>

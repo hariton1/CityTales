@@ -1,9 +1,13 @@
 import {Component, OnInit} from '@angular/core';
-import {CommonModule} from '@angular/common';
+import {CommonModule, DatePipe} from '@angular/common';
 import {UserDto} from '../../user_db.dto/user.dto';
 import {FriendsDto} from '../../user_db.dto/friends.dto';
 import {FriendsService} from '../../user_db.services/friends.service';
 import {UserService} from '../../user_db.services/user.service';
+import {TuiTable} from '@taiga-ui/addon-table';
+import {TuiAutoColorPipe, TuiButton, TuiInitialsPipe, TuiTitle} from '@taiga-ui/core';
+import {TuiAvatar, TuiStatus} from '@taiga-ui/kit';
+import {TuiCell} from '@taiga-ui/layout';
 
 interface Invite {
   user: UserDto;
@@ -12,7 +16,17 @@ interface Invite {
 
 @Component({
   selector: 'app-invite-users',
-  imports: [CommonModule],
+  imports: [CommonModule,
+    TuiTable,
+    TuiInitialsPipe,
+    TuiAutoColorPipe,
+    TuiStatus,
+    TuiButton,
+    TuiTitle,
+    TuiInitialsPipe,
+    TuiCell,
+    TuiAvatar,
+    DatePipe],
   templateUrl: './invite-users.component.html',
   styleUrl: './invite-users.component.scss'
 })
@@ -104,5 +118,17 @@ export class InviteUsersComponent implements OnInit{
         }
       });
     });
+  }
+
+  takeBackInvite(user: UserDto) {
+    
+  }
+
+  acceptInvite(user: UserDto) {
+    
+  }
+
+  declineInvite(user: UserDto) {
+    
   }
 }

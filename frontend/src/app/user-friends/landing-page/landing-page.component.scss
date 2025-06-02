@@ -1,17 +1,8 @@
 .dashboard-container {
   display: flex !important;
-  flex-direction: row !important;
+  flex-direction: column !important;
   width: 100vw;
   gap: 20px;
   padding: 10px;
   box-sizing: border-box;
-}
-
-app-leaderboard,
-app-badges,
-app-xp-tracker {
-  flex-grow: 1;
-  flex-shrink: 1;
-  flex-basis: 0;
-  min-width: 0;
 }
