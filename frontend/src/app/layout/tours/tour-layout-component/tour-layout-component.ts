@@ -10,6 +10,7 @@ import {supabase} from '../../../user-management/supabase.service';
 import {GoogleMap, MapPolyline} from '@angular/google-maps';
 import {BuildingEntity} from '../../../dto/db_entity/BuildingEntity';
 import {TourDto} from '../../../dto/tour.dto';
+import {TourRequestEntity} from '../../../dto/tour_entity/TourRequestEntity';
 @Component({
   selector: 'app-tour-layout-component',
   imports: [TuiButton,
@@ -248,8 +249,8 @@ export class TourLayoutComponent {
       this.endMarker?.getPosition()?.lng()!,
       this.selectedBuildings
     ).subscribe(estimate => {
-      this.tourDuration = (estimate.duration/1000).toFixed(2);
-      this.tourDistance = (estimate.distance/3600).toFixed(2);
+      this.tourDuration = (estimate.duration/3600).toFixed(2);
+      this.tourDistance = (estimate.distance/1000).toFixed(2);
     })
   }
 
@@ -281,5 +282,26 @@ export class TourLayoutComponent {
     this.tourDuration = "0";
     this.tourDistance = "0";
     this.updatePolylinePath()
+  }
+
+
+  createTours(): void {
+    var entity: TourRequestEntity = {
+      userId: this.userId!,
+      start_lat: this.startMarker?.getPosition()?.lat()!,
+      start_lng: this.startMarker?.getPosition()?.lng()!,
+      end_lat: this.endMarker?.getPosition()?.lat()!,
+      end_lng: this.endMarker?.getPosition()?.lng()!,
+      predefined_stops: [],
+      maxDistance: 100000,
+      minDistance: 0,
+      maxDuration: 0,
+      minDuration: 0,
+      maxBudget: 0,
+      minIntermediateStops: 3
+    }
+    this.tourService.createTour(entity).subscribe(data => {
+      console.log(data);
+    })
   }
 }
