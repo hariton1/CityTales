@@ -1,28 +1,19 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, Inject, OnInit, PLATFORM_ID} from '@angular/core';
 import {UserService} from '../../user_db.services/user.service';
 import {UserDto} from '../../user_db.dto/user.dto';
-import {CommonModule, DatePipe} from '@angular/common';
+import {CommonModule} from '@angular/common';
 import {FriendsService} from '../../user_db.services/friends.service';
 import {FriendsDto} from '../../user_db.dto/friends.dto';
 import {UUID} from 'node:crypto';
 import {TuiTable} from '@taiga-ui/addon-table';
-import {TuiAutoColorPipe, TuiButton, TuiInitialsPipe, TuiTitle} from '@taiga-ui/core';
-import {TuiAvatar, TuiStatus} from '@taiga-ui/kit';
-import {TuiCell} from '@taiga-ui/layout';
+import {TuiButton, TuiTitle} from '@taiga-ui/core';
 
 @Component({
   selector: 'app-search-users',
   imports: [CommonModule,
     TuiTable,
-    TuiInitialsPipe,
-    TuiAutoColorPipe,
-    TuiStatus,
     TuiButton,
-    TuiTitle,
-    TuiInitialsPipe,
-    TuiCell,
-    TuiAvatar,
-    DatePipe],
+    TuiTitle],
   templateUrl: './search-users.component.html',
   styleUrl: './search-users.component.scss'
 })
@@ -31,7 +22,10 @@ export class SearchUsersComponent implements OnInit{
   protected users : UserDto[];
   userId: string | null = null;
 
-  constructor(private userService: UserService, private friendsService: FriendsService) {
+  constructor(
+    private userService: UserService,
+    private friendsService: FriendsService
+  ) {
     this.users = [];
   }
   ngOnInit() {

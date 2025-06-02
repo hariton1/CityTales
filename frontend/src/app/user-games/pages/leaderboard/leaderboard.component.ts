@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, Inject, OnInit, PLATFORM_ID} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {TuiSwitch, tuiSwitchOptionsProvider} from '@taiga-ui/kit';
 import {TuiSizeS} from '@taiga-ui/core';
@@ -19,7 +19,10 @@ import {FriendsService} from '../../../user_db.services/friends.service';
   ],
 })
 export class LeaderboardComponent implements OnInit{
-  constructor(private userPointsService: UserPointsService, private userService: UserService, private friendsService: FriendsService) {
+  constructor(
+    private userPointsService: UserPointsService,
+    private userService: UserService,
+    private friendsService: FriendsService) {
   }
 
   isFriends = false;

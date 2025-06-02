@@ -1,12 +1,11 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, Inject, OnInit, PLATFORM_ID} from '@angular/core';
 import {CommonModule, DatePipe} from '@angular/common';
 import {UserDto} from '../../user_db.dto/user.dto';
 import {FriendsDto} from '../../user_db.dto/friends.dto';
 import {FriendsService} from '../../user_db.services/friends.service';
 import {UserService} from '../../user_db.services/user.service';
 import {TuiTable} from '@taiga-ui/addon-table';
-import {TuiAutoColorPipe, TuiButton, TuiInitialsPipe, TuiTitle} from '@taiga-ui/core';
-import {TuiAvatar, TuiStatus} from '@taiga-ui/kit';
+import {TuiButton, TuiTitle} from '@taiga-ui/core';
 import {TuiCell} from '@taiga-ui/layout';
 import {UUID} from 'node:crypto';
 
@@ -19,15 +18,9 @@ interface Invite {
   selector: 'app-invite-users',
   imports: [CommonModule,
     TuiTable,
-    TuiInitialsPipe,
-    TuiAutoColorPipe,
-    TuiStatus,
     TuiButton,
     TuiTitle,
-    TuiInitialsPipe,
-    TuiCell,
-    TuiAvatar,
-    DatePipe],
+    TuiCell],
   templateUrl: './invite-users.component.html',
   styleUrl: './invite-users.component.scss'
 })
@@ -41,7 +34,9 @@ export class InviteUsersComponent implements OnInit{
   private sentInviteMap = new Map<string, FriendsDto>();
   private receivedInviteMap = new Map<string, FriendsDto>();
 
-  constructor(private friendsService: FriendsService, private userService: UserService) {
+  constructor(
+    private friendsService: FriendsService,
+    private userService: UserService) {
   }
   ngOnInit() {
     this.retrieveUserID();

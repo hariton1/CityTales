@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, Inject, OnInit, PLATFORM_ID} from '@angular/core';
 import {CommonModule, DatePipe} from '@angular/common';
 import {FriendsService} from '../../user_db.services/friends.service';
 import {FriendsDto} from '../../user_db.dto/friends.dto';
@@ -23,7 +23,6 @@ interface Friend {
     TuiTable,
     TuiInitialsPipe,
     TuiAutoColorPipe,
-    TuiStatus,
     TuiButton,
     TuiTitle,
     TuiInitialsPipe,
