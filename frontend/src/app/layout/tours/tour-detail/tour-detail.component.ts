@@ -91,8 +91,8 @@ export class TourDetailComponent {
       this.end.lng,
       this.tour.getStops()
     ).subscribe(estimate => {
-      this.tour.setDurationEstimate(+(estimate.duration/1000).toFixed(2));
-      this.tour.setDistance(+(estimate.distance/3600).toFixed(2));
+      this.tour.setDurationEstimate(+(estimate.duration/3600).toFixed(2));
+      this.tour.setDistance(+(estimate.distance/100).toFixed(2));
     })
   }
 
