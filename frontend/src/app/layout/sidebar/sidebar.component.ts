@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output, ViewChild, ElementRef, HostListener} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output, ViewChild, ElementRef, HostListener} from '@angular/core';
 import { HistoricalPlaceEntity} from '../../dto/db_entity/HistoricalPlaceEntity';
 import {HistoricPlaceDetailComponent} from '../historic-place-detail/historic-place-detail.component';
 import {HistoricPlacePreviewComponent} from '../historic-place-preview/historic-place-preview.component';
@@ -12,6 +12,9 @@ import {TuiAppearance, TuiButton, TuiIcon, TuiLoader, TuiTitle, TuiTextfield} fr
 import {TuiCardLarge, TuiHeader, TuiCell, TuiInputSearch} from '@taiga-ui/layout';
 import {debounceTime, filter, Observable, switchMap} from 'rxjs';
 import {SearchService} from '../../services/search.service';
+import {UserService} from '../../services/user.service';
+import {NotificationInboxComponent} from '../../core/notification-inbox/notification-inbox.component';
+import {BreakpointObserver, Breakpoints} from '@angular/cdk/layout';
 
 @Component({
   selector: 'app-sidebar',
@@ -32,12 +35,13 @@ import {SearchService} from '../../services/search.service';
     TuiTextfield,
     TuiInputSearch,
     TuiSearchResults,
-    CommonModule
+    CommonModule,
+    NotificationInboxComponent
   ],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.less'
 })
-export class SidebarComponent {
+export class SidebarComponent implements OnInit{
 
   @Input() selectedPlace: any;
   @Input() historicalPlaces: BuildingEntity[] = [];
@@ -49,8 +53,19 @@ export class SidebarComponent {
   enrichedContent: string = '';
   enrichmentStarted = false;
   enrichmentLoading = false;
+  isMobile = false;
 
-  constructor(readonly EnrichmentService: EnrichmentService, readonly searchService: SearchService) {
+  constructor(readonly EnrichmentService: EnrichmentService, readonly searchService: SearchService,
+              private userService: UserService,
+              readonly breakpointObserver: BreakpointObserver) {
+  }
+
+  ngOnInit() {
+    this.breakpointObserver
+      .observe([Breakpoints.HandsetPortrait, Breakpoints.HandsetLandscape])
+      .subscribe(result => {
+        this.isMobile = result.matches;
+      });
   }
 
   onClick(tone: string): void {
@@ -171,6 +186,9 @@ export class SidebarComponent {
     //check if item is a building
     if(item.latitude != null && item.longitude != null){
       this.selectedPlace = item;
+
+      this.selectedPlace = this.userService.enterHistoricNode(this.selectedPlace);
+
       this.detailedView = true;
       this.open = false;
     } else {

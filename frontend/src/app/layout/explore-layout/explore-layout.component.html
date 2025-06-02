@@ -1,2 +1,34 @@
-<app-sidebar [selectedPlace]="selectedPlace" [historicalPlaces]="historicalPlaces" [detailedView]="setDetailedView" (setDetailedView)="setDetailedViewEvent($event)"></app-sidebar>
-<app-map-view (selectPlaceEvent)="setSelectedPlace($event)" (populatePlacesEvent)="setHistoricalPlaces($event)" (setDetailedViewEvent)="setDetailedViewEvent($event)"></app-map-view>
+<ng-container *ngIf="isMobile">
+    <div class="mobile-view-toggle">
+      <tui-segmented [size]="'m'" [style.border-radius.rem]="10">
+        <button
+          (click)="currentViewMobile = 'discover'"
+        >
+          <tui-icon icon="@tui.telescope" [style.height.rem]="1.2" /> Discover
+        </button>
+        <button
+          (click)="currentViewMobile = 'map'"
+        >
+          <tui-icon icon="@tui.map" [style.height.rem]="1.2" />Map
+        </button>
+      </tui-segmented>
+    </div>
+
+    <div class="notification-button-container">
+      <app-notification-inbox (selectPlaceEvent)="setSelectedPlace($event)" (setDetailedViewEvent)="setDetailedViewEvent($event)"></app-notification-inbox>
+    </div>
+  <!-- Mobile: show only selected component -->
+  <ng-container *ngIf="currentViewMobile === 'discover'">
+    <app-sidebar [selectedPlace]="selectedPlace" [historicalPlaces]="historicalPlaces" [detailedView]="setDetailedView" (setDetailedView)="setDetailedViewEvent($event)"></app-sidebar>
+  </ng-container>
+
+  <ng-container *ngIf="currentViewMobile === 'map'">
+    <app-map-view (selectPlaceEvent)="setSelectedPlace($event)" (populatePlacesEvent)="setHistoricalPlaces($event)" (setDetailedViewEvent)="setDetailedViewEvent($event)"></app-map-view>
+  </ng-container>
+</ng-container>
+
+<!-- Desktop: show both always -->
+<ng-container *ngIf="!isMobile">
+  <app-sidebar [selectedPlace]="selectedPlace" [historicalPlaces]="historicalPlaces" [detailedView]="setDetailedView" (setDetailedView)="setDetailedViewEvent($event)"></app-sidebar>
+  <app-map-view (selectPlaceEvent)="setSelectedPlace($event)" (populatePlacesEvent)="setHistoricalPlaces($event)" (setDetailedViewEvent)="setDetailedViewEvent($event)"></app-map-view>
+</ng-container>
