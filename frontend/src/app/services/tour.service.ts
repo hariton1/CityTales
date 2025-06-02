@@ -5,6 +5,7 @@ import {BACKEND_ADDRESS, SERVER_ADDRESS} from '../globals';
 import {TourEntity} from '../dto/tour_entity/TourEntity';
 import {BuildingEntity} from '../dto/db_entity/BuildingEntity';
 import {TourDto} from '../dto/tour.dto';
+import {TourRequestEntity} from '../dto/tour_entity/TourRequestEntity';
 
 @Injectable({
   providedIn: 'root'
@@ -12,27 +13,6 @@ import {TourDto} from '../dto/tour.dto';
 export class TourService {
 
   constructor(private httpClient: HttpClient) {
-  }
-
-  public createTour(name: string,
-                    description: string,
-                    start_lat: number,
-                    start_long: number,
-                    end_lat: number,
-                    end_long: number,
-                    stops: BuildingEntity[],
-                    userId: string): Observable<TourEntity> {
-    const body = {
-      name,
-      description,
-      start_lat,
-      start_long,
-      end_lat,
-      end_long,
-      stops,
-      userId
-    };
-    return this.httpClient.post<TourEntity>(BACKEND_ADDRESS + 'api/tour/createTour', body);
   }
 
   public getDurationDistanceEstimate(start_lat: number,
@@ -81,4 +61,11 @@ export class TourService {
     console.log(TourDto.ofTourDTo(tour).id)
     return this.httpClient.patch(SERVER_ADDRESS + 'tours/id=' + tour.getId(), TourDto.ofTourDTo(tour))
   }
+
+  public createTour(tourRequest: TourRequestEntity): Observable<Object> {
+    console.log(tourRequest)
+    return this.httpClient.post(BACKEND_ADDRESS + 'api/tour/createBasedOnInterests', tourRequest);
+  }
+
+
 }
