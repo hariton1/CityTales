@@ -104,5 +104,4 @@ export class UserListComponent implements OnInit {
   deleteUser(id: string) : void {
     this.userService.deleteUserById(id);
   }
-
 }
