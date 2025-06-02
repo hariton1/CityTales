@@ -1,22 +1,30 @@
-<div class="user-list-container">
+<div class="centered-wrapper">
   <h2 class="header-with-icon">👤 Users</h2>
 
-  <div *ngIf="!users || users.length === 0" class="no-users-text">
-    No users found.
-  </div>
-
-  <ul *ngIf="users && users.length > 0" class="user-list">
-    <li *ngFor="let user of users" class="user-entry">
-      <div class="user-detail">
-        <div class="user-label">🆔 ID:</div>
-        <div class="user-value">{{ user.id }}</div>
-
-        <div class="user-label">📧 Email:</div>
-        <div class="user-value">{{ user.email }}</div>
-      </div>
-      <button class="invite-button" (click)="sendFriendInvite(user)">
-        📨 Send Invite
-      </button>
-    </li>
-  </ul>
+  <table tuiTable [size]="'m'" [style.width.rem]="70" class="user-list-table">
+    <thead>
+    <tr>
+      <th tuiTh>Actions</th>
+      <th tuiTh>Email</th>
+    </tr>
+    </thead>
+    <tbody tuiTbody>
+    <tr *ngFor="let user of users">
+      <td tuiTd>
+        <button
+          tuiIconButton
+          iconStart="@tui.mail"
+          appearance="primary"
+          size="s"
+          (click)="sendFriendInvite(user)"
+        >
+          Send Invite
+        </button>
+      </td>
+      <td tuiTd>
+        <span tuiTitle>{{ user.email }}</span>
+      </td>
+    </tr>
+    </tbody>
+  </table>
 </div>

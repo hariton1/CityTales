@@ -121,9 +121,6 @@ export class InviteUsersComponent implements OnInit{
     });
   }
 
-  takeBackInvite(user: UserDto) {
-  }
-
   acceptInvite(user: UserDto) {
     const dto = this.receivedInviteMap.get(user.id);
     console.log(dto);
@@ -139,11 +136,26 @@ export class InviteUsersComponent implements OnInit{
         console.error('Failed to send friend invite:', err);
       }
     });
+
+    window.location.reload();
   }
 
   declineInvite(user: UserDto) {
-    const dto = this.receivedInviteMap.get(user.id);
+    const dto = this.sentInviteMap.get(user.id)!;
+    dto.cre_dat = this.sanitizeDate(dto.cre_dat)!;
     console.log(dto)
-    this.friendsService.deleteFriendsPair(dto!);
+    this.friendsService.deleteFriendsPair(dto).subscribe({
+      next: () => console.log(' Deleted successfully'),
+      error: (err) => console.error('Error deleting:', err)
+    });
+    window.location.reload();
+  }
+
+  sanitizeDate(raw: string | Date): Date | null {
+    if (raw instanceof Date) return raw;
+
+    const cleaned = raw.replace(/\s?(am|pm)/, '');
+    const date = new Date(cleaned);
+    return isNaN(date.getTime()) ? null : date;
   }
 }
