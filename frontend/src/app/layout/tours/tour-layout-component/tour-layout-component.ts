@@ -11,10 +11,14 @@ import {GoogleMap, MapPolyline} from '@angular/google-maps';
 import {BuildingEntity} from '../../../dto/db_entity/BuildingEntity';
 import {TourDto} from '../../../dto/tour.dto';
 import {TourRequestEntity} from '../../../dto/tour_entity/TourRequestEntity';
+import {FormsModule} from '@angular/forms';
+import {TuiSlider} from '@taiga-ui/kit';
+
+
 @Component({
   selector: 'app-tour-layout-component',
   imports: [TuiButton,
-    TuiInputModule, ReactiveFormsModule, CommonModule, GoogleMap, TuiTextfield, MapPolyline],
+    TuiInputModule, ReactiveFormsModule, CommonModule, GoogleMap, TuiTextfield, MapPolyline, FormsModule, TuiSlider],
   templateUrl: './tour-layout-component.html',
   standalone: true,
   styleUrl: './tour-layout-component.scss'
@@ -304,4 +308,55 @@ export class TourLayoutComponent {
       console.log(data);
     })
   }
+
+  //Generate Tour tile
+
+  minDistance = 1.0; // km
+  maxDistance = 10.0; // km
+  minSites = 2;
+
+// Generated tours
+  generatedTours: TourDto[] = [];
+
+  generateAdvancedTours() {
+    // Example: Call your backend or algorithm with these parameters
+
+    var entity: TourRequestEntity = {
+      userId: this.userId!,
+      start_lat: this.startMarker?.getPosition()?.lat()!,
+      start_lng: this.startMarker?.getPosition()?.lng()!,
+      end_lat: this.endMarker?.getPosition()?.lat()!,
+      end_lng: this.endMarker?.getPosition()?.lng()!,
+      predefined_stops: [],
+      maxDistance: this.maxDistance * 1000,
+      minDistance: this.minDistance * 1000,
+      maxDuration: 0,
+      minDuration: 0,
+      maxBudget: 0,
+      minIntermediateStops: this.minSites
+    }
+
+    console.log(entity);
+
+    this.tourService.createTour(entity).subscribe(data => {
+      console.log(data);
+      data.forEach(tour => {
+        this.generatedTours.push(TourDto.fromTourEntity(tour))});
+      console.log(this.generatedTours.length);
+
+      this.generatedTours.forEach(tour => {
+        this.tourService.createTourInDB(tour).subscribe({
+          next: tour => {console.log("Tour created successfully!");},
+          error: any => {console.log("An error occured when saving tour to the DB! ")}
+        })
+      })
+
+    })
+  }
+
+  onGeneratedTourClick(tour: TourDto) {
+    this.router.navigateByUrl("/tours/" + tour.getId());
+  }
+
+
 }

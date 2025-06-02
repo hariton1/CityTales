@@ -62,9 +62,9 @@ export class TourService {
     return this.httpClient.patch(SERVER_ADDRESS + 'tours/id=' + tour.getId(), TourDto.ofTourDTo(tour))
   }
 
-  public createTour(tourRequest: TourRequestEntity): Observable<Object> {
+  public createTour(tourRequest: TourRequestEntity): Observable<TourEntity[]> {
     console.log(tourRequest)
-    return this.httpClient.post(BACKEND_ADDRESS + 'api/tour/createBasedOnInterests', tourRequest);
+    return this.httpClient.post<TourEntity[]>(BACKEND_ADDRESS + 'api/tour/createBasedOnInterests', tourRequest);
   }
 
 
