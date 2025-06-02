@@ -1,5 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output, ViewChild, ElementRef, HostListener} from '@angular/core';
-import { HistoricalPlaceEntity} from '../../dto/db_entity/HistoricalPlaceEntity';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {HistoricPlaceDetailComponent} from '../historic-place-detail/historic-place-detail.component';
 import {HistoricPlacePreviewComponent} from '../historic-place-preview/historic-place-preview.component';
 import {NgIf, CommonModule} from '@angular/common';
@@ -7,9 +6,8 @@ import {TuiSearchResults} from '@taiga-ui/experimental';
 import {ReactiveFormsModule, FormControl} from '@angular/forms';
 import {BuildingEntity} from '../../dto/db_entity/BuildingEntity';
 import {EnrichmentService} from '../../services/enrichment.service';
-import {TuiPlatform} from '@taiga-ui/cdk';
-import {TuiAppearance, TuiButton, TuiIcon, TuiLoader, TuiTitle, TuiTextfield} from '@taiga-ui/core';
-import {TuiCardLarge, TuiHeader, TuiCell, TuiInputSearch} from '@taiga-ui/layout';
+import {TuiAppearance, TuiTitle, TuiTextfield} from '@taiga-ui/core';
+import {TuiCell, TuiInputSearch} from '@taiga-ui/layout';
 import {debounceTime, filter, Observable, switchMap} from 'rxjs';
 import {SearchService} from '../../services/search.service';
 import {UserService} from '../../services/user.service';
@@ -22,14 +20,8 @@ import {BreakpointObserver, Breakpoints} from '@angular/cdk/layout';
     NgIf,
     HistoricPlaceDetailComponent,
     HistoricPlacePreviewComponent,
-    TuiPlatform,
     TuiAppearance,
-    TuiCardLarge,
-    TuiHeader,
     TuiTitle,
-    TuiIcon,
-    TuiButton,
-    TuiLoader,
     ReactiveFormsModule,
     TuiCell,
     TuiTextfield,

@@ -1,0 +1,65 @@
+<div class="centered-wrapper">
+  <h2 class="header-with-icon">📩 Invites</h2>
+
+  <table tuiTable [size]="'m'" [style.width.rem]="70" class="friend-invites-table">
+    <thead>
+    <tr>
+      <th tuiTh>Actions</th>
+      <th tuiTh>Email</th>
+      <th tuiTh>Status</th>
+    </tr>
+    </thead>
+    <tbody tuiTbody>
+    <tr *ngFor="let f of receivedInvites">
+      <td tuiTd>
+        <div style="display: flex; gap: 8px;">
+          <button
+            tuiIconButton
+            iconStart="@tui.check"
+            appearance="primary"
+            size="s"
+            (click)="acceptInvite(f.user)"
+          >
+            Accept
+          </button>
+          <button
+            tuiIconButton
+            iconStart="@tui.trash"
+            appearance="error"
+            size="s"
+            (click)="declineInvite(f.user)"
+          >
+            Decline
+          </button>
+        </div>
+      </td>
+      <td tuiTd>
+        <div [tuiCell]="'m'">
+          <span tuiTitle>{{ f.user.email }}</span>
+        </div>
+      </td>
+      <td tuiTd>Received Invite</td>
+    </tr>
+
+    <tr *ngFor="let f of sentInvites">
+      <td tuiTd>
+        <button
+          tuiIconButton
+          iconStart="@tui.trash"
+          appearance="error"
+          size="s"
+          (click)="declineInvite(f.user)"
+        >
+          Take Back
+        </button>
+      </td>
+      <td tuiTd>
+        <div [tuiCell]="'m'">
+          <span tuiTitle>{{ f.user.email }}</span>
+        </div>
+      </td>
+      <td tuiTd>Sent Invite</td>
+    </tr>
+    </tbody>
+  </table>
+</div>

@@ -1,0 +1,57 @@
+<div class="centered-wrapper">
+  <h2 class="header-with-icon">👥 Friend List</h2>
+
+  <ng-container *ngIf="friendInfoList.length > 0; else noFriends">
+    <table
+      tuiTable
+      [size]="'m'"
+      [style.width.rem]="70"
+      class="friend-table"
+    >
+      <thead>
+      <tr>
+        <th tuiTh>Email</th>
+        <th tuiTh>Became Friends On</th>
+        <th tuiTh>Actions</th>
+      </tr>
+      </thead>
+
+      <tbody tuiTbody>
+      <tr *ngFor="let friend of friendInfoList">
+        <!-- Email with avatar -->
+        <td tuiTd>
+          <div [tuiCell]="'m'">
+            <tui-avatar
+              [src]="friend.email | tuiInitials"
+              [style.background]="friend.email | tuiAutoColor"
+            ></tui-avatar>
+            <span tuiTitle>{{ friend.email }}</span>
+          </div>
+        </td>
+
+        <!-- Date -->
+        <td tuiTd>
+            <span tuiTitle>
+              {{ friend.becameFriendsOn | date: 'dd.MM.yyyy' }}
+            </span>
+        </td>
+        <td tuiTd>
+          <button
+            tuiIconButton
+            iconStart="@tui.trash"
+            appearance="error"
+            size="s"
+            (click)="removeFriend(friend)"
+          >
+            Remove Friend
+          </button>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </ng-container>
+
+  <ng-template #noFriends>
+    <p class="no-friends-text">No friends found.</p>
+  </ng-template>
+</div>

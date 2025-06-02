@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, Inject, OnInit, PLATFORM_ID} from '@angular/core';
 import { UserPointsService } from '../../../user_db.services/user-points.service';
 import { UserPointDto } from '../../../user_db.dto/user-point.dto';
 import {CommonModule} from '@angular/common';
@@ -14,7 +14,9 @@ export class XpTrackerComponent implements OnInit {
   userId: string | null = null;
   userPoints: UserPointDto[] = [];
 
-  constructor(private userPointsService: UserPointsService) {}
+  constructor(
+    private userPointsService: UserPointsService
+  ) {}
 
   ngOnInit(): void {
     this.retrieveUserID();

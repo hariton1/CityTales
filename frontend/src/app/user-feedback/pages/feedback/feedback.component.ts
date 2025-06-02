@@ -4,8 +4,7 @@ import {
   TuiHint,
   TuiIcon,
   TuiLabel,
-  TuiTextfieldComponent,
-  TuiTextfieldDirective,
+  TuiTextfieldComponent
 } from '@taiga-ui/core';
 import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {TuiSlider} from '@taiga-ui/kit';
@@ -24,7 +23,6 @@ import {ActivatedRoute, Router} from '@angular/router';
     TuiTextfieldComponent,
     TuiLabel,
     ReactiveFormsModule,
-    TuiTextfieldDirective,
     AsyncPipe,
     TuiIcon,
     TuiInputModule,
