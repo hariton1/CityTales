@@ -5,7 +5,14 @@
   [zoom]="zoom"
   [options]="options"
 >
-  <map-marker #marker="mapMarker" *ngFor="let location of locationsNearby" [position]="{lat: location.latitude, lng: location.longitude}" [options]="markerOptions" (mapClick)="detailAction(marker, location)" (mapMouseout)="closeInfoWindow()"></map-marker>
+  <map-marker
+    *ngFor="let marker of markers"
+    [position]="marker.position"
+    [icon]="marker.icon"
+    (mapClick)="detailAction(markerRef, marker.building)"
+    (mapMouseout)="closeInfoWindow()"
+    #markerRef="mapMarker">
+  </map-marker>
   <map-marker [position]="center" [options]="locationMarkerOptions"></map-marker>
 
   <map-info-window #infoWindow>

@@ -166,9 +166,38 @@ export class MapViewComponent implements OnInit{
   }
 
   addMarkersToMap(locations: BuildingEntity[]): void {
+    /*
     locations.forEach(location => {
       this.markers.push({lat: location.latitude, lng: location.longitude});
-    })
+    })*/
+
+    locations.forEach(location => {
+      console.log('type:', location.buildingType);
+      const iconUrl = this.getIconForBuildingType(location.buildingType);
+
+      this.markers.push({
+        position: { lat: location.latitude, lng: location.longitude },
+        icon: {
+          url: iconUrl,
+          scaledSize: new google.maps.Size(20, 20),
+          anchor: new google.maps.Point(12, 12),
+          labelOrigin: new google.maps.Point(12, 30)
+        },
+        animation: google.maps.Animation.DROP,
+        building: location
+      });
+    });
+  }
+
+  getIconForBuildingType(type: string): string {
+    switch (type?.toLowerCase()) {
+      case 'museum':
+        return 'assets/icons/museum.svg';
+      case 'church':
+        return 'assets/icons/church.svg';
+      default:
+        return 'assets/icons/building-11.svg';
+    }
   }
 
   detailAction(marker: MapMarker, location: BuildingEntity): void {
