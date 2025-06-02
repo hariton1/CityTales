@@ -11,12 +11,16 @@ import java.util.List;
 @AllArgsConstructor
 @ToString
 public class CreateTourRequestDTO {
-    private String name;
-    private String description;
+    private String userId;
     private double start_lat;
     private double start_lng;
     private double end_lat;
     private double end_lng;
-    private List<ViennaHistoryWikiBuildingObject> stops;
-    private String userId;
+    private List<ViennaHistoryWikiBuildingObject> predefined_stops;
+    private double maxDistance;
+    private double minDistance;
+    private double maxDuration;
+    private double minDuration;
+    private double maxBudget;
+    private Integer minIntermediateStops;
 }

@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -19,25 +20,6 @@ public class TourController {
     public TourController(ITourService tourService) {
         this.tourService = tourService;
         System.out.println("TourController created");
-    }
-
-
-    @PostMapping(value = "/createTour", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    public ResponseEntity<TourObject> createTour(@RequestBody CreateTourRequestDTO request) {
-
-
-        TourObject tour = tourService.createTour(request.getName(),
-                request.getDescription(),
-                request.getStart_lat(),
-                request.getStart_lng(),
-                request.getEnd_lat(),
-                request.getEnd_lng(),
-                request.getStops(),
-                request.getUserId());
-
-        if (tour == null) {return ResponseEntity.noContent().build();}
-        return ResponseEntity.ok(tour);
     }
 
     @PostMapping(value = "/durationDistanceEstimate", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -56,5 +38,12 @@ public class TourController {
 
         if (result == null) {return ResponseEntity.noContent().build();}
         return ResponseEntity.ok(result);
+    }
+
+    @PostMapping("/createBasedOnInterests")
+    public ResponseEntity<List<TourObject>> createTourBasedOnInterests(@RequestBody CreateTourRequestDTO request) {
+        System.out.println("Received request: " + request.toString());
+        List<TourObject> tours = tourService.createTours(request);
+        return ResponseEntity.ok(tours);
     }
 }
