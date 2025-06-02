@@ -149,8 +149,9 @@ export class InviteUsersComponent implements OnInit{
   sanitizeDate(raw: string | Date): Date | null {
     if (raw instanceof Date) return raw;
 
-    const cleaned = raw.replace(/\s?(am|pm)/, '');
-    const date = new Date(cleaned);
+    const cleanedLower = raw.replace(/\s?(am|pm)/, '');
+    const cleanedUpper = cleanedLower.replace(/\s?(AM|PM)/, '');
+    const date = new Date(cleanedUpper);
     return isNaN(date.getTime()) ? null : date;
   }
 }
