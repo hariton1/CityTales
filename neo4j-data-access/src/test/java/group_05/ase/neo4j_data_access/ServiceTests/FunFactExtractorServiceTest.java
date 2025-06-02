@@ -34,4 +34,29 @@ public class FunFactExtractorServiceTest {
         assertEquals("People say it is haunted by a ghostly astronomer.", funFact1);
         assertEquals("One night, he helped a lost child find her parents.", funFact2);
     }
+
+    @Test
+    public void testExtractFunFactFromRealisticBuilding() {
+        FunFactExtractorService service = new FunFactExtractorService();
+        String content =
+                "The Stephansdom is Vienna's most famous landmark. Built in the 12th century, it survived many wars and fires. " +
+                        "Its south tower stands 136 meters tall. Legend says its builder made a pact with the devil. " +
+                        "Today, it is visited by millions each year.";
+        String funFact = service.extractFunFact(content);
+        System.out.println("Extracted fun fact: " + funFact);
+        assertTrue(content.contains(funFact));
+    }
+
+    @Test
+    public void testExtractFunFactTFIDF() {
+        FunFactExtractorService service = new FunFactExtractorService();
+        String description =
+                "The Stephansdom is Vienna's most famous landmark. Built in the 12th century, it survived many wars and fires. " +
+                        "Its south tower stands 136 meters tall. Legend says its builder made a pact with the devil. " +
+                        "Today, it is visited by millions each year.";
+        String funFact = service.extractFunFactTFIDF(description);
+        System.out.println("TF-IDF Fun Fact: " + funFact);
+        assertTrue(description.contains(funFact));
+    }
+
 }
