@@ -1,6 +1,7 @@
 package group_05.ase.user_db.endpoints;
 
 import group_05.ase.user_db.restData.UserInterestDTO;
+import group_05.ase.user_db.restData.UserInterestWithWeightDTO;
 import group_05.ase.user_db.services.UserInterestService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -71,6 +72,12 @@ public class UserInterestsController {
         } catch (Exception e) {
             return new ArrayList<>();
         }
+    }
+
+    @GetMapping("/user/{userId}/interests/with-weight")
+    @ResponseStatus(HttpStatus.OK)
+    public List<UserInterestWithWeightDTO> getUserInterestsWithWeightByUserId(@PathVariable("userId") UUID userId) {
+        return userInterestService.getUserInterestsWithWeightByUserId(userId);
     }
 
 
