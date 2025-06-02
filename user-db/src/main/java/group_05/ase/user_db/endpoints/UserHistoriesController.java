@@ -61,11 +61,12 @@ public class UserHistoriesController {
 
     @PostMapping("/create")
     @ResponseStatus(HttpStatus.CREATED)
-    public void createNewUserHistory(@RequestBody UserHistoryDTO userHistoryDTO) {
+    public UserHistoryDTO createNewUserHistory(@RequestBody UserHistoryDTO userHistoryDTO) {
         try {
-            this.userHistoryService.saveNewUserHistory(userHistoryDTO);
+            return this.userHistoryService.saveNewUserHistory(userHistoryDTO);
         } catch (Exception e) {
             System.out.println(e.getMessage());
+            return new UserHistoryDTO();
         }
     }
 

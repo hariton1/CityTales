@@ -19,6 +19,7 @@
         <module>authentification</module>
         <module>neo4j-data-access</module>
         <module>qdrant-adapter</module>
+        <module>openai-adapter</module>
     </modules>
 
     <properties>

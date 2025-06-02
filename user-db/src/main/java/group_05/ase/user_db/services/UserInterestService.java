@@ -35,7 +35,7 @@ public class UserInterestService {
     public List<UserInterestDTO> getUserInterestsByUserId(UUID userId) {
 
         ArrayList<UserInterestDTO> userInterests = new ArrayList<>();
-        List<UserInterestEntity> tmp = this.repository.findByUserId(userId);
+        List<UserInterestEntity> tmp = this.repository.findByUserIdOrderByInterestIdAsc(userId);
 
         for(UserInterestEntity userInterest : tmp) {
             userInterests.add(new UserInterestDTO(userInterest.getUserId(), userInterest.getInterestId(), userInterest.getCreDat(), userInterest.getInterestWeight()));
@@ -48,7 +48,7 @@ public class UserInterestService {
     public List<UserInterestDTO> getUserInterestsByInterestId(int interestId) {
 
         ArrayList<UserInterestDTO> userInterests = new ArrayList<>();
-        List<UserInterestEntity> tmp = this.repository.findByInterestId(interestId);
+        List<UserInterestEntity> tmp = this.repository.findByInterestIdOrderByInterestIdAsc(interestId);
 
         for(UserInterestEntity userInterest : tmp) {
             userInterests.add(new UserInterestDTO(userInterest.getUserId(), userInterest.getInterestId(), userInterest.getCreDat(), userInterest.getInterestWeight()));

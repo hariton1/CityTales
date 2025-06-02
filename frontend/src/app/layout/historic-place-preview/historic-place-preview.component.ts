@@ -1,10 +1,9 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, inject, Input, Output} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {TuiAppearance, TuiScrollbar} from '@taiga-ui/core';
+import {TuiAlertService, TuiAppearance, TuiScrollbar} from '@taiga-ui/core';
 import {TuiCardLarge} from '@taiga-ui/layout';
-import {HistoricalPlaceEntity} from '../../dto/db_entity/HistoricalPlaceEntity';
-import {UserLocationService} from '../../services/user-location.service';
-import {LocationService} from '../../services/location.service';
+import {BuildingEntity} from '../../dto/db_entity/BuildingEntity';
+import {UserService} from '../../services/user.service';
 
 
 @Component({
@@ -18,11 +17,18 @@ import {LocationService} from '../../services/location.service';
 })
 export class HistoricPlacePreviewComponent {
 
-  @Input() historicalPlaces: HistoricalPlaceEntity[] = [];
-  @Output() selectPlaceEvent: EventEmitter<HistoricalPlaceEntity> = new EventEmitter<HistoricalPlaceEntity>();
+  private readonly alerts = inject(TuiAlertService);
+
+  @Input() historicalPlaces: BuildingEntity[] = [];
+  @Output() selectPlaceEvent: EventEmitter<BuildingEntity> = new EventEmitter<BuildingEntity>();
   @Output() setDetailedViewEvent: EventEmitter<boolean> = new EventEmitter<boolean>();
 
-  onDetailsClick(place: HistoricalPlaceEntity) {
+  constructor(private userService: UserService) {
+  }
+
+  onDetailsClick(place: BuildingEntity) {
+    place = this.userService.enterHistoricNode(place);
+
     this.selectPlaceEvent.emit(place);
     this.setDetailedViewEvent.emit(true);
   }

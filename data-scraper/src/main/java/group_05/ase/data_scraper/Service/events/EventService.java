@@ -1,7 +1,9 @@
 package group_05.ase.data_scraper.Service.events;
 
 import group_05.ase.data_scraper.Entity.ViennaHistoryWikiEventObject;
+import group_05.ase.data_scraper.Service.embeddings.OpenAiService;
 import group_05.ase.data_scraper.Service.general.ManualExtractorService;
+import group_05.ase.data_scraper.Service.general.ContentService;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -9,10 +11,7 @@ import org.jsoup.select.Elements;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class EventService {
@@ -22,66 +21,67 @@ public class EventService {
     private final ManualExtractorService manualExtractorService;
     private final EventRepository eventRepository;
     private final Set<String> allEvents = new HashSet<>();
+    private final ContentService contentService;
+    private final OpenAiService openAiService;
 
-    public EventService(ManualExtractorService manualExtractorService, EventRepository wikiEventPersistenceService) {
+
+    public EventService(ManualExtractorService manualExtractorService, EventRepository wikiEventPersistenceService, ContentService contentService, OpenAiService openAiService) {
         this.manualExtractorService = manualExtractorService;
         this.eventRepository = wikiEventPersistenceService;
+        this.contentService = contentService;
+        this.openAiService = openAiService;
     }
 
-    public void search() {
+    public void search(int limit) {
         try {
-            this.scrapeCategory(eventSeed);
+            int[] persistedCount = {0};  // mutable counter
+            this.scrapeCategory(eventSeed, limit, persistedCount);
             System.out.println("#Total events: " + allEvents.size());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public void scrapeCategory(String url) throws IOException {
+    public void scrapeCategory(String url, int limit, int[] persistedCount) throws IOException {
+        if (persistedCount[0] >= limit) return;
+
         Document doc = Jsoup.connect(url).get();
 
         // get sub-categories
         Element mwCategoriesDiv = doc.getElementById("mw-subcategories");
-
         if (mwCategoriesDiv != null) {
             Elements categoryLinks = mwCategoriesDiv.select("a[href^=\"/Kategorie:\"]");
-
             for (Element link : categoryLinks) {
+                if (persistedCount[0] >= limit) return;
                 String fullUrl = "https://www.geschichtewiki.wien.gv.at" + link.attr("href");
-                scrapeCategory(fullUrl);
+                scrapeCategory(fullUrl, limit, persistedCount);
             }
         }
 
         // get actual events
         Element mwPagesDiv = doc.getElementById("mw-pages");
-
         if (mwPagesDiv != null) {
             Elements links = mwPagesDiv.select("a");
 
-            for (Element link : links) {
-                String fullUrl = "https://www.geschichtewiki.wien.gv.at" + link.attr("href");
-                allEvents.add(fullUrl);
-            }
-
             List<ViennaHistoryWikiEventObject> pageEntries = links.stream()
-                    .limit(200)
+                    .limit(200) // Optional: cap how many links are processed per page
                     .parallel()
-                    .map(link -> {
-                        return extractEventInfos(link.attr("abs:href"), link.text());
-                    })
-                    .filter(obj -> obj != null)
+                    .map(link -> extractEventInfos(link.attr("abs:href"), link.text()))
+                    .filter(Objects::nonNull)
                     .toList();
 
-            for (ViennaHistoryWikiEventObject obj:pageEntries) {
+            for (ViennaHistoryWikiEventObject obj : pageEntries) {
+                if (persistedCount[0] >= limit) return;
                 eventRepository.persistViennaHistoryWikiEventObject(obj);
+                persistedCount[0]++;
             }
 
             // pagination
             Elements nextPageLinks = mwPagesDiv.select("a:contains(nächste Seite)");
-            if (!nextPageLinks.isEmpty()) {
+            if (!nextPageLinks.isEmpty() && persistedCount[0] < limit) {
                 String nextPageHref = nextPageLinks.first().attr("href");
                 String nextPageUrl = "https://www.geschichtewiki.wien.gv.at" + nextPageHref;
-                scrapeCategory(nextPageUrl);
+                scrapeCategory(nextPageUrl, limit, persistedCount);
             }
         }
     }
@@ -94,9 +94,10 @@ public class EventService {
             wikiObject.setUrl(url);
             wikiObject.setName(text);
 
-            // Extract all links from <p> tags and images from <img> tags
+            // Extract all links from <p> tags and images from <img> tags & content
             wikiObject.setLinks(manualExtractorService.getLinks(doc));
             wikiObject.setImageUrls(manualExtractorService.getImageUrls(doc));
+            wikiObject.setContentGerman(contentService.extractMainArticleText(doc));
 
             Element table = doc.selectFirst("table.table.table-condensed.table-hover");
 
@@ -144,6 +145,14 @@ public class EventService {
                     }
                 }
             }
+            // Embeddings
+            if (wikiObject.getContentGerman() != null  && !wikiObject.getContentGerman().equals("")) {
+                // System.out.println("Content!: " + wikiObject.getContentGerman());
+                float[] embedding = openAiService.getEmbedding(wikiObject.getContentGerman());
+                eventRepository.persistEmbedding(embedding,wikiObject.getViennaHistoryWikiId());
+                wikiObject.setContentEnglish("");
+            }
+
             return wikiObject;
 
         } catch (Exception e) {

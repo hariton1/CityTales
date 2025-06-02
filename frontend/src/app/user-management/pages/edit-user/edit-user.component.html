@@ -2,10 +2,11 @@
   <form
     tuiForm="l"
     [formGroup]="editUserForm"
+    *ngIf="accountCreated"
   >
     <header tuiHeader>
       <h3 tuiTitle>
-        Editing user: {{ this.loadUser.userData.firstName + ' ' + this.loadUser.userData.lastName }}
+        Editing user: {{ this.user?.email }}
         <span tuiSubtitle>User since {{getMonthName(this.accountCreated?.month)}} {{this.accountCreated.day}}, {{this.accountCreated?.year}}</span>
       </h3>
       <button
@@ -25,9 +26,9 @@
     <fieldset>
       <div class="stack">
         <tui-textfield>
-          <label tuiLabel>First Name</label>
+          <label tuiLabel>Display Name</label>
           <input
-            formControlName="firstName"
+            formControlName="displayName"
             placeholder="John"
             tuiTextfield
             type="text"
@@ -37,31 +38,21 @@
 
       <div class="stack">
         <tui-textfield>
-          <label tuiLabel>Last Name</label>
+          <label tuiLabel>Email</label>
           <input
-            formControlName="lastName"
-            placeholder="Doe"
+            formControlName="email"
+            placeholder="john@doe.com"
             tuiTextfield
-            type="text"
+            type="email"
           />
         </tui-textfield>
+
+        <tui-error
+          formControlName="email"
+          [error]="[] | tuiFieldError | async"
+        />
       </div>
     </fieldset>
-
-    <tui-textfield>
-      <label tuiLabel>Email</label>
-      <input
-        formControlName="email"
-        placeholder="john@doe.com"
-        tuiTextfield
-        type="email"
-      />
-    </tui-textfield>
-
-    <tui-error
-      formControlName="email"
-      [error]="[] | tuiFieldError | async"
-    />
 
     <fieldset>
       <div class="stack">
@@ -127,15 +118,9 @@
     <footer>
       <button
         tuiButton
-        appearance="flat"
-        type="button"
-      >
-        Discard
-      </button>
-
-      <button
-        tuiButton
+        appearance="primary"
         type="submit"
+        (click)="onSubmit()"
       >
         <tui-icon
           icon="@tui.save"

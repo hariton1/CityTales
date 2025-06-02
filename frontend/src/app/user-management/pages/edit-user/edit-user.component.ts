@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {AsyncPipe} from '@angular/common';
+import {AsyncPipe, NgIf} from '@angular/common';
 import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {
   TuiButton,
@@ -19,7 +19,9 @@ import {
 import {TuiForm, TuiHeader} from '@taiga-ui/layout';
 import {TuiInputDateModule, TuiInputDateRangeModule} from '@taiga-ui/legacy';
 import {TuiDay} from '@taiga-ui/cdk';
-import {ActivatedRoute, ParamMap, RouterLink} from '@angular/router';
+import {ActivatedRoute, ParamMap, RouterLink, Router} from '@angular/router';
+import {UserService} from '../../../user_db.services/user.service';
+import {UserDto} from '../../../user_db.dto/user.dto';
 
 @Component({
   selector: 'app-edit-user',
@@ -44,28 +46,20 @@ import {ActivatedRoute, ParamMap, RouterLink} from '@angular/router';
     TuiTextfieldOptionsDirective,
     TuiTextfieldDropdownDirective,
     RouterLink,
+    NgIf,
   ],
   templateUrl: './edit-user.component.html',
   styleUrl: './edit-user.component.scss'
 })
-export class EditUserComponent implements OnInit{
-  userId: number | null = null;
-  loadUser: any;
+export class EditUserComponent implements OnInit {
+  userId: string | null = null;
+  user: UserDto | null = null;
   protected persons = ['User', 'Moderator', 'Contributor'];
   protected statusValues = ['Active', 'Blocked'];
   // Use the parse method directly
   accountCreated: any = null;
 
-  protected editUserForm = new FormGroup({
-    firstName: new FormControl('', Validators.required),
-    lastName: new FormControl('', Validators.required),
-    email: new FormControl({value: '', disabled: true}, Validators.required),
-    role: new FormControl('', Validators.required),
-    status: new FormControl('', Validators.required),
-    birthday: new FormControl({value: TuiDay.fromLocalNativeDate(new Date()), disabled: true}, Validators.required)
-  });
-
-  constructor(readonly route: ActivatedRoute) {
+  constructor(readonly route: ActivatedRoute, readonly userService: UserService, private router: Router) {
   }
 
   ngOnInit(): void {
@@ -73,22 +67,30 @@ export class EditUserComponent implements OnInit{
     this.route.paramMap.subscribe((params: ParamMap) => {
       const idParam = params.get('id');
       if (idParam) {
-        this.userId = +idParam;
-        this.loadUser = this.data.find(user => user.id === this.userId);// Convert string to number using the '+' operator
-      }
-
-      if (this.loadUser) {
-        this.editUserForm.patchValue({
-          firstName: this.loadUser.userData.firstName,
-          lastName: this.loadUser.userData.lastName,
-          email: this.loadUser.userData.email,
-          role: this.loadUser.role.roleName,
-          status: this.loadUser.status.value,
-          birthday: TuiDay.jsonParse(this.loadUser.userData.birthday)
-        });
-        this.accountCreated = TuiDay.parseRawDateString(this.loadUser.createdAt, 'YMD');
+        this.userId = idParam;
+        this.getUserById(idParam);
       }
     });
+  }
+
+  getUserById(id: string): void {
+    this.userService.getUserById(id)
+      .subscribe(user => {
+        this.user = user;
+        console.log('User loaded: ' + this.user);
+          this.editUserForm.patchValue({
+            email: this.user.email,
+            role: 'User', /* to be replaced with the actual role */
+            birthday: TuiDay.currentLocal() /* to be replaced with the actual birthday */
+          });
+        const createdDate = new Date(this.user.created_at);
+        this.accountCreated = new TuiDay(
+          createdDate.getFullYear(),
+          createdDate.getMonth(), // Note: JavaScript months are 0-indexed
+          createdDate.getDate()
+        );
+
+      })
   }
 
   getMonthName(dateNumber: number): string {
@@ -99,6 +101,40 @@ export class EditUserComponent implements OnInit{
     return monthNames[dateNumber];
   }
 
+  onSubmit(): void {
+    if (this.editUserForm.valid && this.user) {
+      const formValues = this.editUserForm.getRawValue();
+
+      const updatedUser = new UserDto(
+        this.user.id,
+        formValues.email ?? '',
+        this.user.created_at
+      );
+
+      this.userService.updateUser(updatedUser)
+        .subscribe({
+          next: () => {
+            console.log('User updated successfully');
+            this.router.navigate(['admin/users']);
+          },
+          error: (error) => {
+            console.error('Error updating user:', error);
+          }
+        });
+    }
+  }
+
+  protected editUserForm = new FormGroup({
+    displayName: new FormControl('', Validators.required),
+    email: new FormControl({value: '', disabled: true}, Validators.required),
+    role: new FormControl('', Validators.required),
+    status: new FormControl('', Validators.required),
+    birthday: new FormControl({value: TuiDay.fromLocalNativeDate(new Date()), disabled: true}, Validators.required)
+  });
+}
+
+
+/*
   protected readonly data = [
     {
       id: 1,
@@ -156,4 +192,4 @@ export class EditUserComponent implements OnInit{
     },
   ];
   protected readonly Date = Date;
-}
+*/
