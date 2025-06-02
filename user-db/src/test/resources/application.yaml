@@ -19,3 +19,9 @@ spring:
   test:
     database:
       replace: none
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          enabled: false
