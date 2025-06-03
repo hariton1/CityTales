@@ -9,8 +9,6 @@
     <tr>
       <th tuiTh>Role</th>
       <th tuiTh>User Data</th>
-      <th tuiTh>Status</th>
-      <!-- <th tuiTh [style.width.rem]="15">Interests</th> -->
       <th tuiTh>Created At</th>
       <th tuiTh>Actions</th>
     </tr>
@@ -37,46 +35,6 @@
           </span>
         </div>
       </td>
-      <!-- Third column -->
-<!--      <td tuiTd>
-        <span [tuiStatus]="user.is_active ? 'var(&#45;&#45;tui-status-positive)' : 'var(&#45;&#45;tui-status-negative)'">
-            {{ user.is_active ? 'Active' : 'Blocked' }}
-        </span>
-      </td>-->
-      <!-- Fourth column
-      <td tuiTd>
-        <tui-items-with-more [style.gap.rem]="0.25">
-          <ng-container *ngFor="let chip of item.interests">
-            <tui-badge *tuiItem>{{ chip }}</tui-badge>
-          </ng-container>
-          <ng-template
-            let-number
-            tuiMore
-          >
-            <button
-              appearance="action-grayscale"
-              tuiDropdownAlign="right"
-              tuiDropdownOpen
-              tuiLink
-              type="button"
-              [tuiDropdown]="dropdown"
-            >
-              + {{ item.interests.length - number - 1 }}
-            </button>
-            <ng-template #dropdown>
-              <div
-                tuiStatus
-                [style.padding.rem]="1"
-              >
-                <ng-container *ngFor="let chip of item.interests; let index = index">
-                  <tui-badge *ngIf="index > number">{{ chip }}</tui-badge>
-                </ng-container>
-              </div>
-            </ng-template>
-          </ng-template>
-        </tui-items-with-more>
-      </td> -->
-
       <td tuiTd>
         <span tuiTitle>
           {{ user.created_at | date: 'dd.MM.yyyy' }}

@@ -1,4 +1,4 @@
-import {Component, Inject, OnInit, PLATFORM_ID} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {CommonModule, DatePipe} from '@angular/common';
 import {FriendsService} from '../../user_db.services/friends.service';
 import {FriendsDto} from '../../user_db.dto/friends.dto';
@@ -6,9 +6,10 @@ import {UserService} from '../../user_db.services/user.service';
 import {UserDto} from '../../user_db.dto/user.dto';
 import {TuiTable} from '@taiga-ui/addon-table';
 import {TuiAutoColorPipe, TuiButton, TuiInitialsPipe, TuiTitle} from '@taiga-ui/core';
-import {TuiAvatar, TuiStatus} from '@taiga-ui/kit';
+import {TuiAvatar} from '@taiga-ui/kit';
 import {TuiCell} from '@taiga-ui/layout';
 import {UUID} from 'node:crypto';
+import {HelperService} from '../../user_db.services/helper.service';
 
 interface Friend {
   email: string;
@@ -42,7 +43,8 @@ export class FriendListComponent implements OnInit {
 
   constructor(
     private friendsService: FriendsService,
-    private userService: UserService
+    private userService: UserService,
+    private helperService: HelperService
   ) {}
 
   ngOnInit(): void {
@@ -88,7 +90,7 @@ export class FriendListComponent implements OnInit {
         next: (user: UserDto) => {
           const friend: Friend = {
             email: user.email,
-            becameFriendsOn: this.sanitizeDate(sentDto.cre_dat),
+            becameFriendsOn: this.helperService.sanitizeDate(sentDto.cre_dat),
             id: user.id
           };
           console.log(sentDto.cre_dat)
@@ -101,23 +103,14 @@ export class FriendListComponent implements OnInit {
     });
   }
 
-  sanitizeDate(raw: string | Date): Date | null {
-    if (raw instanceof Date) return raw;
-
-    const cleanedLower = raw.replace(/\s?(am|pm)/, '');
-    const cleanedUpper = cleanedLower.replace(/\s?(AM|PM)/, '');
-    const date = new Date(cleanedUpper);
-    return isNaN(date.getTime()) ? null : date;
-  }
-
   removeFriend(friend: Friend) {
     console.log(friend)
 
     const del1 = this.receivedMap.get(friend.id);
     const del2 = this.sentMap.get(friend.id);
 
-    del1!.cre_dat = this.sanitizeDate(del1!.cre_dat)!;
-    del2!.cre_dat = this.sanitizeDate(del2!.cre_dat)!;
+    del1!.cre_dat = this.helperService.sanitizeDate(del1!.cre_dat)!;
+    del2!.cre_dat = this.helperService.sanitizeDate(del2!.cre_dat)!;
 
     this.friendsService.deleteFriendsPair(del1!).subscribe({
       next: () => console.log('One way: Deleted successfully'),
