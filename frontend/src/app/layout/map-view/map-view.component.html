@@ -25,9 +25,6 @@
             (mouseleave)="onCircleMouseLeave()"
             (click)="onCircleClick(loc)"
           >
-            <div class="hover-label" *ngIf="hoveredRelatedName === loc.name">
-              {{ loc.name }}
-            </div>
             <img [src]="loc?.imageUrls?.[1]" alt="{{ loc?.name || 'Unnamed' }}" class="building-image" />
           </div>
         </div>

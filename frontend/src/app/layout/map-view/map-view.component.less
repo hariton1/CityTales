@@ -52,6 +52,7 @@ google-map {
   user-select: none;
   // transform: translate(-40px, 65px);
   border: 1px black;
+  z-index: 1000;
 }
 
 .info-content > * {
@@ -65,6 +66,7 @@ google-map {
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 1000;
 }
 
 .circle-building {
@@ -86,6 +88,7 @@ google-map {
   word-break: break-word;
   padding: 3px;
   pointer-events: auto;
+  z-index: 1000;
 }
 
 .no-related {
@@ -137,5 +140,5 @@ google-map {
   white-space: nowrap;
   box-shadow: 0 1px 3px rgba(0,0,0,0.3);
   pointer-events: none;
-  z-index: 100;
+  z-index: 9999;
 }
