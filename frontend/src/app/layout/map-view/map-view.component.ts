@@ -131,10 +131,9 @@ export class MapViewComponent implements OnInit{
   }
   locationMarkerOptions: google.maps.MarkerOptions = {
     draggable: false,
-    animation: google.maps.Animation.BOUNCE,
     icon: {
-      url: 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png',
-      scaledSize: new google.maps.Size(25, 25),
+      url: 'assets/icons/live-location.svg',
+      scaledSize: new google.maps.Size(50, 50),
       origin: new google.maps.Point(0, 0),
       anchor: new google.maps.Point(17, 34),
       labelOrigin: new google.maps.Point(12, 34)
@@ -179,7 +178,7 @@ export class MapViewComponent implements OnInit{
         position: { lat: location.latitude, lng: location.longitude },
         icon: {
           url: iconUrl,
-          scaledSize: new google.maps.Size(20, 20),
+          scaledSize: new google.maps.Size(30, 30),
           anchor: new google.maps.Point(12, 12),
           labelOrigin: new google.maps.Point(12, 30)
         },
@@ -196,7 +195,7 @@ export class MapViewComponent implements OnInit{
       case 'church':
         return 'assets/icons/church.svg';
       default:
-        return 'assets/icons/building-11.svg';
+        return 'assets/icons/town-hall-11.svg';
     }
   }
 
