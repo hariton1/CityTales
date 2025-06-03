@@ -1,7 +1,7 @@
 import {Component, Inject, OnInit, PLATFORM_ID} from '@angular/core';
 import {UserBadgesService} from '../../../user_db.services/user-badges.service';
 import {UserBadgeDTO} from '../../../user_db.dto/user-badge.dto';
-import {CommonModule} from '@angular/common';
+import {CommonModule, DatePipe} from '@angular/common';
 import {CombinedService} from '../../../services/combined.service';
 import {Combined} from '../../../dto/db_entity/Combined';
 import {UUID} from 'node:crypto';
@@ -9,7 +9,10 @@ import {HelperService} from '../../../user_db.services/helper.service';
 
 @Component({
   selector: 'app-badges',
-  imports: [CommonModule],
+  imports: [
+    CommonModule,
+    DatePipe
+  ],
   templateUrl: './badges.component.html',
   styleUrl: './badges.component.scss'
 })
