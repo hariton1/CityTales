@@ -3,11 +3,12 @@
     <!-- Header with building information -->
     <div class="place-detail-header">
       <h2 class="place-detail-title">{{selectedPlace.name}}</h2>
-      <div class="place-location">
+      <div class="place-location" *ngIf="selectedPlace?.latitude != null && selectedPlace?.longitude != null">
         <span class="coordinates">
           {{ selectedPlace.latitude }}°N, {{ selectedPlace.longitude }}°E
         </span>
       </div>
+
 
       <button
         (click)="closeDetail()"

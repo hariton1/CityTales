@@ -34,6 +34,7 @@ export class MapViewComponent implements OnInit{
   hoveredLocation: BuildingEntity | null = null;
   combinedLocations: any[] = [];
   hoveredRelatedName: string | null = null;
+  hoveredIndex: number | null = null;
 
   polylineOptions: google.maps.PolylineOptions = {
     strokeColor: 'blue',
@@ -261,14 +262,22 @@ export class MapViewComponent implements OnInit{
     console.log(this.polylines)
   }
 
-  onCircleMouseEnter(name: string): void {
+  onCircleMouseEnter(name: string, index: number): void {
     this.hoveredRelatedName = name;
-    console.log('Hovered name:', name);
+    this.hoveredIndex = index;
   }
 
   onCircleMouseLeave(): void {
-    console.log('Hover left');
     this.hoveredRelatedName = null;
+    this.hoveredIndex = null;
+  }
+
+  getHoverLabelPosition(index: number, total: number): string {
+    const radius = 60;
+    const angle = (2 * Math.PI / total) * index - Math.PI / 2;
+    const x = radius * Math.cos(angle);
+    const y = radius * Math.sin(angle);
+    return `translate(${x}px, ${y}px) translate(-50%, -50%)`;
   }
 
   onCircleClick(loc: BuildingEntity): void {
