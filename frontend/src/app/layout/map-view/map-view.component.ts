@@ -178,7 +178,7 @@ export class MapViewComponent implements OnInit{
         position: { lat: location.latitude, lng: location.longitude },
         icon: {
           url: iconUrl,
-          scaledSize: new google.maps.Size(30, 30),
+          scaledSize: new google.maps.Size(28, 28),
           anchor: new google.maps.Point(12, 12),
           labelOrigin: new google.maps.Point(12, 30)
         },
