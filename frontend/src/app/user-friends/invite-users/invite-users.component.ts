@@ -8,6 +8,7 @@ import {TuiTable} from '@taiga-ui/addon-table';
 import {TuiButton, TuiTitle} from '@taiga-ui/core';
 import {TuiCell} from '@taiga-ui/layout';
 import {UUID} from 'node:crypto';
+import {HelperService} from '../../user_db.services/helper.service';
 
 interface Invite {
   user: UserDto;
@@ -36,7 +37,9 @@ export class InviteUsersComponent implements OnInit{
 
   constructor(
     private friendsService: FriendsService,
-    private userService: UserService) {
+    private userService: UserService,
+    private helperService: HelperService
+  ) {
   }
   ngOnInit() {
     this.retrieveUserID();
@@ -137,21 +140,12 @@ export class InviteUsersComponent implements OnInit{
 
   declineInvite(user: UserDto) {
     const dto = this.sentInviteMap.get(user.id)!;
-    dto.cre_dat = this.sanitizeDate(dto.cre_dat)!;
+    dto.cre_dat = this.helperService.sanitizeDate(dto.cre_dat)!;
     console.log(dto)
     this.friendsService.deleteFriendsPair(dto).subscribe({
       next: () => console.log(' Deleted successfully'),
       error: (err) => console.error('Error deleting:', err)
     });
     window.location.reload();
-  }
-
-  sanitizeDate(raw: string | Date): Date | null {
-    if (raw instanceof Date) return raw;
-
-    const cleanedLower = raw.replace(/\s?(am|pm)/, '');
-    const cleanedUpper = cleanedLower.replace(/\s?(AM|PM)/, '');
-    const date = new Date(cleanedUpper);
-    return isNaN(date.getTime()) ? null : date;
   }
 }
