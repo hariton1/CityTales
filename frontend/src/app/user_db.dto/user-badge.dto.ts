@@ -1,10 +1,10 @@
 import {UUID} from 'node:crypto';
 
 export class UserBadgeDTO {
-  private user_badge_id: number;
+  public user_badge_id: number;
   private user_id: UUID;
-  private article_id: number;
-  private earned_at: Date;
+  public article_id: number;
+  public earned_at: Date;
 
   constructor(user_badge_id: number, user_id: UUID, article_id: number, earned_at: Date) {
     this.user_badge_id = user_badge_id;

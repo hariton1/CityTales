@@ -1,7 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {SidebarComponent} from '../sidebar/sidebar.component';
 import {MapViewComponent} from '../map-view/map-view.component';
-import {HistoricalPlaceEntity} from '../../dto/db_entity/HistoricalPlaceEntity';
 import {BuildingEntity} from '../../dto/db_entity/BuildingEntity';
 import {TuiSegmented} from '@taiga-ui/kit';
 import {BreakpointObserver, Breakpoints} from '@angular/cdk/layout';

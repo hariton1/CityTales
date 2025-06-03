@@ -78,5 +78,4 @@ public class FriendsController {
             System.out.println(e.getMessage());
         }
     }
-
 }
