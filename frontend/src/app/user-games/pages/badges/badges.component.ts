@@ -1,14 +1,18 @@
 import {Component, Inject, OnInit, PLATFORM_ID} from '@angular/core';
 import {UserBadgesService} from '../../../user_db.services/user-badges.service';
 import {UserBadgeDTO} from '../../../user_db.dto/user-badge.dto';
-import {CommonModule} from '@angular/common';
+import {CommonModule, DatePipe} from '@angular/common';
 import {CombinedService} from '../../../services/combined.service';
 import {Combined} from '../../../dto/db_entity/Combined';
 import {UUID} from 'node:crypto';
+import {HelperService} from '../../../user_db.services/helper.service';
 
 @Component({
   selector: 'app-badges',
-  imports: [CommonModule],
+  imports: [
+    CommonModule,
+    DatePipe
+  ],
   templateUrl: './badges.component.html',
   styleUrl: './badges.component.scss'
 })
@@ -20,7 +24,8 @@ export class BadgesComponent implements OnInit{
 
   constructor(
     private userBadgeService: UserBadgesService,
-    private combinedService: CombinedService
+    private combinedService: CombinedService,
+    private helperService: HelperService
   ) {
   }
 
@@ -32,10 +37,7 @@ export class BadgesComponent implements OnInit{
       this.userBadgeService.getBadgesByUserId(this.userId).subscribe({
         next: (data) => {
           this.badges = data.map(badge => {
-            /*TODO
-            if (badge.earned_at && badge.earned_at.includes(' PM')) {
-              badge.earned_at = badge.earned_at.replace(' PM', '');
-            }*/
+              badge.earned_at = this.helperService.sanitizeDate(badge.earned_at)!
             return badge;
           });
 
@@ -51,7 +53,7 @@ export class BadgesComponent implements OnInit{
 
   enrichBadgesWithArticleDetails() {
     this.badges.forEach((badge, index) => {
-      this.combinedService.getInfosById(badge.getArticleId()).subscribe({
+      this.combinedService.getInfosById(badge.article_id).subscribe({
         next: (articleDetails) => {
           this.badges[index].articleDetails = articleDetails;
         },
