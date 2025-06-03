@@ -2,6 +2,7 @@ package group_05.ase.neo4j_data_access.Controller;
 
 import group_05.ase.neo4j_data_access.Entity.Tour.CreateTourRequestDTO;
 import group_05.ase.neo4j_data_access.Entity.Tour.DurationDistanceEstimateDTO;
+import group_05.ase.neo4j_data_access.Entity.Tour.TourDTO;
 import group_05.ase.neo4j_data_access.Entity.Tour.TourObject;
 import group_05.ase.neo4j_data_access.Service.Interface.ITourService;
 import org.springframework.http.MediaType;
@@ -41,9 +42,9 @@ public class TourController {
     }
 
     @PostMapping("/createBasedOnInterests")
-    public ResponseEntity<List<TourObject>> createTourBasedOnInterests(@RequestBody CreateTourRequestDTO request) {
+    public ResponseEntity<List<TourDTO>> createTourBasedOnInterests(@RequestBody CreateTourRequestDTO request) {
         System.out.println("Received request: " + request.toString());
-        List<TourObject> tours = tourService.createTours(request);
+        List<TourDTO> tours = tourService.createTours(request);
         return ResponseEntity.ok(tours);
     }
 }

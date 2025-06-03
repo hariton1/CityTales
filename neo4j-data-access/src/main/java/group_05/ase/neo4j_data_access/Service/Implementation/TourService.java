@@ -4,8 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import group_05.ase.neo4j_data_access.Entity.Tour.CreateTourRequestDTO;
 import group_05.ase.neo4j_data_access.Entity.Tour.MatchRequest;
+import group_05.ase.neo4j_data_access.Entity.Tour.TourDTO;
 import group_05.ase.neo4j_data_access.Entity.Tour.TourObject;
 import group_05.ase.neo4j_data_access.Entity.ViennaHistoryWikiBuildingObject;
 import group_05.ase.neo4j_data_access.Service.Interface.ITourService;
@@ -30,6 +32,7 @@ public class TourService implements ITourService {
         this.historicBuildingService = historicBuildingService;
         this.historicPersonService = historicPersonService;
         this.historicEventService = historicEventService;
+        this.mapper.registerModule(new Jdk8Module());
     }
 
     private final ObjectMapper mapper = new ObjectMapper();
@@ -40,7 +43,7 @@ public class TourService implements ITourService {
 
 
     @Override
-    public List<TourObject> createTours(CreateTourRequestDTO dto) {
+    public List<TourDTO> createTours(CreateTourRequestDTO dto) {
 
         //HTTP Request to User Interst DB
         List<String> interest_ids = getInterestsFromDB(dto.getUserId());
@@ -69,7 +72,10 @@ public class TourService implements ITourService {
         buildings_wikidata_ids = buildings_wikidata_ids.stream().distinct().toList();
 
         List<GeographicPoint2d> stops = new ArrayList<>();
-        stops.add(new GeographicPoint2d(dto.getStart_lat(), dto.getStart_lng()));
+
+        if(dto.getStart_lat() != 0.0 && dto.getStart_lng() != 0.0) {
+            stops.add(new GeographicPoint2d(dto.getStart_lat(), dto.getStart_lng()));
+        }
 
         Map<GeographicPoint2d, Integer> building_dict = new HashMap<>();
 
@@ -89,7 +95,9 @@ public class TourService implements ITourService {
             dto.getPredefined_stops().forEach(stop -> stops.add(new GeographicPoint2d(stop.getLatitude().get(), stop.getLongitude().get())));
 
         }
-        stops.add(new GeographicPoint2d(dto.getEnd_lat(), dto.getEnd_lng()));
+        if(dto.getEnd_lat() != 0.0 && dto.getEnd_lng() != 0.0) {
+            stops.add(new GeographicPoint2d(dto.getEnd_lat(), dto.getEnd_lng()));
+        }
 
         List<List<Float>> distanceMatrix = getMetricMatrix(stops, "distance");
         System.out.println("Distance Matrix: " + distanceMatrix);
@@ -97,8 +105,27 @@ public class TourService implements ITourService {
         List<List<GeographicPoint2d>> routes = findRoutesBFS(stops, distanceMatrix, dto.getMinDistance(), dto.getMaxDistance(), dto.getMinIntermediateStops(), MAX_ROUTES);
         List<TourObject> tours = routes.stream().map(route -> buildTourObject(route, dto.getUserId(), building_dict)).toList();
 
-        return tours;
+        return tours.stream().map(this::tourObjectToTourDTO).toList();
     }
+
+    private TourDTO tourObjectToTourDTO(TourObject tourObject) {
+        TourDTO dto = new TourDTO();
+        dto.setDescription(tourObject.getDescription());
+        dto.setName(tourObject.getName());
+        dto.setStart_lat(tourObject.getStartLat());
+        dto.setStart_lng(tourObject.getStartLng());
+        dto.setEnd_lat(tourObject.getEndLat());
+        dto.setEnd_lng(tourObject.getEndLng());
+        dto.setDistance(tourObject.getDistance());
+        dto.setDurationEstimate(tourObject.getDurationEstimate());
+        try{
+            dto.setStops(mapper.writeValueAsString(tourObject.getStops()));
+        } catch (JsonProcessingException e) {
+            System.out.println("Could not convert stops array to JSON string: " + e.getMessage());
+        }
+        return dto;
+    }
+
 
     private TourObject buildTourObject(List<GeographicPoint2d> stops, String userId, Map<GeographicPoint2d, Integer> building_dict) {
         TourObject tourObject = new TourObject();
