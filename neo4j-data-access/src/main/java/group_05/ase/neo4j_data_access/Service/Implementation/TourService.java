@@ -110,6 +110,7 @@ public class TourService implements ITourService {
 
     private TourDTO tourObjectToTourDTO(TourObject tourObject) {
         TourDTO dto = new TourDTO();
+        dto.setUserId(tourObject.getUserId());
         dto.setDescription(tourObject.getDescription());
         dto.setName(tourObject.getName());
         dto.setStart_lat(tourObject.getStartLat());
@@ -145,8 +146,8 @@ public class TourService implements ITourService {
         }
         tourObject.setStops(stops_list);
         Map<String, Double> durations = getLengthDurationOfTour(tourObject);
-        tourObject.setDistance(durations.get("distance"));
-        tourObject.setDurationEstimate(durations.get("duration"));
+        tourObject.setDistance(durations.get("distance") / 1000);
+        tourObject.setDurationEstimate(durations.get("duration") / 3600);
 
         return tourObject;
     }
@@ -359,7 +360,7 @@ public class TourService implements ITourService {
             Double distance = summary.path("distance").asDouble();
             Double duration = summary.path("duration").asDouble();
 
-            return Map.of("distance", distance, "duration", duration);
+            return Map.of("distance", distance/1000, "duration", duration/3600);
 
         } catch (JsonProcessingException e) {
             System.out.println("Could not parse directions response.");

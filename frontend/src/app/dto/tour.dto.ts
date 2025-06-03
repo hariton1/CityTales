@@ -29,6 +29,9 @@ export class TourDto {
   }
 
   public static fromTourEntity(tourEntity:TourEntity): TourDto {
+
+    var stops: BuildingEntity[] = JSON.parse(tourEntity.stops);
+
     return new TourDto(
       tourEntity.id,
       tourEntity.name,
@@ -37,7 +40,7 @@ export class TourDto {
       tourEntity.start_lng,
       tourEntity.end_lat,
       tourEntity.end_lng,
-      tourEntity.stops as unknown as BuildingEntity[],
+      stops,
       tourEntity.distance,
       tourEntity.durationEstimate,
       tourEntity.userId
