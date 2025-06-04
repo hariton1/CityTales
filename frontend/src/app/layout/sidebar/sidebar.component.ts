@@ -138,10 +138,6 @@ export class SidebarComponent implements OnInit{
     this.selectedPerson = null;
   }
 
-  setHistoricalPlaces(places: BuildingEntity[]): void {
-    this.historicalPlaces = places;
-    console.log(this.historicalPlaces);
-  }
 
   //Search field
 
@@ -207,15 +203,13 @@ export class SidebarComponent implements OnInit{
   onItemClick(item: any){
     //check if item is a building
     if(item.latitude != null && item.longitude != null){
-      this.selectedPlace = item;
-
-      this.selectedPlace = this.userService.enterHistoricNode(this.selectedPlace);
-
-      this.detailedView = true;
-      this.open = false;
-    } else {
-      window.open(item.url, '_blank');
-      this.open = false;
+      this.setPlaceDetail(item)
+    } else if (item.birthDate != null) {
+      //item is person
+      this.setPersonDetail(item)
+    } else if (item.organizer != null) {
+      //item is event
+      this.setEventDetail(item)
     }
   }
 }
