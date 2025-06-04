@@ -23,12 +23,12 @@
         <div class="tour-card-horizontal" (click)="onTourCardClick(tour)">
           <div class="tour-card-header">
             <h4 tuiTitle class="tui-text_h6">{{ tour.getName() }}</h4>
-            <span tuiSubtitle>Estim. Duration: {{ tour.getDurationEstimate() }}</span>
+            <span tuiSubtitle>Estim. Duration: {{ tour.getDurationEstimate().toFixed(2) }} h</span>
 
           </div>
           <p class="tui-text_body tui-space_top-1">{{ tour.getDescription() }}</p>
+          <button tuiButton size="xs" (click)="deleteTour(tour)" class="slide-tour-delete-button">Delete</button>
         </div>
-        <button tuiButton size="xs" (click)="deleteTour(tour)" class="slide-tour-delete-button">Delete</button>
       </ng-container>
     </div>
   </section>
@@ -39,6 +39,7 @@
   <google-map height="500px" width="100%"
               [center]="center"
               [zoom]="zoom"
+              [options]="options"
               (mapClick)="onMapClick($event)">
     <map-polyline [path]="polylinePath" [options]="polylineOptions"></map-polyline>
   </google-map>
@@ -47,7 +48,6 @@
     <button tuiButton class="control-button" (click)="mode = 'start'">Set Start</button>
     <button tuiButton class="control-button" (click)="mode = 'end'">Set End</button>
     <button tuiButton class="control-button" (click)="clearRoute()">Clear</button>
-    <button tuiButton class="control-button" (click)="createTours()">Create Tours!</button>
 
     <h4>Selected Tour</h4>
     <ol>
@@ -138,30 +138,19 @@
       step="1"
       [(ngModel)]="minSites"
     />
-  </div>
 
-  <!-- Generate Button -->
-  <div class="tui-space_top-3">
-    <button tuiButton appearance="primary" size="m" (click)="generateAdvancedTours()">
-      Generate Advanced Tours
-    </button>
-  </div>
-
-  <!-- Display Generated Tours -->
-  <div class="tui-space_top-5" *ngIf="generatedTours.length > 0">
-    <h3 tuiTitle class="tui-text_h4">Generated Tours</h3>
-    <div class="tour-scroll-container">
-      <ng-container *ngFor="let tour of generatedTours">
-        <div class="tour-card-horizontal" (click)="onGeneratedTourClick(tour)">
-          <div class="tour-card-header">
-            <h4 tuiTitle class="tui-text_h6">{{ tour.getName() }}</h4>
-            <span tuiSubtitle>Distance: {{ tour.getDistance() / 1000 }} km</span>
-            <span tuiSubtitle>Duration: {{ tour.getDurationEstimate() / 3600 }} 0h</span>
-          </div>
-          <p class="tui-text_body tui-space_top-1">{{ tour.getDescription() }}</p>
-        </div>
-      </ng-container>
+    <div class="tui-space_vertical-3">
+      <label tuiLabel>Max budget (€): {{ maxBudget }}</label>
+      <input
+        tuiSlider
+        type="range"
+        min="0"
+        max="100"
+        step="1"
+        [(ngModel)]="maxBudget"
+      >
     </div>
+    <button tuiButton class="control-button" (click)="generateAdvancedTour()">Create a tour for me!</button>
   </div>
 </section>
 
