@@ -302,7 +302,6 @@ export class MapViewComponent implements OnInit{
     const events = (location.relatedEvents || []).map((item: any) => ({ ...item, type: 'event' }));
 
     const combined = [...buildings, ...persons, ...events];
-    console.log('Combined related items:', combined);
     return combined;
   }
 
@@ -324,8 +323,6 @@ export class MapViewComponent implements OnInit{
         this.polylines.push([center, related]);
       }
     });
-
-    console.log(this.polylines)
   }
 
   onCircleMouseEnter(name: string, index: number): void {
@@ -347,7 +344,6 @@ export class MapViewComponent implements OnInit{
   }
 
   onCircleClick(loc: any): void {
-    console.log('Clicked related location:', loc);
     this.selectDetailEvent.emit(loc);
   }
 }
