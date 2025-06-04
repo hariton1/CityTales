@@ -32,7 +32,9 @@ public class FeedbackServiceTest {
             1,
             100.0,
             "Completely correct",
-            null
+            null,
+            "N",
+            "N"
     );
 
     private final ArrayList<FeedbackEntity> feedbackEntities = new ArrayList<>(List.of(feedbackEntity));
