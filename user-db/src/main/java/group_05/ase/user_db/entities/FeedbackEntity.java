@@ -30,4 +30,8 @@ public class FeedbackEntity {
 
     private LocalDateTime creDat;
 
+    private String processed;
+
+    private String approved;
+
 }

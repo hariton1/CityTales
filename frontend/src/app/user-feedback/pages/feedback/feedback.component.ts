@@ -15,6 +15,7 @@ import {TUI_FALSE_HANDLER, tuiClamp, tuiRound} from '@taiga-ui/cdk';
 import {FeedbackDto} from '../../../user_db.dto/feedback.dto';
 import {FeedbackService} from '../../../user_db.services/feedback.service';
 import {ActivatedRoute, Router} from '@angular/router';
+import {UUID} from 'node:crypto';
 
 @Component({
   selector: 'app-feedback',
@@ -76,7 +77,7 @@ export class FeedbackComponent implements OnInit {
     console.log(this.form.value.fb_content);
     let newFeedbackDto = new FeedbackDto(
       -1,
-      'f5599c8c-166b-495c-accc-65addfaa572b',
+     localStorage.getItem("user_uuid") as UUID,
       Number(this.wikiId),
       this.value,
       this.form.value.fb_content ?? '',
