@@ -38,11 +38,41 @@ export class FeedbackListComponent {
   }
 
   ngOnInit(): void {
-    this.feedbackService.getAllFeedbacks().subscribe(
-      (feedbacks) => {
-        this.feedbacks = feedbacks;
+    this.feedbackService.getAllFeedbacks().subscribe({
+      next: (feedbacks) => {
+        // Process each feedback independently
+        feedbacks.forEach(feedback => {
+          // You can process each feedback here
+          console.log('Processing feedback:', feedback);
+          let articleName = '';
+          let userName = '';
+          this.locationService.getLocationByVHWId(feedback.getArticleId()).subscribe(
+            (article) => {
+              articleName = article.building.name;
+            }
+          )
+          this.userService.getUserById(feedback.getUserId()).subscribe(
+            (user) => {
+              userName = user.email;
+            }
+          )
+          let tmp = {
+            article_id: feedback.getArticleId(),
+            article_name: articleName,
+            user_id: feedback.getUserId(),
+            user_name: userName,
+            fb_content: feedback.getFbContent(),
+            rating: feedback.getRating()
+          }
+          // Add the processed feedback to the array
+          this.feedbacks.push(tmp);
+        });
+      },
+      error: (error) => {
+        console.error('Error fetching feedbacks:', error);
       }
-    );
+    });
+
   }
 
   protected handleApproveFeedback(feedback: any): void {

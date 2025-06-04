@@ -20,7 +20,7 @@
       <td tuiTd>
         <div [tuiCell]="'m'">
                     <span tuiTitle>
-                      feedback.article_id
+                      {{ feedback.article_name }}
                     </span>
         </div>
       </td>
@@ -28,11 +28,11 @@
       <td tuiTd>
         <div [tuiCell]="'m'">
           <tui-avatar
-            [src]="feedback.user_id | tuiInitials"
-            [style.background]="feedback.user_id | tuiAutoColor"
+            [src]="feedback.user_name | tuiInitials"
+            [style.background]="feedback.user_name | tuiAutoColor"
           />
           <span tuiTitle>
-                        {{ feedback.user_id }}
+                        {{ feedback.user_name }}
           </span>
         </div>
       </td>
