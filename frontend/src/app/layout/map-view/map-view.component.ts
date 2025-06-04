@@ -1,5 +1,15 @@
-import {Component, inject, OnInit, Output, ViewChild, EventEmitter, NgZone, ElementRef} from '@angular/core';
-import {GoogleMap, GoogleMapsModule, MapInfoWindow, MapMarker} from '@angular/google-maps';
+import {
+  Component,
+  inject,
+  OnInit,
+  Output,
+  ViewChild,
+  EventEmitter,
+  NgZone,
+  ElementRef,
+  HostListener
+} from '@angular/core';
+import {GoogleMap, GoogleMapsModule, MapInfoWindow} from '@angular/google-maps';
 import {CommonModule} from '@angular/common';
 import {UserLocationService} from '../../services/user-location.service';
 import {LocationService} from '../../services/location.service';
@@ -170,6 +180,7 @@ export class MapViewComponent implements OnInit{
   }
 
   private clusterer!: MarkerClusterer;
+  private clickedOnMarker = false;
 
   addMarkersToMap(locations: BuildingEntity[], batchSize = 200): void {
     const batches: BuildingEntity[][] = [];
@@ -192,11 +203,13 @@ export class MapViewComponent implements OnInit{
               anchor: new google.maps.Point(12, 12),
               labelOrigin: new google.maps.Point(12, 30),
             },
-            map: this.map.googleMap!, // show immediately
+            map: this.map.googleMap!,
           });
 
+          //open details when clicking on marker
           marker.addListener('click', () => {
             this.zone.run(() => {
+              this.clickedOnMarker = true;
               this.detailAction(marker, location);
             })
           });
@@ -235,7 +248,7 @@ export class MapViewComponent implements OnInit{
     }
   }
 
-  @ViewChild('nativeInfoContent', { static: false }) nativeInfoContentRef!: ElementRef;
+  @ViewChild('relatedContentToLocation', { static: false }) relatedContentToLocationRef!: ElementRef;
 
   detailAction(marker: google.maps.Marker, location: BuildingEntity): void {
     if (!this.nativeInfoWindow) {
@@ -246,11 +259,10 @@ export class MapViewComponent implements OnInit{
     this.combinedLocations = this.getCombinedItems(location);
     this.hoveredLocation = location;
 
-    const contentEl = this.nativeInfoContentRef.nativeElement;
-    console.log('contentEl:', contentEl);
-    contentEl.style.display = 'block';
-    this.nativeInfoWindow.setContent(contentEl);
-    this.nativeInfoWindow.open(this.map.googleMap!, marker);
+    const relatedContent = this.relatedContentToLocationRef.nativeElement;
+    relatedContent.style.display = 'block';
+    this.nativeInfoWindow.setContent(relatedContent);
+    this.nativeInfoWindow.open(this.map.googleMap, marker);
 
     this.selectPlaceEvent.emit(location);
     this.setDetailedViewEvent.emit(true);
@@ -259,9 +271,19 @@ export class MapViewComponent implements OnInit{
 
   closeInfoWindow() {
     this.nativeInfoWindow.close();
-    this.nativeInfoContentRef.nativeElement.style.display = 'none';
+    this.relatedContentToLocationRef.nativeElement.style.display = 'none';
     this.hoveredLocation = null;
     this.polylines = [];
+  }
+
+  //hide the info window when clicking outside it
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const clickedInsideInfo = this.relatedContentToLocationRef?.nativeElement.contains(event.target);
+    if (!clickedInsideInfo && !this.clickedOnMarker) {
+      this.closeInfoWindow();
+    }
+    this.clickedOnMarker = false;
   }
 
   // Returns CSS translate(x, y) string to position each circle around the center in a circle layout
