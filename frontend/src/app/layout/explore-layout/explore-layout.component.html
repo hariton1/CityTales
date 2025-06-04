@@ -15,20 +15,24 @@
     </div>
 
     <div class="notification-button-container">
-      <app-notification-inbox (selectPlaceEvent)="setSelectedPlace($event)" (setDetailedViewEvent)="setDetailedViewEvent($event)"></app-notification-inbox>
+      <app-notification-inbox (selectPlaceEvent)="selectDetailEvent($event)"></app-notification-inbox>
     </div>
   <!-- Mobile: show only selected component -->
   <ng-container *ngIf="currentViewMobile === 'discover'">
-    <app-sidebar [historicalPlaces]="historicalPlaces" [detailedView]="setDetailedView"></app-sidebar>
+    <app-sidebar [historicalPlaces]="historicalPlaces"></app-sidebar>
   </ng-container>
 
   <ng-container *ngIf="currentViewMobile === 'map'">
-    <app-map-view (selectPlaceEvent)="setSelectedPlace($event)" (populatePlacesEvent)="setHistoricalPlaces($event)" (setDetailedViewEvent)="setDetailedViewEvent($event)"></app-map-view>
+    <app-map-view (populatePlacesEvent)="setHistoricalPlaces($event)" (selectDetailEvent)="selectDetailEvent($event)" )></app-map-view>
   </ng-container>
 </ng-container>
 
 <!-- Desktop: show both always -->
 <ng-container *ngIf="!isMobile">
-  <app-sidebar [historicalPlaces]="historicalPlaces" [detailedView]="setDetailedView"></app-sidebar>
-  <app-map-view (selectPlaceEvent)="setSelectedPlace($event)" (populatePlacesEvent)="setHistoricalPlaces($event)" (setDetailedViewEvent)="setDetailedViewEvent($event)"></app-map-view>
+  <app-sidebar [historicalPlaces]="historicalPlaces"
+               [selectedPlace]="selectedPlace"
+               [selectedEvent]="selectedEvent"
+               [selectedPerson]="selectedPerson">
+  </app-sidebar>
+  <app-map-view (selectDetailEvent)="selectDetailEvent($event)" (populatePlacesEvent)="setHistoricalPlaces($event)"></app-map-view>
 </ng-container>

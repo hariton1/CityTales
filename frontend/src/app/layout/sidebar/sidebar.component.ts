@@ -41,13 +41,12 @@ import {HistoricPersonDetailComponent} from '../historic-person-detail/historic-
 })
 export class SidebarComponent implements OnInit{
 
-  selectedPlace: BuildingEntity | null = null;
-  selectedPerson: PersonEntity | null = null;
-  selectedEvent: EventEntity | null = null;
+  @Input() selectedPlace: BuildingEntity | null = null;
+  @Input() selectedPerson: PersonEntity | null = null;
+  @Input() selectedEvent: EventEntity | null = null;
 
 
   @Input() historicalPlaces: BuildingEntity[] = [];
-  @Input() detailedView: boolean = false;
 
   summary: string = '';
   enrichedContent: string = '';

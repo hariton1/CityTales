@@ -61,4 +61,28 @@ export class ExploreLayoutComponent implements OnInit {
   setDetailedViewEvent(value: boolean) {
     this.setDetailedView = value;
   }
+
+  selectDetailEvent(event: any) {
+    if(event.type == 'building') {
+      this.selectedPlace = event;
+      this.selectedPerson = null;
+      this.selectedEvent = null;
+    }
+
+    if(event.type == 'person') {
+      this.selectedPlace = null;
+      this.selectedPerson = event;
+      this.selectedEvent = null;
+    }
+
+    if(event.organizer != null) {
+      this.selectedPlace = null;
+      this.selectedPerson = null;
+      this.selectedEvent = event;
+    }
+
+    console.log(this.selectedEvent)
+    console.log(this.selectedPlace)
+    console.log(this.selectedPerson);
+  }
 }
