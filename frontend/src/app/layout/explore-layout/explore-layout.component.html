@@ -19,7 +19,7 @@
     </div>
   <!-- Mobile: show only selected component -->
   <ng-container *ngIf="currentViewMobile === 'discover'">
-    <app-sidebar [selectedPlace]="selectedPlace" [historicalPlaces]="historicalPlaces" [detailedView]="setDetailedView" (setDetailedView)="setDetailedViewEvent($event)"></app-sidebar>
+    <app-sidebar [historicalPlaces]="historicalPlaces" [detailedView]="setDetailedView"></app-sidebar>
   </ng-container>
 
   <ng-container *ngIf="currentViewMobile === 'map'">
@@ -29,6 +29,6 @@
 
 <!-- Desktop: show both always -->
 <ng-container *ngIf="!isMobile">
-  <app-sidebar [selectedPlace]="selectedPlace" [historicalPlaces]="historicalPlaces" [detailedView]="setDetailedView" (setDetailedView)="setDetailedViewEvent($event)"></app-sidebar>
+  <app-sidebar [historicalPlaces]="historicalPlaces" [detailedView]="setDetailedView"></app-sidebar>
   <app-map-view (selectPlaceEvent)="setSelectedPlace($event)" (populatePlacesEvent)="setHistoricalPlaces($event)" (setDetailedViewEvent)="setDetailedViewEvent($event)"></app-map-view>
 </ng-container>
