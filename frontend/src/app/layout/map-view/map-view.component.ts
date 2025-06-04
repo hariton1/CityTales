@@ -25,9 +25,9 @@ export class MapViewComponent implements OnInit{
               private userService: UserService) {
   }
 
-  @Output() selectPlaceEvent: EventEmitter<BuildingEntity> = new EventEmitter<BuildingEntity>();
+  @Output() selectDetailEvent: EventEmitter<Object> = new EventEmitter<Object>();
   @Output() populatePlacesEvent = new EventEmitter<BuildingEntity[]>();
-  @Output() setDetailedViewEvent: EventEmitter<boolean> = new EventEmitter<boolean>();
+
 
   @ViewChild(MapInfoWindow) infoWindow: any;
 
@@ -182,8 +182,7 @@ export class MapViewComponent implements OnInit{
     this.hoveredLocation = location;
     this.infoWindow.open(marker);
 
-    this.selectPlaceEvent.emit(location);
-    this.setDetailedViewEvent.emit(true);
+    this.selectDetailEvent.emit(location);
 
     this.generatePolylines(location);
   }
@@ -253,10 +252,8 @@ export class MapViewComponent implements OnInit{
     return `translate(${x}px, ${y}px) translate(-50%, -50%)`;
   }
 
-  onCircleClick(loc: BuildingEntity): void {
+  onCircleClick(loc: any): void {
     console.log('Clicked related location:', loc);
-
-    this.selectPlaceEvent.emit(loc);
-    this.setDetailedViewEvent.emit(true);
+    this.selectDetailEvent.emit(loc);
   }
 }
