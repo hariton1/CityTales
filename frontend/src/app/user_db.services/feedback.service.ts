@@ -62,11 +62,11 @@ export class FeedbackService {
     );
   }
 
-  public approveFeedback(feedback_id: number) {
+  public approveFeedback(feedback_id: number): Observable<any> {
     return this.httpClient.put(this.DOMAIN + '/approve/id=' + feedback_id, {});
   }
 
-  public deleteFeedback(feedback_id: number) {
+  public deleteFeedback(feedback_id: number): Observable<any> {
     return this.httpClient.delete(this.DOMAIN + '/delete/id=' + feedback_id);
   }
 }
