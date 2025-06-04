@@ -10,7 +10,7 @@
       <div class="stack">
         <tui-textfield>
           <label tuiLabel>Username</label>
-          <input tuiTextfield [readonly]="true" [(ngModel)]="email" />
+          <input tuiTextfield [disabled]="true" [(ngModel)]="email" />
           <tui-icon />
         </tui-textfield>
       </div>
@@ -20,7 +20,7 @@
         <div class="stack">
             <tui-textfield>
                 <label tuiLabel>Role</label>
-                <input tuiTextfield [readonly]="true" [(ngModel)]="role" />
+                <input tuiTextfield [disabled]="true" [(ngModel)]="role" />
                 <tui-icon />
             </tui-textfield>
         </div>
