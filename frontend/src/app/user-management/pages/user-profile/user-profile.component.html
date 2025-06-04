@@ -1,0 +1,45 @@
+<div class="centered-wrapper">
+    <header tuiHeader>
+      <h3 tuiTitle>
+        Your profile
+        <span tuiSubtitle>User since {{getMonthName(this.accountCreated?.month)}} {{this.accountCreated.day}}, {{this.accountCreated?.year}}</span>
+      </h3>
+    </header>
+
+    <fieldset class="fieldset-style">
+      <div class="stack">
+        <tui-textfield>
+          <label tuiLabel>Username</label>
+          <input tuiTextfield [disabled]="true" [(ngModel)]="email" />
+          <tui-icon />
+        </tui-textfield>
+      </div>
+    </fieldset>
+
+    <fieldset class="fieldset-style">
+        <div class="stack">
+            <tui-textfield>
+                <label tuiLabel>Role</label>
+                <input tuiTextfield [disabled]="true" [(ngModel)]="role" />
+                <tui-icon />
+            </tui-textfield>
+        </div>
+    </fieldset>
+
+    <fieldset class="fieldset-style">
+        <div class="island">
+            <label tuiLabel>Interests</label>
+            <tui-line-clamp content="{{ userInterests }}" class="clamp" [linesLimit]="linesLimit" />
+            <button tuiButton type="button" class="tui-space_top-4" (click)="toggle()" >
+                Show more
+            </button>
+        </div>
+    </fieldset>
+
+    <footer>
+      <button class="button-style" tuiButton appearance="primary" type="submit" (click)="handleEditInterestsClick()" >
+        Edit interests
+      </button>
+    </footer>
+</div>
+

@@ -13,6 +13,7 @@ import {UserGamesComponent} from './user-games/pages/landing-page/user-games.com
 import {LandingPageComponent} from './user-friends/landing-page/landing-page.component';
 import {NotificationInboxComponent} from './core/notification-inbox/notification-inbox.component';
 import {FeedbackListComponent} from './user-feedback/pages/feedback-list/feedback-list.component';
+import {UserProfileComponent} from './user-management/pages/user-profile/user-profile.component';
 
 export const routes: Routes = [
   {
@@ -42,5 +43,6 @@ export const routes: Routes = [
   { path: 'scoreboard', component: UserGamesComponent },
   { path: 'inbox', component: NotificationInboxComponent },
   { path: 'friends', component: LandingPageComponent },
+  { path: 'profile', component: UserProfileComponent },
   { path: '', redirectTo: '/explore', pathMatch: 'full' } //default page, to be changed
 ];
