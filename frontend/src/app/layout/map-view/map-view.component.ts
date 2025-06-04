@@ -37,9 +37,10 @@ export class MapViewComponent implements OnInit{
               private zone: NgZone) {
   }
 
-  @Output() selectPlaceEvent: EventEmitter<BuildingEntity> = new EventEmitter<BuildingEntity>();
+  @Output() selectDetailEvent: EventEmitter<Object> = new EventEmitter<Object>();
   @Output() populatePlacesEvent = new EventEmitter<BuildingEntity[]>();
-  @Output() setDetailedViewEvent: EventEmitter<boolean> = new EventEmitter<boolean>();
+
+
   @ViewChild(MapInfoWindow) infoWindow: any;
   private nativeInfoWindow = new google.maps.InfoWindow();
   @ViewChild(GoogleMap) map!: GoogleMap;
@@ -264,8 +265,8 @@ export class MapViewComponent implements OnInit{
     this.nativeInfoWindow.setContent(relatedContent);
     this.nativeInfoWindow.open(this.map.googleMap, marker);
 
-    this.selectPlaceEvent.emit(location);
-    this.setDetailedViewEvent.emit(true);
+    this.selectDetailEvent.emit(location);
+
     this.generatePolylines(location);
   }
 
@@ -301,7 +302,6 @@ export class MapViewComponent implements OnInit{
     const events = (location.relatedEvents || []).map((item: any) => ({ ...item, type: 'event' }));
 
     const combined = [...buildings, ...persons, ...events];
-    console.log('Combined related items:', combined);
     return combined;
   }
 
@@ -323,8 +323,6 @@ export class MapViewComponent implements OnInit{
         this.polylines.push([center, related]);
       }
     });
-
-    console.log(this.polylines)
   }
 
   onCircleMouseEnter(name: string, index: number): void {
@@ -345,10 +343,7 @@ export class MapViewComponent implements OnInit{
     return `translate(${x}px, ${y}px) translate(-50%, -50%)`;
   }
 
-  onCircleClick(loc: BuildingEntity): void {
-    console.log('Clicked related location:', loc);
-
-    this.selectPlaceEvent.emit(loc);
-    this.setDetailedViewEvent.emit(true);
+  onCircleClick(loc: any): void {
+    this.selectDetailEvent.emit(loc);
   }
 }

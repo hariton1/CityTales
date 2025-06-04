@@ -1,0 +1,85 @@
+.tour-detail-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.tour-header {
+  padding: 1rem;
+}
+
+.tour-summary {
+  padding: 1rem;
+}
+
+.tour-stops-timeline {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  position: relative;
+  padding: 1rem;
+  gap: 1rem;
+}
+
+.tour-stops-cards {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+}
+
+.stop-card {
+  padding: 1rem;
+  border: 1px solid #ddd; /* Light border */
+  border-radius: 8px;      /* Rounded corners */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Subtle shadow */
+  background-color: #fff;  /* White background */
+  height: auto;
+  width: 100%; /* full width */
+  box-sizing: border-box;
+}
+
+.stop-timeline-item {
+  position: relative;
+  width: 100%;
+}
+
+.stop-timeline-connector {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 1rem 0;
+}
+
+.start-timeline-connector {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 1rem 0;
+}
+
+.connector-line {
+  width: 2px;
+  height: 30px;
+  background-color: #ccc;
+}
+
+.connector-info {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  color: #555;
+  text-align: center;
+}
+
+.stop-images {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.stop-image img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}

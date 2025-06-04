@@ -21,16 +21,14 @@ export class HistoricPlacePreviewComponent {
 
   @Input() historicalPlaces: BuildingEntity[] = [];
   @Output() selectPlaceEvent: EventEmitter<BuildingEntity> = new EventEmitter<BuildingEntity>();
-  @Output() setDetailedViewEvent: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   constructor(private userService: UserService) {
   }
 
   onDetailsClick(place: BuildingEntity) {
     place = this.userService.enterHistoricNode(place);
-
+    console.log("Building detail emitted!");
     this.selectPlaceEvent.emit(place);
-    this.setDetailedViewEvent.emit(true);
   }
 
 }

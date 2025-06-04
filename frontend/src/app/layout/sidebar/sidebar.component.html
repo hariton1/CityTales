@@ -23,7 +23,7 @@
 
   <tui-textfield (pointerdown.capture.stop)="(0)" class="search-field">
     <input
-      placeholder="Search for an entitiy..."
+      placeholder="Search for an entity..."
       [formControl]="control"
       [tuiInputSearch]="search"
       [(tuiInputSearchOpen)]="open"
@@ -93,13 +93,44 @@
 
 
 
-<div class="place-detail-container" *ngIf="detailedView">
-  <app-historic-place-detail [selectedPlace]="selectedPlace" (setDetailEvent)="setDetailEvent($event)"></app-historic-place-detail>
+<div class="sidebar-container" *ngIf="this.selectedPlace || this.selectedEvent || this.selectedPerson">
+
+  <!-- Show Place -->
+  <app-historic-place-detail
+    *ngIf="this.selectedPlace"
+    [selectedPlace]="selectedPlace"
+    (onCloseEvent)="closeDetailView()"
+    (onPersonDetailEvent)="setPersonDetail($event)"
+    (onEventDetailEvent)="setEventDetail($event)"
+    (onBuildingDetailEvent)="setPlaceDetail($event)">
+  </app-historic-place-detail>
+
+  <!-- Show Event -->
+  <app-historic-event-detail
+    *ngIf="this.selectedEvent"
+    [selectedEvent]="selectedEvent"
+    (onCloseEvent)="closeDetailView()"
+    (onPersonDetailEvent)="setPersonDetail($event)"
+    (onEventDetailEvent)="setEventDetail($event)"
+    (onBuildingDetailEvent)="setPlaceDetail($event)">
+  </app-historic-event-detail>
+
+  <!-- Show Person -->
+  <app-historic-person-detail
+    *ngIf="this.selectedPerson"
+    [selectedPerson]="selectedPerson"
+    (onCloseEvent)="closeDetailView()"
+    (onCloseEvent)="closeDetailView()"
+    (onPersonDetailEvent)="setPersonDetail($event)"
+    (onEventDetailEvent)="setEventDetail($event)"
+    (onBuildingDetailEvent)="setPlaceDetail($event)">
+  </app-historic-person-detail>
+
 </div>
 
-<div class="place-preview-container" *ngIf="!detailedView">
-  <app-historic-place-preview [historicalPlaces]="historicalPlaces" (selectPlaceEvent)="setSelectedPlace($event)" (setDetailedViewEvent)="setDetailEvent($event)"></app-historic-place-preview>
 
+<div class="place-preview-container" *ngIf="!this.selectedPlace && !this.selectedEvent && !this.selectedPerson">
+  <app-historic-place-preview [historicalPlaces]="historicalPlaces" (selectPlaceEvent)="setSelectedPlace($event)"></app-historic-place-preview>
 </div>
 
 
