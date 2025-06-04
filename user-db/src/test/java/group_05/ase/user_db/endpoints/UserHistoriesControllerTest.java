@@ -19,12 +19,12 @@ import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
 public class UserHistoriesControllerTest {
@@ -50,10 +50,10 @@ public class UserHistoriesControllerTest {
 
     @Test
     public void testGetAllUserHistories() throws Exception {
-
         when(userHistoryService.getAllUserHistories()).thenReturn(userHistoryDTOs);
 
         mockMvc.perform(get("/userHistories")
+                        .with(jwt())
                         .content(mapper.writeValueAsString(userHistoryDTOs))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -63,15 +63,14 @@ public class UserHistoriesControllerTest {
                 .andExpect(jsonPath("$[0].interest_id").value(userHistoryDTO.getInterestId()));
 
         System.out.println("Test testGetAllUserHistories passed!");
-
     }
 
     @Test
     public void testGetUserHistoriesById() throws Exception {
-
         when(userHistoryService.getUserHistoriesById(any(int.class))).thenReturn(userHistoryDTO);
 
         mockMvc.perform(get("/userHistories/id=2")
+                        .with(jwt())
                         .content(mapper.writeValueAsString(userHistoryDTO))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -81,15 +80,14 @@ public class UserHistoriesControllerTest {
                 .andExpect(jsonPath("$.interest_id").value(userHistoryDTO.getInterestId()));
 
         System.out.println("Test testGetUserHistoriesById passed!");
-
     }
 
     @Test
     public void testGetUserHistoriesByUserId() throws Exception {
-
         when(userHistoryService.getUserHistoriesByUserId(any(UUID.class))).thenReturn(userHistoryDTOs);
 
         mockMvc.perform(get("/userHistories/user_id=f5599c8c-166b-495c-accc-65addfaa572b")
+                        .with(jwt())
                         .content(mapper.writeValueAsString(userHistoryDTOs))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -99,15 +97,14 @@ public class UserHistoriesControllerTest {
                 .andExpect(jsonPath("$[0].interest_id").value(userHistoryDTO.getInterestId()));
 
         System.out.println("Test testGetUserHistoriesByUserId passed!");
-
     }
 
     @Test
     public void testGetUserHistoriesByArticleId() throws Exception {
-
         when(userHistoryService.getUserHistoriesByArticleId(any(int.class))).thenReturn(userHistoryDTOs);
 
         mockMvc.perform(get("/userHistories/article_id=1")
+                        .with(jwt())
                         .content(mapper.writeValueAsString(userHistoryDTOs))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -117,15 +114,14 @@ public class UserHistoriesControllerTest {
                 .andExpect(jsonPath("$[0].interest_id").value(userHistoryDTO.getInterestId()));
 
         System.out.println("Test testGetUserHistoriesByArticleId passed!");
-
     }
 
     @Test
     public void testCreateNewUserHistory() throws Exception {
-
         when(userHistoryService.saveNewUserHistory(any(UserHistoryDTO.class))).thenReturn(userHistoryDTO);
 
         mockMvc.perform(post("/userHistories/create")
+                        .with(jwt())
                         .content(mapper.writeValueAsString(userHistoryDTO))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
@@ -135,14 +131,10 @@ public class UserHistoriesControllerTest {
                 .andExpect(jsonPath("$.interest_id").value(userHistoryDTO.getInterestId()));
 
         System.out.println("Test testCreateNewUserHistory passed!");
-
     }
 
     @Test
-    public void testUpdateUserHistory() throws Exception {
-
+    public void testUpdateUserHistory() {
         System.out.println("Test testUpdateUserHistory not provided!");
-
     }
-
 }
