@@ -1,0 +1,141 @@
+:host {
+  display: block;
+  position: relative;
+}
+
+google-map {
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+
+.gm-style-iw > button.gm-ui-hover-effect {
+  display: none !important;
+}
+
+::ng-deep .gm-style-iw {
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  overflow: visible !important;
+}
+
+::ng-deep .gm-style-iw > div {
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  overflow: visible !important;
+}
+
+// little arrow attached to the infobox
+::ng-deep .gm-style-iw-tc::after {
+  content: none !important;
+  display: none !important;
+}
+
+::ng-deep button.gm-ui-hover-effect {
+  opacity: 0 !important;       /* Hide visually */
+  pointer-events: none !important; /* Disable clicks */
+  width: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+}
+
+.info-content {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  pointer-events: auto;
+  user-select: none;
+  // transform: translate(-40px, 65px);
+  border: 1px black;
+}
+
+.info-content > * {
+  pointer-events: auto;
+}
+
+.circle-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.circle-building {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: #333;
+  text-align: center;
+  word-break: break-word;
+  padding: 3px;
+  pointer-events: auto;
+}
+
+.no-related {
+  font-style: italic;
+  color: #666;
+  text-align: center;
+  margin-top: 1em;
+}
+
+.building-image {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  display: block;
+}
+
+.building-bg {
+  background-color: blue;
+}
+
+.person-bg {
+  background-color: green;
+}
+
+.event-bg {
+  background-color: yellow;
+}
+
+.hover-name {
+  text-align: center;
+  margin-top: 0.5rem;
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+}
+
+.hover-label {
+  position: absolute;
+  pointer-events: none;
+  z-index: 9999;
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  top: 50%;
+  left: 50%;
+  transform-origin: center center;
+}

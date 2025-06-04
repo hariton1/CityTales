@@ -4,6 +4,9 @@ import group_05.ase.user_db.restData.UserInterestDTO;
 import group_05.ase.user_db.services.UserInterestService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,16 +27,6 @@ public class UserInterestsController {
     public List<UserInterestDTO> getAllUserInterests() {
         try {
             return this.userInterestService.getAllUserInterests();
-        } catch (Exception e) {
-            return new ArrayList<UserInterestDTO>(); //"An internal server error occurred => " + e.getMessage();
-        }
-    }
-
-    @GetMapping("/user_id={userId}")
-    @ResponseStatus(HttpStatus.OK)
-    public List<UserInterestDTO> getUserInterestsByUserId(@PathVariable("userId") UUID userId) {
-        try {
-            return this.userInterestService.getUserInterestsByUserId(userId);
         } catch (Exception e) {
             return new ArrayList<UserInterestDTO>(); //"An internal server error occurred => " + e.getMessage();
         }
@@ -68,5 +61,17 @@ public class UserInterestsController {
             System.out.println(e.getMessage());
         }
     }
+
+    @GetMapping("/me")
+    @ResponseStatus(HttpStatus.OK)
+    public List<UserInterestDTO> getOwnUserInterests(@AuthenticationPrincipal Jwt jwt) {
+        try {
+            UUID userId = UUID.fromString(jwt.getSubject());
+            return this.userInterestService.getUserInterestsByUserId(userId);
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
+    }
+
 
 }

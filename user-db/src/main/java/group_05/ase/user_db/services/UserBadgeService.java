@@ -39,7 +39,7 @@ public class UserBadgeService {
     public List<UserBadgeDTO> getUserBadgesByUserId(UUID userId) {
 
         ArrayList<UserBadgeDTO> userBadges = new ArrayList<>();
-        List<UserBadgeEntity> tmp = this.repository.findAllByUserId(userId);
+        List<UserBadgeEntity> tmp = this.repository.findAllByUserIdOrderByUserBadgeIdAsc(userId);
 
         for(UserBadgeEntity userBadge : tmp) {
             userBadges.add(new UserBadgeDTO(
@@ -54,10 +54,10 @@ public class UserBadgeService {
 
     }
 
-    public List<UserBadgeDTO> getUserBadgesBaArticleId(int articleId) {
+    public List<UserBadgeDTO> getUserBadgesByArticleId(int articleId) {
 
         ArrayList<UserBadgeDTO> userBadges = new ArrayList<>();
-        List<UserBadgeEntity> tmp = this.repository.findAllByArticleId(articleId);
+        List<UserBadgeEntity> tmp = this.repository.findAllByArticleIdOrderByUserBadgeIdAsc(articleId);
 
         for(UserBadgeEntity userBadge : tmp) {
             userBadges.add(new UserBadgeDTO(
@@ -74,20 +74,31 @@ public class UserBadgeService {
 
     public UserBadgeDTO saveNewBadge(UserBadgeDTO userBadgeDTO) {
 
-        UserBadgeEntity tmp = new UserBadgeEntity();
+        UserBadgeEntity tmp = this.repository.findByUserIdAndArticleId(userBadgeDTO.getUserId(), userBadgeDTO.getArticleId());//new UserBadgeEntity();
 
-        tmp.setUserId(userBadgeDTO.getUserId());
-        tmp.setArticleId(userBadgeDTO.getArticleId());
-        tmp.setEarnedAt(userBadgeDTO.getEarnedAt());
+        if(tmp == null) {
+            tmp = new UserBadgeEntity();
 
-        UserBadgeEntity insertedBadge = this.repository.save(tmp);
+            tmp.setUserId(userBadgeDTO.getUserId());
+            tmp.setArticleId(userBadgeDTO.getArticleId());
+            tmp.setEarnedAt(userBadgeDTO.getEarnedAt());
 
-        return new UserBadgeDTO(
-                insertedBadge.getUserBadgeId(),
-                insertedBadge.getUserId(),
-                insertedBadge.getArticleId(),
-                insertedBadge.getEarnedAt()
-        );
+            UserBadgeEntity insertedBadge = this.repository.save(tmp);
+
+            return new UserBadgeDTO(
+                    insertedBadge.getUserBadgeId(),
+                    insertedBadge.getUserId(),
+                    insertedBadge.getArticleId(),
+                    insertedBadge.getEarnedAt()
+            );
+        } else {
+            return new UserBadgeDTO(
+                    tmp.getUserBadgeId(),
+                    tmp.getUserId(),
+                    tmp.getArticleId(),
+                    tmp.getEarnedAt()
+            );
+        }
 
     }
 

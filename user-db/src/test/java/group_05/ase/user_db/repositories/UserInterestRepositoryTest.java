@@ -20,8 +20,8 @@ public class UserInterestRepositoryTest {
     UserInterestRepository userInterestRepository;
 
     private final UserInterestEntity userInterestEntity = new UserInterestEntity (
-            UUID.fromString("f5599c8c-166b-495c-accc-65addfaa572b"),
-            5,
+            UUID.fromString("ce7fdb00-a05a-4fd4-af87-0756fc1f36ce"),
+            2,
             null,
             1
     );

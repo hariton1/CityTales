@@ -23,7 +23,8 @@ public class UserPointRepositoryTest {
             1,
             UUID.fromString("f5599c8c-166b-495c-accc-65addfaa572b"),
             1,
-            null
+            null,
+            -1
     );
 
     @Test
@@ -35,6 +36,7 @@ public class UserPointRepositoryTest {
         assertThat(tmp.getUserPointId()).isEqualTo(userPointEntity.getUserPointId());
         assertThat(tmp.getUserId()).isEqualTo(userPointEntity.getUserId());
         assertThat(tmp.getPoints()).isEqualTo(userPointEntity.getPoints());
+        assertThat(tmp.getArticleId()).isEqualTo(userPointEntity.getArticleId());
 
         System.out.println("Test testFindByUserPointId passed!");
 
@@ -49,6 +51,7 @@ public class UserPointRepositoryTest {
         assertThat(tmp.getFirst().getUserPointId()).isEqualTo(userPointEntity.getUserPointId());
         assertThat(tmp.getFirst().getUserId()).isEqualTo(userPointEntity.getUserId());
         assertThat(tmp.getFirst().getPoints()).isEqualTo(userPointEntity.getPoints());
+        assertThat(tmp.getFirst().getArticleId()).isEqualTo(userPointEntity.getArticleId());
 
         System.out.println("Test testFindByUserId passed!");
 

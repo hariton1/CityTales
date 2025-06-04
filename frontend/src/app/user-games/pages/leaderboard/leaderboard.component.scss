@@ -1,0 +1,73 @@
+.leaderboard-container {
+  background: var(--tui-base-02);
+  border-radius: 1rem;
+  max-width: 600px;
+  margin: auto;
+  padding: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.leaderboard-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 1rem;
+}
+
+.leaderboard-table th,
+.leaderboard-table td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid var(--tui-base-03);
+}
+
+.leaderboard-table th {
+  color: var(--tui-text-03);
+  font-weight: 600;
+}
+
+.leaderboard-table tbody tr:hover {
+  background-color: var(--tui-base-01);
+}
+
+::ng-deep .leaderboard-table tbody tr:nth-child(odd) {
+  background-color: #fff; /* keep odd rows white */
+}
+
+::ng-deep .leaderboard-table tbody tr:nth-child(even) {
+  background-color: rgba(119, 136, 153, 0.3); /* lightslategray with 30% opacity */
+}
+
+.badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: white;
+  vertical-align: middle;
+}
+.switch-label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.switch-label-text {
+  font-weight: 600;
+  color: var(--tui-text-03);
+  font-size: 1rem;
+}
+
+.header-with-icon {
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem; /* space between emoji and text */
+}
+
+.current-user {
+  background-color: #e0f7fa;
+  font-weight: bold;
+}

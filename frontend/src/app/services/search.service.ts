@@ -7,6 +7,7 @@ import {Injectable} from '@angular/core';
 import {HistoricalPlaceEntity} from '../dto/db_entity/HistoricalPlaceEntity';
 import {HistoricalPersonEntity} from '../dto/db_entity/HistoricalPersonEntity';
 import {BuildingEntity} from '../dto/db_entity/BuildingEntity';
+import {HistoricalEventEntity} from '../dto/db_entity/HistoricalEventEntity';
 
 @Injectable({ providedIn: 'root' })
 export class SearchService {
@@ -27,4 +28,12 @@ export class SearchService {
       params: params
     });
   }
+
+  public searchEvents(text: string): Observable<HistoricalEventEntity[]> {
+    const params = new HttpParams().set('query', text);
+    return this.httpClient.get<HistoricalEventEntity[]>(BACKEND_ADDRESS + 'api/search/searchEvents', {
+      params: params
+    });
+  }
+
 }

@@ -55,8 +55,6 @@ export class EditUserComponent implements OnInit {
   userId: string | null = null;
   user: UserDto | null = null;
   protected persons = ['User', 'Moderator', 'Contributor'];
-  protected statusValues = ['Active', 'Blocked'];
-  // Use the parse method directly
   accountCreated: any = null;
 
   constructor(readonly route: ActivatedRoute, readonly userService: UserService, private router: Router) {
@@ -79,11 +77,8 @@ export class EditUserComponent implements OnInit {
         this.user = user;
         console.log('User loaded: ' + this.user);
           this.editUserForm.patchValue({
-            displayName: this.user.display_name,
             email: this.user.email,
-            role: 'User', /* to be replaced with the actual role */
-            status: this.user.is_active ? 'Active' : 'Blocked',
-            birthday: TuiDay.currentLocal() /* to be replaced with the actual birthday */
+            role: this.user.role ?? '',
           });
         const createdDate = new Date(this.user.created_at);
         this.accountCreated = new TuiDay(
@@ -104,16 +99,18 @@ export class EditUserComponent implements OnInit {
   }
 
   onSubmit(): void {
+    console.log("HI")
+    console.log("Form valid?", this.editUserForm.valid);
+    console.log("User loaded?", this.user);
     if (this.editUserForm.valid && this.user) {
+      console.log("HII")
       const formValues = this.editUserForm.getRawValue();
 
       const updatedUser = new UserDto(
         this.user.id,
-        this.user.supabase_id,
         formValues.email ?? '',
         this.user.created_at,
-        formValues.displayName ?? '',
-        formValues.status === 'Active',
+        formValues.role ? formValues.role : undefined
       );
 
       this.userService.updateUser(updatedUser)
@@ -130,11 +127,8 @@ export class EditUserComponent implements OnInit {
   }
 
   protected editUserForm = new FormGroup({
-    displayName: new FormControl('', Validators.required),
     email: new FormControl({value: '', disabled: true}, Validators.required),
     role: new FormControl('', Validators.required),
-    status: new FormControl('', Validators.required),
-    birthday: new FormControl({value: TuiDay.fromLocalNativeDate(new Date()), disabled: true}, Validators.required)
   });
 }
 
