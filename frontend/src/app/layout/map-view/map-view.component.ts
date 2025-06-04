@@ -1,11 +1,22 @@
-import {Component, inject, OnInit, Output, ViewChild, EventEmitter} from '@angular/core';
-import {GoogleMapsModule, MapInfoWindow, MapMarker} from '@angular/google-maps';
+import {
+  Component,
+  inject,
+  OnInit,
+  Output,
+  ViewChild,
+  EventEmitter,
+  NgZone,
+  ElementRef,
+  HostListener
+} from '@angular/core';
+import {GoogleMap, GoogleMapsModule, MapInfoWindow} from '@angular/google-maps';
 import {CommonModule} from '@angular/common';
 import {UserLocationService} from '../../services/user-location.service';
 import {LocationService} from '../../services/location.service';
 import {BuildingEntity} from '../../dto/db_entity/BuildingEntity';
 import {TuiAlertService} from '@taiga-ui/core';
 import {UserService} from '../../services/user.service';
+import { MarkerClusterer } from '@googlemaps/markerclusterer';
 
 @Component({
   selector: 'app-map-view',
@@ -22,13 +33,17 @@ export class MapViewComponent implements OnInit{
 
   constructor(private locationService: LocationService,
               private userLocationService: UserLocationService,
-              private userService: UserService) {
+              private userService: UserService,
+              private zone: NgZone) {
   }
 
-  @Output() selectPlaceEvent: EventEmitter<BuildingEntity> = new EventEmitter<BuildingEntity>();
+  @Output() selectDetailEvent: EventEmitter<Object> = new EventEmitter<Object>();
   @Output() populatePlacesEvent = new EventEmitter<BuildingEntity[]>();
-  @Output() setDetailedViewEvent: EventEmitter<boolean> = new EventEmitter<boolean>();
+
+
   @ViewChild(MapInfoWindow) infoWindow: any;
+  private nativeInfoWindow = new google.maps.InfoWindow();
+  @ViewChild(GoogleMap) map!: GoogleMap;
 
   locationsNearby: BuildingEntity[] = [];
   hoveredLocation: BuildingEntity | null = null;
@@ -132,10 +147,9 @@ export class MapViewComponent implements OnInit{
   }
   locationMarkerOptions: google.maps.MarkerOptions = {
     draggable: false,
-    animation: google.maps.Animation.BOUNCE,
     icon: {
-      url: 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png',
-      scaledSize: new google.maps.Size(25, 25),
+      url: 'assets/icons/live-location.svg',
+      scaledSize: new google.maps.Size(50, 50),
       origin: new google.maps.Point(0, 0),
       anchor: new google.maps.Point(17, 34),
       labelOrigin: new google.maps.Point(12, 34)
@@ -166,31 +180,111 @@ export class MapViewComponent implements OnInit{
       });
   }
 
-  addMarkersToMap(locations: BuildingEntity[]): void {
-    locations.forEach(location => {
-      this.markers.push({lat: location.latitude, lng: location.longitude});
-    })
+  private clusterer!: MarkerClusterer;
+  private clickedOnMarker = false;
+
+  addMarkersToMap(locations: BuildingEntity[], batchSize = 200): void {
+    const batches: BuildingEntity[][] = [];
+    for (let i = 0; i < locations.length; i += batchSize) {
+      batches.push(locations.slice(i, i + batchSize));
+    }
+
+    const allMarkers: google.maps.Marker[] = [];
+
+    let delay = 0;
+
+    batches.forEach((batch, i) => {
+      setTimeout(() => {
+        const batchMarkers = batch.map(location => {
+          const marker = new google.maps.Marker({
+            position: { lat: location.latitude, lng: location.longitude },
+            icon: {
+              url: this.getIconForBuildingType(location.buildingType),
+              scaledSize: new google.maps.Size(28, 28),
+              anchor: new google.maps.Point(12, 12),
+              labelOrigin: new google.maps.Point(12, 30),
+            },
+            map: this.map.googleMap!,
+          });
+
+          //open details when clicking on marker
+          marker.addListener('click', () => {
+            this.zone.run(() => {
+              this.clickedOnMarker = true;
+              this.detailAction(marker, location);
+            })
+          });
+
+          return marker;
+        });
+
+        allMarkers.push(...batchMarkers);
+
+        // apply clustering after the final batch has been processed
+        if (i === batches.length - 1) {
+          setTimeout(() => {
+            this.clusterer = new MarkerClusterer({
+              map: this.map.googleMap!,
+              markers: allMarkers,
+              algorithmOptions: {
+                maxZoom: 14,
+              },
+            });
+          }, 100);
+        }
+      }, delay);
+
+      delay += 300;
+    });
   }
 
-  detailAction(marker: MapMarker, location: BuildingEntity): void {
+  getIconForBuildingType(type: string): string {
+    switch (type?.toLowerCase()) {
+      case 'museum':
+        return 'assets/icons/museum.svg';
+      case 'church':
+        return 'assets/icons/church.svg';
+      default:
+        return 'assets/icons/town-hall-11.svg';
+    }
+  }
+
+  @ViewChild('relatedContentToLocation', { static: false }) relatedContentToLocationRef!: ElementRef;
+
+  detailAction(marker: google.maps.Marker, location: BuildingEntity): void {
+    if (!this.nativeInfoWindow) {
+      this.nativeInfoWindow = new google.maps.InfoWindow();
+    }
 
     location = this.userService.enterHistoricNode(location);
-
     this.combinedLocations = this.getCombinedItems(location);
-
     this.hoveredLocation = location;
-    this.infoWindow.open(marker);
 
-    this.selectPlaceEvent.emit(location);
-    this.setDetailedViewEvent.emit(true);
+    const relatedContent = this.relatedContentToLocationRef.nativeElement;
+    relatedContent.style.display = 'block';
+    this.nativeInfoWindow.setContent(relatedContent);
+    this.nativeInfoWindow.open(this.map.googleMap, marker);
+
+    this.selectDetailEvent.emit(location);
 
     this.generatePolylines(location);
   }
 
   closeInfoWindow() {
-    this.infoWindow.close();
+    this.nativeInfoWindow.close();
+    this.relatedContentToLocationRef.nativeElement.style.display = 'none';
     this.hoveredLocation = null;
     this.polylines = [];
+  }
+
+  //hide the info window when clicking outside it
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const clickedInsideInfo = this.relatedContentToLocationRef?.nativeElement.contains(event.target);
+    if (!clickedInsideInfo && !this.clickedOnMarker) {
+      this.closeInfoWindow();
+    }
+    this.clickedOnMarker = false;
   }
 
   // Returns CSS translate(x, y) string to position each circle around the center in a circle layout
@@ -208,7 +302,6 @@ export class MapViewComponent implements OnInit{
     const events = (location.relatedEvents || []).map((item: any) => ({ ...item, type: 'event' }));
 
     const combined = [...buildings, ...persons, ...events];
-    console.log('Combined related items:', combined);
     return combined;
   }
 
@@ -230,8 +323,6 @@ export class MapViewComponent implements OnInit{
         this.polylines.push([center, related]);
       }
     });
-
-    console.log(this.polylines)
   }
 
   onCircleMouseEnter(name: string, index: number): void {
@@ -252,10 +343,7 @@ export class MapViewComponent implements OnInit{
     return `translate(${x}px, ${y}px) translate(-50%, -50%)`;
   }
 
-  onCircleClick(loc: BuildingEntity): void {
-    console.log('Clicked related location:', loc);
-
-    this.selectPlaceEvent.emit(loc);
-    this.setDetailedViewEvent.emit(true);
+  onCircleClick(loc: any): void {
+    this.selectDetailEvent.emit(loc);
   }
 }
