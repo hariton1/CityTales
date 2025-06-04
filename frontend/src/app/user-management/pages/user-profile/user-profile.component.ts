@@ -17,6 +17,7 @@ import {UUID} from 'node:crypto';
 import {forkJoin, of, switchMap} from 'rxjs';
 import {UserInterestsService} from '../../../user_db.services/user-interests.service';
 import {InterestsService} from '../../../user_db.services/interests.service';
+import {TuiLineClamp} from '@taiga-ui/kit';
 
 @Component({
   selector: 'app-user-profile',
@@ -29,7 +30,8 @@ import {InterestsService} from '../../../user_db.services/interests.service';
     TuiLabel,
     TuiTextfieldComponent,
     TuiTextfieldDirective,
-    TuiTitle
+    TuiTitle,
+    TuiLineClamp
   ],
   templateUrl: './user-profile.component.html',
   styleUrl: './user-profile.component.scss'
@@ -52,6 +54,16 @@ export class UserProfileComponent {
     console.log('Processing profile for userId:' + localStorage.getItem("user_uuid") as UUID);
     this.getUserById(this.userId);
     this.fetchUserInterests();
+  }
+
+  protected linesLimit = 2;
+
+  protected toggle(): void {
+    this.linesLimit = this.collapsed ? 12 : 2;
+  }
+
+  private get collapsed(): boolean {
+    return this.linesLimit === 2;
   }
 
   getUserById(id: string): void {
