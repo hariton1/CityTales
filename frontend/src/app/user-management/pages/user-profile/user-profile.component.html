@@ -10,7 +10,7 @@
       <div class="stack">
         <tui-textfield>
           <label tuiLabel>Username</label>
-          <input tuiTextfield [disabled]="true" [(ngModel)]="email" />
+          <input tuiTextfield [readonly]="true" [(ngModel)]="email" />
           <tui-icon />
         </tui-textfield>
       </div>
@@ -20,7 +20,7 @@
         <div class="stack">
             <tui-textfield>
                 <label tuiLabel>Role</label>
-                <input tuiTextfield [disabled]="true" [(ngModel)]="role" />
+                <input tuiTextfield [readonly]="true" [(ngModel)]="role" />
                 <tui-icon />
             </tui-textfield>
         </div>
@@ -29,17 +29,8 @@
     <fieldset class="fieldset-style">
         <div class="island">
             <label tuiLabel>Interests</label>
-            <tui-line-clamp
-                    content="{{ userInterests }}"
-                    class="clamp"
-                    [linesLimit]="linesLimit"
-            />
-            <button
-                    tuiButton
-                    type="button"
-                    class="tui-space_top-4"
-                    (click)="toggle()"
-            >
+            <tui-line-clamp content="{{ userInterests }}" class="clamp" [linesLimit]="linesLimit" />
+            <button tuiButton type="button" class="tui-space_top-4" (click)="toggle()" >
                 Show more
             </button>
         </div>
