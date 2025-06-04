@@ -1,5 +1,6 @@
 package group_05.ase.neo4j_data_access.Service.Implementation;
 
+import group_05.ase.neo4j_data_access.DTO.FunFactResult;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -127,5 +128,46 @@ public class FunFactExtractorService {
         score += sentence.length() / 100.0;
         return score;
     }
+
+    public FunFactResult extractFunFactHybridWithReason(String text) {
+        List<String> sentences = splitIntoSentences(text);
+        if (sentences.isEmpty()) return new FunFactResult("", 0, "Kein Satz gefunden.");
+
+        String bestSentence = "";
+        double bestScore = -1;
+        String bestReason = "";
+
+        for (String sentence : sentences) {
+            double humor = humorScore(sentence);
+            double tfidf = tfidfScore(sentence, sentences);
+            double heur = baseHeuristicScore(sentence);
+            double hybridScore = humor * 3.0 + heur + tfidf;
+
+            StringBuilder reason = new StringBuilder();
+            if (humor > 0) reason.append("Humor erkannt, ");
+            if (heur > 0.9) reason.append("Heuristik: Zahl/Superlativ, ");
+            if (tfidf > 0.7) reason.append("Seltenheit im Text, ");
+
+            if (hybridScore > bestScore) {
+                bestScore = hybridScore;
+                bestSentence = sentence;
+                bestReason = reason.length() > 0 ? reason.toString() : "Höchster Hybrid-Score.";
+            }
+        }
+        return new FunFactResult(bestSentence, bestScore, bestReason);
+    }
+
+    private double tfidfScore(String sentence, List<String> allSentences) {
+        List<String> sentenceTokens = tokenize(sentence);
+        List<List<String>> tokenized = allSentences.stream().map(this::tokenize).collect(Collectors.toList());
+        double score = 0;
+        for (String token : sentenceTokens) {
+            double tf = (double) Collections.frequency(sentenceTokens, token) / sentenceTokens.size();
+            double idf = Math.log((double) allSentences.size() / (1 + countSentencesContaining(token, tokenized)));
+            score += tf * idf;
+        }
+        return score;
+    }
+
 
 }

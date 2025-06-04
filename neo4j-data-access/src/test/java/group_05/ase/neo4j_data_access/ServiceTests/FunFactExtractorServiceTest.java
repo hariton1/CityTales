@@ -1,5 +1,6 @@
 package group_05.ase.neo4j_data_access.ServiceTests;
 
+import group_05.ase.neo4j_data_access.DTO.FunFactResult;
 import group_05.ase.neo4j_data_access.Service.Implementation.FunFactExtractorService;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
@@ -102,8 +103,20 @@ public class FunFactExtractorServiceTest {
 
         assertTrue(funFact.toLowerCase().contains("angeblich") || funFact.toLowerCase().contains("geistern") || funFact.toLowerCase().contains("lachen"));
     }
+    @Test
+    public void testExtractFunFactHybridWithReason() {
+        FunFactExtractorService service = new FunFactExtractorService();
+        String description = "Das Schloss war angeblich einst von Geistern bewohnt. "
+                + "Viele Menschen behaupten, nachts Lachen gehört zu haben. "
+                + "Der Bau wurde im 18. Jahrhundert fertiggestellt.";
+        FunFactResult result = service.extractFunFactHybridWithReason(description);
 
+        System.out.println("Hybrid Fun Fact: " + result.getSentence());
+        System.out.println("Score: " + result.getScore());
+        System.out.println("Reason: " + result.getReason());
 
-
-
+        assertTrue(Arrays.asList(description.split("(?<=[.!?])\\s+")).contains(result.getSentence()));
+        assertFalse(result.getReason().isEmpty());
     }
+
+}
