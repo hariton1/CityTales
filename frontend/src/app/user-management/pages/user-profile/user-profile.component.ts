@@ -16,6 +16,7 @@ import {TuiForm, TuiHeader} from '@taiga-ui/layout';
 import {TuiDay} from '@taiga-ui/cdk';
 import {UserService} from '../../../user_db.services/user.service';
 import {UserDto} from '../../../user_db.dto/user.dto';
+import {UUID} from 'node:crypto';
 
 @Component({
   selector: 'app-user-profile',
@@ -43,8 +44,8 @@ export class UserProfileComponent {
   }
 
   ngOnInit(): void {
-    console.log(`Processing profile for userId: ${this.userId}`);
-    this.userId = this.route.snapshot.queryParamMap.get('id');
+    console.log('Processing profile for userId:' + localStorage.getItem("user_uuid") as UUID);
+    this.userId = localStorage.getItem("user_uuid") as UUID;
     this.getUserById(this.userId ?? "");
   }
 

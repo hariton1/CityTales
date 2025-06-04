@@ -42,6 +42,7 @@ export class EditInterestsComponent implements OnInit{
 
   protected loading = true;
   protected error: any = null;
+  private userId: UUID;
 
   isMobile = false;
 
@@ -50,7 +51,9 @@ export class EditInterestsComponent implements OnInit{
   constructor(
     private interestsService: InterestsService,
     private userInterestService: UserInterestsService,
-    private breakpointObserver: BreakpointObserver) {}
+    private breakpointObserver: BreakpointObserver) {
+    this.userId = localStorage.getItem("user_uuid") as UUID;
+  }
 
   ngOnInit(): void {
     this.breakpointObserver
@@ -66,7 +69,7 @@ export class EditInterestsComponent implements OnInit{
   fetchUserInterests(): void {
     this.loading = true;
     // Use switchMap to handle the sequential flow
-    this.userInterestService.getUserInterestsByUserId(localStorage.getItem("user_uuid") as UUID)
+    this.userInterestService.getUserInterestsByUserId(this.userId)
       .pipe(
         switchMap(interests => {
           this.userInterestsList = interests;
@@ -135,7 +138,7 @@ export class EditInterestsComponent implements OnInit{
       if (!alreadyExists) {
         console.log('Creating interest:', interest.getInterestName(), interest.getInterestId());
         const newInterest = new UserInterestDto(
-          localStorage.getItem("user_uuid") as UUID,
+          this.userId,
           interest.getInterestId(),
           new Date(),
           1
@@ -170,7 +173,7 @@ export class EditInterestsComponent implements OnInit{
       this.interestsService.getInterestByInterestId(interest.getInterestId()).subscribe(detail => {
           const selectedFilters = this.form.value.filters || [];
           if (!selectedFilters.includes(detail.getInterestName())) {
-            interest.setUserId(localStorage.getItem("user_uuid") as UUID);
+            interest.setUserId(this.userId);
             console.log('Deleting interest:', interest);
             this.userInterestService.deleteUserInterest(interest).subscribe({
               next: () => {
