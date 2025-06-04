@@ -196,7 +196,7 @@ export class TourLayoutComponent {
     }
 
     //TODO: replace with user location
-    this.locationService.getLocationsInRadius(48.19994406631644, 16.371089994357767, 500).subscribe(locations => {
+    this.locationService.getLocationsInRadius(48.19994406631644, 16.371089994357767, 1000).subscribe(locations => {
       this.buildingData = locations;
       console.log(this.buildingData.length);
 
@@ -385,25 +385,21 @@ export class TourLayoutComponent {
       } else {
         this.alerts.open('Your tour finished generating!', {label: 'Success!', appearance: 'success', autoClose: 6000}).subscribe();
       }
-      console.log(data.length);
       var tourdtos: TourDto[] = [];
       data.forEach(tour => {
-        console.log(tour.userId)
         tourdtos.push(TourDto.fromTourEntity(tour))});
 
 
       var selectedTour: TourDto = tourdtos[tourdtos.length - 1];
 
-      console.log("Selected tour: " + selectedTour);
-      console.log("Selected tour user id: " + selectedTour.getUserId());
-
       this.tourService.createTourInDB(selectedTour).subscribe({
-        next: tour => {console.log("Tour created successfully!");},
-        error: any => {console.log("An error occured when saving tour to the DB! ")}});
-
-      this.tourService.getToursForUserId(this.userId!).subscribe(tours => {
-        tours.forEach(tour => {this.generatedTours.push(TourDto.fromTourEntity(tour))});
-      })
+        next: tour => {console.log("Tour created successfully!");
+          this.tourService.getToursForUserId(this.userId!).subscribe(tours => {
+            this.userTours = tours.map(tour => TourDto.fromTourEntity(tour));
+          })
+          },
+        error: any => {console.log("An error occured when saving tour to the DB! ")}
+      });
     })
   }
 
