@@ -87,7 +87,15 @@ export class FeedbackListComponent {
     /*const id = user.id;
     const email = user.email;
     this.confirmDelete(id,email);*/
-    this.feedbackService.approveFeedback(feedback.feedback_id);
+    this.feedbackService.approveFeedback(feedback.feedback_id).subscribe({
+      next: (results) => {
+        console.log('works', results);
+      },
+      error: (err) => {
+        console.error('no works', err);
+      }
+    });
+
   }
 
   protected handleDeleteFeedback(feedback: any): void {
@@ -96,7 +104,13 @@ export class FeedbackListComponent {
     /*const id = user.id;
     const email = user.email;
     this.confirmDelete(id,email);*/
-    this.feedbackService.deleteFeedback(feedback.feedback_id);
+    this.feedbackService.deleteFeedback(feedback.feedback_id).subscribe({
+      next: (results) => {
+        console.log('works', results);
+      },
+      error: (err) => {
+        console.error('no works', err);
+      }
+    });
   }
-
 }
