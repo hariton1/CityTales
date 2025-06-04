@@ -146,8 +146,8 @@ public class TourService implements ITourService {
         }
         tourObject.setStops(stops_list);
         Map<String, Double> durations = getLengthDurationOfTour(tourObject);
-        tourObject.setDistance(durations.get("distance") / 1000);
-        tourObject.setDurationEstimate(durations.get("duration") / 3600);
+        tourObject.setDistance(durations.get("distance"));
+        tourObject.setDurationEstimate(durations.get("duration"));
 
         return tourObject;
     }
@@ -159,7 +159,7 @@ public class TourService implements ITourService {
             List<List<Float>> distanceMatrix,
             double minDistance,
             double maxDistance,
-            int minIntermediateStops, // new parameter
+            int minIntermediateStops,
             int maxRoutes
     ) {
         int N = stops.size();
@@ -309,16 +309,6 @@ public class TourService implements ITourService {
         }
 
         return accessOpenRoutingService(points, "foot-walking");
-    }
-
-    @Override
-    public TourObject getTourByName(String name) {
-        return null;
-    }
-
-    @Override
-    public void deleteTourByName(String name) {
-
     }
 
     private Map<String, Double> getLengthDurationOfTour(TourObject tour){
