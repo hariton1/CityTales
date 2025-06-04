@@ -17,13 +17,23 @@
     </fieldset>
 
     <fieldset class="fieldset-style">
-      <div class="stack">
-        <tui-textfield>
-          <label tuiLabel>Role</label>
-          <input tuiTextfield [disabled]="true" [(ngModel)]="role" />
-          <tui-icon />
-        </tui-textfield>
-      </div>
+        <div class="stack">
+            <tui-textfield>
+                <label tuiLabel>Role</label>
+                <input tuiTextfield [disabled]="true" [(ngModel)]="role" />
+                <tui-icon />
+            </tui-textfield>
+        </div>
+    </fieldset>
+
+    <fieldset class="fieldset-style">
+        <div class="stack">
+            <tui-textfield>
+                <label tuiLabel>Interests</label>
+                <input tuiTextarea [disabled]="true" [(ngModel)]="userInterests" />
+                <tui-icon />
+            </tui-textfield>
+        </div>
     </fieldset>
 
     <footer>

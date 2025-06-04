@@ -1,22 +1,22 @@
 import { Component } from '@angular/core';
-import {AsyncPipe, NgIf} from '@angular/common';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {ActivatedRoute, ParamMap, Router, RouterLink} from '@angular/router';
+import {Router} from '@angular/router';
 import {
   TuiButton,
-  TuiError,
   TuiIcon,
   TuiLabel,
   TuiTextfieldComponent,
   TuiTextfieldDirective,
   TuiTitle
 } from '@taiga-ui/core';
-import {TuiChevron, TuiDataListWrapperComponent, TuiFieldErrorPipe, TuiSelectDirective} from '@taiga-ui/kit';
-import {TuiForm, TuiHeader} from '@taiga-ui/layout';
+import {TuiHeader} from '@taiga-ui/layout';
 import {TuiDay} from '@taiga-ui/cdk';
 import {UserService} from '../../../user_db.services/user.service';
 import {UserDto} from '../../../user_db.dto/user.dto';
 import {UUID} from 'node:crypto';
+import {forkJoin, of, switchMap} from 'rxjs';
+import {UserInterestsService} from '../../../user_db.services/user-interests.service';
+import {InterestsService} from '../../../user_db.services/interests.service';
 
 @Component({
   selector: 'app-user-profile',
@@ -36,19 +36,22 @@ import {UUID} from 'node:crypto';
 })
 export class UserProfileComponent {
 
-  private userId: string | null = null;
+  private userId: UUID;
   private user: UserDto | null = null;
   protected accountCreated: any = null;
+  protected userInterests: string = "";
 
-  constructor(private route: ActivatedRoute,
-              private userService: UserService,
+  constructor(private userService: UserService,
+              private userInterestService: UserInterestsService,
+              private interestsService: InterestsService,
               private router: Router) {
+    this.userId = localStorage.getItem("user_uuid") as UUID;
   }
 
   ngOnInit(): void {
     console.log('Processing profile for userId:' + localStorage.getItem("user_uuid") as UUID);
-    this.userId = localStorage.getItem("user_uuid") as UUID;
-    this.getUserById(this.userId ?? "");
+    this.getUserById(this.userId);
+    this.fetchUserInterests();
   }
 
   getUserById(id: string): void {
@@ -64,6 +67,42 @@ export class UserProfileComponent {
         );
 
       })
+  }
+
+  fetchUserInterests(): void {
+    if (!this.userId) return;
+
+    // Use switchMap to handle the sequential flow
+    this.userInterestService.getUserInterestsByUserId(this.userId)
+      .pipe(
+        switchMap(interests => {
+          // If no interests, return an empty array observable
+          if (interests.length === 0) {
+            return of([]);
+          }
+
+          // Create an array of observables for each interest detail request
+          const detailRequests = interests.map(interest =>
+            this.interestsService.getInterestByInterestId(interest.getInterestId())
+          );
+
+          // Use forkJoin to wait for all detail requests to complete
+          return forkJoin(detailRequests);
+        })
+      )
+      .subscribe({
+        next: (interestDetails) => {
+          // Extract names from the interest details and join them into a single string
+          const interestNames = interestDetails.map(detail => detail.getInterestName());
+          this.userInterests = interestNames.join(', '); // Store all interests in a single string
+          console.log('User interests:', this.userInterests);
+        },
+        error: (err) => {
+          console.error('Error fetching interests or details:', err);
+          this.userInterests = ""; // Reset to empty string on error
+        }
+      });
+
   }
 
   getMonthName(dateNumber: number): string {
