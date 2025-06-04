@@ -12,7 +12,7 @@ import {TuiDay, TuiPlatform} from '@taiga-ui/cdk';
 import {NgIf} from '@angular/common';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import {UserDto} from '../../user_db.dto/user.dto';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {UserService} from '../../user_db.services/user.service';
 import {UUID} from 'node:crypto';
 
@@ -51,7 +51,8 @@ export class EditInterestsComponent implements OnInit{
   constructor(
     private interestsService: InterestsService,
     private userInterestService: UserInterestsService,
-    private breakpointObserver: BreakpointObserver) {
+    private breakpointObserver: BreakpointObserver,
+    private router: Router) {
     this.userId = localStorage.getItem("user_uuid") as UUID;
   }
 
@@ -193,6 +194,7 @@ export class EditInterestsComponent implements OnInit{
     console.log('Form submitted with values:', this.form.value);
     this.deleteInterest();
     this.createInterests();
+    this.router.navigate(['/profile']);
   }
 
   protected form = new FormGroup({
