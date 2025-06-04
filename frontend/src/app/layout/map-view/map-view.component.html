@@ -9,46 +9,6 @@
 
   <map-marker [position]="center" [options]="locationMarkerOptions"></map-marker>
 
-  <div #nativeInfoContent [style.display]="'none'">
-    <div class="info-content" *ngIf="hoveredLocation as location">
-      <ng-container *ngIf="combinedLocations && combinedLocations.length > 0; else noRelated">
-        <div class="circle-wrapper">
-          <div
-            *ngFor="let loc of combinedLocations; let i = index"
-            class="circle-building"
-            [ngClass]="{
-      'building-bg': loc.type === 'building',
-      'person-bg': loc.type === 'person',
-      'event-bg': loc.type === 'event'
-    }"
-            [style.transform]="getCirclePosition(i, combinedLocations.length)"
-            (mouseenter)="onCircleMouseEnter(loc.name, i)"
-            (mouseleave)="onCircleMouseLeave()"
-            (click)="onCircleClick(loc)"
-          >
-            <img [src]="loc?.imageUrls?.[1]" alt="{{ loc?.name || 'Unnamed' }}" class="building-image" />
-          </div>
-
-          <!-- SINGLE Hover Label rendered in front of all -->
-        </div>
-        <div
-          class="hover-label"
-          *ngIf="hoveredIndex !== null"
-          [style.top.%]="50"
-          [style.left.%]="50"
-          [style.transform]="getHoverLabelPosition(hoveredIndex, combinedLocations.length)"
-        >
-          {{ hoveredRelatedName }}
-        </div>
-
-
-      </ng-container>
-
-      <ng-template #noRelated>
-        <p class="no-related">No related buildings found.</p>
-      </ng-template>
-    </div>
-  </div>
   <map-polyline
     *ngFor="let line of polylines"
     [path]="line"
@@ -56,3 +16,42 @@
   </map-polyline>
 
 </google-map>
+
+<div #relatedContentToLocation [style.display]="'none'">
+  <div class="info-content" *ngIf="hoveredLocation as location">
+    <ng-container *ngIf="combinedLocations && combinedLocations.length > 0; else noRelated">
+      <div class="circle-wrapper">
+        <div
+          *ngFor="let loc of combinedLocations; let i = index"
+          class="circle-building"
+          [ngClass]="{
+      'building-bg': loc.type === 'building',
+      'person-bg': loc.type === 'person',
+      'event-bg': loc.type === 'event'
+    }"
+          [style.transform]="getCirclePosition(i, combinedLocations.length)"
+          (mouseenter)="onCircleMouseEnter(loc.name, i)"
+          (mouseleave)="onCircleMouseLeave()"
+          (click)="onCircleClick(loc)"
+        >
+          <img [src]="loc?.imageUrls?.[1]" alt="{{ loc?.name || 'Unnamed' }}" class="building-image" />
+        </div>
+
+        <!-- SINGLE Hover Label rendered in front of all -->
+      </div>
+      <div
+        class="hover-label"
+        *ngIf="hoveredIndex !== null"
+        [style.top.%]="50"
+        [style.left.%]="50"
+        [style.transform]="getHoverLabelPosition(hoveredIndex, combinedLocations.length)"
+      >
+        {{ hoveredRelatedName }}
+      </div>
+    </ng-container>
+
+    <ng-template #noRelated>
+      <p class="no-related">No related buildings found.</p>
+    </ng-template>
+  </div>
+</div>
