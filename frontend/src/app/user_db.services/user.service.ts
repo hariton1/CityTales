@@ -41,7 +41,7 @@ export class UserService {
 
     return this.httpClient.patch<UserDto>(`${this.DOMAIN}/id=${user.id}`, payload)
       .pipe(map(updatedUser => {
-        return new UserDto(updatedUser.id, updatedUser.email, updatedUser.created_at);
+        return new UserDto(updatedUser.id, updatedUser.email, updatedUser.created_at, updatedUser.role);
       }));
   }
 }

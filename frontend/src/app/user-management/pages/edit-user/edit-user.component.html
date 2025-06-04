@@ -26,18 +26,6 @@
     <fieldset>
       <div class="stack">
         <tui-textfield>
-          <label tuiLabel>Display Name</label>
-          <input
-            formControlName="displayName"
-            placeholder="John"
-            tuiTextfield
-            type="text"
-          />
-        </tui-textfield>
-      </div>
-
-      <div class="stack">
-        <tui-textfield>
           <label tuiLabel>Email</label>
           <input
             formControlName="email"
@@ -78,42 +66,7 @@
           [error]="[] | tuiFieldError | async"
         />
       </div>
-      <div class="stack">
-        <tui-textfield
-          tuiChevron
-          [tuiTextfieldCleaner]="false"
-        >
-          <label tuiLabel>Status</label>
-
-          <input
-            formControlName="status"
-            tuiSelect
-          />
-
-          <tui-data-list-wrapper
-            *tuiTextfieldDropdown
-            new
-            [items]="statusValues"
-          />
-        </tui-textfield>
-        <tui-error
-          formControlName="status"
-          [error]="[] | tuiFieldError | async"
-        />
-      </div>
     </fieldset>
-
-    <tui-input-date formControlName="birthday">
-      Birthday
-      <input
-        placeholder="Birthday"
-        tuiTextfieldLegacy
-      />
-    </tui-input-date>
-    <tui-error
-      formControlName="birthday"
-      [error]="[] | tuiFieldError | async"
-    />
 
     <footer>
       <button
