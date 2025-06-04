@@ -8,9 +8,13 @@ import {TuiAlertService, TuiButton, TuiIcon, TuiTitle} from '@taiga-ui/core';
 import {UserInterestsService} from '../../user_db.services/user-interests.service';
 import {InterestsService} from '../../user_db.services/interests.service';
 import {TuiAppBarBack, TuiAppBarComponent, TuiHeader} from '@taiga-ui/layout';
-import {TuiPlatform} from '@taiga-ui/cdk';
+import {TuiDay, TuiPlatform} from '@taiga-ui/cdk';
 import {NgIf} from '@angular/common';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import {UserDto} from '../../user_db.dto/user.dto';
+import {ActivatedRoute} from '@angular/router';
+import {UserService} from '../../user_db.services/user.service';
+import {UUID} from 'node:crypto';
 
 @Component({
   selector: 'app-edit-interests',
@@ -62,7 +66,7 @@ export class EditInterestsComponent implements OnInit{
   fetchUserInterests(): void {
     this.loading = true;
     // Use switchMap to handle the sequential flow
-    this.userInterestService.getUserInterestsByUserId('f5599c8c-166b-495c-accc-65addfaa572b')
+    this.userInterestService.getUserInterestsByUserId(localStorage.getItem("user_uuid") as UUID)
       .pipe(
         switchMap(interests => {
           this.userInterestsList = interests;
@@ -131,7 +135,7 @@ export class EditInterestsComponent implements OnInit{
       if (!alreadyExists) {
         console.log('Creating interest:', interest.getInterestName(), interest.getInterestId());
         const newInterest = new UserInterestDto(
-          'f5599c8c-166b-495c-accc-65addfaa572b',
+          localStorage.getItem("user_uuid") as UUID,
           interest.getInterestId(),
           new Date(),
           1
@@ -166,7 +170,7 @@ export class EditInterestsComponent implements OnInit{
       this.interestsService.getInterestByInterestId(interest.getInterestId()).subscribe(detail => {
           const selectedFilters = this.form.value.filters || [];
           if (!selectedFilters.includes(detail.getInterestName())) {
-            interest.setUserId('f5599c8c-166b-495c-accc-65addfaa572b');
+            interest.setUserId(localStorage.getItem("user_uuid") as UUID);
             console.log('Deleting interest:', interest);
             this.userInterestService.deleteUserInterest(interest).subscribe({
               next: () => {

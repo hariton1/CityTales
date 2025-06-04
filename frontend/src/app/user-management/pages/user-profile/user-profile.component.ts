@@ -35,16 +35,16 @@ import {UserDto} from '../../../user_db.dto/user.dto';
 })
 export class UserProfileComponent {
 
-  userId: string | null = null;
-  user: UserDto | null = null;
-  accountCreated: any = null;
+  private userId: string | null = null;
+  private user: UserDto | null = null;
+  protected accountCreated: any = null;
 
   constructor(readonly route: ActivatedRoute,readonly userService: UserService, private router: Router) {
   }
 
   ngOnInit(): void {
-    console.log(`Processing feedback for wikiId: ${this.userId}`);
-    this.userId = this.route.snapshot.queryParamMap.get('wikiId');
+    console.log(`Processing profile for userId: ${this.userId}`);
+    this.userId = this.route.snapshot.queryParamMap.get('id');
     this.getUserById(this.userId ?? "");
   }
 
@@ -73,6 +73,14 @@ export class UserProfileComponent {
 
   handleEditInterestsClick () {
     this.router.navigate(['/edit-interests']);
+  }
+
+  get role(): string {
+    return this.user?.role ?? '';
+  }
+
+  get email(): string {
+    return this.user?.email ?? '';
   }
 
 }
