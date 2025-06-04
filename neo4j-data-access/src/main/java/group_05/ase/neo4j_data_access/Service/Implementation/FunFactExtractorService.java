@@ -82,4 +82,50 @@ public class FunFactExtractorService {
         if (text == null || text.isBlank()) return new ArrayList<>();
         return Arrays.asList(text.split("(?<=[.!?])\\s+"));
     }
+
+    private static final List<String> HUMOR_KEYWORDS = Arrays.asList(
+            "witzig", "lustig", "kurios", "scherz", "geheimnis", "ironie", "legende", "sage",
+            "Geist", "Spuk", "angeblich", "sagt man", "heißt es", "Gerücht", "Mythos", "besonders"
+    );
+
+    private double humorScore(String sentence) {
+        String lower = sentence.toLowerCase();
+        return HUMOR_KEYWORDS.stream()
+                .filter(lower::contains)
+                .count() * 1.0; // 1 Punkt je gefundenem Keyword
+    }
+
+    public String extractFunFactHumorAware(String text) {
+        List<String> sentences = splitIntoSentences(text);
+        if (sentences.isEmpty()) return "";
+
+        String bestSentence = "";
+        double bestScore = -1;
+
+        for (String sentence : sentences) {
+            // Humor zählt stärker als alles andere!
+            double score = humorScore(sentence) * 3.0
+                    + baseHeuristicScore(sentence); // kann optional kombiniert werden
+            if (score > bestScore) {
+                bestScore = score;
+                bestSentence = sentence;
+            }
+        }
+        // Fallback: Kein humorvoller Satz gefunden? Nimm TF-IDF
+        if (bestScore < 0.01) {
+            return extractFunFactTFIDF(text);
+        }
+        return bestSentence;
+    }
+
+    private double baseHeuristicScore(String sentence) {
+        double score = 0;
+        if (sentence.matches(".*\\d+.*")) score += 1.0;
+        if (sentence.matches(".*(oldest|first|most|best|largest|famous|haunted|legend|loved|helped|ghost|witzig|Legende|Geist|Jahrhundert).*")) score += 0.8;
+        if (sentence.matches(".*[A-Z][a-z]+.*")) score += 0.5;
+        if (sentence.length() < 30) score -= 0.5;
+        score += sentence.length() / 100.0;
+        return score;
+    }
+
 }

@@ -4,6 +4,7 @@ import group_05.ase.neo4j_data_access.Service.Implementation.FunFactExtractorSer
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class FunFactExtractorServiceTest {
@@ -57,6 +58,52 @@ public class FunFactExtractorServiceTest {
         String funFact = service.extractFunFactTFIDF(description);
         System.out.println("TF-IDF Fun Fact: " + funFact);
         assertTrue(description.contains(funFact));
+    }  @Test
+    public void testExtractFunFact_SimpleStory() {
+        FunFactExtractorService service = new FunFactExtractorService();
+        String description = "Das Wiener Riesenrad ist eines der berühmtesten Wahrzeichen Wiens. "
+                + "Es wurde 1897 gebaut und ist 65 Meter hoch. "
+                + "Viele Filme wurden hier gedreht. "
+                + "Die Legende besagt, dass ein Geist nachts im Riesenrad spukt.";
+        String funFact = service.extractFunFact(description);
+
+        System.out.println("Extracted Fun Fact: " + funFact);
+
+        // Der FunFact muss ein Satz aus der Beschreibung sein
+        assertTrue(description.contains(funFact));
+        // Bonus: Prüfe, ob der Satz eine Zahl oder Schlüsselwort enthält
+        assertTrue(funFact.matches(".*(\\d+|berühmtesten|hoch|Legende|Geist).*"));
     }
 
-}
+    @Test
+    public void testExtractFunFactTFIDF2() {
+        FunFactExtractorService service = new FunFactExtractorService();
+        String description = "Das Wiener Riesenrad ist eines der berühmtesten Wahrzeichen Wiens. "
+                + "Es wurde 1897 gebaut und ist 65 Meter hoch. "
+                + "Viele Filme wurden hier gedreht. "
+                + "Die Legende besagt, dass ein Geist nachts im Riesenrad spukt.";
+        String funFact = service.extractFunFactTFIDF(description);
+
+        System.out.println("TF-IDF Fun Fact: " + funFact);
+
+        List<String> sentences = Arrays.asList(description.split("(?<=[.!?])\\s+"));
+        assertTrue(sentences.contains(funFact));
+    }
+
+    @Test
+    public void testExtractFunFactHumorAware() {
+        FunFactExtractorService service = new FunFactExtractorService();
+        String description = "Das Schloss war angeblich einst von Geistern bewohnt. "
+                + "Viele Menschen behaupten, nachts Lachen gehört zu haben. "
+                + "Der Bau wurde im 18. Jahrhundert fertiggestellt.";
+        String funFact = service.extractFunFactHumorAware(description);
+
+        System.out.println("Humor-aware Fun Fact: " + funFact);
+
+        assertTrue(funFact.toLowerCase().contains("angeblich") || funFact.toLowerCase().contains("geistern") || funFact.toLowerCase().contains("lachen"));
+    }
+
+
+
+
+    }
