@@ -23,7 +23,7 @@
   <ng-template #dropdownContent>
     <tui-scrollbar>
     <ul class="notification-inbox-dropdown" *ngIf="notifications.length > 0">
-      <li *ngFor="let notification of notifications" class="notification-item">
+      <li *ngFor="let notification of notifications" class="notification-item" (click)="onNotificationClick(notification.building)">
           <div class="notification-avatar">
             <tui-icon icon="@tui.landmark" [style.height.rem]="1.2" />
           </div>

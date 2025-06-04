@@ -54,7 +54,7 @@ public class CategorizationController {
     */
 
 
-    @GetMapping("/match")
+    @PostMapping("/match")
     @ResponseBody
     public ResponseEntity<List<Integer>> matching(@RequestBody MatchRequest dto) {
 
