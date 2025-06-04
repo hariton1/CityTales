@@ -24,4 +24,9 @@ public class UserDTO {
     @Setter
     @JsonProperty(required = true, value = "created_at")
     private LocalDateTime createdAt;
+
+    @Getter
+    @Setter
+    @JsonProperty(required = true, value = "roles")
+    private String roles;
 }

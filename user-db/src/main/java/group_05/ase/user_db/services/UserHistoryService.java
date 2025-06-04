@@ -6,7 +6,6 @@ import group_05.ase.user_db.repositories.ArticleWeightRepository;
 import group_05.ase.user_db.repositories.UserHistoryRepository;
 import group_05.ase.user_db.restData.ArticleWeightDTO;
 import group_05.ase.user_db.restData.UserHistoryDTO;
-
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;

@@ -1,15 +1,17 @@
 <header tuiNavigationHeader class="header">
 
     <span tuiNavigationLogo>
-        CityTales
+      <a routerLink="/explore" ><img src="assets/logo/cityTales-logo-desktop-white.svg" alt="CityTales Logo" height="25" /></a>
     </span>
     <tui-segmented [size]="'m'" class="main-nav-desktop">
       <a routerLink="/explore" >🌎 Explore</a>
-      <a routerLinkActive  href="#">🧭 Tours</a>
-      <!-- <a routerLink="/feedback">Contribute</a> -->
+      <a routerLink="/tours">🧭 Tours</a>
+      <a routerLink="/feedback">Contribute</a>
       <a routerLinkActive href="#">For Educators</a>
       <a routerLinkActive href="#">About</a>
+      <a routerLink="/scoreboard">Scoreboard</a>
       <a routerLinkActive href="/scoreboard">Scoreboard</a>
+      <a routerLinkActive href="/friends">Friends</a>
       <!-- <a routerLink="/onboarding" >Onboarding</a> -->
     </tui-segmented>
 

@@ -3,11 +3,12 @@
     <!-- Header with building information -->
     <div class="place-detail-header">
       <h2 class="place-detail-title">{{selectedPlace.name}}</h2>
-      <div class="place-location">
+      <div class="place-location" *ngIf="selectedPlace?.latitude != null && selectedPlace?.longitude != null">
         <span class="coordinates">
           {{ selectedPlace.latitude }}°N, {{ selectedPlace.longitude }}°E
         </span>
       </div>
+
 
       <button
         (click)="closeDetail()"
@@ -65,8 +66,9 @@
             <div class="related-items">
               <div class="related-item" *ngFor="let person of selectedPlace.relatedPersons">
             <span class="value">
-              <a [href]="person.url" target="_blank" *ngIf="person.url">{{ person.name }}</a>
-              <span *ngIf="!person.url">{{ person.name }}</span>
+              <div (click)="onPersonClick(person)">
+                <span>{{ person.name }}</span>
+              </div>
             </span>
               </div>
             </div>
@@ -77,8 +79,9 @@
             <div class="related-items">
               <div class="related-item" *ngFor="let place of selectedPlace.relatedBuildings">
             <span class="value">
-              <a [href]="place.url" target="_blank" *ngIf="place.url">{{ place.name }}</a>
-              <span *ngIf="!place.url">{{ place.name }}</span>
+              <div (click)="onBuildingClick(place)">
+                <span>{{ place.name }}</span>
+              </div>
             </span>
               </div>
             </div>
@@ -89,8 +92,9 @@
             <div class="related-items">
               <div class="related-item" *ngFor="let event of selectedPlace.relatedEvents">
             <span class="value">
-              <a [href]="event.url" target="_blank" *ngIf="event.url">{{ event.name }}</a>
-              <span *ngIf="!event.url">{{ event.name }}</span>
+              <div (click)="onEventClick(event)">
+                <span>{{ event.name }}</span>
+              </div>
             </span>
               </div>
             </div>

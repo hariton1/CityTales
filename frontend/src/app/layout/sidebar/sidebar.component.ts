@@ -1,5 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output, ViewChild, ElementRef, HostListener} from '@angular/core';
-import { HistoricalPlaceEntity} from '../../dto/db_entity/HistoricalPlaceEntity';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {HistoricPlaceDetailComponent} from '../historic-place-detail/historic-place-detail.component';
 import {HistoricPlacePreviewComponent} from '../historic-place-preview/historic-place-preview.component';
 import {NgIf, CommonModule} from '@angular/common';
@@ -7,14 +6,17 @@ import {TuiSearchResults} from '@taiga-ui/experimental';
 import {ReactiveFormsModule, FormControl} from '@angular/forms';
 import {BuildingEntity} from '../../dto/db_entity/BuildingEntity';
 import {EnrichmentService} from '../../services/enrichment.service';
-import {TuiPlatform} from '@taiga-ui/cdk';
-import {TuiAppearance, TuiButton, TuiIcon, TuiLoader, TuiTitle, TuiTextfield} from '@taiga-ui/core';
-import {TuiCardLarge, TuiHeader, TuiCell, TuiInputSearch} from '@taiga-ui/layout';
+import {TuiAppearance, TuiTitle, TuiTextfield} from '@taiga-ui/core';
+import {TuiCell, TuiInputSearch} from '@taiga-ui/layout';
 import {debounceTime, filter, Observable, switchMap} from 'rxjs';
 import {SearchService} from '../../services/search.service';
 import {UserService} from '../../services/user.service';
 import {NotificationInboxComponent} from '../../core/notification-inbox/notification-inbox.component';
 import {BreakpointObserver, Breakpoints} from '@angular/cdk/layout';
+import {PersonEntity} from '../../dto/db_entity/PersonEntity';
+import {EventEntity} from '../../dto/db_entity/EventEntity';
+import {HistoricEventDetailComponent} from '../historic-event-detail/historic-event-detail.component';
+import {HistoricPersonDetailComponent} from '../historic-person-detail/historic-person-detail.component';
 
 @Component({
   selector: 'app-sidebar',
@@ -22,32 +24,29 @@ import {BreakpointObserver, Breakpoints} from '@angular/cdk/layout';
     NgIf,
     HistoricPlaceDetailComponent,
     HistoricPlacePreviewComponent,
-    TuiPlatform,
     TuiAppearance,
-    TuiCardLarge,
-    TuiHeader,
     TuiTitle,
-    TuiIcon,
-    TuiButton,
-    TuiLoader,
     ReactiveFormsModule,
     TuiCell,
     TuiTextfield,
     TuiInputSearch,
     TuiSearchResults,
     CommonModule,
-    NotificationInboxComponent
+    NotificationInboxComponent,
+    HistoricEventDetailComponent,
+    HistoricPersonDetailComponent
   ],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.less'
 })
 export class SidebarComponent implements OnInit{
 
-  @Input() selectedPlace: any;
-  @Input() historicalPlaces: BuildingEntity[] = [];
-  @Input() detailedView: boolean = false;
+  @Input() selectedPlace: BuildingEntity | null = null;
+  @Input() selectedPerson: PersonEntity | null = null;
+  @Input() selectedEvent: EventEntity | null = null;
 
-  @Output() setDetailedView: EventEmitter<boolean> = new EventEmitter<boolean>();
+
+  @Input() historicalPlaces: BuildingEntity[] = [];
 
   summary: string = '';
   enrichedContent: string = '';
@@ -108,18 +107,36 @@ export class SidebarComponent implements OnInit{
 
   setSelectedPlace(place: any) {
     this.selectedPlace = place;
-    console.log(place.name);
+    console.log(this.selectedPlace);
+    console.log(this.selectedEvent);
+    console.log(this.selectedPerson);
   }
 
-  setDetailEvent(event: boolean): void {
-    this.detailedView = event
-    this.setDetailedView.emit(event);
+  setPlaceDetail(place: BuildingEntity) {
+    this.selectedPlace = place;
+    this.selectedEvent = null;
+    this.selectedPerson = null;
   }
 
-  setHistoricalPlaces(places: BuildingEntity[]): void {
-    this.historicalPlaces = places;
-    console.log(this.historicalPlaces);
+  setPersonDetail(person: PersonEntity) {
+    console.log('Received person:', person);
+    this.selectedPlace = null;
+    this.selectedEvent = null;
+    this.selectedPerson = person;
   }
+
+  setEventDetail(event: EventEntity) {
+    this.selectedEvent = event;
+    this.selectedPlace = null;
+    this.selectedPerson = null;
+  }
+
+  closeDetailView(): void {
+    this.selectedPlace = null;
+    this.selectedEvent = null;
+    this.selectedPerson = null;
+  }
+
 
   //Search field
 
@@ -185,17 +202,13 @@ export class SidebarComponent implements OnInit{
   onItemClick(item: any){
     //check if item is a building
     if(item.latitude != null && item.longitude != null){
-      this.selectedPlace = item;
-
-      this.selectedPlace = this.userService.enterHistoricNode(this.selectedPlace);
-
-      this.detailedView = true;
-      this.open = false;
-    } else {
-      window.open(item.url, '_blank');
-      this.open = false;
+      this.setPlaceDetail(item)
+    } else if (item.birthDate != null) {
+      //item is person
+      this.setPersonDetail(item)
+    } else if (item.organizer != null) {
+      //item is event
+      this.setEventDetail(item)
     }
   }
-
-
 }

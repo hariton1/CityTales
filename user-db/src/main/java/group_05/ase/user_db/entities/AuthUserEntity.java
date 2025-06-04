@@ -24,4 +24,7 @@ public class AuthUserEntity {
 
     @Column(name = "created_at", nullable = true)
     private LocalDateTime createdAt;
+
+    @Column(name = "role", nullable = true)
+    private String role;
 }
