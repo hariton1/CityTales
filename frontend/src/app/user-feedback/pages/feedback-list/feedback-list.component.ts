@@ -132,7 +132,7 @@ export class FeedbackListComponent {
       .pipe(
         switchMap((response) => {
           if (response) {
-            this.feedbackService.deleteFeedback(feedbackId).subscribe({
+            this.feedbackService.approveFeedback(feedbackId).subscribe({
               next: (results) => {
                 console.log('works', results);
                 return this.alerts.open('Feedback approved successfully!', {label: 'Success!', appearance: 'success', autoClose: 3000});
