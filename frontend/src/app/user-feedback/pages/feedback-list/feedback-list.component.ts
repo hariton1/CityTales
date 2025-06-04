@@ -7,6 +7,7 @@ import {UserService} from '../../../user_db.services/user.service';
 import {FeedbackService} from '../../../user_db.services/feedback.service';
 import {LocationService} from '../../../services/location.service';
 import {TuiCell} from '@taiga-ui/layout';
+import {catchError, forkJoin, of} from 'rxjs';
 
 @Component({
   selector: 'app-feedback-list',
@@ -44,28 +45,32 @@ export class FeedbackListComponent {
         feedbacks.forEach(feedback => {
           // You can process each feedback here
           console.log('Processing feedback:', feedback);
-          let articleName = '';
-          let userName = '';
-          this.locationService.getLocationByVHWId(feedback.getArticleId()).subscribe(
-            (article) => {
-              articleName = article.building.name;
-            }
-          )
-          this.userService.getUserById(feedback.getUserId()).subscribe(
-            (user) => {
-              userName = user.email;
-            }
-          )
-          let tmp = {
-            article_id: feedback.getArticleId(),
-            article_name: articleName,
-            user_id: feedback.getUserId(),
-            user_name: userName,
-            fb_content: feedback.getFbContent(),
-            rating: feedback.getRating()
-          }
-          // Add the processed feedback to the array
-          this.feedbacks.push(tmp);
+          const locationObs = this.locationService.getLocationByVHWId(feedback.getArticleId())
+            .pipe(catchError(error => {
+              console.error('Error fetching location:', error);
+              return of(null);
+            }));
+
+          const userObs = this.userService.getUserById(feedback.getUserId())
+            .pipe(catchError(error => {
+              console.error('Error fetching user:', error);
+              return of(null);
+            }));
+
+          forkJoin([locationObs, userObs]).subscribe(([article, user]) => {
+            const articleName = article?.building?.name || 'Unknown';
+            const userName = user?.email || 'Unknown';
+
+            this.feedbacks.push({
+              article_id: feedback.getArticleId(),
+              article_name: articleName,
+              user_id: feedback.getUserId(),
+              user_name: userName,
+              fb_content: feedback.getFbContent(),
+              rating: feedback.getRating()
+            });
+          });
+
         });
       },
       error: (error) => {
