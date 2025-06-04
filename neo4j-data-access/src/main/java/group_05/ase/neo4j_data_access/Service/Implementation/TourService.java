@@ -11,12 +11,10 @@ import group_05.ase.neo4j_data_access.Entity.Tour.TourDTO;
 import group_05.ase.neo4j_data_access.Entity.Tour.TourObject;
 import group_05.ase.neo4j_data_access.Entity.ViennaHistoryWikiBuildingObject;
 import group_05.ase.neo4j_data_access.Service.Interface.ITourService;
-import org.neo4j.cypherdsl.core.Match;
 import org.springframework.data.neo4j.types.GeographicPoint2d;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.Instant;
 import java.util.*;

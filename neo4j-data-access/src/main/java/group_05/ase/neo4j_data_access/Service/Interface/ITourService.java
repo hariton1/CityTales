@@ -2,7 +2,6 @@ package group_05.ase.neo4j_data_access.Service.Interface;
 
 import group_05.ase.neo4j_data_access.Entity.Tour.CreateTourRequestDTO;
 import group_05.ase.neo4j_data_access.Entity.Tour.TourDTO;
-import group_05.ase.neo4j_data_access.Entity.Tour.TourObject;
 import group_05.ase.neo4j_data_access.Entity.ViennaHistoryWikiBuildingObject;
 
 import java.util.List;
