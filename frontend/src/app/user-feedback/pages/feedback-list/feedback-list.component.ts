@@ -1,14 +1,13 @@
-import {Component, inject} from '@angular/core';
+import { Component } from '@angular/core';
 import {NgForOf} from "@angular/common";
-import {TuiAlertService, TuiAutoColorPipe, TuiButton, TuiInitialsPipe, TuiTitle} from "@taiga-ui/core";
-import {TUI_CONFIRM, TuiAvatar, TuiConfirmData, TuiStatus} from "@taiga-ui/kit";
+import {TuiAutoColorPipe, TuiButton, TuiInitialsPipe, TuiTitle} from "@taiga-ui/core";
+import {TuiAvatar, TuiStatus} from "@taiga-ui/kit";
 import {TuiTableDirective, TuiTableTbody, TuiTableTd, TuiTableTh} from "@taiga-ui/addon-table";
 import {UserService} from '../../../user_db.services/user.service';
 import {FeedbackService} from '../../../user_db.services/feedback.service';
 import {LocationService} from '../../../services/location.service';
 import {TuiCell} from '@taiga-ui/layout';
-import {catchError, forkJoin, of, switchMap} from 'rxjs';
-import {TuiResponsiveDialogService} from '@taiga-ui/addon-mobile';
+import {catchError, forkJoin, of} from 'rxjs';
 
 @Component({
   selector: 'app-feedback-list',
@@ -38,9 +37,6 @@ export class FeedbackListComponent {
               private locationService: LocationService ) {
     this.feedbacks = [];
   }
-
-  private dialogs = inject(TuiResponsiveDialogService);
-  private alerts = inject(TuiAlertService);
 
   ngOnInit(): void {
     this.feedbackService.getAllFeedbacks().subscribe({
@@ -88,95 +84,33 @@ export class FeedbackListComponent {
   protected handleApproveFeedback(feedback: any): void {
     // Use getters to ensure we get the values correctly
     console.log(feedback);
-    this.confirmApprove(feedback.feedback_id);
-    /*this.feedbackService.approveFeedback(feedback.feedback_id).subscribe({
+    /*const id = user.id;
+    const email = user.email;
+    this.confirmDelete(id,email);*/
+    this.feedbackService.approveFeedback(feedback.feedback_id).subscribe({
       next: (results) => {
         console.log('works', results);
       },
       error: (err) => {
         console.error('no works', err);
       }
-    });*/
+    });
 
   }
 
   protected handleDeleteFeedback(feedback: any): void {
     // Use getters to ensure we get the values correctly
     console.log(feedback);
-    this.confirmDelete(feedback.feedback_id);
-    /*this.feedbackService.deleteFeedback(feedback.feedback_id).subscribe({
+    /*const id = user.id;
+    const email = user.email;
+    this.confirmDelete(id,email);*/
+    this.feedbackService.deleteFeedback(feedback.feedback_id).subscribe({
       next: (results) => {
         console.log('works', results);
       },
       error: (err) => {
         console.error('no works', err);
       }
-    });*/
-  }
-
-  protected confirmApprove(feedbackId: number): void {
-    console.log(feedbackId);
-    const data: TuiConfirmData = {
-      content:
-        'Feedback will be approved. This action cannot be undone!',
-      yes: 'Yes',
-      no: 'No',
-    };
-
-    this.dialogs
-      .open<boolean>(TUI_CONFIRM, {
-        label: 'Are you sure you want to approve the feedback?',
-        size: 'm',
-        data,
-      })
-      .pipe(
-        switchMap((response) => {
-          if (response) {
-            this.feedbackService.approveFeedback(feedbackId).subscribe({
-              next: (results) => {
-                console.log('works', results);
-                return this.alerts.open('Feedback approved successfully!', {label: 'Success!', appearance: 'success', autoClose: 3000});
-              },
-              error: (err) => {
-                console.error('no works', err);
-              }
-            });
-          }
-          return this.alerts.open('Feedback approval cancelled!', {label: 'Cancelled!', appearance: 'warning', autoClose: 3000});
-        }))
-      .subscribe();
-  }
-
-  protected confirmDelete(feedbackId: number): void {
-    console.log(feedbackId);
-    const data: TuiConfirmData = {
-      content:
-        'Feedback will be deleted. This action cannot be undone!',
-      yes: 'Yes',
-      no: 'No',
-    };
-
-    this.dialogs
-      .open<boolean>(TUI_CONFIRM, {
-        label: 'Are you sure you want to delete the feedback?',
-        size: 'm',
-        data,
-      })
-      .pipe(
-        switchMap((response) => {
-          if (response) {
-            this.feedbackService.deleteFeedback(feedbackId).subscribe({
-              next: (results) => {
-                console.log('works', results);
-                return this.alerts.open('Feedback deleted successfully!', {label: 'Success!', appearance: 'success', autoClose: 3000});
-              },
-              error: (err) => {
-                console.error('no works', err);
-              }
-            });
-          }
-          return this.alerts.open('Feedback deletion cancelled!', {label: 'Cancelled!', appearance: 'warning', autoClose: 3000});
-        }))
-      .subscribe();
+    });
   }
 }
