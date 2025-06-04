@@ -13,6 +13,10 @@ import {SearchService} from '../../services/search.service';
 import {UserService} from '../../services/user.service';
 import {NotificationInboxComponent} from '../../core/notification-inbox/notification-inbox.component';
 import {BreakpointObserver, Breakpoints} from '@angular/cdk/layout';
+import {PersonEntity} from '../../dto/db_entity/PersonEntity';
+import {EventEntity} from '../../dto/db_entity/EventEntity';
+import {HistoricEventDetailComponent} from '../historic-event-detail/historic-event-detail.component';
+import {HistoricPersonDetailComponent} from '../historic-person-detail/historic-person-detail.component';
 
 @Component({
   selector: 'app-sidebar',
@@ -28,18 +32,22 @@ import {BreakpointObserver, Breakpoints} from '@angular/cdk/layout';
     TuiInputSearch,
     TuiSearchResults,
     CommonModule,
-    NotificationInboxComponent
+    NotificationInboxComponent,
+    HistoricEventDetailComponent,
+    HistoricPersonDetailComponent
   ],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.less'
 })
 export class SidebarComponent implements OnInit{
 
-  @Input() selectedPlace: any;
+  selectedPlace: BuildingEntity | null = null;
+  selectedPerson: PersonEntity | null = null;
+  selectedEvent: EventEntity | null = null;
+
+
   @Input() historicalPlaces: BuildingEntity[] = [];
   @Input() detailedView: boolean = false;
-
-  @Output() setDetailedView: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   summary: string = '';
   enrichedContent: string = '';
@@ -100,12 +108,34 @@ export class SidebarComponent implements OnInit{
 
   setSelectedPlace(place: any) {
     this.selectedPlace = place;
-    console.log(place.name);
+    console.log(this.selectedPlace);
+    console.log(this.selectedEvent);
+    console.log(this.selectedPerson);
   }
 
-  setDetailEvent(event: boolean): void {
-    this.detailedView = event
-    this.setDetailedView.emit(event);
+  setPlaceDetail(place: BuildingEntity) {
+    this.selectedPlace = place;
+    this.selectedEvent = null;
+    this.selectedPerson = null;
+  }
+
+  setPersonDetail(person: PersonEntity) {
+    console.log('Received person:', person);
+    this.selectedPlace = null;
+    this.selectedEvent = null;
+    this.selectedPerson = person;
+  }
+
+  setEventDetail(event: EventEntity) {
+    this.selectedEvent = event;
+    this.selectedPlace = null;
+    this.selectedPerson = null;
+  }
+
+  closeDetailView(): void {
+    this.selectedPlace = null;
+    this.selectedEvent = null;
+    this.selectedPerson = null;
   }
 
   setHistoricalPlaces(places: BuildingEntity[]): void {

@@ -28,6 +28,7 @@ export class MapViewComponent implements OnInit{
   @Output() selectPlaceEvent: EventEmitter<BuildingEntity> = new EventEmitter<BuildingEntity>();
   @Output() populatePlacesEvent = new EventEmitter<BuildingEntity[]>();
   @Output() setDetailedViewEvent: EventEmitter<boolean> = new EventEmitter<boolean>();
+
   @ViewChild(MapInfoWindow) infoWindow: any;
 
   locationsNearby: BuildingEntity[] = [];
