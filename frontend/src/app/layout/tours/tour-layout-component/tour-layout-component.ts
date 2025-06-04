@@ -1,7 +1,7 @@
-import {Component, ViewChild} from '@angular/core';
+import {Component, inject, ViewChild} from '@angular/core';
 import {Router} from '@angular/router';
 import {FormControl, ReactiveFormsModule} from '@angular/forms';
-import {TuiButton, TuiTextfield} from '@taiga-ui/core';
+import {TuiAlertService, TuiButton, TuiTextfield} from '@taiga-ui/core';
 import {TuiInputModule} from '@taiga-ui/legacy';
 import {CommonModule} from '@angular/common';
 import {LocationService} from '../../../services/location.service';
@@ -29,6 +29,7 @@ export class TourLayoutComponent {
   private tourService: TourService;
   private router: Router;
   private userId: string | null = null;
+  private readonly alerts = inject(TuiAlertService);
 
   constructor(locationService: LocationService, tourService: TourService, router: Router) {
     this.locationService = locationService;
@@ -40,7 +41,6 @@ export class TourLayoutComponent {
       this.tourService.getToursForUserId(userId!).subscribe(tours => {
         this.userTours = tours.map(tour => TourDto.fromTourEntity(tour))
         console.log("User tours length: " + this.userTours.length);
-        this.userTours.forEach(tour => {console.log(tour.getId())})
       })
     })
   }
@@ -72,7 +72,7 @@ export class TourLayoutComponent {
     //create tour in backend
 
     if(!this.startMarker || !this.endMarker){
-      alert("Please select start and end point!");
+      this.alerts.open('Please select a start and end point!', {label: 'Failure!', appearance: 'warning', autoClose: 3000}).subscribe();
       return;
     }
 
@@ -93,15 +93,26 @@ export class TourLayoutComponent {
       this.tourDistance = (tour.getDistance() / 1000).toFixed(2);
       this.tourDuration = (tour.getDurationEstimate() /3600).toFixed(2);
       if(tour.getUserId() !== 'NONE') {
-        console.log(tour.getUserId())
         this.tourService.createTourInDB(tour).subscribe({
           next: tour => {
-            console.log("Tour created successfully!");},
-          error: any => {console.log("An error occured when saving tour to the DB! ")}});
+            this.alerts.open('Your tour was created successfully!', {
+              label: 'Success!',
+              appearance: 'positive',
+              autoClose: 3000
+            }).subscribe()},
+          error:any => {this.alerts.open('Your tour could not be created!', {
+            label: 'Failure!',
+            appearance: 'warning',
+            autoClose: 3000
+          }).subscribe()}});
         this.userTours.push(tour);
         this.resetInterface();
       } else {
-        alert("Tour could not be created! No user logged in. Please log in to create a tour.");
+        this.alerts.open('No user logged in! Cannot create tour.', {
+          label: 'Failure!',
+          appearance: 'warning',
+          autoClose: 6000
+        }).subscribe();
       }
     }
 
@@ -121,6 +132,54 @@ export class TourLayoutComponent {
   buildingData: BuildingEntity[] = [];
 
   markers: google.maps.Marker[] = [];
+
+  options: google.maps.MapOptions = {
+    zoomControl: true,
+    mapTypeControl: false,
+    scaleControl: false,
+    streetViewControl: false,
+    rotateControl: false,
+    fullscreenControl: false,
+    clickableIcons: true,
+    disableDoubleClickZoom: true,
+    mapTypeId: 'roadmap',
+    styles: [
+      {
+        "featureType": "poi",
+        "elementType": "labels.text",
+        "stylers": [
+          {
+            "visibility": "off"
+          }
+        ]
+      },
+      {
+        "featureType": "poi.business",
+        "stylers": [
+          {
+            "visibility": "off"
+          }
+        ]
+      },
+      {
+        "featureType": "road",
+        "elementType": "labels.icon",
+        "stylers": [
+          {
+            "visibility": "off"
+          }
+        ]
+      },
+      {
+        "featureType": "transit",
+        "stylers": [
+          {
+            "visibility": "off"
+          }
+        ]
+      }
+    ]
+  }
 
   polylinePath: google.maps.LatLngLiteral[] = [];
   polylineOptions: google.maps.PolylineOptions = {
@@ -220,7 +279,7 @@ export class TourLayoutComponent {
     console.log(tour.getId())
     this.tourService.deleteTourById(tour.getId());
     this.userTours = this.userTours.filter(t => t.getId() !== tour.getId());
-    alert("Tour deleted successfully!");
+    this.alerts.open('Your tour is deleted!', {label: 'Success!', appearance: 'success', autoClose: 3000}).subscribe();
   }
 
 
@@ -253,8 +312,8 @@ export class TourLayoutComponent {
       this.endMarker?.getPosition()?.lng()!,
       this.selectedBuildings
     ).subscribe(estimate => {
-      this.tourDuration = (estimate.duration/3600).toFixed(2);
-      this.tourDistance = (estimate.distance/1000).toFixed(2);
+      this.tourDuration = (estimate.duration).toFixed(2);
+      this.tourDistance = (estimate.distance).toFixed(2);
     })
   }
 
@@ -288,41 +347,24 @@ export class TourLayoutComponent {
     this.updatePolylinePath()
   }
 
-
-  createTours(): void {
-    var entity: TourRequestEntity = {
-      userId: this.userId!,
-      start_lat: this.startMarker?.getPosition()?.lat()!,
-      start_lng: this.startMarker?.getPosition()?.lng()!,
-      end_lat: this.endMarker?.getPosition()?.lat()!,
-      end_lng: this.endMarker?.getPosition()?.lng()!,
-      predefined_stops: [],
-      maxDistance: 100000,
-      minDistance: 0,
-      maxDuration: 0,
-      minDuration: 0,
-      maxBudget: 0,
-      minIntermediateStops: 3
-    }
-    this.tourService.createTour(entity).subscribe(data => {
-      console.log(data);
-    })
-  }
-
-  //Generate Tour tile
-
   minDistance = 1.0; // km
   maxDistance = 10.0; // km
   minSites = 2;
+  maxBudget = 10;
 
-// Generated tours
   generatedTours: TourDto[] = [];
 
-  generateAdvancedTours() {
-    // Example: Call your backend or algorithm with these parameters
+  generateAdvancedTour() {
 
+    if(!this.startMarker || !this.endMarker){
+      this.alerts.open('Please select a start and end point!', {label: 'Failure!', appearance: 'warning', autoClose: 3000}).subscribe();
+      return;
+    }
+
+    console.log("Generating tour for user " + this.userId)
+    var user = this.userId!;
     var entity: TourRequestEntity = {
-      userId: this.userId!,
+      userId: user,
       start_lat: this.startMarker?.getPosition()?.lat()!,
       start_lng: this.startMarker?.getPosition()?.lng()!,
       end_lat: this.endMarker?.getPosition()?.lat()!,
@@ -332,25 +374,36 @@ export class TourLayoutComponent {
       minDistance: this.minDistance * 1000,
       maxDuration: 0,
       minDuration: 0,
-      maxBudget: 0,
+      maxBudget: this.maxBudget,
       minIntermediateStops: this.minSites
     }
-
-    console.log(entity);
-
+    this.alerts.open('Your tour is being generated...', {label: 'Success!', appearance: 'success', autoClose: 6000}).subscribe();
     this.tourService.createTour(entity).subscribe(data => {
-      console.log(data);
+      if(data.length === 0) {
+        this.alerts.open('No tour found for your parameters! Please choose other parameters.', {label: 'Failure!', appearance: 'warning', autoClose: 6000}).subscribe();
+        return;
+      } else {
+        this.alerts.open('Your tour finished generating!', {label: 'Success!', appearance: 'success', autoClose: 6000}).subscribe();
+      }
+      console.log(data.length);
+      var tourdtos: TourDto[] = [];
       data.forEach(tour => {
-        this.generatedTours.push(TourDto.fromTourEntity(tour))});
-      console.log(this.generatedTours.length);
+        console.log(tour.userId)
+        tourdtos.push(TourDto.fromTourEntity(tour))});
 
-      this.generatedTours.forEach(tour => {
-        this.tourService.createTourInDB(tour).subscribe({
-          next: tour => {console.log("Tour created successfully!");},
-          error: any => {console.log("An error occured when saving tour to the DB! ")}
-        })
+
+      var selectedTour: TourDto = tourdtos[tourdtos.length - 1];
+
+      console.log("Selected tour: " + selectedTour);
+      console.log("Selected tour user id: " + selectedTour.getUserId());
+
+      this.tourService.createTourInDB(selectedTour).subscribe({
+        next: tour => {console.log("Tour created successfully!");},
+        error: any => {console.log("An error occured when saving tour to the DB! ")}});
+
+      this.tourService.getToursForUserId(this.userId!).subscribe(tours => {
+        tours.forEach(tour => {this.generatedTours.push(TourDto.fromTourEntity(tour))});
       })
-
     })
   }
 
