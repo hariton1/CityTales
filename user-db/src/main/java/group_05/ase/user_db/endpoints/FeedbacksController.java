@@ -80,4 +80,24 @@ public class FeedbacksController {
         }
     }
 
+    @PutMapping("/approve/id={feedbackId}")
+    @ResponseStatus(HttpStatus.OK)
+    public void approveFeedback(@PathVariable("feedbackId") int feedbackId) {
+        try {
+            this.feedbackService.approveFeedback(feedbackId);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/delete/id={feedbackId}")
+    @ResponseStatus(HttpStatus.OK)
+    public void deleteFeedback(@PathVariable("feedbackId") int feedbackId) {
+        try {
+            this.feedbackService.deleteFeedback(feedbackId);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
 }

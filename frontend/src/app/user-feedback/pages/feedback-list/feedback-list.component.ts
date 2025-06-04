@@ -62,6 +62,7 @@ export class FeedbackListComponent {
             const userName = user?.email || 'Unknown';
 
             this.feedbacks.push({
+              feedback_id: feedback.getFeedbackId(),
               article_id: feedback.getArticleId(),
               article_name: articleName,
               user_id: feedback.getUserId(),
@@ -86,6 +87,7 @@ export class FeedbackListComponent {
     /*const id = user.id;
     const email = user.email;
     this.confirmDelete(id,email);*/
+    this.feedbackService.approveFeedback(feedback.feedback_id);
   }
 
   protected handleDeleteFeedback(feedback: any): void {
@@ -94,6 +96,7 @@ export class FeedbackListComponent {
     /*const id = user.id;
     const email = user.email;
     this.confirmDelete(id,email);*/
+    this.feedbackService.deleteFeedback(feedback.feedback_id);
   }
 
 }
