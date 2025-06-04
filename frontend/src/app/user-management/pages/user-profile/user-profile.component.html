@@ -1,1 +1,35 @@
-<p>user-profile works!</p>
+<div class="centered-wrapper">
+    <header tuiHeader>
+      <h3 tuiTitle>
+        Your profile
+        <span tuiSubtitle>User since {{getMonthName(this.accountCreated?.month)}} {{this.accountCreated.day}}, {{this.accountCreated?.year}}</span>
+      </h3>
+    </header>
+
+    <fieldset>
+      <div class="stack">
+        <tui-textfield>
+          <label tuiLabel>Username</label>
+          <input tuiTextfield [disabled]="true" [(ngModel)]="user?.email" />
+          <tui-icon />
+        </tui-textfield>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <div class="stack">
+        <tui-textfield>
+          <label tuiLabel>Role</label>
+          <input tuiTextfield [disabled]="true" [(ngModel)]="user?.role" />
+          <tui-icon />
+        </tui-textfield>
+      </div>
+    </fieldset>
+
+    <footer>
+      <button tuiButton appearance="primary" type="submit" (click)="handleEditInterestsClick()" >
+        Edit interests
+      </button>
+    </footer>
+</div>
+
