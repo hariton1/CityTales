@@ -24,12 +24,6 @@ build:neo4j-data-access:
     - cd neo4j-data-access
     - mvn clean package -DskipTests
 
-build:authentification:
-  stage: build
-  script:
-    - cd authentification
-    - mvn clean package -DskipTests
-
 # TODO: FE
 
 # Test
@@ -62,16 +56,6 @@ test:neo4j-data-access:
   artifacts:
     paths:
       - user-db/target/neo4j-data-access-*.jar
-
-#test:authentification:
-  #stage: test
-  #needs: ["build:authentification"]
-  #script:
-    #- cd authentification
-    #- mvn test -Dtest=AppUserRepositoryTest,AuthServiceTest
-  #artifacts:
-    #paths:
-      #- authentification/target/authentification-*.jar
 
 # TODO: FE
 
