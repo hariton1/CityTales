@@ -5,7 +5,8 @@ import { Injectable } from '@angular/core';
 })
 export class UtilitiesService {
 
-  constructor() { }
+  constructor() {
+  }
 
   /**
    * Converts a date to a formatted string.

@@ -10,8 +10,10 @@ import java.util.UUID;
 @Repository
 public interface UserBadgeRepository extends JpaRepository<UserBadgeEntity, Integer> {
 
-    List<UserBadgeEntity> findAllByUserId(UUID userId);
+    List<UserBadgeEntity> findAllByUserIdOrderByUserBadgeIdAsc(UUID userId);
 
-    List<UserBadgeEntity> findAllByArticleId(int articleId);
+    List<UserBadgeEntity> findAllByArticleIdOrderByUserBadgeIdAsc(int articleId);
+
+    UserBadgeEntity findByUserIdAndArticleId(UUID userId, int articleI);
 
 }

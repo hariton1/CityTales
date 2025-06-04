@@ -1,6 +1,6 @@
 package group_05.ase.user_db.services;
 
-import group_05.ase.user_db.entities.UserEntity;
+import group_05.ase.user_db.entities.AuthUserEntity;
 import group_05.ase.user_db.repositories.UserRepository;
 import group_05.ase.user_db.restData.UserDTO;
 import org.springframework.stereotype.Service;
@@ -21,11 +21,10 @@ public class UserService {
 
     public List<UserDTO> getAllUsers() {
         ArrayList<UserDTO> users = new ArrayList<>();
-        List<UserEntity> tmp = this.repository.findAll();
+        List<AuthUserEntity> tmp = this.repository.findAll();
 
-        for(UserEntity user : tmp) {
-            users.add(new UserDTO(user.getId(), user.getSupabaseId(), user.getEmail(),
-                    user.getCreatedAt(), user.getDisplayName(), user.isActive()));
+        for(AuthUserEntity user : tmp) {
+            users.add(new UserDTO(user.getId(),user.getEmail(),user.getCreatedAt(), user.getRole()));
         }
 
         return users;
@@ -36,10 +35,10 @@ public class UserService {
             throw new IllegalArgumentException("User ID cannot be null");
         }
 
-        UserEntity user = this.repository.findById(userId)
+        AuthUserEntity user = this.repository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
 
-        return new UserDTO(user.getId(), user.getSupabaseId(), user.getEmail(), user.getCreatedAt(), user.getDisplayName(), user.isActive());
+        return new UserDTO(user.getId(),user.getEmail(),user.getCreatedAt(), user.getRole());
     }
 
     public void deleteUserById(UUID userId) {
@@ -50,24 +49,16 @@ public class UserService {
     }
 
     public UserDTO updateUserById(UUID userId, UserDTO updatedValues) {
-        UserEntity existingUser = this.repository.findById(userId)
+        AuthUserEntity existingUser = this.repository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("User not found"));
 
-        if (updatedValues.getDisplayName() != null) {
-            existingUser.setDisplayName(updatedValues.getDisplayName());
-        }
 
         if (updatedValues.getEmail() != null) {
             existingUser.setEmail(updatedValues.getEmail());
         }
 
-        if (updatedValues.getIsActive() != null) {
-            existingUser.setActive(updatedValues.getIsActive());
-        }
+        AuthUserEntity updatedUser = this.repository.save(existingUser);
 
-        UserEntity updatedUser = this.repository.save(existingUser);
-
-        return new UserDTO(updatedUser.getId(), updatedUser.getSupabaseId(), updatedUser.getEmail(), updatedUser.getCreatedAt(), updatedUser.getDisplayName(), updatedUser.isActive());
+        return new UserDTO(updatedUser.getId(),updatedUser.getEmail(),updatedUser.getCreatedAt(), existingUser.getRole());
     }
-
 }

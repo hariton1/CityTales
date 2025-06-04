@@ -1,13 +1,18 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
-import { HistoricalPlaceEntity} from '../../dto/db_entity/HistoricalPlaceEntity';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {HistoricPlaceDetailComponent} from '../historic-place-detail/historic-place-detail.component';
 import {HistoricPlacePreviewComponent} from '../historic-place-preview/historic-place-preview.component';
-import {NgIf} from '@angular/common';
+import {NgIf, CommonModule} from '@angular/common';
+import {TuiSearchResults} from '@taiga-ui/experimental';
+import {ReactiveFormsModule, FormControl} from '@angular/forms';
 import {BuildingEntity} from '../../dto/db_entity/BuildingEntity';
 import {EnrichmentService} from '../../services/enrichment.service';
-import {TuiPlatform} from '@taiga-ui/cdk';
-import {TuiAppearance, TuiButton, TuiIcon, TuiLoader, TuiTitle} from '@taiga-ui/core';
-import {TuiCardLarge, TuiHeader} from '@taiga-ui/layout';
+import {TuiAppearance, TuiTitle, TuiTextfield} from '@taiga-ui/core';
+import {TuiCell, TuiInputSearch} from '@taiga-ui/layout';
+import {debounceTime, filter, Observable, switchMap} from 'rxjs';
+import {SearchService} from '../../services/search.service';
+import {UserService} from '../../services/user.service';
+import {NotificationInboxComponent} from '../../core/notification-inbox/notification-inbox.component';
+import {BreakpointObserver, Breakpoints} from '@angular/cdk/layout';
 
 @Component({
   selector: 'app-sidebar',
@@ -15,19 +20,20 @@ import {TuiCardLarge, TuiHeader} from '@taiga-ui/layout';
     NgIf,
     HistoricPlaceDetailComponent,
     HistoricPlacePreviewComponent,
-    TuiPlatform,
     TuiAppearance,
-    TuiCardLarge,
-    TuiHeader,
     TuiTitle,
-    TuiIcon,
-    TuiButton,
-    TuiLoader
+    ReactiveFormsModule,
+    TuiCell,
+    TuiTextfield,
+    TuiInputSearch,
+    TuiSearchResults,
+    CommonModule,
+    NotificationInboxComponent
   ],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.less'
 })
-export class SidebarComponent {
+export class SidebarComponent implements OnInit{
 
   @Input() selectedPlace: any;
   @Input() historicalPlaces: BuildingEntity[] = [];
@@ -39,8 +45,19 @@ export class SidebarComponent {
   enrichedContent: string = '';
   enrichmentStarted = false;
   enrichmentLoading = false;
+  isMobile = false;
 
-  constructor(readonly EnrichmentService: EnrichmentService) {
+  constructor(readonly EnrichmentService: EnrichmentService, readonly searchService: SearchService,
+              private userService: UserService,
+              readonly breakpointObserver: BreakpointObserver) {
+  }
+
+  ngOnInit() {
+    this.breakpointObserver
+      .observe([Breakpoints.HandsetPortrait, Breakpoints.HandsetLandscape])
+      .subscribe(result => {
+        this.isMobile = result.matches;
+      });
   }
 
   onClick(tone: string): void {
@@ -96,4 +113,79 @@ export class SidebarComponent {
     console.log(this.historicalPlaces);
   }
 
+  //Search field
+
+  protected readonly control = new FormControl('');
+
+  open = false;
+
+  lastSearches: string[] = [];
+
+  results$ = this.control.valueChanges.pipe(
+    debounceTime(300),
+    filter((query: string | null): query is string =>
+      typeof query === 'string' && query.length > 0),// Add debounce to prevent too many requests
+    filter(query => !!query), // Filter out empty/null queries
+    switchMap(query => {
+      return new Observable<Record<string, any[]>>(observer => {
+        const results: Record<string, any[]> = {};
+
+        // Create an array to store our subscription
+        const subscriptions = [
+          this.searchService.searchLocation(query).subscribe({
+            next: (buildings) => {
+              results['Buildings'] = buildings;
+              // Check if we have both results
+              if ('Persons' in results) {
+                observer.next(results);
+              }
+            },
+            error: (error) => observer.error(error)
+          }),
+
+          this.searchService.searchPersons(query).subscribe({
+            next: (persons) => {
+              results['Persons'] = persons;
+              // Check if we have both results
+              if ('Events' in results) {
+                observer.next(results);
+              }
+            },
+            error: (error) => observer.error(error)
+          }),
+
+          this.searchService.searchEvents(query).subscribe({
+            next: (events) => {
+              results['Events'] = events;
+              // Check if we have both results
+              if ('Buildings' in results) {
+                observer.next(results);
+              }
+            },
+            error: (error) => observer.error(error)
+          })
+        ];
+
+        // Return cleanup function
+        return () => {
+          subscriptions.forEach(sub => sub.unsubscribe());
+        };
+      });
+    })
+  );
+
+  onItemClick(item: any){
+    //check if item is a building
+    if(item.latitude != null && item.longitude != null){
+      this.selectedPlace = item;
+
+      this.selectedPlace = this.userService.enterHistoricNode(this.selectedPlace);
+
+      this.detailedView = true;
+      this.open = false;
+    } else {
+      window.open(item.url, '_blank');
+      this.open = false;
+    }
+  }
 }

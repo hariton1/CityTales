@@ -1,0 +1,30 @@
+<div class="centered-wrapper">
+  <h2 class="header-with-icon">👤 Users</h2>
+
+  <table tuiTable [size]="'m'" [style.width.rem]="70" class="user-list-table">
+    <thead>
+    <tr>
+      <th tuiTh>Actions</th>
+      <th tuiTh>Email</th>
+    </tr>
+    </thead>
+    <tbody tuiTbody>
+    <tr *ngFor="let user of users">
+      <td tuiTd>
+        <button
+          tuiIconButton
+          iconStart="@tui.mail"
+          appearance="primary"
+          size="s"
+          (click)="sendFriendInvite(user)"
+        >
+          Send Invite
+        </button>
+      </td>
+      <td tuiTd>
+        <span tuiTitle>{{ user.email }}</span>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>

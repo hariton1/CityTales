@@ -3,11 +3,12 @@
     <!-- Header with building information -->
     <div class="place-detail-header">
       <h2 class="place-detail-title">{{selectedPlace.name}}</h2>
-      <div class="place-location">
+      <div class="place-location" *ngIf="selectedPlace?.latitude != null && selectedPlace?.longitude != null">
         <span class="coordinates">
           {{ selectedPlace.latitude }}°N, {{ selectedPlace.longitude }}°E
         </span>
       </div>
+
 
       <button
         (click)="closeDetail()"
@@ -23,6 +24,12 @@
       <div class="content-section">
         <h3>Description</h3>
         <p>{{ selectedPlace.contentGerman }}</p>
+      </div>
+
+      <div>
+        <button class="feedback-button" appearance="secondary" size="m" tuiButton type="button" (click)="navigateToFeedback()">
+          <tui-icon icon="@tui.message-circle-plus" [style.height.rem]="1"/> Give us feedback
+        </button>
       </div>
 
       <div class="content-section">

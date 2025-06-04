@@ -7,7 +7,7 @@ import {AsyncPipe} from '@angular/common';
 import {TuiInputModule} from '@taiga-ui/legacy';
 import { supabase } from '../../supabase.service';
 import {Router} from '@angular/router'; // adjust the path if neededimport { supabase } from '../supabase.service'; // adjust the path if needed
-
+import {jwtDecode} from 'jwt-decode';
 
 @Component({
   selector: 'app-login',
@@ -42,6 +42,7 @@ export class LoginComponent {
     const { data: { session } } = await supabase.auth.getSession();
     // If session and token exists, skip login
     if (session && session.access_token) {
+      console.log('JWT-Token:', session.access_token);
       this.router.navigate(['/explore']);
     }
   }
@@ -61,11 +62,22 @@ export class LoginComponent {
       alert(error.message);
       return;
     }
+
     // Login successful, session info in data.session
     alert('Login successful!');
     // --- Log the JWT here ---
     if (data.session) {
       console.log('JWT:', data.session.access_token);
+
+      const token = data.session.access_token;
+      const decodedToken: any = jwtDecode(token);
+
+      const uuid = decodedToken.sub;
+      console.log('decoded token: ' + decodedToken);
+      if (uuid) {
+        console.log("user token: " + uuid);
+        localStorage.setItem('user_uuid', uuid);
+      }
     } else {
       console.log('No session returned from Supabase.');
     }

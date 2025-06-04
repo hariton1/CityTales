@@ -32,6 +32,7 @@ public class UserBadgeController {
     @GetMapping("/user_id={userId}")
     @ResponseStatus(HttpStatus.OK)
     public List<UserBadgeDTO> getAllUserBadges(@PathVariable("userId") UUID userId) {
+        System.out.println("user_id of badges: " + userId);
         try {
             return this.userBadgeService.getUserBadgesByUserId(userId);
         } catch (Exception e) {
@@ -43,7 +44,7 @@ public class UserBadgeController {
     @ResponseStatus(HttpStatus.OK)
     public List<UserBadgeDTO> getAllUserBadges(@PathVariable("article_id") int article_id) {
         try {
-            return this.userBadgeService.getUserBadgesBaArticleId(article_id);
+            return this.userBadgeService.getUserBadgesByArticleId(article_id);
         } catch (Exception e) {
             return new ArrayList<UserBadgeDTO>(); //"An internal server error occurred => " + e.getMessage();
         }

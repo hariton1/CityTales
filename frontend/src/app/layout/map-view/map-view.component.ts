@@ -1,13 +1,11 @@
-import {Component, inject, OnInit, Output, ViewChild} from '@angular/core';
+import {Component, inject, OnInit, Output, ViewChild, EventEmitter} from '@angular/core';
 import {GoogleMapsModule, MapInfoWindow, MapMarker} from '@angular/google-maps';
 import {CommonModule} from '@angular/common';
 import {UserLocationService} from '../../services/user-location.service';
 import {LocationService} from '../../services/location.service';
-import {EventEmitter} from '@angular/core';
 import {BuildingEntity} from '../../dto/db_entity/BuildingEntity';
-import {UserHistoriesService} from '../../user_db.services/user-histories.service';
-import {UserHistoryDto} from '../../user_db.dto/user-history.dto';
 import {TuiAlertService} from '@taiga-ui/core';
+import {UserService} from '../../services/user.service';
 
 @Component({
   selector: 'app-map-view',
@@ -16,7 +14,7 @@ import {TuiAlertService} from '@taiga-ui/core';
     CommonModule
   ],
   templateUrl: './map-view.component.html',
-  styleUrl: './map-view.component.scss'
+  styleUrl: './map-view.component.less'
 })
 export class MapViewComponent implements OnInit{
 
@@ -24,7 +22,7 @@ export class MapViewComponent implements OnInit{
 
   constructor(private locationService: LocationService,
               private userLocationService: UserLocationService,
-              private userHistoriesService: UserHistoriesService) {
+              private userService: UserService) {
   }
 
   @Output() selectPlaceEvent: EventEmitter<BuildingEntity> = new EventEmitter<BuildingEntity>();
@@ -36,6 +34,7 @@ export class MapViewComponent implements OnInit{
   hoveredLocation: BuildingEntity | null = null;
   combinedLocations: any[] = [];
   hoveredRelatedName: string | null = null;
+  hoveredIndex: number | null = null;
 
   polylineOptions: google.maps.PolylineOptions = {
     strokeColor: 'blue',
@@ -55,6 +54,13 @@ export class MapViewComponent implements OnInit{
     minZoom: 4,
     zoomControl: true,
     clickableIcons: true,
+    streetViewControl: false,
+    fullscreenControl: false,
+    mapTypeControl: true,
+    mapTypeControlOptions: {
+      style: google.maps.MapTypeControlStyle.DROPDOWN_MENU, // or .HORIZONTAL_BAR
+      position: google.maps.ControlPosition.TOP_RIGHT       // e.g., BOTTOM_LEFT, TOP_CENTER, etc.
+    },
     styles: [
       {
         "featureType": "poi",
@@ -89,6 +95,26 @@ export class MapViewComponent implements OnInit{
             "visibility": "off"
           }
         ]
+      },
+      {
+        featureType: 'poi.medical',
+        stylers: [{ visibility: 'off' }]
+      },
+      {
+        featureType: 'poi.attraction',
+        stylers: [{ visibility: 'off' }]
+      },
+      {
+        featureType: 'poi.park',
+        stylers: [{ visibility: 'off' }]
+      },
+      {
+        featureType: 'poi.sports_complex',
+        stylers: [{ visibility: 'off' }]
+      },
+      {
+        featureType: 'poi.school',
+        stylers: [{ visibility: 'off' }]
       }
     ]
   };
@@ -133,7 +159,7 @@ export class MapViewComponent implements OnInit{
   // For testing in case navigator.geolocation breaks - happened to me for some reason...
   ngOnInit(): void {
 
-      this.locationService.getLocationsInRadius(this.center.lat, this.center.lng, 100000).subscribe(locations => {
+      this.locationService.getLocationsInRadius(this.center.lat, this.center.lng, 10000).subscribe(locations => {
         this.locationsNearby = locations;
         this.addMarkersToMap(locations);
         this.populatePlacesEvent.emit(locations);
@@ -148,26 +174,7 @@ export class MapViewComponent implements OnInit{
 
   detailAction(marker: MapMarker, location: BuildingEntity): void {
 
-    location.userHistoryEntry = new UserHistoryDto(
-      -1,
-      "f5599c8c-166b-495c-accc-65addfaa572b",
-      Number(location.viennaHistoryWikiId),
-      new Date(),
-      new Date(0),
-      2);
-
-    this.userHistoriesService.createNewUserHistory(location.userHistoryEntry).subscribe({
-      next: (results) => {
-        console.log('New user history entry created successfully', results);
-        location.userHistoryEntry.setUserHistoryId(results.getUserHistoryId());
-        this.alerts
-          .open('Your new user history entry is saved', {label: 'Success!', appearance: 'success', autoClose: 3000})
-          .subscribe();
-      },
-      error: (err) => {
-        console.error('Error creating user history entry:', err);
-      }
-    });
+    location = this.userService.enterHistoricNode(location);
 
     this.combinedLocations = this.getCombinedItems(location);
 
@@ -227,14 +234,22 @@ export class MapViewComponent implements OnInit{
     console.log(this.polylines)
   }
 
-  onCircleMouseEnter(name: string): void {
+  onCircleMouseEnter(name: string, index: number): void {
     this.hoveredRelatedName = name;
-    console.log('Hovered name:', name);
+    this.hoveredIndex = index;
   }
 
   onCircleMouseLeave(): void {
-    console.log('Hover left');
     this.hoveredRelatedName = null;
+    this.hoveredIndex = null;
+  }
+
+  getHoverLabelPosition(index: number, total: number): string {
+    const radius = 60;
+    const angle = (2 * Math.PI / total) * index - Math.PI / 2;
+    const x = radius * Math.cos(angle);
+    const y = radius * Math.sin(angle);
+    return `translate(${x}px, ${y}px) translate(-50%, -50%)`;
   }
 
   onCircleClick(loc: BuildingEntity): void {
