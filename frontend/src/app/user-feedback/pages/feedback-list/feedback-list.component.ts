@@ -58,7 +58,7 @@ export class FeedbackListComponent {
             }));
 
           forkJoin([locationObs, userObs]).subscribe(([article, user]) => {
-            const articleName = article?.building?.name || 'Unknown';
+            const articleName = (<any>article).name || 'Unknown';
             const userName = user?.email || 'Unknown';
 
             this.feedbacks.push({
