@@ -7,6 +7,8 @@ import {EditUserComponent} from './user-management/pages/edit-user/edit-user.com
 import {OnboardingComponent} from './user-interests/onboarding/onboarding.component';
 import {EditInterestsComponent} from './user-interests/edit-interests/edit-interests.component';
 import {FeedbackComponent} from './user-feedback/pages/feedback/feedback.component';
+import {TourLayoutComponent} from './layout/tours/tour-layout-component/tour-layout-component';
+import {TourDetailComponent} from './layout/tours/tour-detail/tour-detail.component';
 import {UserGamesComponent} from './user-games/pages/landing-page/user-games.component';
 import {LandingPageComponent} from './user-friends/landing-page/landing-page.component';
 import {NotificationInboxComponent} from './core/notification-inbox/notification-inbox.component';
@@ -29,6 +31,8 @@ export const routes: Routes = [
   }
   ,
   { path: 'explore', component: ExploreLayoutComponent },
+  { path: 'tours', component: TourLayoutComponent},
+  { path: 'tours/:id', component: TourDetailComponent},
   { path: 'login', component: LoginComponent },
   { path: 'register', component: SignUpComponent },
   { path: 'onboarding', component: OnboardingComponent },
