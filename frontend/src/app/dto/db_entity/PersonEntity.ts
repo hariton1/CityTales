@@ -1,3 +1,7 @@
+import {EventEntity} from './EventEntity';
+import {UserHistoryDto} from '../../user_db.dto/user-history.dto';
+import {BuildingEntity} from './BuildingEntity';
+
 export interface PersonEntity {
   viennaHistoryWikiId: string;
   url: string;
@@ -23,4 +27,10 @@ export interface PersonEntity {
 
   contentGerman: string;
   contentEnglish: string;
+
+  relatedBuildings: BuildingEntity[];
+  relatedPersons: PersonEntity[];
+  relatedEvents: EventEntity[];
+
+  userHistoryEntry: UserHistoryDto;
 }
