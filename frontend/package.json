@@ -24,6 +24,7 @@
     "@angular/router": "^19.2.6",
     "@angular/service-worker": "^19.2.6",
     "@angular/ssr": "^19.2.6",
+    "@googlemaps/markerclusterer": "^2.5.3",
     "@maskito/angular": "^3.7.2",
     "@maskito/core": "^3.7.2",
     "@maskito/kit": "^3.7.2",
