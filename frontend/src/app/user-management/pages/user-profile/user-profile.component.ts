@@ -40,7 +40,9 @@ export class UserProfileComponent {
   private user: UserDto | null = null;
   protected accountCreated: any = null;
 
-  constructor(readonly route: ActivatedRoute,readonly userService: UserService, private router: Router) {
+  constructor(private route: ActivatedRoute,
+              private userService: UserService,
+              private router: Router) {
   }
 
   ngOnInit(): void {
