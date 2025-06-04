@@ -98,4 +98,13 @@ public class FeedbackService {
 
     }
 
+    public void approveFeedback(int feedbackId) {
+        System.out.println("Approving feedback: " + feedbackId);
+    }
+
+    public void deleteFeedback(int feedbackId) {
+        System.out.println("Deleting feedback: " + feedbackId);
+        this.repository.deleteById(feedbackId);
+    }
+
 }

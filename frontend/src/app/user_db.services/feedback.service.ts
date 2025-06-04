@@ -61,4 +61,12 @@ export class FeedbackService {
       }
     );
   }
+
+  public approveFeedback(feedback_id: number) {
+    return this.httpClient.put(this.DOMAIN + '/approve/id=' + feedback_id, {});
+  }
+
+  public deleteFeedback(feedback_id: number) {
+    return this.httpClient.delete(this.DOMAIN + '/delete/id=' + feedback_id);
+  }
 }
