@@ -9,7 +9,7 @@ import {UtilitiesService} from '../services/utilities.service';
 @Injectable({providedIn: 'root'})
 export class FeedbackService {
 
-  private DOMAIN = SERVER_ADDRESS + 'feedbacks/';
+  private DOMAIN = SERVER_ADDRESS + 'feedbacks';
 
   constructor(private httpClient: HttpClient,
               private utilitiesService: UtilitiesService) {
@@ -20,7 +20,7 @@ export class FeedbackService {
   }
 
   public getFeedbackById(feedback_id: number): Observable<FeedbackDto> {
-    return this.httpClient.get<FeedbackDto>(this.DOMAIN + feedback_id);
+    return this.httpClient.get<FeedbackDto>(this.DOMAIN + '/id=' + feedback_id);
   }
 
   public getFeedbacksByUserId(user_id: UUID): Observable<FeedbackDto> {
@@ -46,7 +46,7 @@ export class FeedbackService {
     };
 
     return this.httpClient.post<FeedbackDto>(
-      this.DOMAIN + 'create',
+      this.DOMAIN + '/create',
       feedbackToSend,
       {
         headers: new HttpHeaders({
