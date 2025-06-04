@@ -5,6 +5,10 @@ import {HistoricalPersonEntity} from '../../dto/db_entity/HistoricalPersonEntity
 import {TuiAlertService, TuiIcon, TuiScrollbar} from '@taiga-ui/core';
 import {UserHistoriesService} from '../../user_db.services/user-histories.service';
 import { Router } from '@angular/router';
+import {PersonEntity} from '../../dto/db_entity/PersonEntity';
+import {EventEntity} from '../../dto/db_entity/EventEntity';
+import {BuildingEntity} from '../../dto/db_entity/BuildingEntity';
+import {UserService} from '../../services/user.service';
 
 @Component({
   selector: 'app-historic-place-detail',
@@ -21,7 +25,7 @@ export class HistoricPlaceDetailComponent {
 
   private readonly alerts = inject(TuiAlertService);
 
-  constructor(private personService: PersonService,
+  constructor(private userService: UserService,
               private userHistoriesService: UserHistoriesService,
               private router: Router) {
   }
@@ -37,9 +41,29 @@ export class HistoricPlaceDetailComponent {
   }
   private _selectedPlace: any;
 
-  @Output() setDetailEvent: EventEmitter<boolean> = new EventEmitter<boolean>();
+  @Output() onPersonDetailEvent: EventEmitter<PersonEntity> = new EventEmitter<PersonEntity>();
+  @Output() onEventDetailEvent: EventEmitter<EventEntity> = new EventEmitter<EventEntity>();
+  @Output() onBuildingDetailEvent: EventEmitter<BuildingEntity> = new EventEmitter<BuildingEntity>();
+  @Output() onCloseEvent: EventEmitter<void> = new EventEmitter();
+
+
+  onPersonClick(person: PersonEntity) {
+    console.log("Emitted Person event: " + person);
+    this.onPersonDetailEvent.emit(person);
+  }
+
+  onEventClick(event: EventEntity) {
+    this.onEventDetailEvent.emit(event);
+  }
+
+  onBuildingClick(buildingEntity: BuildingEntity) {
+    buildingEntity = this.userService.enterHistoricNode(buildingEntity);
+    this.onBuildingDetailEvent.emit(buildingEntity);
+  }
+
 
   closeDetail():void{
+    console.log(this.selectedPlace)
     this._selectedPlace.userHistoryEntry.setCloseDt(new Date());
 
     this.userHistoriesService.updateUserHistory(this._selectedPlace.userHistoryEntry).subscribe({
@@ -54,7 +78,7 @@ export class HistoricPlaceDetailComponent {
         }
     });
 
-    this.setDetailEvent.emit(false);
+    this.onCloseEvent.emit();
   }
 
   navigateToFeedback(): void {

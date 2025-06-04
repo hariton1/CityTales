@@ -27,7 +27,8 @@
     </tr>
     </thead>
     <tbody>
-    <tr *ngFor="let player of leaderboard; index as i">
+    <tr *ngFor="let player of leaderboard; index as i" [class.current-user]="player.name === currentUserEmail"
+    >
       <td>{{ i + 1 }}</td>
       <td>
         {{ player.name }}

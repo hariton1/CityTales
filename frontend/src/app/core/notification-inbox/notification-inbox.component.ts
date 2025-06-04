@@ -38,7 +38,6 @@ export class NotificationInboxComponent implements OnInit{
   readonly subscription = new Subscription();
 
   @Output() selectPlaceEvent: EventEmitter<BuildingEntity> = new EventEmitter<BuildingEntity>();
-  @Output() setDetailedViewEvent: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   protected open = false;
 
@@ -80,13 +79,15 @@ export class NotificationInboxComponent implements OnInit{
     );
   }
 
-  openNotification(building: BuildingEntity): void {
+  onNotificationClick(building: BuildingEntity): void {
+    console.log("Messsage clicked!")
     building = this.userService.enterHistoricNodeAlert(building);
     this.selectPlaceEvent.emit(building);
-    this.setDetailedViewEvent.emit(true);
+    this.open = !this.open;
   }
 
   protected onClick(): void {
+    console.log("Messsage clicked!")
     this.open = !this.open;
   }
 

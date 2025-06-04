@@ -15,9 +15,9 @@
     </div>
 
     <div class="badge-text">
-      <p><strong>Badge ID:</strong> {{ badge.getUserBadgeId() }}</p>
+      <p><strong>Badge ID:</strong> {{ badge.user_badge_id }}</p>
       <p><strong>Article Name:</strong> {{ badge.articleDetails?.name }}</p>
-      <p *ngIf="badge.getEarnedAt()"><strong>Earned At:</strong> {{ badge.getEarnedAt() | date:'medium' }}</p>
+      <p *ngIf="badge.earned_at"><strong>Earned At:</strong> {{ badge.earned_at | date:'dd.MM.yyyy' }}</p>
     </div>
   </div>
 </div>

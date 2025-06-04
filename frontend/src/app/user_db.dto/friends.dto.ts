@@ -1,10 +1,10 @@
 import {UUID} from 'node:crypto';
 
 export class FriendsDto {
-  private friends_id: number;
-  private friend_one: UUID;
-  private friend_two: UUID;
-  private cre_dat: Date;
+  public friends_id: number;
+  public friend_one: UUID;
+  public friend_two: UUID;
+  public cre_dat: Date;
 
   constructor(friends_id: number, friend_one: UUID, friend_two: UUID, creDat: Date) {
     this.friends_id = friends_id;

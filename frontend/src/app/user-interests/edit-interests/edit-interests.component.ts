@@ -8,9 +8,13 @@ import {TuiAlertService, TuiButton, TuiIcon, TuiTitle} from '@taiga-ui/core';
 import {UserInterestsService} from '../../user_db.services/user-interests.service';
 import {InterestsService} from '../../user_db.services/interests.service';
 import {TuiAppBarBack, TuiAppBarComponent, TuiHeader} from '@taiga-ui/layout';
-import {TuiPlatform} from '@taiga-ui/cdk';
+import {TuiDay, TuiPlatform} from '@taiga-ui/cdk';
 import {NgIf} from '@angular/common';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import {UserDto} from '../../user_db.dto/user.dto';
+import {ActivatedRoute, Router} from '@angular/router';
+import {UserService} from '../../user_db.services/user.service';
+import {UUID} from 'node:crypto';
 
 @Component({
   selector: 'app-edit-interests',
@@ -38,6 +42,7 @@ export class EditInterestsComponent implements OnInit{
 
   protected loading = true;
   protected error: any = null;
+  private userId: UUID;
 
   isMobile = false;
 
@@ -46,7 +51,10 @@ export class EditInterestsComponent implements OnInit{
   constructor(
     private interestsService: InterestsService,
     private userInterestService: UserInterestsService,
-    private breakpointObserver: BreakpointObserver) {}
+    private breakpointObserver: BreakpointObserver,
+    private router: Router) {
+    this.userId = localStorage.getItem("user_uuid") as UUID;
+  }
 
   ngOnInit(): void {
     this.breakpointObserver
@@ -62,7 +70,7 @@ export class EditInterestsComponent implements OnInit{
   fetchUserInterests(): void {
     this.loading = true;
     // Use switchMap to handle the sequential flow
-    this.userInterestService.getUserInterestsByUserId('f5599c8c-166b-495c-accc-65addfaa572b')
+    this.userInterestService.getUserInterestsByUserId(this.userId)
       .pipe(
         switchMap(interests => {
           this.userInterestsList = interests;
@@ -131,7 +139,7 @@ export class EditInterestsComponent implements OnInit{
       if (!alreadyExists) {
         console.log('Creating interest:', interest.getInterestName(), interest.getInterestId());
         const newInterest = new UserInterestDto(
-          'f5599c8c-166b-495c-accc-65addfaa572b',
+          this.userId,
           interest.getInterestId(),
           new Date(),
           1
@@ -166,7 +174,7 @@ export class EditInterestsComponent implements OnInit{
       this.interestsService.getInterestByInterestId(interest.getInterestId()).subscribe(detail => {
           const selectedFilters = this.form.value.filters || [];
           if (!selectedFilters.includes(detail.getInterestName())) {
-            interest.setUserId('f5599c8c-166b-495c-accc-65addfaa572b');
+            interest.setUserId(this.userId);
             console.log('Deleting interest:', interest);
             this.userInterestService.deleteUserInterest(interest).subscribe({
               next: () => {
@@ -186,6 +194,7 @@ export class EditInterestsComponent implements OnInit{
     console.log('Form submitted with values:', this.form.value);
     this.deleteInterest();
     this.createInterests();
+    this.router.navigate(['/profile']);
   }
 
   protected form = new FormGroup({

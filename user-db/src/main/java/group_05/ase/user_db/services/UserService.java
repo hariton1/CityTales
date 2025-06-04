@@ -24,7 +24,7 @@ public class UserService {
         List<AuthUserEntity> tmp = this.repository.findAll();
 
         for(AuthUserEntity user : tmp) {
-            users.add(new UserDTO(user.getId(),user.getEmail(),user.getCreatedAt()));
+            users.add(new UserDTO(user.getId(),user.getEmail(),user.getCreatedAt(), user.getRole()));
         }
 
         return users;
@@ -38,7 +38,7 @@ public class UserService {
         AuthUserEntity user = this.repository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
 
-        return new UserDTO(user.getId(),user.getEmail(),user.getCreatedAt());
+        return new UserDTO(user.getId(),user.getEmail(),user.getCreatedAt(), user.getRole());
     }
 
     public void deleteUserById(UUID userId) {
@@ -59,6 +59,6 @@ public class UserService {
 
         AuthUserEntity updatedUser = this.repository.save(existingUser);
 
-        return new UserDTO(updatedUser.getId(),updatedUser.getEmail(),updatedUser.getCreatedAt());
+        return new UserDTO(updatedUser.getId(),updatedUser.getEmail(),updatedUser.getCreatedAt(), existingUser.getRole());
     }
 }
