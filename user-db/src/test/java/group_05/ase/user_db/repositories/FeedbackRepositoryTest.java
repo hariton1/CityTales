@@ -25,7 +25,9 @@ public class FeedbackRepositoryTest {
             1,
             100.0,
             "Completely correct",
-            null
+            null,
+            "N",
+            "N"
     );
 
     @Test

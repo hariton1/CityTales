@@ -1,0 +1,85 @@
+<div class="centered-wrapper">
+  <table
+    tuiTable
+    [size]="'m'"
+    [style.width.rem]="70"
+    class="users"
+  >
+    <thead>
+    <tr>
+      <th tuiTh>Article</th>
+      <th tuiTh>Username</th>
+      <th tuiTh>Feedback</th>
+      <th tuiTh>Rating</th>
+      <th tuiTh>Actions</th>
+    </tr>
+    </thead>
+    <tbody tuiTbody>
+    <tr *ngFor="let feedback of feedbacks">
+      <!-- First column -->
+      <td tuiTd>
+        <div [tuiCell]="'m'">
+                    <span tuiTitle>
+                      {{ feedback.article_name }}
+                    </span>
+        </div>
+      </td>
+      <!-- Second column -->
+      <td tuiTd>
+        <div [tuiCell]="'m'">
+          <tui-avatar
+            [src]="feedback.user_name | tuiInitials"
+            [style.background]="feedback.user_name | tuiAutoColor"
+          />
+          <span tuiTitle>
+                        {{ feedback.user_name }}
+          </span>
+        </div>
+      </td>
+      <!-- Third column -->
+      <td tuiTd>
+        <span tuiTitle>
+          {{ feedback.fb_content }}
+        </span>
+
+      </td>
+      <!-- Fourth column -->
+      <td tuiTd>
+        <span tuiTitle>
+          {{ feedback.rating }}
+        </span>
+
+      </td>
+
+      <!-- approve / delete feedback -->
+      <td tuiTd>
+                <span tuiStatus>
+                    <button
+                      appearance="action"
+                      iconStart="@tui.check"
+                      size="s"
+                      tuiIconButton
+                      type="button"
+                      (click)="handleApproveFeedback(feedback)"
+                    >
+                        Approve
+                    </button>
+                    <button
+                      appearance="action"
+                      iconStart="@tui.trash"
+                      size="s"
+                      tuiIconButton
+                      type="button"
+                      (click)="handleDeleteFeedback(feedback)"
+                    >
+                        Delete
+                    </button>
+                </span>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
+</div>
+
+
