@@ -27,7 +27,7 @@
 
           </div>
           <p class="tui-text_body tui-space_top-1">{{ tour.getDescription() }}</p>
-          <button tuiButton size="xs" (click)="deleteTour(tour)" class="slide-tour-delete-button">Delete</button>
+          <button tuiButton size="xs" (click)="deleteTour(tour); $event.stopPropagation()" class="slide-tour-delete-button">Delete</button>
         </div>
       </ng-container>
     </div>
@@ -120,7 +120,6 @@
     <input
       tuiSlider
       type="range"
-      min="minDistance"
       min="0"
       max="50"
       step="0.2"

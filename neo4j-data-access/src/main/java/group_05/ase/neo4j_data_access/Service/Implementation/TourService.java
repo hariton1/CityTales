@@ -11,12 +11,10 @@ import group_05.ase.neo4j_data_access.Entity.Tour.TourDTO;
 import group_05.ase.neo4j_data_access.Entity.Tour.TourObject;
 import group_05.ase.neo4j_data_access.Entity.ViennaHistoryWikiBuildingObject;
 import group_05.ase.neo4j_data_access.Service.Interface.ITourService;
-import org.neo4j.cypherdsl.core.Match;
 import org.springframework.data.neo4j.types.GeographicPoint2d;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.Instant;
 import java.util.*;
@@ -146,8 +144,8 @@ public class TourService implements ITourService {
         }
         tourObject.setStops(stops_list);
         Map<String, Double> durations = getLengthDurationOfTour(tourObject);
-        tourObject.setDistance(durations.get("distance") / 1000);
-        tourObject.setDurationEstimate(durations.get("duration") / 3600);
+        tourObject.setDistance(durations.get("distance"));
+        tourObject.setDurationEstimate(durations.get("duration"));
 
         return tourObject;
     }
@@ -159,7 +157,7 @@ public class TourService implements ITourService {
             List<List<Float>> distanceMatrix,
             double minDistance,
             double maxDistance,
-            int minIntermediateStops, // new parameter
+            int minIntermediateStops,
             int maxRoutes
     ) {
         int N = stops.size();
@@ -309,16 +307,6 @@ public class TourService implements ITourService {
         }
 
         return accessOpenRoutingService(points, "foot-walking");
-    }
-
-    @Override
-    public TourObject getTourByName(String name) {
-        return null;
-    }
-
-    @Override
-    public void deleteTourByName(String name) {
-
     }
 
     private Map<String, Double> getLengthDurationOfTour(TourObject tour){
