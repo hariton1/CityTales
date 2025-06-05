@@ -3,7 +3,6 @@ package group_05.ase.user_db.services;
 import group_05.ase.user_db.entities.FeedbackEntity;
 import group_05.ase.user_db.repositories.FeedbackRepository;
 import group_05.ase.user_db.restData.FeedbackDTO;
-
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -96,6 +95,20 @@ public class FeedbackService {
 
         this.repository.save(tmp);
 
+    }
+
+    public void approveFeedback(int feedbackId) {
+        System.out.println("Approving feedback: " + feedbackId);
+        FeedbackEntity tmp = this.repository.findByFeedbackId(feedbackId);
+
+        tmp.setApproved("Y");
+
+        this.repository.save(tmp);
+    }
+
+    public void deleteFeedback(int feedbackId) {
+        System.out.println("Deleting feedback: " + feedbackId);
+        this.repository.deleteById(feedbackId);
     }
 
 }

@@ -42,6 +42,7 @@ export class LoginComponent {
     const { data: { session } } = await supabase.auth.getSession();
     // If session and token exists, skip login
     if (session && session.access_token) {
+      console.log('JWT-Token:', session.access_token);
       this.router.navigate(['/explore']);
     }
   }
