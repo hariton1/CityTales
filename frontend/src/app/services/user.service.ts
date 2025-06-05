@@ -15,11 +15,14 @@ import {UserBadgeDTO} from '../user_db.dto/user-badge.dto';
 import {UserHistoriesService} from '../user_db.services/user-histories.service';
 import {UserPointsService} from '../user_db.services/user-points.service';
 import {UserBadgesService} from '../user_db.services/user-badges.service';
+import {UUID} from 'node:crypto';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
 
-    constructor(private httpClient: HttpClient,
+  userId: UUID | null = null;
+
+  constructor(private httpClient: HttpClient,
                 private userHistoriesService: UserHistoriesService,
                 private userPointsService: UserPointsService,
                 private userBadgeService: UserBadgesService) {
@@ -192,116 +195,110 @@ export class UserService {
         return this.httpClient.delete<boolean>(SERVER_ADDRESS + 'gamification/delete' + gamificationId);
     }
 
+    public createUserHistoryEntry(node:any): UserHistoryDto {
+      return new UserHistoryDto(
+        -1,
+        this.userId!,
+        Number(node.viennaHistoryWikiId),
+        new Date(),
+        new Date(0),
+        2);
+    }
+
+    public createUserPointsEntry(node: any,points: number): UserPointDto {
+      return new UserPointDto(
+        -1,
+        this.userId!,
+        points,
+        new Date(),
+        Number(node.viennaHistoryWikiId)
+      );
+    }
+
+  private saveUserHistoryEntry(node: any): void {
+    this.userHistoriesService.createNewUserHistory(node.userHistoryEntry).subscribe({
+      next: (results) => {
+        console.log('New user history entry created successfully', results);
+        node.userHistoryEntry.setUserHistoryId(results.getUserHistoryId());
+        // Uncomment if you want to show alerts
+        // this.alerts
+        //   .open('Your new user history entry is saved', { label: 'Success!', appearance: 'success', autoClose: 3000 })
+        //   .subscribe();
+      },
+      error: (err) => {
+        console.error('Error creating user history entry:', err);
+      }
+    });
+  }
+
+  private saveUserPointsEntry(entry: UserPointDto): void {
+    this.userPointsService.createNewPoints(entry).subscribe({
+      next: (results) => {
+        console.log('New user points entry created successfully', results);
+        // Uncomment to show alert
+        // this.alerts
+        //   .open('User points entry saved', { label: 'Success!', appearance: 'success', autoClose: 3000 })
+        //   .subscribe();
+      },
+      error: (err) => {
+        console.error('Error creating user points entry:', err);
+      }
+    });
+  }
+
   public enterHistoricNode(node: any): any {
-    console.log(node);
-
-    node.userHistoryEntry = new UserHistoryDto(
-      -1,
-      "f5599c8c-166b-495c-accc-65addfaa572b",
-      Number(node.viennaHistoryWikiId),
-      new Date(),
-      new Date(0),
-      2);
-
-    let newUserPointsEntry = new UserPointDto(
-      -1,
-      "f5599c8c-166b-495c-accc-65addfaa572b",
-      1,
-      new Date(),
-      Number(node.viennaHistoryWikiId)
-    );
-
-    this.userHistoriesService.createNewUserHistory(node.userHistoryEntry).subscribe({
-      next: (results) => {
-        console.log('New user history entry created successfully', results);
-        node.userHistoryEntry.setUserHistoryId(results.getUserHistoryId());
-        /*this.alerts
-          .open('Your new user history entry is saved', {label: 'Success!', appearance: 'success', autoClose: 3000})
-          .subscribe();*/
-      },
-      error: (err) => {
-        console.error('Error creating user history entry:', err);
+      console.log(node);
+      const stored = localStorage.getItem("user_uuid") as UUID;
+      if (stored) {
+        this.userId = stored;
+      } else {
+        return;
       }
-    });
 
-    this.userPointsService.createNewPoints(newUserPointsEntry).subscribe({
-      next: (results) => {
-        console.log('New user points entry created successfully', results);
-        /*this.alerts
-          .open('Your new user history entry is saved', {label: 'Success!', appearance: 'success', autoClose: 3000})
-          .subscribe();*/
-      },
-      error: (err) => {
-        console.error('Error creating user points entry:', err);
+      node.userHistoryEntry = this.createUserHistoryEntry(node);
+      let newUserPointsEntry = this.createUserPointsEntry(node,1);
+
+      this.saveUserHistoryEntry(node);
+      this.saveUserPointsEntry(newUserPointsEntry);
+
+      return node;
+    }
+
+    public enterHistoricNodeAlert(node: any): any {
+      console.log(node);
+
+      const stored = localStorage.getItem("user_uuid") as UUID;
+      if (stored) {
+        this.userId = stored;
+      } else {
+        return;
       }
-    });
 
-    return node;
-  }
+      node.userHistoryEntry = this.createUserHistoryEntry(node);
+      let newUserPointsEntry = this.createUserPointsEntry(node,2);
 
-  public enterHistoricNodeAlert(node: any): any {
-    console.log(node);
+      let newBadgeEntry = new UserBadgeDTO(
+        -1,
+        this.userId,
+        Number(node.viennaHistoryWikiId),
+        new Date()
+      );
 
-    node.userHistoryEntry = new UserHistoryDto(
-      -1,
-      "f5599c8c-166b-495c-accc-65addfaa572b",
-      Number(node.viennaHistoryWikiId),
-      new Date(),
-      new Date(0),
-      2);
+      this.saveUserHistoryEntry(node);
+     this.saveUserPointsEntry(newUserPointsEntry);
 
-    let newUserPointsEntry = new UserPointDto(
-      -1,
-      "f5599c8c-166b-495c-accc-65addfaa572b",
-      2,
-      new Date(),
-      Number(node.viennaHistoryWikiId)
-    );
+      this.userBadgeService.createUserBadge(newBadgeEntry).subscribe({
+        next: (results) => {
+          console.log('New badge entry created successfully', results);
+          /*this.alerts
+            .open('Your new user history entry is saved', {label: 'Success!', appearance: 'success', autoClose: 3000})
+            .subscribe();*/
+        },
+        error: (err) => {
+          console.error('Error creating badge entry:', err);
+        }
+      });
 
-    let newBadgeEntry = new UserBadgeDTO(
-      -1,
-      "f5599c8c-166b-495c-accc-65addfaa572b",
-      Number(node.viennaHistoryWikiId),
-      new Date()
-    );
-
-    this.userHistoriesService.createNewUserHistory(node.userHistoryEntry).subscribe({
-      next: (results) => {
-        console.log('New user history entry created successfully', results);
-        node.userHistoryEntry.setUserHistoryId(results.getUserHistoryId());
-        /*this.alerts
-          .open('Your new user history entry is saved', {label: 'Success!', appearance: 'success', autoClose: 3000})
-          .subscribe();*/
-      },
-      error: (err) => {
-        console.error('Error creating user history entry:', err);
-      }
-    });
-
-    this.userPointsService.createNewPoints(newUserPointsEntry).subscribe({
-      next: (results) => {
-        console.log('New user points entry created successfully', results);
-        /*this.alerts
-          .open('Your new user history entry is saved', {label: 'Success!', appearance: 'success', autoClose: 3000})
-          .subscribe();*/
-      },
-      error: (err) => {
-        console.error('Error creating user points entry:', err);
-      }
-    });
-
-    this.userBadgeService.createUserBadge(newBadgeEntry).subscribe({
-      next: (results) => {
-        console.log('New badge entry created successfully', results);
-        /*this.alerts
-          .open('Your new user history entry is saved', {label: 'Success!', appearance: 'success', autoClose: 3000})
-          .subscribe();*/
-      },
-      error: (err) => {
-        console.error('Error creating badge entry:', err);
-      }
-    });
-
-    return node;
-  }
+      return node;
+    }
 }

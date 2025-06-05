@@ -1,0 +1,111 @@
+<div class="place-detail-container">
+  <div class="place-detail-card">
+    <!-- Header with building information -->
+    <div class="place-detail-header">
+      <h2 class="place-detail-title">{{selectedEvent.name}}</h2>
+      <div class="place-location">
+        <span class="coordinates" *ngIf="selectedEvent.dateFrom != '' && selectedEvent.dateTo != '' ">
+          {{ selectedEvent.dateFrom}} until {{selectedEvent.dateTo}}
+        </span>
+      </div>
+
+
+      <button
+        (click)="closeDetail()"
+      > Close </button>
+
+
+    </div>
+
+
+    <!-- Main content -->
+    <tui-scrollbar class="scrollable-content">
+      <div class="place-detail-content">
+        <div class="content-section">
+          <h3>Description</h3>
+          <p>{{ selectedEvent.contentGerman }}</p>
+        </div>
+
+        <div>
+          <button class="feedback-button" appearance="secondary" size="m" tuiButton type="button" (click)="navigateToFeedback()">
+            <tui-icon icon="@tui.message-circle-plus" [style.height.rem]="1"/> Give us feedback
+          </button>
+        </div>
+
+        <div class="content-section">
+          <h3>Person Information</h3>
+          <div class="building-details">
+            <div class="detail-row" *ngIf="selectedEvent.name">
+              <span class="label">Name:</span>
+              <span class="value">{{ selectedEvent.name }}</span>
+            </div>
+            <div class="detail-row" *ngIf="selectedEvent.organizer">
+              <span class="label">Jobs:</span>
+              <span class="value">{{ selectedEvent.organizer }}</span>
+            </div>
+            <div class="detail-row" *ngIf="selectedEvent.participantCount">
+              <span class="label">Sex:</span>
+              <span class="value">{{ selectedEvent.participantCount }}</span>
+            </div>
+            <div class="detail-row" *ngIf="selectedEvent.topic">
+              <span class="label">Birth Place:</span>
+              <span class="value">{{ selectedEvent.topic }}</span>
+            </div>
+            <div class="detail-row" *ngIf="selectedEvent.imageUrls.length > 0">
+              <img [src]="selectedEvent.imageUrls[0]" alt="Building image" class="building-image">
+            </div>
+            <div class="detail-row" *ngIf="selectedEvent.url">
+              <span class="label">Wiki URL:</span>
+              <span class="value">
+              <a [href]="selectedEvent.url" target="_blank"> {{ selectedEvent.url }} </a>
+            </span>
+            </div>
+
+            <div class="content-section" *ngIf="selectedEvent.relatedPersons?.length">
+              <h3>Related Persons</h3>
+              <div class="related-items">
+                <div class="related-item" *ngFor="let person of selectedEvent.relatedPersons">
+            <span class="value">
+              <div (click)="onPersonClick(person)">
+                <span>{{ person.name }}</span>
+              </div>
+            </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="content-section" *ngIf="selectedEvent.relatedBuildings?.length">
+              <h3>Related Places</h3>
+              <div class="related-items">
+                <div class="related-item" *ngFor="let place of selectedEvent.relatedBuildings">
+            <span class="value">
+              <div (click)="onBuildingClick(place)">
+                <span>{{ place.name }}</span>
+              </div>
+            </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="content-section" *ngIf="selectedEvent.relatedEvents?.length">
+              <h3>Related Events</h3>
+              <div class="related-items">
+                <div class="related-item" *ngFor="let event of selectedEvent.relatedEvents">
+            <span class="value">
+              <div (click)="onEventClick(event)">
+                <span>{{ event.name }}</span>
+              </div>
+            </span>
+                </div>
+              </div>
+            </div>
+
+
+
+          </div>
+        </div>
+      </div>
+    </tui-scrollbar>
+  </div>
+</div>
+

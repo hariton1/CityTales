@@ -1,0 +1,90 @@
+.layout-container {
+  padding: 2rem;
+}
+
+.recommended-section {
+  background-color: #f7f9fa;
+  padding: 1.5rem;
+  border-radius: 1rem;
+}
+
+.tour-card {
+  padding: 1rem;
+  border: 10px solid var(--tui-base-03);
+  border-radius: 1rem;
+  background-color: white;
+  box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.05);
+}
+
+.create-section {
+  background-color: #ffffff;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.05);
+}
+
+.tour-scroll-container {
+  display: flex;
+  overflow-x: auto;
+  gap: 1rem;
+  padding-bottom: 0.5rem;
+
+  /* Optional: smooth scroll on supported devices */
+  scroll-behavior: smooth;
+
+  /* Hide scrollbar on WebKit */
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;     /* Firefox */
+}
+
+.tour-card-horizontal {
+  flex: 0 0 auto;
+  width: 220px;
+  padding: 1rem;
+  border-radius: 1rem;
+  border: 2px solid;
+  background: var(--tui-base-01);
+  box-shadow: var(--tui-shadow-hover);
+  transition: box-shadow 0.3s;
+  cursor: pointer;
+
+  &:hover {
+    box-shadow: var(--tui-shadow-large);
+    border-color: var(--tui-primary);
+  }
+}
+
+.tour-card-header {
+  display: flex;
+  flex-direction: column;
+}
+
+.tour-delete-button {
+  padding: 4px 12px;
+  margin-left: 8px;
+}
+
+.control-button {
+  padding: 8px 16px;
+  margin-right: 8px;
+}
+
+.tui-block {
+  padding: 8px 16px;
+}
+
+.advanced-tour-section{
+  padding: 2rem;
+  padding-bottom: 10rem;
+}
+
+.tour-scroll-container {
+  display: flex;
+  overflow-x: auto;
+  gap: 1rem;
+  padding: 1rem;
+}

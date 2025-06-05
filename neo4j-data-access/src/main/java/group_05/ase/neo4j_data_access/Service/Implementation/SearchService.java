@@ -12,12 +12,15 @@ import java.util.List;
 @Service
 public class SearchService implements ISearchService {
 
-    @Autowired
     private HistoricBuildingService historicBuildingService;
-    @Autowired
     private HistoricPersonService historicPersonService;
-    @Autowired
     private HistoricEventService historicEventService;
+
+    public SearchService(HistoricBuildingService historicBuildingService, HistoricPersonService historicPersonService, HistoricEventService historicEventService) {
+        this.historicBuildingService = historicBuildingService;
+        this.historicPersonService = historicPersonService;
+        this.historicEventService = historicEventService;
+    }
 
     @Override
     public List<ViennaHistoryWikiPersonObject> searchPersonsWithKeyword(String query) {
