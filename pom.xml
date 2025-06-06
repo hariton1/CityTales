@@ -19,6 +19,7 @@
         <module>neo4j-data-access</module>
         <module>qdrant-adapter</module>
         <module>openai-adapter</module>
+        <module>orchestrator</module>
     </modules>
 
     <properties>

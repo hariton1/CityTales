@@ -13,5 +13,5 @@ public class UserInterestWithWeightDTO {
     private String description;
     private String interestNameDe;
     private float interestWeight;            // <-- comes from UserInterestEntity
-    private LocalDateTime creDat;            // <-- if you want creation date too
+    private LocalDateTime creDat;
 }
