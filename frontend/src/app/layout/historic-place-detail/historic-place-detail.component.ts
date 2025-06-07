@@ -1,9 +1,6 @@
 import {ChangeDetectionStrategy, Component, effect, EventEmitter, inject, Input, Output, signal} from '@angular/core';
 import {CommonModule, NgIf} from '@angular/common';
-import {PersonService} from '../../services/person.service';
-import {HistoricalPersonEntity} from '../../dto/db_entity/HistoricalPersonEntity';
 import {
-  TuiAlertService,
   TuiButton,
   TuiDialog,
   TuiHint,
@@ -33,6 +30,8 @@ import {TuiTooltip} from '@taiga-ui/kit';
 import {MaskitoDirective} from '@maskito/angular';
 import {TuiResponsiveDialogOptions} from '@taiga-ui/addon-mobile';
 import {MaskitoOptions} from '@maskito/core';
+import {UUID} from 'node:crypto';
+import {UserDto} from '../../user_db.dto/user.dto';
 
 const postfix = ' €';
 const numberOptions = maskitoNumberOptionsGenerator({
@@ -70,7 +69,6 @@ const numberOptions = maskitoNumberOptionsGenerator({
 })
 export class HistoricPlaceDetailComponent {
 
-  private readonly alerts = inject(TuiAlertService);
   private readonly pricesService = inject(PricesService);
   locationId= signal(0);
   prices = this.pricesService.prices;
@@ -82,11 +80,15 @@ export class HistoricPlaceDetailComponent {
     effect(() => {
       this.pricesService.getPricesByLocation(this.locationId());
     })
+    let userId = localStorage.getItem("user_uuid") as UUID;
+    this.userService.getUserWithRoleById(userId).subscribe((user) => {
+      this.initPrices(user);
+    });
   }
 
-  private associatedPersons: HistoricalPersonEntity[] = [];
   protected dialogLabel = '';
   protected options: Partial<TuiResponsiveDialogOptions> = {};
+  protected userHasPermission = false;
   protected readonly maskitoOptions: MaskitoOptions = {
     ...numberOptions,
     plugins: [
@@ -154,7 +156,6 @@ export class HistoricPlaceDetailComponent {
   }
   set selectedPlace(value: any) {
     this._selectedPlace = value;
-    this.locationId.set(this.selectedPlace.viennaHistoryWikiId);
   }
   private _selectedPlace: any;
 
@@ -177,7 +178,6 @@ export class HistoricPlaceDetailComponent {
     buildingEntity = this.userService.enterHistoricNode(buildingEntity);
     this.onBuildingDetailEvent.emit(buildingEntity);
   }
-
 
   closeDetail():void{
     console.log(this.selectedPlace)
@@ -224,6 +224,22 @@ export class HistoricPlaceDetailComponent {
 
   deletePrice(id: number): void {
     this.pricesService.delete(id);
+  }
+
+  initPrices(user: UserDto): void {
+    this.locationId.set(this.selectedPlace.viennaHistoryWikiId);
+    let contributor = true; //TODO change this once Contributor role is assignable
+    let emailMatchesLocation = false;
+
+    if(user?.role === 'Contributor'){
+      contributor = true;
+    }
+    if(user?.email.includes('@priceadminmaintainer.com')) {
+      // TODO add functionality for museum workers to maintain prices
+      emailMatchesLocation = true;
+    }
+
+    this.userHasPermission = contributor && emailMatchesLocation;
   }
 }
 
