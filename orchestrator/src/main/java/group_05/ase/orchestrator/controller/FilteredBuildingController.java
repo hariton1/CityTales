@@ -1,7 +1,10 @@
 package group_05.ase.orchestrator.controller;
 
+import group_05.ase.orchestrator.dto.ViennaHistoryWikiBuildingObject;
+import group_05.ase.orchestrator.client.Neo4jBuildingClient;
+import group_05.ase.orchestrator.client.UserInterestClient;
+import group_05.ase.orchestrator.dto.UserInterestsDTO;
 import group_05.ase.orchestrator.service.FilteredBuildingService;
-import group_05.ase.orchestrator.dto.BuildingDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,16 +17,15 @@ import java.util.UUID;
 public class FilteredBuildingController {
 
     private final FilteredBuildingService filteredBuildingService;
+    private final UserInterestClient userInterestClient;
+    private final Neo4jBuildingClient buildingClient;
 
-    @GetMapping("/filtered")
-    public List<BuildingDTO> getFilteredBuildingsForUser(
-            @RequestParam("latitude") double latitude,
-            @RequestParam("longitude") double longitude,
-            @RequestParam("radius") double radius,
-            @RequestParam("userId") UUID userId,
-            @RequestHeader("Authorization") String jwtToken
-    ) {
-        return filteredBuildingService.getFilteredBuildingsForUser(latitude, longitude, radius, userId, jwtToken);
+
+    @GetMapping("/filtered/byUser/{userId}")
+    public List<ViennaHistoryWikiBuildingObject> getFilteredBuildingsForUser(@PathVariable UUID userId) {
+        List<UserInterestsDTO> interests = userInterestClient.getUserInterests(userId);
+        List<ViennaHistoryWikiBuildingObject> buildings = buildingClient.getAllBuildings();
+        return filteredBuildingService.filterBuildingsByUserInterests(buildings, interests);
     }
 
 

@@ -21,6 +21,7 @@ public class WebClientConfig {
                 .baseUrl(neo4jBaseUrl)
                 .build();
     }
+
 }
 
 
