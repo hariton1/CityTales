@@ -25,12 +25,9 @@ public class HistoricPersonService implements IHistoricPersonService {
     private final String NEO4J_PASSWORD;
 
     private Driver driver;
-    private final IWikipediaExtractorService wikipediaExtractorService;
     private final IMappingService mappingService;
 
-    public HistoricPersonService(IWikipediaExtractorService wikipediaExtractorService, Neo4jProperties properties, IMappingService mappingService) {
-        this.wikipediaExtractorService = wikipediaExtractorService;
-
+    public HistoricPersonService(Neo4jProperties properties, IMappingService mappingService) {
         this.NEO4J_URL = properties.getUrl();
         this.NEO4J_USER = properties.getUser();
         this.NEO4J_PASSWORD = properties.getPassword();
