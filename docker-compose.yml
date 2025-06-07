@@ -70,6 +70,7 @@ services:
     environment:
       - USER_DB_URL=http://user-db:8090
       - NEO4J_DATA_ACCESS_URL=http://neo4j-data-access:8083
+      - JWT_SECRET=CNLhuS70KdmqBduY1qYM5Q/fKOLySiD/yYr2Qz0c2GJ9LNVgMarMX4CrU2mkyy8qZobBFA3JglypiPTxg/P7aA==
     depends_on:
       - user-db
       - neo4j-data-access
