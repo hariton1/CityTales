@@ -16,12 +16,19 @@ public class Neo4jBuildingClient {
         this.webClient = webClient;
     }
 
-    public List<ViennaHistoryWikiBuildingObject> getAllBuildings() {
+    // Im Neo4jBuildingClient:
+    public List<ViennaHistoryWikiBuildingObject> getBuildingsByLocation(double latitude, double longitude, double radius) {
         return webClient.get()
-                .uri("/all")
+                .uri(uriBuilder -> uriBuilder
+                        .path("/api/historicPlace/by/location")
+                        .queryParam("latitude", latitude)
+                        .queryParam("longitude", longitude)
+                        .queryParam("radius", radius)
+                        .build())
                 .retrieve()
                 .bodyToFlux(ViennaHistoryWikiBuildingObject.class)
                 .collectList()
                 .block();
     }
+
 }

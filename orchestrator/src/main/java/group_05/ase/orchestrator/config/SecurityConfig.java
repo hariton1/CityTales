@@ -1,6 +1,5 @@
 package group_05.ase.orchestrator.config;
 
-import jakarta.annotation.PostConstruct;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -15,6 +14,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 @Configuration
 public class SecurityConfig {
+
     @Value("${jwt.secret}")
     private String jwtSecret;
 
@@ -37,11 +37,8 @@ public class SecurityConfig {
         NimbusJwtDecoder decoder = NimbusJwtDecoder
                 .withSecretKey(new SecretKeySpec(jwtSecret.getBytes(), "HmacSHA256"))
                 .build();
-
-        // Optionale Validatoren entfernen
+        // Remove default validators (optional, but you had it)
         decoder.setJwtValidator(token -> OAuth2TokenValidatorResult.success());
         return decoder;
-    } 0
-
+    }
 }
-

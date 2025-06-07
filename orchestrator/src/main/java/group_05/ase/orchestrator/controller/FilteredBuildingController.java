@@ -20,18 +20,33 @@ public class FilteredBuildingController {
     private final UserInterestClient userInterestClient;
     private final Neo4jBuildingClient buildingClient;
 
+//    @GetMapping("/filtered/byUserAndLocation")
+//    public List<ViennaHistoryWikiBuildingObject> getFilteredBuildingsForUserAndLocation(
+//            @RequestParam UUID userId,
+//            @RequestParam double latitude,
+//            @RequestParam double longitude,
+//            @RequestParam double radius
+//    ) {
+//        try {
+//            List<UserInterestsDTO> interests = userInterestClient.getUserInterests(userId);
+//            List<ViennaHistoryWikiBuildingObject> buildings = buildingClient.getBuildingsByLocation(latitude, longitude, radius);
+//            return filteredBuildingService.filterBuildingsByUserInterestsAndLocation(buildings, interests, latitude, longitude, radius);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            throw new RuntimeException("Fehler im Controller: " + e.getMessage(), e);
+//        }
+//    }
 
     @GetMapping("/filtered/byUser/{userId}")
-    public List<ViennaHistoryWikiBuildingObject> getFilteredBuildingsForUser(@PathVariable UUID userId) {
-        try {
-            List<UserInterestsDTO> interests = userInterestClient.getUserInterests(userId);
-            List<ViennaHistoryWikiBuildingObject> buildings = buildingClient.getAllBuildings();
-            return filteredBuildingService.filterBuildingsByUserInterests(buildings, interests);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("Fehler im Controller: " + e.getMessage(), e);
-        }
+    public List<ViennaHistoryWikiBuildingObject> getFilteredBuildingsForUser(
+            @PathVariable UUID userId,
+            @RequestParam double latitude,
+            @RequestParam double longitude,
+            @RequestParam double radius
+    ) {
+        List<UserInterestsDTO> interests = userInterestClient.getUserInterests(userId);
+        List<ViennaHistoryWikiBuildingObject> buildings = buildingClient.getBuildingsByLocation(latitude, longitude, radius);
+        return filteredBuildingService.filterBuildingsByUserInterests(buildings, interests);
     }
-
 
 }
