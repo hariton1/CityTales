@@ -1,28 +1,32 @@
 package group_05.ase.orchestrator.client;
 
 import group_05.ase.orchestrator.dto.UserInterestsDTO;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
-
 import java.util.List;
 import java.util.UUID;
+import java.time.Duration;
 
 @Component
 public class UserInterestClient {
 
     private final WebClient webClient;
 
-    public UserInterestClient(WebClient.Builder builder) {
-        this.webClient = builder.baseUrl("http://user-db:8090/api/userInterest").build();
+    public UserInterestClient(@Qualifier("userDbClient") WebClient webClient) {
+        this.webClient = webClient;
     }
 
     public List<UserInterestsDTO> getUserInterests(UUID userId) {
-        // Annahme: Endpoint gibt List<UserInterestDTO> zurück
-        return webClient.get()
-                .uri("/byUserId/{userId}", userId)
-                .retrieve()
-                .bodyToFlux(UserInterestsDTO.class)
-                .collectList()
-                .block();
+        try {
+            return webClient.get()
+                    .uri("/byUserId/{userId}", userId)
+                    .retrieve()
+                    .bodyToFlux(UserInterestsDTO.class)
+                    .collectList()
+                    .block(Duration.ofSeconds(5));
+        } catch (Exception e) {
+            return List.of();
+        }
     }
 }

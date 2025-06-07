@@ -23,9 +23,14 @@ public class FilteredBuildingController {
 
     @GetMapping("/filtered/byUser/{userId}")
     public List<ViennaHistoryWikiBuildingObject> getFilteredBuildingsForUser(@PathVariable UUID userId) {
-        List<UserInterestsDTO> interests = userInterestClient.getUserInterests(userId);
-        List<ViennaHistoryWikiBuildingObject> buildings = buildingClient.getAllBuildings();
-        return filteredBuildingService.filterBuildingsByUserInterests(buildings, interests);
+        try {
+            List<UserInterestsDTO> interests = userInterestClient.getUserInterests(userId);
+            List<ViennaHistoryWikiBuildingObject> buildings = buildingClient.getAllBuildings();
+            return filteredBuildingService.filterBuildingsByUserInterests(buildings, interests);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Fehler im Controller: " + e.getMessage(), e);
+        }
     }
 
 

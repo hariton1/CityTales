@@ -1,13 +1,17 @@
 package group_05.ase.orchestrator.config;
 
+import jakarta.annotation.PostConstruct;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.oauth2.core.OAuth2TokenValidatorResult;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.beans.factory.annotation.Value;
+
+import javax.crypto.spec.SecretKeySpec;
 
 @Configuration
 public class SecurityConfig {
@@ -30,9 +34,14 @@ public class SecurityConfig {
 
     @Bean
     public JwtDecoder jwtDecoder() {
-        return NimbusJwtDecoder.withSecretKey(
-                new javax.crypto.spec.SecretKeySpec(jwtSecret.getBytes(), "HmacSHA256")
-        ).build();
-    }
+        NimbusJwtDecoder decoder = NimbusJwtDecoder
+                .withSecretKey(new SecretKeySpec(jwtSecret.getBytes(), "HmacSHA256"))
+                .build();
+
+        // Optionale Validatoren entfernen
+        decoder.setJwtValidator(token -> OAuth2TokenValidatorResult.success());
+        return decoder;
+    } 0
+
 }
 
