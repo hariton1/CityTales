@@ -1,15 +1,18 @@
-# -- Build Stage --
-FROM maven:3.8.3-openjdk-17 AS builder
+# ---- Build-Image ----
+FROM maven:3.9.6-eclipse-temurin-21 AS build
 WORKDIR /app
-COPY pom.xml .
-RUN mvn dependency:go-offline
 
-COPY src/ ./src/
-RUN mvn package -DskipTests
+# Kopiere das ganze Projekt (inkl. aller Module)
+COPY . .
 
-# -- Run Stage --
-FROM maven:3.8.3-openjdk-17
+# Baue ALLE Module (wichtig: nicht nur orchestrator, sondern auch die SNAPSHOT-Dependencies!)
+RUN mvn clean install -DskipTests
+
+# ---- Run-Image ----
+FROM eclipse-temurin:21-jre
 WORKDIR /app
-COPY --from=builder /app/target/orchestrator-*-SNAPSHOT.jar orchestrator.jar
-EXPOSE 9098
-ENTRYPOINT ["java", "-jar", "/app/orchestrator.jar"]
+
+# Kopiere das gebaute JAR aus dem orchestrator-Modul
+COPY --from=build /app/orchestrator/target/orchestrator-*.jar app.jar
+
+ENTRYPOINT ["java", "-jar", "app.jar"]

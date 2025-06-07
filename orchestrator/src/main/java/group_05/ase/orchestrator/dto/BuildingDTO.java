@@ -14,4 +14,6 @@ public class BuildingDTO {
     private String buildingType;
     private Double latitude;
     private Double longitude;
+    private float weight;
+
 }
