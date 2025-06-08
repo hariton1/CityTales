@@ -5,6 +5,7 @@ import {Injectable} from '@angular/core';
 import {UUID} from 'node:crypto';
 import {UserHistoryDto} from '../user_db.dto/user-history.dto';
 import {UtilitiesService} from '../services/utilities.service';
+import {UserInterestDto} from '../user_db.dto/user-interest.dto';
 
 @Injectable({providedIn: 'root'})
 export class UserHistoriesService {
@@ -24,7 +25,12 @@ export class UserHistoriesService {
   }
 
   public getUserHistoriesByUserId(user_id: UUID): Observable<UserHistoryDto[]> {
-    return this.httpClient.get<UserHistoryDto[]>(this.DOMAIN + 'user_id=' + user_id);
+    return this.httpClient.get<any[]>(this.DOMAIN + 'user_id=' + user_id)
+      .pipe(
+        map(data => data.map(item => {
+          return new UserHistoryDto(item.user_history_id, item.user_id, item.article_id, item.open_dt, item.close_dt, item.interest_id);
+        }))
+      );
   }
 
   public getUserHistoriesByArticleId(article_id: number): Observable<UserHistoryDto[]> {

@@ -133,6 +133,10 @@ export class UserProfileComponent {
     this.router.navigate(['/reset-pass']);
   }
 
+  handleDisplayHistoryClick () {
+    this.router.navigate(['/my-history']);
+  }
+
   get role(): string {
     return this.user?.role ?? '';
   }

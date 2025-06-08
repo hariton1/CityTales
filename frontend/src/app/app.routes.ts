@@ -15,6 +15,7 @@ import {NotificationInboxComponent} from './core/notification-inbox/notification
 import {FeedbackListComponent} from './user-feedback/pages/feedback-list/feedback-list.component';
 import {UserProfileComponent} from './user-management/pages/user-profile/user-profile.component';
 import {ResetPasswordComponent} from './user-management/pages/reset-password/reset-password.component';
+import {HistoryOneUserComponent} from './user-history/pages/history-one-user/history-one-user.component';
 
 export const routes: Routes = [
   {
@@ -46,5 +47,6 @@ export const routes: Routes = [
   { path: 'friends', component: LandingPageComponent },
   { path: 'profile', component: UserProfileComponent },
   { path: 'reset-pass', component: ResetPasswordComponent },
+  { path: 'my-history', component: HistoryOneUserComponent },
   { path: '', redirectTo: '/explore', pathMatch: 'full' } //default page, to be changed
 ];
