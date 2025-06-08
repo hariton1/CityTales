@@ -52,7 +52,10 @@ public class UserService {
         if (userId == null) {
             throw new IllegalArgumentException("User ID cannot be null");
         }
-        this.repository.deleteById(userId);
+        //this.repository.deleteById(userId);
+        UserDataEntity tmp = this.userDataRepository.findByUserId(userId);
+        tmp.setStatus("Deleted");
+        this.userDataRepository.save(tmp);
     }
 
     public UserDTO updateUserById(UUID userId, UserDTO updatedValues) {

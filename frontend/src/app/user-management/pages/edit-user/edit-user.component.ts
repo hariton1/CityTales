@@ -54,7 +54,7 @@ import {UserDto} from '../../../user_db.dto/user.dto';
 export class EditUserComponent implements OnInit {
   userId: string | null = null;
   user: UserDto | null = null;
-  protected persons = ['User', 'Moderator', 'Contributor'];
+  protected persons = ['Admin', 'User', 'Moderator', 'Contributor'];
   protected statuses = ['Active', 'Locked'];
   accountCreated: any = null;
 
