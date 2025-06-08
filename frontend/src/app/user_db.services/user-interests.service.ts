@@ -20,13 +20,21 @@ export class UserInterestsService {
   }
 
   public getUserInterestsByUserId(user_id: UUID): Observable<UserInterestDto[]> {
-    // this.httpClient.get<UserInterestDto[]>(this.DOMAIN + 'user_id=' + user_id);
     return this.httpClient.get<any[]>(this.DOMAIN + 'user_id=' + user_id)
-        .pipe(
-            map(data => data.map(item => {
-              return new UserInterestDto(item.user, item.interest_id, item.cre_dat, item.interest_weight);
-            }))
-        );
+      .pipe(
+        map(data => data.map(item => {
+          return new UserInterestDto(item.user, item.interest_id, item.cre_dat, item.interest_weight);
+        }))
+      );
+  }
+
+  public getMyInterests(): Observable<UserInterestDto[]> {
+    return this.httpClient.get<any[]>(this.DOMAIN + 'me')
+      .pipe(
+        map(data => data.map(item => {
+          return new UserInterestDto(item.user, item.interest_id, item.cre_dat, item.interest_weight);
+        }))
+      );
   }
 
   public getUserInterestsByInterestId(interest_id: number): Observable<UserInterestDto[]> {

@@ -85,7 +85,7 @@ export class UserProfileComponent {
     if (!this.userId) return;
 
     // Use switchMap to handle the sequential flow
-    this.userInterestService.getUserInterestsByUserId(this.userId)
+    this.userInterestService.getMyInterests()
       .pipe(
         switchMap(interests => {
           // If no interests, return an empty array observable
