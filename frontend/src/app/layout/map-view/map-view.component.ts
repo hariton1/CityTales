@@ -17,6 +17,7 @@ import {BuildingEntity} from '../../dto/db_entity/BuildingEntity';
 import {TuiAlertService} from '@taiga-ui/core';
 import {UserService} from '../../services/user.service';
 import { MarkerClusterer } from '@googlemaps/markerclusterer';
+import { InterestFilterService } from '../../services/interest-filter.service';
 
 @Component({
   selector: 'app-map-view',
@@ -30,11 +31,13 @@ import { MarkerClusterer } from '@googlemaps/markerclusterer';
 export class MapViewComponent implements OnInit{
 
   private readonly alerts = inject(TuiAlertService);
+  interestFiltering$ = this.interestFilterService.getFiltering();
 
   constructor(private locationService: LocationService,
               private userLocationService: UserLocationService,
               private userService: UserService,
-              private zone: NgZone) {
+              private zone: NgZone,
+              private interestFilterService: InterestFilterService) {
   }
 
   @Output() selectDetailEvent: EventEmitter<Object> = new EventEmitter<Object>();
@@ -178,6 +181,9 @@ export class MapViewComponent implements OnInit{
         this.addMarkersToMap(locations);
         this.populatePlacesEvent.emit(locations);
       });
+
+    this.interestFilterService.getFiltering().subscribe(active => {
+      console.log('Interest Filter ist jetzt:', active);
   }
 
   private clusterer!: MarkerClusterer;
