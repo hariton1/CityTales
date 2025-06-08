@@ -35,9 +35,9 @@ export class HistoryOneUserComponent {
   ngOnInit(): void {
     this.userHistoriesService.getUserHistoriesByUserId(localStorage.getItem("user_uuid") as UUID).subscribe({
       next: (userHistories) => {
-        // Process each feedback independently
+        // Process each user history independently
         userHistories.forEach(userHistory => {
-          // You can process each feedback here
+          // You can process each user history here
           console.log('Processing user history:', userHistory);
           const locationObs = this.locationService.getLocationByVHWId(userHistory.getArticleId())
             .pipe(catchError(error => {
