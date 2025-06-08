@@ -75,6 +75,7 @@ public class MappingService implements IMappingService {
         eventEntity.setTypeOfEvent(Optional.ofNullable(getSafeString(node, "typeOfEvent")));
         eventEntity.setTopic(Optional.ofNullable(getSafeString(node, "topic")));
         eventEntity.setSeeAlso(Optional.ofNullable(getSafeString(node, "seeAlso")));
+
         if (node.containsKey("links")) {
             eventEntity.setLinks(node.get("links").asList(Value::asString));
         } else {

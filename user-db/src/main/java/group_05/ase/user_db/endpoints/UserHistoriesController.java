@@ -2,6 +2,8 @@ package group_05.ase.user_db.endpoints;
 
 import group_05.ase.user_db.restData.UserHistoryDTO;
 import group_05.ase.user_db.services.UserHistoryService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,6 +14,8 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/userHistories")
 public class UserHistoriesController {
+
+    private static final Logger logger = LoggerFactory.getLogger(UserHistoriesController.class);
 
     private final UserHistoryService userHistoryService;
 
@@ -25,7 +29,8 @@ public class UserHistoriesController {
         try {
             return this.userHistoryService.getAllUserHistories();
         } catch (Exception e) {
-            return new ArrayList<UserHistoryDTO>(); //"An internal server error occurred => " + e.getMessage();
+            logger.error("Error fetching user histories: {}", e.getMessage());
+            throw new RuntimeException("Error fetching user histories", e);
         }
     }
 
@@ -35,7 +40,8 @@ public class UserHistoriesController {
         try {
             return this.userHistoryService.getUserHistoriesById(userId);
         } catch (Exception e) {
-            return new UserHistoryDTO(); //"An internal server error occurred => " + e.getMessage();
+            logger.error("Error fetching user histories by id {}: {}", userId, e.getMessage());
+            throw new RuntimeException("Error fetching user histories", e);
         }
     }
 
@@ -45,7 +51,8 @@ public class UserHistoriesController {
         try {
             return this.userHistoryService.getUserHistoriesByUserId(userId);
         } catch (Exception e) {
-            return new ArrayList<UserHistoryDTO>(); //"An internal server error occurred => " + e.getMessage();
+            logger.error("Error fetching user histories by user_id {}: {}", userId.toString(), e.getMessage());
+            throw new RuntimeException("Error fetching user histories", e);
         }
     }
 
@@ -55,7 +62,8 @@ public class UserHistoriesController {
         try {
             return this.userHistoryService.getUserHistoriesByArticleId(articleId);
         } catch (Exception e) {
-            return new ArrayList<UserHistoryDTO>(); //"An internal server error occurred => " + e.getMessage();
+            logger.error("Error fetching user histories by article_id {}: {}", articleId, e.getMessage());
+            throw new RuntimeException("Error fetching user histories", e);
         }
     }
 
@@ -65,8 +73,8 @@ public class UserHistoriesController {
         try {
             return this.userHistoryService.saveNewUserHistory(userHistoryDTO);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return new UserHistoryDTO();
+            logger.error("Error creating user history {}: {}", userHistoryDTO.toString(), e.getMessage());
+            throw new RuntimeException("Error creating user history", e);
         }
     }
 
@@ -76,7 +84,8 @@ public class UserHistoriesController {
         try {
             this.userHistoryService.saveChangedUserHistory(userHistoryDTO);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            logger.error("Error updating user history {}: {}", userHistoryDTO.toString(), e.getMessage());
+            throw new RuntimeException("Error updating user history", e);
         }
     }
 

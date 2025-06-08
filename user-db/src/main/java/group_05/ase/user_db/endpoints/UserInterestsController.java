@@ -2,6 +2,8 @@ package group_05.ase.user_db.endpoints;
 
 import group_05.ase.user_db.restData.UserInterestDTO;
 import group_05.ase.user_db.services.UserInterestService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -16,6 +18,8 @@ import java.util.UUID;
 @RequestMapping("/userInterests")
 public class UserInterestsController {
 
+    private static final Logger logger = LoggerFactory.getLogger(UserInterestsController.class);
+
     private final UserInterestService userInterestService;
 
     public UserInterestsController(UserInterestService userInterestService) {
@@ -28,7 +32,8 @@ public class UserInterestsController {
         try {
             return this.userInterestService.getAllUserInterests();
         } catch (Exception e) {
-            return new ArrayList<UserInterestDTO>(); //"An internal server error occurred => " + e.getMessage();
+            logger.error("Error fetching user interests: {}", e.getMessage());
+            throw new RuntimeException("Error fetching user interests", e);
         }
     }
 
@@ -38,7 +43,8 @@ public class UserInterestsController {
         try {
             return this.userInterestService.getUserInterestsByInterestId(interestId);
         } catch (Exception e) {
-            return new ArrayList<UserInterestDTO>(); //"An internal server error occurred => " + e.getMessage();
+            logger.error("Error fetching user interests by id {}: {}", interestId, e.getMessage());
+            throw new RuntimeException("Error fetching user interests", e);
         }
     }
 
@@ -48,7 +54,8 @@ public class UserInterestsController {
         try {
             this.userInterestService.saveNewUserInterest(userInterestDTO);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            logger.error("Error creating user interest by id {}: {}", userInterestDTO.toString(), e.getMessage());
+            throw new RuntimeException("Error creating user interest", e);
         }
     }
 
@@ -58,7 +65,8 @@ public class UserInterestsController {
         try {
             this.userInterestService.deleteUserInterest(userInterestDTO);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            logger.error("Error deleting user interest by id {}: {}", userInterestDTO.toString(), e.getMessage());
+            throw new RuntimeException("Error deleting user interest", e);
         }
     }
 
@@ -69,7 +77,8 @@ public class UserInterestsController {
             UUID userId = UUID.fromString(jwt.getSubject());
             return this.userInterestService.getUserInterestsByUserId(userId);
         } catch (Exception e) {
-            return new ArrayList<>();
+            logger.error("Error fetching user interests by user_id {}: {}", jwt.getSubject(), e.getMessage());
+            throw new RuntimeException("Error fetching user interests", e);
         }
     }
 

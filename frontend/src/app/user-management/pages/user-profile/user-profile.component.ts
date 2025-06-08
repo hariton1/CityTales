@@ -85,7 +85,7 @@ export class UserProfileComponent {
     if (!this.userId) return;
 
     // Use switchMap to handle the sequential flow
-    this.userInterestService.getUserInterestsByUserId(this.userId)
+    this.userInterestService.getMyInterests()
       .pipe(
         switchMap(interests => {
           // If no interests, return an empty array observable
@@ -127,6 +127,14 @@ export class UserProfileComponent {
 
   handleEditInterestsClick () {
     this.router.navigate(['/edit-interests']);
+  }
+
+  handleChangePassClick () {
+    this.router.navigate(['/reset-pass']);
+  }
+
+  handleDisplayHistoryClick () {
+    this.router.navigate(['/my-history']);
   }
 
   get role(): string {
