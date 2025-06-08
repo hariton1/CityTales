@@ -80,6 +80,7 @@ export class EditUserComponent implements OnInit {
           this.editUserForm.patchValue({
             email: this.user.email,
             role: this.user.role,
+            status: this.user.status,
           });
         const createdDate = new Date(this.user.created_at);
         this.accountCreated = new TuiDay(
