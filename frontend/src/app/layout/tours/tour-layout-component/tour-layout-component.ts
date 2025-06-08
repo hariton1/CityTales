@@ -196,7 +196,7 @@ export class TourLayoutComponent {
     }
 
     //TODO: replace with user location
-    this.locationService.getLocationsInRadius(48.19994406631644, 16.371089994357767, 1000).subscribe(locations => {
+    this.locationService.getLocationsInRadius(48.19994406631644, 16.371089994357767, 1000, true).subscribe(locations => {
       this.buildingData = locations;
       console.log(this.buildingData.length);
 
