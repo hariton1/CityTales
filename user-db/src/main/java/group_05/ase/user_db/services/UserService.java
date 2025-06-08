@@ -65,8 +65,12 @@ public class UserService {
         }
 
         AuthUserEntity updatedUser = this.repository.save(existingUser);
-        UserDataEntity userData = this.userDataRepository.findByUserId(updatedUser.getId());
 
-        return new UserDTO(updatedUser.getId(),updatedUser.getEmail(),updatedUser.getCreatedAt(), userData.getRoleName(), userData.getStatus());
+        UserDataEntity tmp = this.userDataRepository.findByUserId(updatedUser.getId());
+        tmp.setRoleName(updatedValues.getRole());
+        tmp.setStatus(updatedValues.getStatus());
+        this.userDataRepository.save(tmp);
+
+        return new UserDTO(updatedUser.getId(),updatedUser.getEmail(),updatedUser.getCreatedAt(), tmp.getRoleName(), tmp.getStatus());
     }
 }
