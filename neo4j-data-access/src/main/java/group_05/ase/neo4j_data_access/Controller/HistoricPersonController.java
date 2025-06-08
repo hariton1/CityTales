@@ -76,35 +76,5 @@ public class HistoricPersonController {
         }
         return ResponseEntity.ok(events);
     }
-
-    @GetMapping("/funfact/by/id/{viennaHistoryWikiId}")
-    public ResponseEntity<String> getFunFactById(@PathVariable int viennaHistoryWikiId) {
-        ViennaHistoryWikiBuildingObject buildingById = historicBuildingService.getBuildingById(viennaHistoryWikiId);
-        if (buildingById == null || buildingById.getContentEnglish() == null || buildingById.getContentEnglish().isBlank()) {
-            return ResponseEntity.notFound().build();
-        }
-        String funFact = funFactExtractorService.extractFunFact(buildingById.getContentEnglish());
-        return ResponseEntity.ok(funFact);
-    }
-
-    @GetMapping("/funfact/dto/by/id/{viennaHistoryWikiId}")
-    public ResponseEntity<FunFactObject> getFunFactDtoById(@PathVariable int viennaHistoryWikiId) {
-        ViennaHistoryWikiBuildingObject buildingById = historicBuildingService.getBuildingById(viennaHistoryWikiId);
-        if (buildingById == null || buildingById.getContentEnglish() == null || buildingById.getContentEnglish().isBlank()) {
-            return ResponseEntity.notFound().build();
-        }
-        String funFact = funFactExtractorService.extractFunFact(buildingById.getContentEnglish());
-        return ResponseEntity.ok(new FunFactObject(buildingById.getName(), funFact));
-    }
-
-    @GetMapping("/funfact/tfidf/by/id/{viennaHistoryWikiId}")
-    public ResponseEntity<FunFactObject> getFunFactTFIDFById(@PathVariable int viennaHistoryWikiId) {
-        ViennaHistoryWikiBuildingObject buildingById = historicBuildingService.getBuildingById(viennaHistoryWikiId);
-        if (buildingById == null || buildingById.getContentEnglish() == null || buildingById.getContentEnglish().isBlank()) {
-            return ResponseEntity.notFound().build();
-        }
-        String funFact = funFactExtractorService.extractFunFactTFIDF(buildingById.getContentEnglish());
-        return ResponseEntity.ok(new FunFactObject(buildingById.getName(), funFact));
-    }
 }
 
