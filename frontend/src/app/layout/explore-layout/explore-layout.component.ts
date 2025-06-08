@@ -9,8 +9,6 @@ import {TuiIcon} from '@taiga-ui/core';
 import {NotificationInboxComponent} from '../../core/notification-inbox/notification-inbox.component';
 import {PersonEntity} from '../../dto/db_entity/PersonEntity';
 import {EventEntity} from '../../dto/db_entity/EventEntity';
-import { FormsModule } from '@angular/forms';
-import { InterestFilterService } from '../../services/interest-filter.service';
 
 @Component({
   selector: 'app-explore-layout',
@@ -20,7 +18,6 @@ import { InterestFilterService } from '../../services/interest-filter.service';
     TuiSegmented,
     NgIf,
     TuiIcon,
-    FormsModule,
     NotificationInboxComponent
   ],
   templateUrl: './explore-layout.component.html',
@@ -30,7 +27,6 @@ export class ExploreLayoutComponent implements OnInit {
 
   currentViewMobile: 'discover' | 'map' = 'discover';
   isMobile = false;
-  interestFiltering: boolean = true;
 
   selectedPlace: BuildingEntity | null = null;
   selectedPerson: PersonEntity | null = null;
@@ -40,25 +36,16 @@ export class ExploreLayoutComponent implements OnInit {
   setDetailedView: boolean = false;
 
   constructor(
-    private interestFilterService: InterestFilterService,
     readonly breakpointObserver: BreakpointObserver
   ) {}
 
   ngOnInit() {
-    this.interestFilterService.filtering$.subscribe(
-      value => this.interestFiltering = value
-    );
-
-    this.breakpointObserver
+      this.breakpointObserver
       .observe([Breakpoints.HandsetPortrait, Breakpoints.HandsetLandscape])
       .subscribe(result => {
         this.isMobile = result.matches;
         this.currentViewMobile = 'discover';
       });
-  }
-
-  onInterestFilteringChange(value: boolean) {
-    this.interestFilterService.setFiltering(value);
   }
 
   setSelectedPlace(place: BuildingEntity) {

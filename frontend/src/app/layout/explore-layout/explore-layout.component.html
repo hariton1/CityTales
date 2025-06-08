@@ -18,14 +18,6 @@
       <app-notification-inbox (selectPlaceEvent)="selectDetailEvent($event)"></app-notification-inbox>
     </div>
 
-  <div class="interest-filter-toggle">
-    <tui-switch
-      [(ngModel)]="interestFiltering"
-      (ngModelChange)="onInterestFilteringChange($event)"
-    >
-      Interest Filter
-    </tui-switch>
-  </div>
   <!-- Mobile: show only selected component -->
   <ng-container *ngIf="currentViewMobile === 'discover'">
     <app-sidebar [historicalPlaces]="historicalPlaces"></app-sidebar>
