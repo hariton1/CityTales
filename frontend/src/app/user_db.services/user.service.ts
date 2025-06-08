@@ -36,7 +36,11 @@ export class UserService {
 
   public updateUser(user: UserDto) : Observable<UserDto> {
     const payload = {
+      id: user.id,
       email: user.email,
+      created_at: user.created_at,
+      role: user.role,
+      status: user.status,
     };
 
     return this.httpClient.patch<UserDto>(`${this.DOMAIN}/id=${user.id}`, payload)
