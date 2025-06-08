@@ -55,6 +55,7 @@ export class EditUserComponent implements OnInit {
   userId: string | null = null;
   user: UserDto | null = null;
   protected persons = ['User', 'Moderator', 'Contributor'];
+  protected statuses = ['Active', 'Locked'];
   accountCreated: any = null;
 
   constructor(readonly route: ActivatedRoute, readonly userService: UserService, private router: Router) {
@@ -78,7 +79,7 @@ export class EditUserComponent implements OnInit {
         console.log('User loaded: ' + this.user);
           this.editUserForm.patchValue({
             email: this.user.email,
-            role: this.user.role ?? '',
+            role: this.user.role,
           });
         const createdDate = new Date(this.user.created_at);
         this.accountCreated = new TuiDay(
@@ -110,7 +111,8 @@ export class EditUserComponent implements OnInit {
         this.user.id,
         formValues.email ?? '',
         this.user.created_at,
-        formValues.role ? formValues.role : undefined
+        formValues.role ?? '',
+        formValues.status ?? ''
       );
 
       this.userService.updateUser(updatedUser)
@@ -129,6 +131,7 @@ export class EditUserComponent implements OnInit {
   protected editUserForm = new FormGroup({
     email: new FormControl({value: '', disabled: true}, Validators.required),
     role: new FormControl('', Validators.required),
+    status: new FormControl('', Validators.required),
   });
 }
 

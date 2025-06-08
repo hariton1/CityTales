@@ -1,6 +1,8 @@
 package group_05.ase.user_db.services;
 
 import group_05.ase.user_db.entities.AuthUserEntity;
+import group_05.ase.user_db.entities.UserDataEntity;
+import group_05.ase.user_db.repositories.UserDataRepository;
 import group_05.ase.user_db.repositories.UserRepository;
 import group_05.ase.user_db.restData.UserDTO;
 import org.springframework.stereotype.Service;
@@ -14,9 +16,11 @@ import java.util.UUID;
 public class UserService {
 
     private final UserRepository repository;
+    private final UserDataRepository userDataRepository;
 
-    public UserService(UserRepository repository) {
+    public UserService(UserRepository repository, UserDataRepository userDataRepository) {
         this.repository = repository;
+        this.userDataRepository = userDataRepository;
     }
 
     public List<UserDTO> getAllUsers() {
@@ -24,7 +28,8 @@ public class UserService {
         List<AuthUserEntity> tmp = this.repository.findAll();
 
         for(AuthUserEntity user : tmp) {
-            users.add(new UserDTO(user.getId(),user.getEmail(),user.getCreatedAt(), user.getRole()));
+            UserDataEntity userData = this.userDataRepository.findByUserId(user.getId());
+            users.add(new UserDTO(user.getId(),user.getEmail(),user.getCreatedAt(), userData.getRoleName(), userData.getStatus()));
         }
 
         return users;
@@ -38,7 +43,9 @@ public class UserService {
         AuthUserEntity user = this.repository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
 
-        return new UserDTO(user.getId(),user.getEmail(),user.getCreatedAt(), user.getRole());
+        UserDataEntity userData = this.userDataRepository.findByUserId(user.getId());
+
+        return new UserDTO(user.getId(),user.getEmail(),user.getCreatedAt(), userData.getRoleName(), userData.getStatus());
     }
 
     public void deleteUserById(UUID userId) {
@@ -58,7 +65,8 @@ public class UserService {
         }
 
         AuthUserEntity updatedUser = this.repository.save(existingUser);
+        UserDataEntity userData = this.userDataRepository.findByUserId(updatedUser.getId());
 
-        return new UserDTO(updatedUser.getId(),updatedUser.getEmail(),updatedUser.getCreatedAt(), existingUser.getRole());
+        return new UserDTO(updatedUser.getId(),updatedUser.getEmail(),updatedUser.getCreatedAt(), userData.getRoleName(), userData.getStatus());
     }
 }
