@@ -2,6 +2,8 @@ package group_05.ase.user_db.endpoints;
 
 import group_05.ase.user_db.restData.UserBadgeDTO;
 import group_05.ase.user_db.services.UserBadgeService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,6 +14,8 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/userBadges")
 public class UserBadgeController {
+
+    private static final Logger logger = LoggerFactory.getLogger(UserBadgeController.class);
 
     private final UserBadgeService userBadgeService;
 
@@ -25,7 +29,8 @@ public class UserBadgeController {
         try {
             return this.userBadgeService.getAllUserBadges();
         } catch (Exception e) {
-            return new ArrayList<UserBadgeDTO>(); //"An internal server error occurred => " + e.getMessage();
+            logger.error("Error fetching badges: {}", e.getMessage());
+            throw new RuntimeException("Error fetching badges", e);
         }
     }
 
@@ -36,7 +41,8 @@ public class UserBadgeController {
         try {
             return this.userBadgeService.getUserBadgesByUserId(userId);
         } catch (Exception e) {
-            return new ArrayList<UserBadgeDTO>(); //"An internal server error occurred => " + e.getMessage();
+            logger.error("Error fetching badges by user_id {}: {}", userId.toString(), e.getMessage());
+            throw new RuntimeException("Error fetching badges", e);
         }
     }
 
@@ -46,7 +52,8 @@ public class UserBadgeController {
         try {
             return this.userBadgeService.getUserBadgesByArticleId(article_id);
         } catch (Exception e) {
-            return new ArrayList<UserBadgeDTO>(); //"An internal server error occurred => " + e.getMessage();
+            logger.error("Error fetching badges by article_id {}: {}", article_id, e.getMessage());
+            throw new RuntimeException("Error fetching badges", e);
         }
     }
 
@@ -56,8 +63,8 @@ public class UserBadgeController {
         try {
             return this.userBadgeService.saveNewBadge(userBadgeDTO);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return new UserBadgeDTO();
+            logger.error("Error creating badge {}: {}", userBadgeDTO.toString(), e.getMessage());
+            throw new RuntimeException("Error creating badge", e);
         }
     }
 

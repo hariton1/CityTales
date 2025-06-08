@@ -2,6 +2,8 @@ package group_05.ase.user_db.endpoints;
 
 import group_05.ase.user_db.restData.FeedbackDTO;
 import group_05.ase.user_db.services.FeedbackService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,6 +14,8 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/feedbacks")
 public class FeedbacksController {
+
+    private static final Logger logger = LoggerFactory.getLogger(FeedbacksController.class);
 
     private final FeedbackService feedbackService;
 
@@ -26,7 +30,8 @@ public class FeedbacksController {
         try {
             return this.feedbackService.getAllFeedbacks();
         } catch (Exception e) {
-            return new ArrayList<FeedbackDTO>(); //"An internal server error occurred => " + e.getMessage();
+            logger.error("Error fetching feedbacks: {}", e.getMessage());
+            throw new RuntimeException("Error fetching feedbacks", e);
         }
     }
 
@@ -36,7 +41,8 @@ public class FeedbacksController {
         try {
             return this.feedbackService.getFeedbackById(feedbackId);
         } catch (Exception e) {
-            return new FeedbackDTO(); //"An internal server error occurred => " + e.getMessage();
+            logger.error("Error fetching feedback by id {}: {}", feedbackId, e.getMessage());
+            throw new RuntimeException("Error fetching feedback", e);
         }
     }
 
@@ -46,7 +52,8 @@ public class FeedbacksController {
         try {
             return this.feedbackService.getFeedbacksByUserId(userId);
         } catch (Exception e) {
-            return new ArrayList<FeedbackDTO>(); //"An internal server error occurred => " + e.getMessage();
+            logger.error("Error fetching feedback by user_id {}: {}", userId.toString(), e.getMessage());
+            throw new RuntimeException("Error fetching feedback", e);
         }
     }
 
@@ -56,7 +63,8 @@ public class FeedbacksController {
         try {
             return this.feedbackService.getFeedbacksByArticleId(articleId);
         } catch (Exception e) {
-            return new ArrayList<FeedbackDTO>(); //"An internal server error occurred => " + e.getMessage();
+            logger.error("Error fetching feedback by article_id {}: {}", articleId, e.getMessage());
+            throw new RuntimeException("Error fetching feedback", e);
         }
     }
 
@@ -66,7 +74,8 @@ public class FeedbacksController {
         try {
             return this.feedbackService.getFeedbacksByFbContentLike(content);
         } catch (Exception e) {
-            return new ArrayList<FeedbackDTO>(); //"An internal server error occurred => " + e.getMessage();
+            logger.error("Error fetching feedback by content {}: {}", content, e.getMessage());
+            throw new RuntimeException("Error fetching feedback", e);
         }
     }
 
@@ -76,7 +85,8 @@ public class FeedbacksController {
         try {
             this.feedbackService.saveNewFeedback(feedbackDTO);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            logger.error("Error creating feedback {}: {}", feedbackDTO.toString(), e.getMessage());
+            throw new RuntimeException("Error creating feedback", e);
         }
     }
 
@@ -86,7 +96,8 @@ public class FeedbacksController {
         try {
             this.feedbackService.approveFeedback(feedbackId);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            logger.error("Error approving feedback by id {}: {}", feedbackId, e.getMessage());
+            throw new RuntimeException("Error approving feedback", e);
         }
     }
 
@@ -96,7 +107,8 @@ public class FeedbacksController {
         try {
             this.feedbackService.deleteFeedback(feedbackId);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            logger.error("Error deleting feedback by id {}: {}", feedbackId, e.getMessage());
+            throw new RuntimeException("Error deleting feedback", e);
         }
     }
 

@@ -8,8 +8,9 @@
     <thead>
     <tr>
       <th tuiTh>Role</th>
-      <th tuiTh>User Data</th>
-      <th tuiTh>Created At</th>
+      <th tuiTh>Status</th>
+      <th tuiTh>Username</th>
+      <th tuiTh>Created at</th>
       <th tuiTh>Actions</th>
     </tr>
     </thead>
@@ -19,11 +20,19 @@
       <td tuiTd>
         <div [tuiCell]="'m'">
                     <span tuiTitle>
-                      Default
+                      {{ user.role }}
                     </span>
         </div>
       </td>
       <!-- Second column -->
+      <td tuiTd>
+        <div [tuiCell]="'m'">
+                    <span tuiTitle>
+                      {{ user.status }}
+                    </span>
+        </div>
+      </td>
+      <!-- Third column -->
       <td tuiTd>
         <div [tuiCell]="'m'">
           <tui-avatar
@@ -35,6 +44,7 @@
           </span>
         </div>
       </td>
+      <!-- Fourth column -->
       <td tuiTd>
         <span tuiTitle>
           {{ user.created_at | date: 'dd.MM.yyyy' }}

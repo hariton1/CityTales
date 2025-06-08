@@ -307,7 +307,7 @@ export class UserService {
   public getUserWithRoleById(id: string) : Observable<UserDto> {
     return this.httpClient.get<UserDto>(`${this.USERS_DOMAIN}/id=${id}`)
       .pipe(map(user => {
-        return new UserDto(user.id,user.email, user.created_at, user.role);
+        return new UserDto(user.id,user.email, user.created_at, user.role, user.status);
       }));
   }
 }
