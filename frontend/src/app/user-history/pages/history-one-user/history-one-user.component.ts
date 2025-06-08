@@ -7,6 +7,7 @@ import {LocationService} from '../../../services/location.service';
 import {UserHistoriesService} from '../../../user_db.services/user-histories.service';
 import {catchError, forkJoin, of} from 'rxjs';
 import {UUID} from 'node:crypto';
+import {HelperService} from '../../../user_db.services/helper.service';
 
 @Component({
   selector: 'app-history-one-user',
@@ -28,7 +29,8 @@ export class HistoryOneUserComponent {
   protected userHistories: any[];
 
   constructor(private userHistoriesService: UserHistoriesService,
-              private locationService: LocationService) {
+              private locationService: LocationService,
+              private helperService: HelperService) {
     this.userHistories = [];
   }
 
@@ -50,7 +52,7 @@ export class HistoryOneUserComponent {
 
             this.userHistories.push({
               article_name: articleName,
-              open_dt: userHistory.getOpenDt()
+              open_dt: this.helperService.sanitizeDate(userHistory.getOpenDt())
             });
           });
 
