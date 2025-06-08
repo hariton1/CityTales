@@ -20,7 +20,7 @@ public class UserInterestClient {
     public List<UserInterestsDTO> getUserInterests(UUID userId) {
         try {
             return webClient.get()
-                    .uri("/byUserId/{userId}", userId)
+                    .uri("userInterests/user/{userID}/interests/with-weight", userId)
                     .retrieve()
                     .bodyToFlux(UserInterestsDTO.class)
                     .collectList()

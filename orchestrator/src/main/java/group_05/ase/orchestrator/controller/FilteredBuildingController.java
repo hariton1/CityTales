@@ -1,5 +1,7 @@
 package group_05.ase.orchestrator.controller;
 
+import group_05.ase.orchestrator.client.ArticleClient;
+import group_05.ase.orchestrator.dto.ArticleWeightDTO;
 import group_05.ase.orchestrator.dto.ViennaHistoryWikiBuildingObject;
 import group_05.ase.orchestrator.client.Neo4jBuildingClient;
 import group_05.ase.orchestrator.client.UserInterestClient;
@@ -19,23 +21,8 @@ public class FilteredBuildingController {
     private final FilteredBuildingService filteredBuildingService;
     private final UserInterestClient userInterestClient;
     private final Neo4jBuildingClient buildingClient;
+    private final ArticleClient articleClient;
 
-//    @GetMapping("/filtered/byUserAndLocation")
-//    public List<ViennaHistoryWikiBuildingObject> getFilteredBuildingsForUserAndLocation(
-//            @RequestParam UUID userId,
-//            @RequestParam double latitude,
-//            @RequestParam double longitude,
-//            @RequestParam double radius
-//    ) {
-//        try {
-//            List<UserInterestsDTO> interests = userInterestClient.getUserInterests(userId);
-//            List<ViennaHistoryWikiBuildingObject> buildings = buildingClient.getBuildingsByLocation(latitude, longitude, radius);
-//            return filteredBuildingService.filterBuildingsByUserInterestsAndLocation(buildings, interests, latitude, longitude, radius);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            throw new RuntimeException("Fehler im Controller: " + e.getMessage(), e);
-//        }
-//    }
 
     @GetMapping("/filtered/byUser/{userId}")
     public List<ViennaHistoryWikiBuildingObject> getFilteredBuildingsForUser(
@@ -46,7 +33,8 @@ public class FilteredBuildingController {
     ) {
         List<UserInterestsDTO> interests = userInterestClient.getUserInterests(userId);
         List<ViennaHistoryWikiBuildingObject> buildings = buildingClient.getBuildingsByLocation(latitude, longitude, radius);
-        return filteredBuildingService.filterBuildingsByUserInterests(buildings, interests);
+        List<ArticleWeightDTO> articleWeights = articleClient.getAllArticleWeights();
+        return filteredBuildingService.filterBuildingsByUserInterests(buildings, interests, articleWeights);
     }
 
 }

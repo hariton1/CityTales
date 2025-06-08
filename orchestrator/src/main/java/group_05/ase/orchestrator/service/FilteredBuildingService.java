@@ -1,116 +1,53 @@
 package group_05.ase.orchestrator.service;
 
+import group_05.ase.orchestrator.dto.ArticleWeightDTO;
 import group_05.ase.orchestrator.dto.UserInterestsDTO;
 import group_05.ase.orchestrator.dto.ViennaHistoryWikiBuildingObject;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
-//@Service
-//public class FilteredBuildingService {
-
-//
-//    /**
-//     * Filtert Gebäude nach Interessen und Radius.
-//     */
-//    public List<ViennaHistoryWikiBuildingObject> filterBuildingsByUserInterestsAndLocation(
-//            List<ViennaHistoryWikiBuildingObject> allBuildings,
-//            List<UserInterestsDTO> userInterests,
-//            double latitude,
-//            double longitude,
-//            double radiusMeters
-//    ) {
-//        List<String> interestNames = userInterests.stream()
-//                .map(UserInterestsDTO::getInterestNameEn)
-//                .toList();
-//
-//        List<ViennaHistoryWikiBuildingObject> filtered = new ArrayList<>();
-//        for (ViennaHistoryWikiBuildingObject building : allBuildings) {
-//            if (
-//                    matchesAnyInterest(building, interestNames)
-//                            && isWithinRadius(building, latitude, longitude, radiusMeters)
-//            ) {
-//                filtered.add(building);
-//            }
-//        }
-//        return filtered;
-//    }
-//
-//    /**
-//     * Checkt, ob das Gebäude einen der Interessen matcht.
-//     */
-//    private boolean matchesAnyInterest(ViennaHistoryWikiBuildingObject building, List<String> interestNames) {
-//        for (String interest : interestNames) {
-//            if (
-//                    containsIgnoreCase(building.getName(), interest)
-//                            || containsIgnoreCase(building.getBuildingType().orElse(""), interest)
-//                            || containsIgnoreCase(building.getNamedAfter().orElse(""), interest)
-//                            || containsIgnoreCase(building.getOtherName().orElse(""), interest)
-//                            || containsIgnoreCase(building.getSeeAlso().orElse(""), interest)
-//            ) {
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
-//
-//    private boolean containsIgnoreCase(String text, String search) {
-//        return text != null && search != null
-//                && text.toLowerCase().contains(search.toLowerCase());
-//    }
-//
-//    /**
-//     * Berechnet, ob das Gebäude im Radius um die Startkoordinate liegt.
-//     */
-//    private boolean isWithinRadius(ViennaHistoryWikiBuildingObject building, double centerLat, double centerLon, double radiusMeters) {
-//        Optional<Double> optLat = building.getLatitude();
-//        Optional<Double> optLon = building.getLongitude();
-//        if (optLat.isEmpty() || optLon.isEmpty()) {
-//            return false;
-//        }
-//        double lat = optLat.get();
-//        double lon = optLon.get();
-//        double distance = haversine(centerLat, centerLon, lat, lon);
-//        return distance <= radiusMeters;
-//    }
-//
-//    /**
-//     * Haversine-Formel für Entfernung zwischen 2 Punkten in Metern.
-//     */
-//    private double haversine(double lat1, double lon1, double lat2, double lon2) {
-//        final int R = 6371000; // Erd-Radius in Meter
-//        double dLat = Math.toRadians(lat2 - lat1);
-//        double dLon = Math.toRadians(lon2 - lon1);
-//        double a =
-//                Math.sin(dLat / 2) * Math.sin(dLat / 2)
-//                        + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
-//                        * Math.sin(dLon / 2) * Math.sin(dLon / 2);
-//        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-//        return R * c;
-//    }
-//}
 @Service
 public class FilteredBuildingService {
 
+
+
     public List<ViennaHistoryWikiBuildingObject> filterBuildingsByUserInterests(
             List<ViennaHistoryWikiBuildingObject> buildings,
-            List<UserInterestsDTO> interests
+            List<UserInterestsDTO> interests,
+            List<ArticleWeightDTO> articleWeights // <-- pass in here!
     ) {
-        if (interests == null || interests.isEmpty()) {
-            // Kein Filter: alles zurückgeben
-            return buildings;
-        }
+        System.out.println("Input buildings: " + (buildings == null ? "null" : buildings.size()));
+        System.out.println("Input interests: " + (interests == null ? "null" : interests.size()));
+        System.out.println("Input articleWeights: " + (articleWeights == null ? "null" : articleWeights.size()));
 
-        List<String> interestNames = interests.stream()
-                .map(UserInterestsDTO::getInterestNameEn)
-                .map(String::toLowerCase)
+        Map<Integer, Float> weightMap = articleWeights.stream()
+                .collect(Collectors.toMap(
+                        ArticleWeightDTO::getArticleId,
+                        ArticleWeightDTO::getWeight
+                ));
+
+        List<String> interestNames = interests == null ? List.of() :
+                interests.stream()
+                        .map(UserInterestsDTO::getInterestNameEn)
+                        .map(String::toLowerCase)
+                        .toList();
+
+        List<ViennaHistoryWikiBuildingObject> filtered = buildings.stream()
+                .filter(b -> interests == null || interests.isEmpty() || matchesAnyInterest(b, interestNames))
                 .toList();
 
-        return buildings.stream()
-                .filter(b -> matchesAnyInterest(b, interestNames))
-                .toList();
+        // Make a mutable copy and sort
+        List<ViennaHistoryWikiBuildingObject> sorted = new ArrayList<>(filtered);
+        sorted.sort((a, b) -> {
+            float wA = weightMap.getOrDefault(a.getViennaHistoryWikiId(), 0.0f);
+            float wB = weightMap.getOrDefault(b.getViennaHistoryWikiId(), 0.0f);
+            return Float.compare(wB, wA);
+        });
+        System.out.println("Filtered buildings: " + filtered.size());
+        System.out.println("Sorted buildings: " + sorted.size());
+        return sorted;
     }
 
     private boolean matchesAnyInterest(ViennaHistoryWikiBuildingObject building, List<String> interestNames) {
