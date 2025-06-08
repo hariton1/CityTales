@@ -4,13 +4,15 @@ export class UserDto {
   private _id: UUID;
   private _email: string;
   private _created_at: Date;
-  private _role?: string;
+  private _role: string;
+  private _status: string;
 
-  constructor(id: UUID, email: string, created_at: Date, role?: string) {
+  constructor(id: UUID, email: string, created_at: Date, role: string, status: string) {
     this._id = id;
     this._email = email;
     this._created_at = created_at;
     this._role = role;
+    this._status = status;
   }
 
   get id(): UUID {
@@ -37,12 +39,20 @@ export class UserDto {
     this._created_at = value;
   }
 
-  get role(): string | undefined {
+  get role(): string {
     return this._role;
   }
 
-  set role(value: string | undefined) {
+  set role(value: string) {
     this._role = value;
+  }
+
+  get status(): string {
+    return this._status;
+  }
+
+  set status(value: string) {
+    this._status = value;
   }
 
   toString(): string {
@@ -54,7 +64,9 @@ export class UserDto {
       " " +
       this._created_at +
       " " +
-      (this._role ? this._role : "")
+      this._role +
+      " " +
+      this._status
     );
   }
 }

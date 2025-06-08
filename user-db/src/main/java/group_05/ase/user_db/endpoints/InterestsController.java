@@ -2,6 +2,8 @@ package group_05.ase.user_db.endpoints;
 
 import group_05.ase.user_db.restData.InterestDTO;
 import group_05.ase.user_db.services.InterestService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,6 +13,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/interests")
 public class InterestsController {
+
+    private static final Logger logger = LoggerFactory.getLogger(InterestsController.class);
 
     private final InterestService interestService;
 
@@ -24,7 +28,8 @@ public class InterestsController {
         try {
             return this.interestService.getAllInterests();
         } catch (Exception e) {
-            return new ArrayList<InterestDTO>();//"An internal server error occurred => " + e.getMessage();
+            logger.error("Error fetching interests: {}", e.getMessage());
+            throw new RuntimeException("Error fetching interests", e);
         }
     }
 
@@ -34,7 +39,8 @@ public class InterestsController {
         try {
             return this.interestService.getInterestById(interestId);
         } catch (Exception e) {
-            return new InterestDTO();//"An internal server error occurred => " + e.getMessage();
+            logger.error("Error fetching interests by id {}: {}", interestId, e.getMessage());
+            throw new RuntimeException("Error fetching interests", e);
         }
     }
 
@@ -44,7 +50,8 @@ public class InterestsController {
         try {
             return this.interestService.getInterestByNameEn(interestNameEn);
         } catch (Exception e) {
-            return new InterestDTO();//"An internal server error occurred => " + e.getMessage();
+            logger.error("Error fetching interests by interest_name_en {}: {}", interestNameEn, e.getMessage());
+            throw new RuntimeException("Error fetching interests", e);
         }
     }
 
@@ -54,7 +61,8 @@ public class InterestsController {
         try {
             return this.interestService.getInterestByNameDe(interestNameDe);
         } catch (Exception e) {
-            return new InterestDTO();//"An internal server error occurred => " + e.getMessage();
+            logger.error("Error fetching interests by interest_name_de {}: {}", interestNameDe, e.getMessage());
+            throw new RuntimeException("Error fetching interests", e);
         }
     }
 
@@ -64,7 +72,8 @@ public class InterestsController {
         try {
             return this.interestService.getInterestsByDescriptionLike(description);
         } catch (Exception e) {
-            return new ArrayList<InterestDTO>();//"An internal server error occurred => " + e.getMessage();
+            logger.error("Error fetching interests by description {}: {}", description, e.getMessage());
+            throw new RuntimeException("Error fetching interests", e);
         }
     }
 
@@ -74,7 +83,8 @@ public class InterestsController {
         try {
             this.interestService.saveNewInterest(interestDTO);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            logger.error("Error creating interest {}: {}", interestDTO.toString(), e.getMessage());
+            throw new RuntimeException("Error creating interest", e);
         }
     }
 

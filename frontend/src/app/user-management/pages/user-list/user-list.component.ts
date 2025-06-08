@@ -57,7 +57,7 @@ export class UserListComponent implements OnInit {
     this.userService.getAllUsers()
       .subscribe({
         next: (users) => {
-          this.users = users;
+          this.users = users.filter(user => user.status !== 'Deleted');
         },
         error(error) {
           console.error('Error fetching users:', error);
@@ -102,6 +102,6 @@ export class UserListComponent implements OnInit {
   }
 
   deleteUser(id: string) : void {
-    this.userService.deleteUserById(id);
+    this.userService.deleteUserById(id).subscribe({});
   }
 }
