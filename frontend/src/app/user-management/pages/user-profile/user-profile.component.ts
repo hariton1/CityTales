@@ -129,6 +129,10 @@ export class UserProfileComponent {
     this.router.navigate(['/edit-interests']);
   }
 
+  handleChangePassClick () {
+    this.router.navigate(['/reset-pass']);
+  }
+
   get role(): string {
     return this.user?.role ?? '';
   }
