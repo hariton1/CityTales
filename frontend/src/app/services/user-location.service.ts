@@ -50,7 +50,7 @@ export class UserLocationService {
           };
           //send location to backend
           this.locationService
-            .getLocationsInRadius(position.coords.latitude, position.coords.longitude, radius)
+            .getLocationsInRadius(position.coords.latitude, position.coords.longitude, radius, false)
             .subscribe(historicalPlaces => {
               console.log(historicalPlaces.length);
               this.historicalPlacesSubject.next(historicalPlaces);
