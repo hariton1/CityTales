@@ -32,9 +32,9 @@
         </button>
       </div>
 
-      <div class="content-section">
+      <div class="content-section" *ngIf="this.prices().length > 0">
         <h3>Prices
-          <button tuiButton appearance="flat" size="xs" type="button" class="add-btn" tuiHint="Add a new price!"
+          <button *ngIf="userHasPermission" tuiButton appearance="flat" size="xs" type="button" class="add-btn" tuiHint="Add a new price!"
                   tuiHintDirection="top" (click)="showDialog(-1)">
             <tui-icon icon="@tui.circle-plus" class="prices"></tui-icon>
           </button>
@@ -46,7 +46,7 @@
           <div class="price-description" tuiHint="{{price.description}}">{{ price.description }}</div>
           <div class="price-bold">{{ price.price }} €</div>
 
-          <button tuiButton appearance="flat" size="xs" type="button" class="edit-btn" tuiHint="Edit or delete an existing price!"
+          <button *ngIf="userHasPermission" tuiButton appearance="flat" size="xs" type="button" class="edit-btn" tuiHint="Edit or delete an existing price!"
                   tuiHintDirection="top" (click)="showDialog(i.valueOf())">
             <tui-icon icon="@tui.square-pen" class="prices"></tui-icon>
           </button>
