@@ -68,7 +68,7 @@ export class EditInterestsComponent implements OnInit{
   fetchUserInterests(): void {
     this.loading = true;
     // Use switchMap to handle the sequential flow
-    this.userInterestService.getUserInterestsByUserId(this.userId)
+    this.userInterestService.getMyInterests()
       .pipe(
         switchMap(interests => {
           this.userInterestsList = interests;
