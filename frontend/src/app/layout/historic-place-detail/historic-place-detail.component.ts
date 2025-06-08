@@ -177,6 +177,12 @@ export class HistoricPlaceDetailComponent {
   }
   set selectedPlace(value: any) {
     this._selectedPlace = value;
+
+    this.summary = '';
+    this.enrichedContent = '';
+    this.enrichmentStarted = false;
+    this.enrichmentLoading = false;
+    this.cdr.detectChanges();
   }
   private _selectedPlace: any;
 
@@ -189,30 +195,15 @@ export class HistoricPlaceDetailComponent {
   onPersonClick(person: PersonEntity) {
     console.log("Emitted Person event: " + person);
     this.onPersonDetailEvent.emit(person);
-    this.summary = '';
-    this.enrichedContent = '';
-    this.enrichmentStarted = false;
-    this.enrichmentLoading = false;
-    this.cdr.detectChanges();
   }
 
   onEventClick(event: EventEntity) {
     this.onEventDetailEvent.emit(event);
-    this.summary = '';
-    this.enrichedContent = '';
-    this.enrichmentStarted = false;
-    this.enrichmentLoading = false;
-    this.cdr.detectChanges();
   }
 
   onBuildingClick(buildingEntity: BuildingEntity) {
     buildingEntity = this.userService.enterHistoricNode(buildingEntity);
     this.onBuildingDetailEvent.emit(buildingEntity);
-    this.summary = '';
-    this.enrichedContent = '';
-    this.enrichmentStarted = false;
-    this.enrichmentLoading = false;
-    this.cdr.detectChanges();
   }
 
   closeDetail():void{
