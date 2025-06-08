@@ -3,6 +3,8 @@ package group_05.ase.user_db.endpoints;
 
 import group_05.ase.user_db.restData.PriceDTO;
 import group_05.ase.user_db.services.PriceService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,6 +14,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/prices")
 public class PriceController {
+
+    private static final Logger logger = LoggerFactory.getLogger(PriceController.class);
 
     private final PriceService service;
 
@@ -25,8 +29,8 @@ public class PriceController {
         try {
             return this.service.getPricesByLocation(location_id);
         } catch (Exception e) {
-            System.err.println(e.getMessage());
-            return new ArrayList<PriceDTO>();
+            logger.error("Error fetching prices for location {}: {}", location_id, e.getMessage());
+            throw new RuntimeException("Error fetching prices", e);
         }
     }
 
@@ -36,8 +40,8 @@ public class PriceController {
         try {
             return this.service.createOrUpdatePrice(dto);
         } catch (Exception e) {
-            System.err.println(e.getMessage());
-            return new PriceDTO();
+            logger.error("Error creating price {}: {}", dto.toString(), e.getMessage());
+            throw new RuntimeException("Error creating price", e);
         }
     }
 
@@ -47,7 +51,8 @@ public class PriceController {
         try {
             this.service.deletePrice(id);
         } catch (Exception e) {
-            System.err.println(e.getMessage());
+            logger.error("Error deleting price by id {}: {}", id, e.getMessage());
+            throw new RuntimeException("Error deleting price", e);
         }
     }
 }

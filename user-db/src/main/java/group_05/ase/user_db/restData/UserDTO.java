@@ -27,6 +27,11 @@ public class UserDTO {
 
     @Getter
     @Setter
-    @JsonProperty(required = true, value = "roles")
-    private String roles;
+    @JsonProperty(required = true, value = "role")
+    private String role;
+
+    @Getter
+    @Setter
+    @JsonProperty(required = true, value = "status")
+    private String status;
 }

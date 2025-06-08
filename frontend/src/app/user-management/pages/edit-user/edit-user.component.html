@@ -68,6 +68,32 @@
       </div>
     </fieldset>
 
+    <fieldset>
+      <div class="stack">
+        <tui-textfield
+          tuiChevron
+          [tuiTextfieldCleaner]="false"
+        >
+          <label tuiLabel>User status</label>
+
+          <input
+            formControlName="status"
+            tuiSelect
+          />
+
+          <tui-data-list-wrapper
+            *tuiTextfieldDropdown
+            new
+            [items]="statuses"
+          />
+        </tui-textfield>
+        <tui-error
+          formControlName="status"
+          [error]="[] | tuiFieldError | async"
+        />
+      </div>
+    </fieldset>
+
     <footer>
       <button
         tuiButton

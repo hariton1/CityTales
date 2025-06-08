@@ -8,6 +8,9 @@ import {TuiInputModule} from '@taiga-ui/legacy';
 import { supabase } from '../../supabase.service';
 import {Router} from '@angular/router'; // adjust the path if neededimport { supabase } from '../supabase.service'; // adjust the path if needed
 import {jwtDecode} from 'jwt-decode';
+import {UserService} from '../../../user_db.services/user.service';
+import {UserPointsService} from '../../../user_db.services/user-points.service';
+import { UserPointDto } from '../../../user_db.dto/user-point.dto';
 
 @Component({
   selector: 'app-login',
@@ -36,7 +39,9 @@ export class LoginComponent {
     email: new FormControl('', Validators.required),
     passwordValue: new FormControl('', Validators.required),
   });
-  constructor(private router: Router) {}
+  constructor(private router: Router,
+              private userService: UserService,
+              private userPointsService: UserPointsService) {}
 
   async ngOnInit(): Promise<void> {
     const { data: { session } } = await supabase.auth.getSession();
@@ -77,6 +82,19 @@ export class LoginComponent {
       if (uuid) {
         console.log("user token: " + uuid);
         localStorage.setItem('user_uuid', uuid);
+        this.userService.getUserById(uuid).subscribe(user => {
+          console.log(user);
+          localStorage.setItem('user_role', user.role)
+        });
+        this.userPointsService.createNewPoints(new UserPointDto(
+          -1,
+          uuid,
+          1,
+          new Date(),
+          -100
+        )).subscribe(points => {
+          console.log(points);
+        });
       }
     } else {
       console.log('No session returned from Supabase.');
