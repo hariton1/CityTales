@@ -2,6 +2,7 @@
   <section
     tuiCardLarge="compact"
     [tuiCardCollapsed]="collapsed()"
+    class="tui-space_bottom-5"
   >
 
     <div class="image-info-flex">
@@ -81,8 +82,83 @@
     </tui-expand>
   </section>
 
+  <div class="tone-selector">
+    <span style="font: var(--tui-font-heading-6); display: block; width: 100%">Choose how you want the story to be told <tui-icon
+      tuiHintDirection="bottom"
+      tuiTooltip="Select a tone to change the storytelling style — not the facts."
+    /></span>
+    <button
+      tuiSurface
+      type="button"
+      class="tone"
+      [style.background-image]="'url(assets/images/historian-bg.png)'"
+      [style.color]="'#fff'"
+      (click)="startEnrichment('historian')"
+    >
+      <h3 class="heading">Historian</h3>
+    </button>
+
+    <button
+      tuiSurface
+      type="button"
+      class="tone"
+      [style.background-image]="'url(assets/images/tour-guide-bg.png)'"
+      [style.color]="'#fff'"
+      (click)="startEnrichment('tour')"
+    >
+      <h3 class="heading">Tour Guide</h3>
+    </button>
+
+    <button
+      tuiSurface
+      type="button"
+      class="tone"
+      [style.background-image]="'url(assets/images/funny-bg.png)'"
+      [style.color]="'#fff'"
+      (click)="startEnrichment('funny')"
+    >
+      <h3 class="heading">Funny</h3>
+    </button>
+  </div>
+
+  <div tuiPlatform="web" class="content">
+    <!-- Skeleton Loader -->
+    <ng-container *ngIf="enrichmentStarted && enrichmentLoading; else contentLoaded">
+      <div class="fade-in">
+        <div
+          class="skeleton-line"
+          *ngFor="let width of lineWidths"
+          [style.width.%]="width"
+        ></div>
+      </div>
+    </ng-container>
+
+    <!-- Enriched Content -->
+    <ng-template #contentLoaded>
+      <!-- Only show if enrichment has started AND finished loading -->
+      <div *ngIf="enrichmentStarted && !enrichmentLoading" class="fade-in">
+        <section class="place-summary">
+          <header tuiHeader class="tui-space_top-3 tui-space_bottom-3">
+            <span class="tui-text_h6">Quick Facts & Highlights</span>
+          </header>
+          <span class="place-summary-text">{{ summary }}</span>
+
+          <header tuiHeader class="tui-space_top-5 tui-space_bottom-3">
+            <span class="tui-text_h6">Deep Dive into the {{ selectedPlace.name }}</span>
+          </header>
+          <span class="place-summary-text">{{ enrichedContent }}</span>
+        </section>
+      </div>
+    </ng-template>
+  </div>
+
+
+</div>
+
+<!--
+
   <div class="place-detail-card">
-    <!-- Header with building information -->
+    &lt;!&ndash; Header with building information &ndash;&gt;
     <div class="place-detail-header">
       <h2 class="place-detail-title">{{selectedPlace.name}}</h2>
       <div class="place-location" *ngIf="selectedPlace?.latitude != null && selectedPlace?.longitude != null">
@@ -100,7 +176,7 @@
     </div>
 
 
-    <!-- Main content -->
+    &lt;!&ndash; Main content &ndash;&gt;
     <tui-scrollbar class="scrollable-content">
     <div class="place-detail-content">
       <div class="content-section">
@@ -252,4 +328,4 @@
     </tui-scrollbar>
   </div>
 </div>
-
+-->

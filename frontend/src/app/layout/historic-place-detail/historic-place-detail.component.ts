@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, effect, EventEmitter, inject, Input, Output, signal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, effect, EventEmitter, inject, Input, Output, signal, ChangeDetectorRef} from '@angular/core';
 import {CommonModule, NgIf} from '@angular/common';
 import {
   TuiButton,
@@ -6,7 +6,7 @@ import {
   TuiHint,
   TuiIcon,
   TuiLabel, TuiLink,
-  TuiScrollbar,
+  TuiScrollbar, TuiSurface,
   TuiTextfieldComponent, TuiTextfieldDirective, TuiTextfieldOptionsDirective, TuiTitle
 } from '@taiga-ui/core';
 import {UserHistoriesService} from '../../user_db.services/user-histories.service';
@@ -26,7 +26,7 @@ import {
 } from '@maskito/kit';
 import {TuiAutoFocus} from '@taiga-ui/cdk';
 import {TuiInputModule, TuiTextfieldControllerModule} from '@taiga-ui/legacy';
-import {TuiChevron, TuiTooltip} from '@taiga-ui/kit';
+import {TuiCarouselComponent, TuiChevron, TuiTooltip} from '@taiga-ui/kit';
 import {MaskitoDirective} from '@maskito/angular';
 import {TuiResponsiveDialogOptions} from '@taiga-ui/addon-mobile';
 import {MaskitoOptions} from '@maskito/core';
@@ -34,6 +34,7 @@ import {UUID} from 'node:crypto';
 import {UserDto} from '../../user_db.dto/user.dto';
 import {TuiCard, TuiHeader} from '@taiga-ui/layout';
 import {TuiExpand} from '@taiga-ui/experimental';
+import {EnrichmentService} from '../../services/enrichment.service';
 
 const postfix = ' €';
 const numberOptions = maskitoNumberOptionsGenerator({
@@ -69,7 +70,9 @@ const numberOptions = maskitoNumberOptionsGenerator({
     TuiTitle,
     TuiLink,
     TuiChevron,
-    TuiExpand
+    TuiExpand,
+    TuiSurface,
+    TuiCarouselComponent
   ],
   templateUrl: './historic-place-detail.component.html',
   styleUrl: './historic-place-detail.component.less',
@@ -81,11 +84,20 @@ export class HistoricPlaceDetailComponent {
   locationId= signal(0);
   prices = this.pricesService.prices;
   public readonly collapsed = signal(true); //for collapsed card
+  protected index = 0;
+  lineWidths = [90, 70, 95, 60, 85, 80];
+
+  summary: string = '';
+  enrichedContent: string = '';
+  enrichmentStarted = false;
+  enrichmentLoading = false;
 
 
   constructor(private userService: UserService,
               private userHistoriesService: UserHistoriesService,
-              private router: Router) {
+              private router: Router,
+              readonly EnrichmentService: EnrichmentService,
+              readonly cdr: ChangeDetectorRef) {
     effect(() => {
       this.pricesService.getPricesByLocation(this.locationId());
     })
@@ -177,15 +189,30 @@ export class HistoricPlaceDetailComponent {
   onPersonClick(person: PersonEntity) {
     console.log("Emitted Person event: " + person);
     this.onPersonDetailEvent.emit(person);
+    this.summary = '';
+    this.enrichedContent = '';
+    this.enrichmentStarted = false;
+    this.enrichmentLoading = false;
+    this.cdr.detectChanges();
   }
 
   onEventClick(event: EventEntity) {
     this.onEventDetailEvent.emit(event);
+    this.summary = '';
+    this.enrichedContent = '';
+    this.enrichmentStarted = false;
+    this.enrichmentLoading = false;
+    this.cdr.detectChanges();
   }
 
   onBuildingClick(buildingEntity: BuildingEntity) {
     buildingEntity = this.userService.enterHistoricNode(buildingEntity);
     this.onBuildingDetailEvent.emit(buildingEntity);
+    this.summary = '';
+    this.enrichedContent = '';
+    this.enrichmentStarted = false;
+    this.enrichmentLoading = false;
+    this.cdr.detectChanges();
   }
 
   closeDetail():void{
@@ -205,6 +232,11 @@ export class HistoricPlaceDetailComponent {
     });
 
     this.onCloseEvent.emit();
+    this.summary = '';
+    this.enrichedContent = '';
+    this.enrichmentStarted = false;
+    this.enrichmentLoading = false;
+    this.cdr.detectChanges();
   }
 
   navigateToFeedback(): void {
@@ -249,6 +281,32 @@ export class HistoricPlaceDetailComponent {
     }
 
     this.userHasPermission = contributor && emailMatchesLocation;
+  }
+
+  startEnrichment(tone: string): void {
+    this.enrichmentStarted = true;
+    this.enrichmentLoading = true;
+
+    let content = this.selectedPlace.contentGerman;
+
+    this.EnrichmentService.enrichContentWithTone(tone, content).subscribe({
+      next: (response) => {
+        console.log('tone: ' + response.tone);
+        console.log('summary: ' + response.summary);
+        console.log('enrichedContent: ' + response.enrichedContent);
+
+        this.summary = response.summary;
+        this.enrichedContent = response.enrichedContent;
+      },
+      error: (error: any) => {
+        console.error(error);
+      },
+      complete: () => {
+        console.log('Completed');
+        this.enrichmentLoading = false;
+        this.cdr.detectChanges();
+      }
+    })
   }
 }
 
