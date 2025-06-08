@@ -16,11 +16,13 @@ import {UserHistoriesService} from '../user_db.services/user-histories.service';
 import {UserPointsService} from '../user_db.services/user-points.service';
 import {UserBadgesService} from '../user_db.services/user-badges.service';
 import {UUID} from 'node:crypto';
+import {UserDto} from '../user_db.dto/user.dto';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
 
   userId: UUID | null = null;
+  readonly USERS_DOMAIN = SERVER_ADDRESS + 'users';
 
   constructor(private httpClient: HttpClient,
                 private userHistoriesService: UserHistoriesService,
@@ -301,4 +303,11 @@ export class UserService {
 
       return node;
     }
+
+  public getUserWithRoleById(id: string) : Observable<UserDto> {
+    return this.httpClient.get<UserDto>(`${this.USERS_DOMAIN}/id=${id}`)
+      .pipe(map(user => {
+        return new UserDto(user.id,user.email, user.created_at, user.role);
+      }));
+  }
 }
