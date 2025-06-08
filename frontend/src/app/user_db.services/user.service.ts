@@ -38,7 +38,6 @@ export class UserService {
     const payload = {
       id: user.id,
       email: user.email,
-      created_at: user.created_at,
       role: user.role,
       status: user.status,
     };
