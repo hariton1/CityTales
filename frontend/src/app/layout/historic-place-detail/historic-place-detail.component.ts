@@ -5,9 +5,9 @@ import {
   TuiDialog,
   TuiHint,
   TuiIcon,
-  TuiLabel,
+  TuiLabel, TuiLink,
   TuiScrollbar,
-  TuiTextfieldComponent, TuiTextfieldDirective, TuiTextfieldOptionsDirective
+  TuiTextfieldComponent, TuiTextfieldDirective, TuiTextfieldOptionsDirective, TuiTitle
 } from '@taiga-ui/core';
 import {UserHistoriesService} from '../../user_db.services/user-histories.service';
 import { Router } from '@angular/router';
@@ -26,12 +26,14 @@ import {
 } from '@maskito/kit';
 import {TuiAutoFocus} from '@taiga-ui/cdk';
 import {TuiInputModule, TuiTextfieldControllerModule} from '@taiga-ui/legacy';
-import {TuiTooltip} from '@taiga-ui/kit';
+import {TuiChevron, TuiTooltip} from '@taiga-ui/kit';
 import {MaskitoDirective} from '@maskito/angular';
 import {TuiResponsiveDialogOptions} from '@taiga-ui/addon-mobile';
 import {MaskitoOptions} from '@maskito/core';
 import {UUID} from 'node:crypto';
 import {UserDto} from '../../user_db.dto/user.dto';
+import {TuiCard, TuiHeader} from '@taiga-ui/layout';
+import {TuiExpand} from '@taiga-ui/experimental';
 
 const postfix = ' €';
 const numberOptions = maskitoNumberOptionsGenerator({
@@ -61,10 +63,16 @@ const numberOptions = maskitoNumberOptionsGenerator({
     TuiTextfieldDirective,
     TuiTextfieldOptionsDirective,
     TuiTooltip,
-    MaskitoDirective
+    MaskitoDirective,
+    TuiCard,
+    TuiHeader,
+    TuiTitle,
+    TuiLink,
+    TuiChevron,
+    TuiExpand
   ],
   templateUrl: './historic-place-detail.component.html',
-  styleUrl: './historic-place-detail.component.scss',
+  styleUrl: './historic-place-detail.component.less',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class HistoricPlaceDetailComponent {
@@ -72,6 +80,7 @@ export class HistoricPlaceDetailComponent {
   private readonly pricesService = inject(PricesService);
   locationId= signal(0);
   prices = this.pricesService.prices;
+  public readonly collapsed = signal(true); //for collapsed card
 
 
   constructor(private userService: UserService,

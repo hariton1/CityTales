@@ -1,4 +1,86 @@
 <div class="place-detail-container">
+  <section
+    tuiCardLarge="compact"
+    [tuiCardCollapsed]="collapsed()"
+  >
+
+    <div class="image-info-flex">
+      <div class="image-container" *ngIf="selectedPlace.imageUrls.length > 0">
+        <img [src]="selectedPlace.imageUrls[1]" alt="Building" />
+      </div>
+
+      <div class="info-block">
+        <header tuiHeader class="tui-space_bottom-5">
+          <hgroup>
+            <h1 class="place-title tui-space_bottom-2" tuiTitle>{{selectedPlace.name}}</h1>
+            <p tuiSubtitle>
+               <span class="icon-and-text">
+                <span class="icon">
+                  <tui-icon icon="@tui.compass" [style.height.rem]="1.3" />
+                </span>
+                 {{ selectedPlace.latitude }}°N, {{ selectedPlace.longitude }}°E
+              </span>
+            </p>
+          </hgroup>
+        </header>
+
+        <div class="detail-row icon-and-text tui-space_bottom-3" *ngIf="selectedPlace.dateFrom">
+          <span class="icon-and-text">
+            <span class="icon">
+              <tui-icon icon="@tui.hammer" [style.height.rem]="1.2" />
+            </span>
+
+            <strong> Built in: </strong> {{ selectedPlace.dateFrom }}
+          </span>
+        </div>
+
+        <div class="detail-row icon-and-text tui-space_bottom-3" *ngIf="selectedPlace.dateTo">
+          <span class="icon-and-text">
+            <span class="icon">
+              <tui-icon icon="@tui.octagon-minus" [style.height.rem]="1.2" />
+            </span>
+
+            <strong> Demolished in: </strong> {{ selectedPlace.dateTo }}
+          </span>
+        </div>
+
+        <div class="detail-row icon-and-text tui-space_bottom-3" *ngIf="selectedPlace.architect">
+          <span class="icon-and-text">
+            <span class="icon">
+              <tui-icon icon="@tui.pencil" [style.height.rem]="1.2" />
+            </span>
+
+            <strong> Architect: </strong> {{ selectedPlace.architect }}
+          </span>
+        </div>
+
+        <div class="bottom-right-button">
+          <button
+            appearance="secondary"
+            size="s"
+            tuiButton
+            type="button"
+            [tuiChevron]="!collapsed()"
+            (click)="collapsed.set(!collapsed())"
+          >
+            Sources
+          </button>
+        </div>
+      </div>
+    </div>
+
+
+
+    <tui-expand [expanded]="!collapsed()">
+      <div class="detail-row" *ngIf="selectedPlace.url">
+        <span class="label">Wiki URL: </span>
+        <span class="value">
+              <a [href]="selectedPlace.url" target="_blank"> {{ selectedPlace.url }} </a>
+            </span>
+      </div>
+    </tui-expand>
+  </section>
+
   <div class="place-detail-card">
     <!-- Header with building information -->
     <div class="place-detail-header">
