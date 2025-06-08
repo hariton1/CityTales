@@ -8,6 +8,10 @@ import {TuiInputModule, TuiInputDateModule} from '@taiga-ui/legacy';
 import {TuiDay} from '@taiga-ui/cdk';
 import { supabase } from '../../supabase.service';
 import {Router} from '@angular/router';
+import {UserDataService} from '../../../user_db.services/user-data.service';
+import {UserDataDto} from '../../../user_db.dto/user-data.dto';
+import {UUID} from 'node:crypto';
+import {UserService} from '../../../user_db.services/user.service';
 
 
 @Component({
@@ -42,7 +46,8 @@ export class SignUpComponent {
     passwordValue: new FormControl('', Validators.required),
     birthday: new FormControl(TuiDay.fromLocalNativeDate(new Date()), Validators.required)
   });
-  constructor(private router: Router) {}
+  constructor(private router: Router,
+              private userDataService: UserDataService) {}
 
   async onSubmit(): Promise<void> {
     if (this.signupForm.invalid) {
@@ -71,6 +76,15 @@ export class SignUpComponent {
     return;
   }
   alert('Signup successful! Please check your email to confirm your account.');
+  this.userDataService.saveUserData(new UserDataDto(
+    -1,
+    data.user?.id as UUID,
+    'User',
+    'Active',
+    new Date()
+  )).subscribe(data => {
+    console.log(data);
+  })
   this.router.navigate(['/login']);
   }
 }
