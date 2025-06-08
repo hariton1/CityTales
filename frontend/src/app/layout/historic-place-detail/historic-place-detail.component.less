@@ -6,7 +6,7 @@
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-
+  gap: 2rem;
 }
 
 .place-detail-card {
@@ -81,6 +81,118 @@
   justify-content: center;
   vertical-align: middle;
 }
+
+.tone-selector {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.tone {
+  position: relative;
+  background: currentColor center no-repeat;
+  background-size: cover;
+  border-radius: 1.25rem;
+  padding: 0.4rem 2rem;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  z-index: 0;
+  color: #fff;
+  transition: color 0.3s ease;
+  overflow: hidden;
+}
+
+/* Animated glowing border */
+.tone::before {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  width: calc(100% + 6px);
+  height: calc(100% + 6px);
+  border-radius: 1.5rem;
+  background: linear-gradient(45deg, #00f, #f0f, #0ff, #00f);
+  background-size: 400%;
+  animation: glowing-border 8s linear infinite;
+  z-index: -2;
+  filter: blur(6px);
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.tone:hover::before {
+  opacity: 1;
+}
+
+/* Black transparent overlay for readability */
+.tone::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: rgba(0, 0, 0, 0.4); /* <-- controls how dark the overlay is */
+  z-index: -1;
+  pointer-events: none;
+}
+
+@keyframes glowing-border {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.skeleton-line {
+  height: 20px;
+  margin: 8px 0;
+  border-radius: 6px;
+  background: linear-gradient(
+    90deg,
+    #e0e0e0 0%,
+    #f0f0f0 40%,
+    #e0e0e0 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s linear infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.fade-in {
+  opacity: 0;
+  animation: fadeInSmooth 0.5s ease-in-out forwards;
+}
+
+@keyframes fadeInSmooth {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.place-summary {
+  padding: 1rem;
+}
+
+.place-summary-text {
+  font: var(--tui-font-text-m) !important;
+}
+
 
 .place-detail-title {
   margin: 0;
