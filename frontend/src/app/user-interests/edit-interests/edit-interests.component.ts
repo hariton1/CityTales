@@ -8,12 +8,10 @@ import {TuiAlertService, TuiButton, TuiIcon, TuiTitle} from '@taiga-ui/core';
 import {UserInterestsService} from '../../user_db.services/user-interests.service';
 import {InterestsService} from '../../user_db.services/interests.service';
 import {TuiAppBarBack, TuiAppBarComponent, TuiHeader} from '@taiga-ui/layout';
-import {TuiDay, TuiPlatform} from '@taiga-ui/cdk';
+import {TuiPlatform} from '@taiga-ui/cdk';
 import {NgIf} from '@angular/common';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import {UserDto} from '../../user_db.dto/user.dto';
-import {ActivatedRoute, Router} from '@angular/router';
-import {UserService} from '../../user_db.services/user.service';
+import {Router} from '@angular/router';
 import {UUID} from 'node:crypto';
 
 @Component({

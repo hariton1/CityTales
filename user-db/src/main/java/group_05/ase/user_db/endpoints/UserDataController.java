@@ -2,16 +2,19 @@ package group_05.ase.user_db.endpoints;
 
 import group_05.ase.user_db.restData.UserDataDTO;
 import group_05.ase.user_db.services.UserDataService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/userData")
 public class UserDataController {
+
+    private static final Logger logger = LoggerFactory.getLogger(UserDataController.class);
 
     private final UserDataService userDataService;
 
@@ -25,7 +28,8 @@ public class UserDataController {
         try {
             return this.userDataService.getAllUserData();
         } catch (Exception e) {
-            return new ArrayList<UserDataDTO>(); //"An internal server error occurred => " + e.getMessage();
+            logger.error("Error fetching user data: {}", e.getMessage());
+            throw new RuntimeException("Error fetching user data", e);
         }
     }
 
@@ -35,7 +39,8 @@ public class UserDataController {
         try {
             return this.userDataService.getUserDataById(userDataId);
         } catch (Exception e) {
-            return new UserDataDTO(); //"An internal server error occurred => " + e.getMessage();
+            logger.error("Error fetching user data by id {}: {}", userDataId, e.getMessage());
+            throw new RuntimeException("Error fetching user data", e);
         }
     }
 
@@ -45,7 +50,8 @@ public class UserDataController {
         try {
             return this.userDataService.getUserDataByUserId(userId);
         } catch (Exception e) {
-            return new UserDataDTO(); //"An internal server error occurred => " + e.getMessage();
+            logger.error("Error fetching user data by user_id {}: {}", userId.toString(), e.getMessage());
+            throw new RuntimeException("Error fetching user data", e);
         }
     }
 
@@ -55,8 +61,8 @@ public class UserDataController {
         try {
             return this.userDataService.saveUserData(userDataDTO);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return new UserDataDTO();
+            logger.error("Error saving user data {}: {}", userDataDTO.toString(), e.getMessage());
+            throw new RuntimeException("Error saving user data", e);
         }
     }
 
