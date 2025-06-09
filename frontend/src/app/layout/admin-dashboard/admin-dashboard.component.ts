@@ -25,7 +25,7 @@ export class AdminDashboardComponent {
   }
 
   handleFeedbacksClick () {
-    this.router.navigate(['/feedbacks']);
+    this.router.navigate(['/feedback-list']);
   }
 
   handleUserActivityClick () {
