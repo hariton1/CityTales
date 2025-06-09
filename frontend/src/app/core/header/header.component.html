@@ -6,11 +6,11 @@
     <tui-segmented [size]="'m'" class="main-nav-desktop">
       <a routerLink="/explore" >🌎 Explore</a>
       <a routerLink="/tours">🧭 Tours</a>
-      <a routerLink="/feedback">Contribute</a>
-      <a routerLinkActive href="#">For Educators</a>
-      <a routerLinkActive href="#">About</a>
-      <a routerLink="/scoreboard">Scoreboard</a>
-      <a routerLinkActive href="/friends">Friends</a>
+      <!-- <a routerLink="/feedback">Contribute</a> -->
+      <!-- <a routerLinkActive href="#">For Educators</a> -->
+      <a *ngIf="loggedIn" routerLink="/scoreboard">Scoreboard</a>
+      <a *ngIf="loggedIn" routerLinkActive href="/friends">Friends</a>
+      <a routerLinkActive href="/about-us">About us</a>
       <!-- <a routerLink="/onboarding" >Onboarding</a> -->
     </tui-segmented>
 
@@ -20,16 +20,13 @@
       size="s"
       tuiButton
       type="button"
-      routerLink="admin/users"
+      routerLink="admin-dashboard"
     >
-      <tui-icon
-        icon="@tui.users"
-        [style.height.rem]="1"
-      />
-      User Management
+      <tui-icon icon="@tui.users" [style.height.rem]="1"/>
+      Admin dashboard
     </button>
 
-    <button appearance="flat" tuiButton type="button" routerLink="register">
+    <button *ngIf="!loggedIn" appearance="flat" tuiButton type="button" routerLink="register">
       Sign Up
     </button>
 
