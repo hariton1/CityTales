@@ -105,7 +105,7 @@ export class HistoricPlaceDetailComponent implements OnInit{
   locationId= signal(0);
   prices = this.pricesService.prices;
   public readonly collapsed = signal(true); //for collapsed card
-  protected index = 0; //tone slider
+  protected index1 = 0; //tone slider
   lineWidths = [90, 70, 95, 60, 85, 80, 60, 75, 85, 80];
   isMobile = false;
 
@@ -348,15 +348,27 @@ export class HistoricPlaceDetailComponent implements OnInit{
 
   protected readonly itemsCount = 3;
   protected index2 = 0; //related persons slider
+  protected index3 = 0; //related buildings slider
 
-  protected get rounded(): number {
+  protected get roundedPersons(): number {
     return Math.floor(this.index2 / this.itemsCount);
   }
 
-  protected onIndex(index: number): void {
+  protected onIndexPersons(index: number): void {
     this.index2 = index * this.itemsCount;
+    this.cdr.detectChanges();
   }
 
+  protected get roundedBuildings(): number {
+    return Math.floor(this.index3 / this.itemsCount);
+  }
+
+  protected onIndexBuildings(index: number): void {
+    this.index3 = index * this.itemsCount;
+    this.cdr.detectChanges();
+  }
+
+  protected readonly Math = Math;
 }
 
 class PriceDTO implements Price {

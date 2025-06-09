@@ -1,4 +1,6 @@
 <tui-scrollbar class="scrollable-content" [style]="'overflow-y: auto'">
+  <!-- TODO: make it responsive -->
+
 <div class="place-detail-container">
   <section
     tuiCardLarge="compact"
@@ -92,7 +94,7 @@
     <tui-carousel
       [draggable]="true"
       [itemsCount]="isMobile ? 2 : 4"
-      [(index)]="index"
+      [(index)]="index1"
     >
       <ng-container *ngFor="let tone of tones">
         <button
@@ -201,8 +203,8 @@
     </div>
 
 
-    <div class="related-persons" *ngIf="selectedPlace.relatedPersons?.length">
-      <span class="tui-space_bottom-5" style="font: var(--tui-font-heading-6); display: block; width: 100%">Related Persons</span>
+    <div class="related-persons tui-space_bottom-6" *ngIf="selectedPlace.relatedPersons?.length">
+      <span class="tui-space_bottom-5" style="font: var(--tui-font-heading-6); display: block; width: 100%"><tui-icon icon="@tui.user" [style.height.rem]="1.5" /> Related Persons</span>
 
       <tui-carousel
         [draggable]="true"
@@ -245,11 +247,63 @@
         </ng-container>
       </tui-carousel>
       <tui-pagination
+        *ngIf="selectedPlace.relatedPersons?.length > 3"
         size="s"
         class="tui-space_top-4"
-        [index]="rounded"
+        [index]="roundedPersons"
         [length]="selectedPlace.relatedPersons?.length / itemsCount"
-        (indexChange)="onIndex($event)"
+        (indexChange)="onIndexPersons($event)"
+      />
+    </div>
+
+    <div class="related-buildings" *ngIf="selectedPlace.relatedBuildings?.length">
+      <span class="tui-space_bottom-5" style="font: var(--tui-font-heading-6); display: block; width: 100%"><tui-icon icon="@tui.landmark" [style.height.rem]="1.5" /> Related Places</span>
+
+      <tui-carousel
+        [draggable]="true"
+        [itemsCount]="3"
+        [(index)]="index3"
+        [style.--tui-carousel-padding] = "isMobile ? '0' : '0 15px 0 0'"
+      >
+        <ng-container *ngFor="let building of selectedPlace.relatedBuildings">
+          <div
+            tuiAppearance="outline-grayscale"
+            tuiCardLarge
+            *tuiItem
+            class="person-card"
+          >
+            <div (click)="onBuildingClick(building)">
+              <aside tuiAccessories>
+                <tui-avatar
+                  class="avatar"
+                  size="l"
+                  [src]="
+              building.imageUrls[1] === 'https://www.geschichtewiki.wien.gv.at/images/7/7d/RDF.png'
+                ? 'assets/images/no-picture.png'
+                : (building.imageUrls[1] | tuiFallbackSrc: '@tui.user' | async)
+            "
+                  [style.background]="
+              building.imageUrls[1] === 'https://www.geschichtewiki.wien.gv.at/images/7/7d/RDF.png'
+                ? 'transparent'
+                : (building.imageUrls[1] | tuiAutoColor)
+            "
+                />
+              </aside>
+              <h2 tuiTitle>
+                {{ building.name }}
+
+              </h2>
+            </div>
+          </div>
+        </ng-container>
+      </tui-carousel>
+      <tui-pagination
+        *ngIf="selectedPlace.relatedBuildings?.length > 3"
+        size="s"
+        class="tui-space_top-4"
+        [index]="roundedBuildings"
+        [length]="Math.ceil(selectedPlace.relatedBuildings?.length / itemsCount)"
+        (indexChange)="onIndexBuildings($event)"
       />
     </div>
       <!--<div class="related-persons-list">
@@ -286,18 +340,6 @@
         </div>
       </div>-->
 
-    <div class="content-section" *ngIf="selectedPlace.relatedBuildings?.length">
-      <h3>Related Places</h3>
-      <div class="related-items">
-        <div class="related-item" *ngFor="let place of selectedPlace.relatedBuildings">
-            <span class="value">
-              <div (click)="onBuildingClick(place)">
-                <span>{{ place.name }}</span>
-              </div>
-            </span>
-        </div>
-      </div>
-    </div>
 
     <div class="content-section" *ngIf="selectedPlace.relatedEvents?.length">
       <h3>Related Events</h3>
