@@ -3,12 +3,51 @@ package group_05.ase.neo4j_data_access.Services;
 import group_05.ase.neo4j_data_access.DTO.FunFactResult;
 import group_05.ase.neo4j_data_access.Service.Implementation.FunFactExtractorService;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.client.MockRestServiceServer;
+import org.springframework.web.client.RestTemplate;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class FunFactExtractorServiceTest {
 
-    private final FunFactExtractorService service = new FunFactExtractorService();
+    private FunFactExtractorService service;
+    private RestTemplate restTemplate;
+    private MockRestServiceServer mockServer;
+
+    @BeforeEach
+    void setup() {
+        restTemplate = new RestTemplate();
+        service = new FunFactExtractorService(restTemplate);
+        mockServer = MockRestServiceServer.createServer(restTemplate);
+    }
+
+    @Test
+    void testExtractFunFactWithML() {
+        String testText = "Die k. k. Wiener Gartenbaugesellschaft wurde am 2. Mai 1837 gegründet. Es gab berühmte Bälle, ein Kino, einen Skandal und eine Hundeshow.";
+        String expectedFunFact = "Es gab berühmte Bälle, ein Kino, einen Skandal und eine Hundeshow.";
+        double expectedScore = 0.5;
+
+        // Mock the Python service response
+        mockServer.expect(requestTo("http://localhost:5005/funfact"))
+                .andExpect(method(org.springframework.http.HttpMethod.POST))
+                .andRespond(withSuccess(
+                        "{ \"funfact\": \"" + expectedFunFact + "\", \"score\": " + expectedScore + " }",
+                        MediaType.APPLICATION_JSON
+                ));
+
+        FunFactResult result = service.extractFunFactWithML(testText);
+
+        assertThat(result.getSentence()).isEqualTo(expectedFunFact);
+        assertThat(result.getScore()).isEqualTo(expectedScore);
+
+        mockServer.verify();
+    }
 
     @Test
     void extractFunFactHybridWithReason_returnsExpectedResult() {

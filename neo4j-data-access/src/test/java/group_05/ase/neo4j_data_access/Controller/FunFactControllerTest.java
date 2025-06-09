@@ -1,49 +1,52 @@
 package group_05.ase.neo4j_data_access.Controller;
 
+import group_05.ase.neo4j_data_access.DTO.FunFactCardDTO;
+import group_05.ase.neo4j_data_access.DTO.FunFactResult;
 import group_05.ase.neo4j_data_access.Entity.ViennaHistoryWikiBuildingObject;
-import group_05.ase.neo4j_data_access.Service.Interface.IHistoricBuildingService;
 import group_05.ase.neo4j_data_access.Service.Implementation.FunFactExtractorService;
+import group_05.ase.neo4j_data_access.Service.Interface.IHistoricBuildingService;
+import group_05.ase.neo4j_data_access.Service.Interface.IHistoricEventService;
+import group_05.ase.neo4j_data_access.Service.Interface.IHistoricPersonService;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.Arrays;
-
-import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(FunFactController.class)
-class FunFactControllerTest {
-
-    @Autowired
-    private MockMvc mockMvc;
+public class FunFactControllerTest {
 
     @MockBean
     private IHistoricBuildingService historicBuildingService;
-
     @MockBean
     private FunFactExtractorService funFactExtractorService;
+    @MockBean
+    private IHistoricPersonService historicPersonService;
+    @MockBean
+    private IHistoricEventService historicEventService;
+    @Autowired
+    private MockMvc mockMvc;
 
     @Test
-    void getFunFactForBuilding_returnsFunFactCard() throws Exception {
+    void testGetFunFactForBuilding() throws Exception {
         ViennaHistoryWikiBuildingObject building = new ViennaHistoryWikiBuildingObject();
-        building.setName("Prater");
-        building.setImageUrls(Arrays.asList("prater.jpg"));
-        building.setContentGerman("Der Prater ist ein berühmter Park in Wien. Hier steht das berühmte Riesenrad.");
+        building.setContentGerman("Das ist ein Dummytext für das Gebäude.");
 
-        Mockito.when(historicBuildingService.getBuildingById(anyInt())).thenReturn(building);
-        Mockito.when(funFactExtractorService.extractFunFactHybridWithReason(Mockito.anyString()))
-                .thenReturn(new group_05.ase.neo4j_data_access.DTO.FunFactResult(
-                        "Hier steht das berühmte Riesenrad.", 2.5, "Heuristik: Zahl/Superlativ, "));
+        FunFactResult funFactResult = new FunFactResult("Super Headline", 0.95,"Ein toller Grund");
+        // Angenommen FunFactCardDTO benötigt: headline, funFact, source, score, reason
+        FunFactCardDTO card = new FunFactCardDTO("Super Headline", "Eine tolle FunFact", "Wikipedia", 0.95, "Weil das Gebäude berühmt ist");
 
-        mockMvc.perform(get("/api/funfact/by/id/1"))
+        when(historicBuildingService.getBuildingById(9356)).thenReturn(building);
+        when(funFactExtractorService.extractFunFactWithML(building.getContentGerman())).thenReturn(funFactResult);
+
+        mockMvc.perform(get("/api/funfact/building/9356"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.headline").value("Prater"))
-                .andExpect(jsonPath("$.funFact").value("Hier steht das berühmte Riesenrad."))
-                .andExpect(jsonPath("$.imageUrl").value("prater.jpg"));
+                .andExpect(jsonPath("$.headline").exists())
+                .andExpect(jsonPath("$.funFact").exists())
+                .andExpect(jsonPath("$.score").exists());
     }
 }

@@ -54,4 +54,6 @@ public class FunFactMapper {
             return "default.jpg";
         }
     }
+
+
 }
