@@ -122,6 +122,14 @@ public class OpenAIService {
     );
 
     public EnrichmentResponse generateResponse(String tone, String content) {
+        if (content == null || content.trim().isEmpty()) {
+            return new EnrichmentResponse(
+                    "<p><em>No content provided.</em></p>",
+                    "<p><em>No content available for enrichment.</em></p>",
+                    tone
+            );
+        }
+
         String summaryPrompt = """
             You are a historian writing a concise, strictly factual summary of the following historical site or figure.
             Do not ask questions, speculate, or add any information not in the input.
