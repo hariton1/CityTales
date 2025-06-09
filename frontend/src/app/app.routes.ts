@@ -17,6 +17,9 @@ import {UserProfileComponent} from './user-management/pages/user-profile/user-pr
 import {ResetPasswordComponent} from './user-management/pages/reset-password/reset-password.component';
 import {HistoryOneUserComponent} from './user-history/pages/history-one-user/history-one-user.component';
 import {GameQuizComponent} from './layout/game-quiz/game-quiz/game-quiz.component';
+import {AdminDashboardComponent} from './layout/admin-dashboard/admin-dashboard.component';
+import {HistoryAllUsersComponent} from './user-history/pages/history-all-users/history-all-users.component';
+import {AboutComponent} from './core/about/about.component';
 
 export const routes: Routes = [
   {
@@ -49,6 +52,9 @@ export const routes: Routes = [
   { path: 'profile', component: UserProfileComponent },
   { path: 'reset-pass', component: ResetPasswordComponent },
   { path: 'my-history', component: HistoryOneUserComponent },
+  { path: 'history', component: HistoryAllUsersComponent },
   { path: 'quizzes', component: GameQuizComponent },
+  { path: 'admin-dashboard', component: AdminDashboardComponent },
+  { path: 'about-us', component: AboutComponent },
   { path: '', redirectTo: '/explore', pathMatch: 'full' } //default page, to be changed
 ];

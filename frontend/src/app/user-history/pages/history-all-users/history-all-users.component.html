@@ -19,6 +19,14 @@
       <!-- Second column -->
       <td tuiTd>
         <div [tuiCell]="'m'">
+                    <span tuiTitle>
+                      {{ userHistory.username }}
+                    </span>
+        </div>
+      </td>
+      <!-- Third column -->
+      <td tuiTd>
+        <div [tuiCell]="'m'">
           <span tuiTitle>
             {{ userHistory.open_dt | date: 'dd.MM.yyyy' }}
           </span>
