@@ -12,8 +12,10 @@ import {
 } from '@angular/core';
 import {CommonModule, NgIf} from '@angular/common';
 import {
+  TuiAppearance,
+  TuiAutoColorPipe,
   TuiButton,
-  TuiDialog,
+  TuiDialog, TuiFallbackSrcPipe,
   TuiHint,
   TuiIcon,
   TuiLabel, TuiLink,
@@ -37,7 +39,7 @@ import {
 } from '@maskito/kit';
 import {TuiAutoFocus, TuiItem, TuiPlatform} from '@taiga-ui/cdk';
 import {TuiInputModule, TuiTextfieldControllerModule} from '@taiga-ui/legacy';
-import {TuiCarouselComponent, TuiChevron, TuiTooltip} from '@taiga-ui/kit';
+import {TuiAvatar, TuiCarouselComponent, TuiChevron, TuiPagination, TuiTooltip} from '@taiga-ui/kit';
 import {MaskitoDirective} from '@maskito/angular';
 import {TuiResponsiveDialogOptions} from '@taiga-ui/addon-mobile';
 import {MaskitoOptions} from '@maskito/core';
@@ -86,7 +88,12 @@ const numberOptions = maskitoNumberOptionsGenerator({
     TuiSurface,
     TuiCarouselComponent,
     TuiPlatform,
-    TuiItem
+    TuiItem,
+    TuiAvatar,
+    TuiFallbackSrcPipe,
+    TuiAutoColorPipe,
+    TuiAppearance,
+    TuiPagination
   ],
   templateUrl: './historic-place-detail.component.html',
   styleUrl: './historic-place-detail.component.less',
@@ -98,7 +105,7 @@ export class HistoricPlaceDetailComponent implements OnInit{
   locationId= signal(0);
   prices = this.pricesService.prices;
   public readonly collapsed = signal(true); //for collapsed card
-  protected index = 0;
+  protected index = 0; //tone slider
   lineWidths = [90, 70, 95, 60, 85, 80, 60, 75, 85, 80];
   isMobile = false;
 
@@ -338,6 +345,18 @@ export class HistoricPlaceDetailComponent implements OnInit{
       }
     })
   }
+
+  protected readonly itemsCount = 3;
+  protected index2 = 0; //related persons slider
+
+  protected get rounded(): number {
+    return Math.floor(this.index2 / this.itemsCount);
+  }
+
+  protected onIndex(index: number): void {
+    this.index2 = index * this.itemsCount;
+  }
+
 }
 
 class PriceDTO implements Price {
