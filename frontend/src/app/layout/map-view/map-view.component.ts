@@ -27,7 +27,7 @@ import { MarkerClusterer } from '@googlemaps/markerclusterer';
   templateUrl: './map-view.component.html',
   styleUrl: './map-view.component.less'
 })
-export class MapViewComponent implements OnInit{
+export class MapViewComponent implements OnInit {
 
   private readonly alerts = inject(TuiAlertService);
 
@@ -39,6 +39,9 @@ export class MapViewComponent implements OnInit{
 
   @Output() selectDetailEvent: EventEmitter<Object> = new EventEmitter<Object>();
   @Output() populatePlacesEvent = new EventEmitter<BuildingEntity[]>();
+
+  private selectedMarker: google.maps.Marker | null = null;
+  private selectedBuildingType: string | null = null;
 
 
   @ViewChild(MapInfoWindow) infoWindow: any;
@@ -57,8 +60,10 @@ export class MapViewComponent implements OnInit{
     strokeWeight: 2,
   };
 
-  markers: any[] = [];
+  markers: google.maps.Marker[] = [];
+  public location_marker_dict = new Map<any, google.maps.Marker>
   center: google.maps.LatLngLiteral = {lat: 48.19865798950195, lng: 16.3714542388916};
+  user_location: google.maps.LatLngLiteral = {lat: 48.19865798950195, lng: 16.3714542388916};
   zoom = 15;
 
   polylines: google.maps.LatLngLiteral[][] = [];
@@ -113,38 +118,26 @@ export class MapViewComponent implements OnInit{
       },
       {
         featureType: 'poi.medical',
-        stylers: [{ visibility: 'off' }]
+        stylers: [{visibility: 'off'}]
       },
       {
         featureType: 'poi.attraction',
-        stylers: [{ visibility: 'off' }]
+        stylers: [{visibility: 'off'}]
       },
       {
         featureType: 'poi.park',
-        stylers: [{ visibility: 'off' }]
+        stylers: [{visibility: 'off'}]
       },
       {
         featureType: 'poi.sports_complex',
-        stylers: [{ visibility: 'off' }]
+        stylers: [{visibility: 'off'}]
       },
       {
         featureType: 'poi.school',
-        stylers: [{ visibility: 'off' }]
+        stylers: [{visibility: 'off'}]
       }
     ]
   };
-
-  markerOptions: google.maps.MarkerOptions = {
-    draggable: false,
-    animation: google.maps.Animation.DROP,
-    icon: {
-      url: 'https://cdn-icons-png.flaticon.com/512/263/263633.png',
-      scaledSize: new google.maps.Size(25, 25),
-      origin: new google.maps.Point(0, 0),
-      anchor: new google.maps.Point(17, 34),
-      labelOrigin: new google.maps.Point(12, 34)
-    }
-  }
   locationMarkerOptions: google.maps.MarkerOptions = {
     draggable: false,
     icon: {
@@ -155,29 +148,40 @@ export class MapViewComponent implements OnInit{
       labelOrigin: new google.maps.Point(12, 34)
     }
   }
+  selectedMarkerOptions: google.maps.MarkerOptions = {
+    draggable: false,
+    icon: {
+      url: 'assets/icons/selected_location_marker.svg',
+      scaledSize: new google.maps.Size(50, 50),
+      origin: new google.maps.Point(0, 0),
+      anchor: new google.maps.Point(17, 34),
+      labelOrigin: new google.maps.Point(12, 34),
+    }
+  }
 
-/*  ngOnInit(): void {
-    var location = this.userLocationService.getPosition();
 
-    location.then(position => {
-      this.center = {lat: position.lat, lng: position.lng};
-      this.locationService.getLocationsInRadius(position.lat, position.lng, 2000).subscribe(locations => {
-        this.locationsNearby = locations;
-        this.addMarkersToMap(locations);
-        this.populatePlacesEvent.emit(locations);
+  /*  ngOnInit(): void {
+      var location = this.userLocationService.getPosition();
+
+      location.then(position => {
+        this.center = {lat: position.lat, lng: position.lng};
+        this.locationService.getLocationsInRadius(position.lat, position.lng, 2000).subscribe(locations => {
+          this.locationsNearby = locations;
+          this.addMarkersToMap(locations);
+          this.populatePlacesEvent.emit(locations);
+        })
       })
-    })
-  }*/
+    }*/
 
   // TODO: remove later on
   // For testing in case navigator.geolocation breaks - happened to me for some reason...
   ngOnInit(): void {
 
-      this.locationService.getLocationsInRadius(this.center.lat, this.center.lng, 10000).subscribe(locations => {
-        this.locationsNearby = locations;
-        this.addMarkersToMap(locations);
-        this.populatePlacesEvent.emit(locations);
-      });
+    this.locationService.getLocationsInRadius(this.center.lat, this.center.lng, 10000).subscribe(locations => {
+      this.locationsNearby = locations;
+      this.addMarkersToMap(locations);
+      this.populatePlacesEvent.emit(locations);
+    });
   }
 
   private clusterer!: MarkerClusterer;
@@ -197,7 +201,7 @@ export class MapViewComponent implements OnInit{
       setTimeout(() => {
         const batchMarkers = batch.map(location => {
           const marker = new google.maps.Marker({
-            position: { lat: location.latitude, lng: location.longitude },
+            position: {lat: location.latitude, lng: location.longitude},
             icon: {
               url: this.getIconForBuildingType(location.buildingType),
               scaledSize: new google.maps.Size(28, 28),
@@ -214,7 +218,7 @@ export class MapViewComponent implements OnInit{
               this.detailAction(marker, location);
             })
           });
-
+          this.location_marker_dict.set(location.viennaHistoryWikiId, marker)
           return marker;
         });
 
@@ -249,7 +253,7 @@ export class MapViewComponent implements OnInit{
     }
   }
 
-  @ViewChild('relatedContentToLocation', { static: false }) relatedContentToLocationRef!: ElementRef;
+  @ViewChild('relatedContentToLocation', {static: false}) relatedContentToLocationRef!: ElementRef;
 
   detailAction(marker: google.maps.Marker, location: BuildingEntity): void {
     if (!this.nativeInfoWindow) {
@@ -267,7 +271,46 @@ export class MapViewComponent implements OnInit{
 
     this.selectDetailEvent.emit(location);
 
+    //Center map around selected marker & change icion
+    this.selectMarker(marker, location);
+
     this.generatePolylines(location);
+  }
+
+  selectMarker(marker: google.maps.Marker, location: BuildingEntity): void {
+    if (marker == null) {
+      console.log("Could not select marker since the desired object has no coordinates.");
+      this.unselectMarker()
+      return
+    }
+    this.center = {lat: marker.getPosition()?.lat()!, lng: marker.getPosition()?.lng()!}
+    //Reset old marker
+    if (this.selectedMarker && this.selectedMarker !== marker) {
+      this.selectedMarker.setIcon({
+        url: this.getIconForBuildingType(this.selectedBuildingType!),
+        scaledSize: new google.maps.Size(28, 28),
+        anchor: new google.maps.Point(12, 12),
+        labelOrigin: new google.maps.Point(12, 30),
+      })
+    }
+
+    //Set new marker and flags
+    marker.setOptions(this.selectedMarkerOptions);
+    this.selectedMarker = marker;
+    this.selectedBuildingType = location.buildingType;
+  }
+
+  unselectMarker() {
+    if (this.selectedMarker != null) {
+      this.selectedMarker.setIcon({
+        url: this.getIconForBuildingType(this.selectedBuildingType!),
+        scaledSize: new google.maps.Size(28, 28),
+        anchor: new google.maps.Point(12, 12),
+        labelOrigin: new google.maps.Point(12, 30),
+      })
+    }
+    this.selectedMarker = null;
+    this.selectedBuildingType = null;
   }
 
   closeInfoWindow() {
@@ -297,9 +340,9 @@ export class MapViewComponent implements OnInit{
   }
 
   getCombinedItems(location: any): any[] {
-    const buildings = (location.relatedBuildings || []).map((item: any) => ({ ...item, type: 'building' }));
-    const persons = (location.relatedPersons || []).map((item: any) => ({ ...item, type: 'person' }));
-    const events = (location.relatedEvents || []).map((item: any) => ({ ...item, type: 'event' }));
+    const buildings = (location.relatedBuildings || []).map((item: any) => ({...item, type: 'building'}));
+    const persons = (location.relatedPersons || []).map((item: any) => ({...item, type: 'person'}));
+    const events = (location.relatedEvents || []).map((item: any) => ({...item, type: 'event'}));
 
     const combined = [...buildings, ...persons, ...events];
     return combined;
@@ -345,5 +388,16 @@ export class MapViewComponent implements OnInit{
 
   onCircleClick(loc: any): void {
     this.selectDetailEvent.emit(loc);
+    this.selectMarker(this.getMarkerToLocation(loc), loc)
+    this.closeInfoWindow();
+  }
+
+  getMarkerToLocation(location: any): any {
+    var marker = this.location_marker_dict.get(location.viennaHistoryWikiId)
+    if(!marker){
+      console.warn("Could not find location marker for location object!");
+      return
+    }
+    return marker;
   }
 }

@@ -19,7 +19,9 @@
     </div>
   <!-- Mobile: show only selected component -->
   <ng-container *ngIf="currentViewMobile === 'discover'">
-    <app-sidebar [historicalPlaces]="historicalPlaces"></app-sidebar>
+    <app-sidebar (onCloseDetailView)="onCloseDetailView()"
+                 [historicalPlaces]="historicalPlaces"
+                 (onSelectEvent)="onSelectEvent($event)"></app-sidebar>
   </ng-container>
 
   <ng-container *ngIf="currentViewMobile === 'map'">
@@ -32,7 +34,9 @@
   <app-sidebar [historicalPlaces]="historicalPlaces"
                [selectedPlace]="selectedPlace"
                [selectedEvent]="selectedEvent"
-               [selectedPerson]="selectedPerson">
+               [selectedPerson]="selectedPerson"
+                (onCloseDetailView)="onCloseDetailView()"
+                (onSelectEvent)="onSelectEvent($event)">
   </app-sidebar>
   <app-map-view (selectDetailEvent)="selectDetailEvent($event)" (populatePlacesEvent)="setHistoricalPlaces($event)"></app-map-view>
 </ng-container>

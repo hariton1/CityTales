@@ -7,7 +7,7 @@
   [options]="options"
 >
 
-  <map-marker [position]="center" [options]="locationMarkerOptions"></map-marker>
+  <map-marker [position]="user_location" [options]="locationMarkerOptions"></map-marker>
 
   <map-polyline
     *ngFor="let line of polylines"

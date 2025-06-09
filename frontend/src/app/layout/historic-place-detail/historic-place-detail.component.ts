@@ -180,7 +180,6 @@ export class HistoricPlaceDetailComponent {
   }
 
   closeDetail():void{
-    console.log(this.selectedPlace)
     this._selectedPlace.userHistoryEntry.setCloseDt(new Date());
 
     this.userHistoriesService.updateUserHistory(this._selectedPlace.userHistoryEntry).subscribe({
