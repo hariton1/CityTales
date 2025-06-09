@@ -86,71 +86,26 @@
       tuiHintDirection="bottom"
       tuiTooltip="Select a tone to change the storytelling style — not the facts."
     /></span>
-    <button
-      tuiSurface
-      type="button"
-      class="tone"
-      [style.background-image]="'url(assets/images/historian-bg.png)'"
-      [style.color]="'#fff'"
-      (click)="startEnrichment('academic')"
-    >
-      <h3 class="heading">Historian</h3>
-    </button>
 
-    <button
-      tuiSurface
-      type="button"
-      class="tone"
-      [style.background-image]="'url(assets/images/tour-guide-bg.png)'"
-      [style.color]="'#fff'"
-      (click)="startEnrichment('tour')"
-    >
-      <h3 class="heading">Tour Guide</h3>
-    </button>
-
-    <button
-      tuiSurface
-      type="button"
-      class="tone"
-      [style.background-image]="'url(assets/images/poetic-bg.png)'"
-      [style.color]="'#fff'"
-      (click)="startEnrichment('poetic')"
-    >
-      <h3 class="heading">Poetic</h3>
-    </button>
-
-    <button
-      tuiSurface
-      type="button"
-      class="tone"
-      [style.background-image]="'url(assets/images/dramatic-bg.png)'"
-      [style.color]="'#fff'"
-      (click)="startEnrichment('dramatic')"
-    >
-      <h3 class="heading">Dramatic</h3>
-    </button>
-
-    <button
-      tuiSurface
-      type="button"
-      class="tone"
-      [style.background-image]="'url(assets/images/child-friendly-bg.png)'"
-      [style.color]="'#fff'"
-      (click)="startEnrichment('child-friendly')"
-    >
-      <h3 class="heading">Child-Friendly</h3>
-    </button>
-
-    <button
-      tuiSurface
-      type="button"
-      class="tone"
-      [style.background-image]="'url(assets/images/funny-bg.jpg)'"
-      [style.color]="'#fff'"
-      (click)="startEnrichment('funny')"
-    >
-      <h3 class="heading">Funny</h3>
-    </button>
+  <tui-carousel
+    [draggable]="true"
+    [itemsCount]="4"
+    [(index)]="index"
+  >
+    <ng-container *ngFor="let tone of tones">
+      <button
+        *tuiItem
+        tuiSurface
+        type="button"
+        class="tone"
+        [style.background-image]="'url(assets/images/' + tone.bg + ')'"
+        [style.color]="'#fff'"
+        (click)="startEnrichment(tone.key)"
+      >
+        <h3 class="heading">{{ tone.label }}</h3>
+      </button>
+    </ng-container>
+  </tui-carousel>
   </div>
 
   <div tuiPlatform="web" class="content">
