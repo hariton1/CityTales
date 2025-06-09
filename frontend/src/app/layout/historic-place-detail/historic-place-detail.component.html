@@ -78,6 +78,8 @@
               <a [href]="selectedPlace.url" target="_blank"> {{ selectedPlace.url }} </a>
             </span>
       </div>
+
+      <pre>{{ selectedPlace | json }}</pre>
     </tui-expand>
   </section>
 
@@ -87,232 +89,166 @@
       tuiTooltip="Select a tone to change the storytelling style — not the facts."
     /></span>
 
-  <tui-carousel
-    [draggable]="true"
-    [itemsCount]="4"
-    [(index)]="index"
-  >
-    <ng-container *ngFor="let tone of tones">
-      <button
-        *tuiItem
-        tuiSurface
-        type="button"
-        class="tone"
-        [style.background-image]="'url(assets/images/' + tone.bg + ')'"
-        [style.color]="'#fff'"
-        (click)="startEnrichment(tone.key)"
-      >
-        <h3 class="heading">{{ tone.label }}</h3>
+    <tui-carousel
+      [draggable]="true"
+      [itemsCount]="isMobile ? 2 : 4"
+      [(index)]="index"
+    >
+      <ng-container *ngFor="let tone of tones">
+        <button
+          *tuiItem
+          tuiSurface
+          type="button"
+          class="tone"
+          [style.background-image]="'url(assets/images/' + tone.bg + ')'"
+          [style.color]="'#fff'"
+          (click)="startEnrichment(tone.key)"
+        >
+          <h3 class="heading">{{ tone.label }}</h3>
+        </button>
+      </ng-container>
+    </tui-carousel>
+  </div>
+
+  <button
+    (click)="closeDetail()"
+  > Close </button>
+
+  <div class="content-section" *ngIf="this.prices().length > 0">
+    <h3>Prices
+      <button *ngIf="userHasPermission" tuiButton appearance="flat" size="xs" type="button" class="add-btn" tuiHint="Add a new price!"
+              tuiHintDirection="top" (click)="showDialog(-1)">
+        <tui-icon icon="@tui.circle-plus" class="prices"></tui-icon>
       </button>
-    </ng-container>
-  </tui-carousel>
-  </div>
+    </h3>
 
-  <div tuiPlatform="web" class="content">
-    <!-- Skeleton Loader -->
-    <ng-container *ngIf="enrichmentStarted && enrichmentLoading; else contentLoaded">
-      <div class="fade-in">
-        <div
-          class="skeleton-line"
-          *ngFor="let width of lineWidths"
-          [style.width.%]="width"
-        ></div>
-      </div>
-    </ng-container>
+    <div *ngFor="let price of prices(); index as i" class="price-row">
 
-    <!-- Enriched Content -->
-    <ng-template #contentLoaded>
-      <!-- Only show if enrichment has started AND finished loading -->
-      <div *ngIf="enrichmentStarted && !enrichmentLoading" class="fade-in">
-        <section class="place-summary">
-          <header tuiHeader class="tui-space_top-3 tui-space_bottom-3">
-            <span class="tui-text_h6">Quick Facts & Highlights</span>
-          </header>
-          <div class="place-summary-text" [innerHTML]="summary"></div>
+      <div class="price-bold" tuiHint="{{price.name}}">{{ price.name }}</div>
+      <div class="price-description" tuiHint="{{price.description}}">{{ price.description }}</div>
+      <div class="price-bold">{{ price.price }} €</div>
 
-          <header tuiHeader class="tui-space_top-5 tui-space_bottom-3">
-            <span class="tui-text_h6">Deep Dive into the {{ selectedPlace.name }}</span>
-          </header>
-          <div class="place-summary-text" [innerHTML]="enrichedContent"></div>
-        </section>
-      </div>
-    </ng-template>
-  </div>
-
-
-</div>
-</tui-scrollbar>
-<!--
-
-  <div class="place-detail-card">
-    &lt;!&ndash; Header with building information &ndash;&gt;
-    <div class="place-detail-header">
-      <h2 class="place-detail-title">{{selectedPlace.name}}</h2>
-      <div class="place-location" *ngIf="selectedPlace?.latitude != null && selectedPlace?.longitude != null">
-        <span class="coordinates">
-          {{ selectedPlace.latitude }}°N, {{ selectedPlace.longitude }}°E
-        </span>
-      </div>
-
-
-      <button
-        (click)="closeDetail()"
-      > Close </button>
-
-
+      <button *ngIf="userHasPermission" tuiButton appearance="flat" size="xs" type="button" class="edit-btn" tuiHint="Edit or delete an existing price!"
+              tuiHintDirection="top" (click)="showDialog(i.valueOf())">
+        <tui-icon icon="@tui.square-pen" class="prices"></tui-icon>
+      </button>
     </div>
 
+  </div>
 
-    &lt;!&ndash; Main content &ndash;&gt;
-    <tui-scrollbar class="scrollable-content">
-    <div class="place-detail-content">
-      <div class="content-section">
-        <h3>Description</h3>
-        <p>{{ selectedPlace.contentGerman }}</p>
+  <ng-template let-observer [tuiDialogOptions]="options" [(tuiDialog)]="open">
+    <form [formGroup]="priceForm" class="textAreaContainerCtrl" (ngSubmit)="observer.complete()">
+      <div class="stack">
+        <tui-textfield #price tuiTextfieldSize="m" tuiAutoFocus [maskito]="maskitoOptions">
+          <label tuiLabel>Price value</label>
+          <input tuiTextfield required [placeholder]="price.focused() ? 'e.g. 15,00€' : 'Price value'"
+                 formControlName="priceFormValue"/>
+          <tui-icon tuiTooltip="The monetary value of the price."/>
+        </tui-textfield>
       </div>
 
-      <div>
-        <button class="feedback-button" appearance="secondary" size="m" tuiButton type="button" (click)="navigateToFeedback()">
-          <tui-icon icon="@tui.message-circle-plus" [style.height.rem]="1"/> Give us feedback
+      <div class="stack">
+        <tui-textfield #name tuiTextfieldSize="m">
+          <label tuiLabel>Name</label>
+          <input tuiTextfield required [placeholder]="name.focused() ? 'e.g. Adult' : 'Name'"
+                 formControlName="nameFormValue"/>
+          <tui-icon tuiTooltip="A short-hand name for the price."/>
+        </tui-textfield>
+      </div>
+
+      <div class="stack">
+        <tui-textfield #desc tuiTextfieldSize="m">
+          <label tuiLabel>Description</label>
+          <input tuiTextfield [placeholder]="desc.focused() ? 'e.g. Tour Ticket' : 'Description'"
+                 formControlName="descriptionFormValue"/>
+          <tui-icon tuiTooltip="Additional information for the price."/>
+        </tui-textfield>
+      </div>
+
+      <div class="price-dialog-buttons">
+        <button size="s" tuiButton type="submit" (click)="onSubmit()" class="save-button">
+          <tui-icon icon="@tui.save" [style.height.rem]="1.2"/>
+          Save
+        </button>
+
+        <button appearance="action-destructive" size="s" tuiButton type="submit" (click)="onDelete()" *ngIf="dialogLabel.startsWith('Edit')">
+          Delete
         </button>
       </div>
 
-      <div class="content-section" *ngIf="this.prices().length > 0">
-        <h3>Prices
-          <button *ngIf="userHasPermission" tuiButton appearance="flat" size="xs" type="button" class="add-btn" tuiHint="Add a new price!"
-                  tuiHintDirection="top" (click)="showDialog(-1)">
-            <tui-icon icon="@tui.circle-plus" class="prices"></tui-icon>
-          </button>
-        </h3>
+    </form>
+  </ng-template>
 
-        <div *ngFor="let price of prices(); index as i" class="price-row">
+  <div class="content">
+    <!-- Skeleton Loader -->
+    <div *ngIf="enrichmentStarted && enrichmentLoading" class="fade-in">
+      <div class="skeleton-line" *ngFor="let width of lineWidths" [style.width.%]="width"></div>
+    </div>
 
-          <div class="price-bold" tuiHint="{{price.name}}">{{ price.name }}</div>
-          <div class="price-description" tuiHint="{{price.description}}">{{ price.description }}</div>
-          <div class="price-bold">{{ price.price }} €</div>
+    <div *ngIf="enrichmentStarted && !enrichmentLoading" class="fade-in">
+      <section class="place-summary">
+        <header tuiHeader class="tui-space_top-3 tui-space_bottom-3">
+          <span class="tui-text_h6">Quick Facts & Highlights</span>
+        </header>
+        <div class="place-summary-text" [innerHTML]="summary"></div>
 
-          <button *ngIf="userHasPermission" tuiButton appearance="flat" size="xs" type="button" class="edit-btn" tuiHint="Edit or delete an existing price!"
-                  tuiHintDirection="top" (click)="showDialog(i.valueOf())">
-            <tui-icon icon="@tui.square-pen" class="prices"></tui-icon>
-          </button>
-        </div>
+        <header tuiHeader class="tui-space_top-5 tui-space_bottom-3">
+          <span class="tui-text_h6">Deep Dive into the {{ selectedPlace.name }}</span>
+        </header>
+        <div class="place-summary-text" [innerHTML]="enrichedContent"></div>
+      </section>
+    </div>
 
-      </div>
 
-      <ng-template let-observer [tuiDialogOptions]="options" [(tuiDialog)]="open">
-        <form [formGroup]="priceForm" class="textAreaContainerCtrl" (ngSubmit)="observer.complete()">
-          <div class="stack">
-            <tui-textfield #price tuiTextfieldSize="m" tuiAutoFocus [maskito]="maskitoOptions">
-              <label tuiLabel>Price value</label>
-              <input tuiTextfield required [placeholder]="price.focused() ? 'e.g. 15,00€' : 'Price value'"
-                     formControlName="priceFormValue"/>
-              <tui-icon tuiTooltip="The monetary value of the price."/>
-            </tui-textfield>
-          </div>
+    <div class="content-section">
+      <div class="building-details">
 
-          <div class="stack">
-            <tui-textfield #name tuiTextfieldSize="m">
-              <label tuiLabel>Name</label>
-              <input tuiTextfield required [placeholder]="name.focused() ? 'e.g. Adult' : 'Name'"
-                     formControlName="nameFormValue"/>
-              <tui-icon tuiTooltip="A short-hand name for the price."/>
-            </tui-textfield>
-          </div>
-
-          <div class="stack">
-            <tui-textfield #desc tuiTextfieldSize="m">
-              <label tuiLabel>Description</label>
-              <input tuiTextfield [placeholder]="desc.focused() ? 'e.g. Tour Ticket' : 'Description'"
-                     formControlName="descriptionFormValue"/>
-              <tui-icon tuiTooltip="Additional information for the price."/>
-            </tui-textfield>
-          </div>
-
-          <div class="price-dialog-buttons">
-            <button size="s" tuiButton type="submit" (click)="onSubmit()" class="save-button">
-              <tui-icon icon="@tui.save" [style.height.rem]="1.2"/>
-              Save
-            </button>
-
-            <button appearance="action-destructive" size="s" tuiButton type="submit" (click)="onDelete()" *ngIf="dialogLabel.startsWith('Edit')">
-              Delete
-            </button>
-          </div>
-
-        </form>
-      </ng-template>
-
-      <div class="content-section">
-        <h3>Building Information</h3>
-        <div class="building-details">
-          <div class="detail-row" *ngIf="selectedPlace.name">
-            <span class="label">Name:</span>
-            <span class="value">{{ selectedPlace.name }}</span>
-          </div>
-          <div class="detail-row" *ngIf="selectedPlace.dateFrom">
-            <span class="label">Build in:</span>
-            <span class="value">{{ selectedPlace.dateFrom }}</span>
-          </div>
-          <div class="detail-row" *ngIf="selectedPlace.dateTo">
-            <span class="label">Demolished in:</span>
-            <span class="value">{{ selectedPlace.dateTo }}</span>
-          </div>
-          <div class="detail-row" *ngIf="selectedPlace.architect">
-            <span class="label">Responsible Architect:</span>
-            <span class="value">{{ selectedPlace.architect }}</span>
-          </div>
-          <div class="detail-row" *ngIf="selectedPlace.url">
-            <span class="label">Wiki URL:</span>
-            <span class="value">
-              <a [href]="selectedPlace.url" target="_blank"> {{ selectedPlace.url }} </a>
-            </span>
-          </div>
-          <div class="detail-row" *ngIf="selectedPlace.imageUrls.length > 0">
-            <img [src]="selectedPlace.imageUrls[1]" alt="Building image" class="building-image">
-          </div>
-
-          <div class="content-section" *ngIf="selectedPlace.relatedPersons?.length">
-            <h3>Related Persons</h3>
-            <div class="related-items">
-              <div class="related-item" *ngFor="let person of selectedPlace.relatedPersons">
+        <div class="content-section" *ngIf="selectedPlace.relatedPersons?.length">
+          <h3>Related Persons</h3>
+          <div class="related-items">
+            <div class="related-item" *ngFor="let person of selectedPlace.relatedPersons">
             <span class="value">
               <div (click)="onPersonClick(person)">
                 <span>{{ person.name }}</span>
               </div>
             </span>
-              </div>
             </div>
           </div>
+        </div>
 
-          <div class="content-section" *ngIf="selectedPlace.relatedBuildings?.length">
-            <h3>Related Places</h3>
-            <div class="related-items">
-              <div class="related-item" *ngFor="let place of selectedPlace.relatedBuildings">
+        <div class="content-section" *ngIf="selectedPlace.relatedBuildings?.length">
+          <h3>Related Places</h3>
+          <div class="related-items">
+            <div class="related-item" *ngFor="let place of selectedPlace.relatedBuildings">
             <span class="value">
               <div (click)="onBuildingClick(place)">
                 <span>{{ place.name }}</span>
               </div>
             </span>
-              </div>
             </div>
           </div>
+        </div>
 
-          <div class="content-section" *ngIf="selectedPlace.relatedEvents?.length">
-            <h3>Related Events</h3>
-            <div class="related-items">
-              <div class="related-item" *ngFor="let event of selectedPlace.relatedEvents">
+        <div class="content-section" *ngIf="selectedPlace.relatedEvents?.length">
+          <h3>Related Events</h3>
+          <div class="related-items">
+            <div class="related-item" *ngFor="let event of selectedPlace.relatedEvents">
             <span class="value">
               <div (click)="onEventClick(event)">
                 <span>{{ event.name }}</span>
               </div>
             </span>
-              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-    </tui-scrollbar>
   </div>
-</div>
--->
+  </div>
+
+  <div class="place-detail-card" style="overflow-y: auto">
+
+
+
+  </div>
+</tui-scrollbar>

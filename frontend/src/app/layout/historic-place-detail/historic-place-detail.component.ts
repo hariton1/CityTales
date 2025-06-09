@@ -1,4 +1,15 @@
-import {ChangeDetectionStrategy, Component, effect, EventEmitter, inject, Input, Output, signal, ChangeDetectorRef} from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  effect,
+  EventEmitter,
+  inject,
+  Input,
+  Output,
+  signal,
+  ChangeDetectorRef,
+  OnInit
+} from '@angular/core';
 import {CommonModule, NgIf} from '@angular/common';
 import {
   TuiButton,
@@ -35,6 +46,7 @@ import {UserDto} from '../../user_db.dto/user.dto';
 import {TuiCard, TuiHeader} from '@taiga-ui/layout';
 import {TuiExpand} from '@taiga-ui/experimental';
 import {EnrichmentService} from '../../services/enrichment.service';
+import {BreakpointObserver, Breakpoints} from '@angular/cdk/layout';
 
 const postfix = ' €';
 const numberOptions = maskitoNumberOptionsGenerator({
@@ -80,7 +92,7 @@ const numberOptions = maskitoNumberOptionsGenerator({
   styleUrl: './historic-place-detail.component.less',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class HistoricPlaceDetailComponent {
+export class HistoricPlaceDetailComponent implements OnInit{
 
   private readonly pricesService = inject(PricesService);
   locationId= signal(0);
@@ -88,6 +100,7 @@ export class HistoricPlaceDetailComponent {
   public readonly collapsed = signal(true); //for collapsed card
   protected index = 0;
   lineWidths = [90, 70, 95, 60, 85, 80, 60, 75, 85, 80];
+  isMobile = false;
 
   summary: string = '';
   enrichedContent: string = '';
@@ -99,9 +112,11 @@ export class HistoricPlaceDetailComponent {
               private userHistoriesService: UserHistoriesService,
               private router: Router,
               readonly EnrichmentService: EnrichmentService,
-              readonly cdr: ChangeDetectorRef) {
+              readonly cdr: ChangeDetectorRef,
+              readonly breakpointObserver: BreakpointObserver) {
     effect(() => {
       this.pricesService.getPricesByLocation(this.locationId());
+      this.cdr.markForCheck();
     })
     let userId = localStorage.getItem("user_uuid") as UUID;
     this.userService.getUserWithRoleById(userId).subscribe((user) => {
@@ -117,6 +132,14 @@ export class HistoricPlaceDetailComponent {
     { key: 'child-friendly', label: 'Child-Friendly', bg: 'child-friendly-bg.png' },
     { key: 'funny', label: 'Funny', bg: 'funny-bg.jpg' },
   ];
+
+  ngOnInit() {
+    this.breakpointObserver
+      .observe([Breakpoints.Handset])
+      .subscribe(result => {
+        this.isMobile = result.matches;
+      });
+  }
 
   protected dialogLabel = '';
   protected options: Partial<TuiResponsiveDialogOptions> = {};
@@ -187,13 +210,18 @@ export class HistoricPlaceDetailComponent {
     return this._selectedPlace;
   }
   set selectedPlace(value: any) {
-    this._selectedPlace = value;
+    this._selectedPlace = {
+      ...value,
+      relatedPersons: value.relatedPersons ?? this._selectedPlace?.relatedPersons,
+      relatedBuildings: value.relatedBuildings ?? this._selectedPlace?.relatedBuildings,
+      relatedEvents: value.relatedEvents ?? this._selectedPlace?.relatedEvents,
+    };
 
     this.summary = '';
     this.enrichedContent = '';
     this.enrichmentStarted = false;
     this.enrichmentLoading = false;
-    this.cdr.detectChanges();
+    this.cdr.markForCheck();
   }
   private _selectedPlace: any;
 
@@ -238,7 +266,7 @@ export class HistoricPlaceDetailComponent {
     this.enrichedContent = '';
     this.enrichmentStarted = false;
     this.enrichmentLoading = false;
-    this.cdr.detectChanges();
+    this.cdr.markForCheck();
   }
 
   navigateToFeedback(): void {
