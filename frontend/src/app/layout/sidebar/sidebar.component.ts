@@ -45,6 +45,9 @@ export class SidebarComponent implements OnInit{
   @Input() selectedPerson: PersonEntity | null = null;
   @Input() selectedEvent: EventEntity | null = null;
 
+  @Output() onCloseDetailView = new EventEmitter();
+  @Output() onSelectEvent:EventEmitter<any> = new EventEmitter<any>();
+
 
   @Input() historicalPlaces: BuildingEntity[] = [];
 
@@ -116,6 +119,8 @@ export class SidebarComponent implements OnInit{
     this.selectedPlace = place;
     this.selectedEvent = null;
     this.selectedPerson = null;
+    console.log("On Place Detail function was called!")
+    this.onSelectEvent.emit(place);
   }
 
   setPersonDetail(person: PersonEntity) {
@@ -123,18 +128,22 @@ export class SidebarComponent implements OnInit{
     this.selectedPlace = null;
     this.selectedEvent = null;
     this.selectedPerson = person;
+    this.onCloseDetailView.emit()
   }
 
   setEventDetail(event: EventEntity) {
     this.selectedEvent = event;
     this.selectedPlace = null;
     this.selectedPerson = null;
+    this.onCloseDetailView.emit()
   }
 
   closeDetailView(): void {
     this.selectedPlace = null;
     this.selectedEvent = null;
     this.selectedPerson = null;
+    this.onCloseDetailView.emit()
+    console.log("Close Detail in sidebar component called!");
   }
 
 

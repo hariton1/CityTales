@@ -2,7 +2,7 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {Router} from '@angular/router';
 import {UserHistoriesService} from '../../user_db.services/user-histories.service';
 import {NgForOf, NgIf} from '@angular/common';
-import {TuiButton, TuiIcon, TuiScrollbar} from '@taiga-ui/core';
+import {TuiIcon, TuiScrollbar} from '@taiga-ui/core';
 import {PersonEntity} from '../../dto/db_entity/PersonEntity';
 import {EventEntity} from '../../dto/db_entity/EventEntity';
 import {BuildingEntity} from '../../dto/db_entity/BuildingEntity';
@@ -14,8 +14,7 @@ import {UserService} from '../../services/user.service';
     NgForOf,
     NgIf,
     TuiIcon,
-    TuiScrollbar,
-    TuiButton
+    TuiScrollbar
   ],
   templateUrl: './historic-event-detail.component.html',
   styleUrl: './historic-event-detail.component.scss'
