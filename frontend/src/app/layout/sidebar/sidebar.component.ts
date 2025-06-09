@@ -24,7 +24,6 @@ import {HistoricPersonDetailComponent} from '../historic-person-detail/historic-
     NgIf,
     HistoricPlaceDetailComponent,
     HistoricPlacePreviewComponent,
-    TuiAppearance,
     TuiTitle,
     ReactiveFormsModule,
     TuiCell,
@@ -58,7 +57,6 @@ export class SidebarComponent implements OnInit{
   isMobile = false;
 
   constructor(readonly EnrichmentService: EnrichmentService, readonly searchService: SearchService,
-              private userService: UserService,
               readonly breakpointObserver: BreakpointObserver) {
   }
 
