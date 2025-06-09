@@ -349,6 +349,7 @@ export class HistoricPlaceDetailComponent implements OnInit{
   protected readonly itemsCount = 3;
   protected index2 = 0; //related persons slider
   protected index3 = 0; //related buildings slider
+  protected index4 = 0; //related events slider
 
   protected get roundedPersons(): number {
     return Math.floor(this.index2 / this.itemsCount);
@@ -368,7 +369,26 @@ export class HistoricPlaceDetailComponent implements OnInit{
     this.cdr.detectChanges();
   }
 
-  protected readonly Math = Math;
+  protected get roundedEvents(): number {
+    return Math.floor(this.index4 / this.itemsCount);
+  }
+
+  protected onIndexEvents(index: number): void {
+    this.index4 = index * this.itemsCount;
+    this.cdr.detectChanges();
+  }
+
+  get personsPageCount(): number {
+    return Math.ceil(this.selectedPlace?.relatedPersons?.length / this.itemsCount);
+  }
+
+  get buildingsPageCount(): number {
+    return Math.ceil(this.selectedPlace?.relatedBuildings?.length / this.itemsCount);
+  }
+
+  get eventsPageCount(): number {
+    return Math.ceil(this.selectedPlace?.relatedEvents?.length / this.itemsCount);
+  }
 }
 
 class PriceDTO implements Price {
