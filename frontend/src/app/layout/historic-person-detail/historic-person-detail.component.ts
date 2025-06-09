@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {NgForOf, NgIf} from "@angular/common";
-import {TuiIcon, TuiScrollbar} from "@taiga-ui/core";
+import {TuiButton, TuiIcon, TuiScrollbar} from "@taiga-ui/core";
 import {HistoricalPersonEntity} from '../../dto/db_entity/HistoricalPersonEntity';
 import {UserHistoriesService} from '../../user_db.services/user-histories.service';
 import {Router} from '@angular/router';
@@ -11,12 +11,13 @@ import {UserService} from '../../services/user.service';
 
 @Component({
   selector: 'app-historic-person-detail',
-    imports: [
-        NgForOf,
-        NgIf,
-        TuiIcon,
-        TuiScrollbar
-    ],
+  imports: [
+    NgForOf,
+    NgIf,
+    TuiIcon,
+    TuiScrollbar,
+    TuiButton
+  ],
   templateUrl: './historic-person-detail.component.html',
   styleUrl: './historic-person-detail.component.scss'
 })
