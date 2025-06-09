@@ -1,6 +1,5 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {Router} from '@angular/router';
-import {UserHistoriesService} from '../../user_db.services/user-histories.service';
 import {NgForOf, NgIf} from '@angular/common';
 import {TuiIcon, TuiScrollbar} from '@taiga-ui/core';
 import {PersonEntity} from '../../dto/db_entity/PersonEntity';
