@@ -4,6 +4,11 @@ import group_05.ase.neo4j_data_access.DTO.FunFactResult;
 import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.stream.Collectors;
+import org.springframework.http.*;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class FunFactExtractorService {
@@ -12,6 +17,18 @@ public class FunFactExtractorService {
             "witzig", "lustig", "kurios", "scherz", "geheimnis", "ironie", "legende", "sage",
             "geist", "spuk", "angeblich", "sagt man", "heißt es", "gerücht", "mythos", "besonders"
     );
+
+    private final RestTemplate restTemplate;
+    private final String pythonUrl = "http://funfact-ml-service:5005/funfact";
+
+
+    public FunFactExtractorService(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
+
+    public FunFactExtractorService() {
+        this.restTemplate = new RestTemplate();
+    }
 
     public FunFactResult extractFunFactHybridWithReason(String text) {
         List<String> sentences = splitIntoSentences(text);
@@ -87,4 +104,24 @@ public class FunFactExtractorService {
         if (text == null || text.isBlank()) return new ArrayList<>();
         return Arrays.asList(text.split("(?<=[.!?])\\s+"));
     }
+
+    public FunFactResult extractFunFactWithML(String text) {
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("text", text);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<Map<String, String>> requestEntity = new HttpEntity<>(requestBody, headers);
+        ResponseEntity<Map> response = restTemplate.postForEntity(pythonUrl, requestEntity, Map.class);
+
+        if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+            String funFact = response.getBody().get("funfact").toString();
+            double score = Double.parseDouble(response.getBody().get("score").toString());
+            return new FunFactResult(funFact, score, "ML-Extraktion");
+        } else {
+            throw new RuntimeException("Python ML service returned error: " + response.getStatusCode());
+        }
+    }
+
 }

@@ -10,8 +10,10 @@ import group_05.ase.neo4j_data_access.Service.Implementation.FunFactMapper;
 import group_05.ase.neo4j_data_access.Service.Interface.IHistoricBuildingService;
 import group_05.ase.neo4j_data_access.Service.Interface.IHistoricEventService;
 import group_05.ase.neo4j_data_access.Service.Interface.IHistoricPersonService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.ResourceAccessException;
 
 @RestController
 @RequestMapping("/api/funfact")
@@ -38,10 +40,16 @@ public class FunFactController {
         if (building == null || building.getContentGerman() == null || building.getContentGerman().isBlank()) {
             return ResponseEntity.notFound().build();
         }
-        FunFactResult funFactResult = funFactExtractorService.extractFunFactHybridWithReason(building.getContentGerman());
-        FunFactCardDTO card = FunFactMapper.mapToFunFactCard(building, funFactResult);
-        return ResponseEntity.ok(card);
+        try {
+            FunFactResult funFactResult = funFactExtractorService.extractFunFactWithML(building.getContentGerman());
+            FunFactCardDTO card = FunFactMapper.mapToFunFactCard(building, funFactResult);
+            return ResponseEntity.ok(card);
+        } catch (ResourceAccessException ex) {
+            // ML-Service nicht erreichbar
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
+        }
     }
+
 
     @GetMapping("/person/{id}")
     public ResponseEntity<FunFactCardDTO> getFunFactForPerson(@PathVariable int id) {
