@@ -85,7 +85,7 @@ export class HistoricPlaceDetailComponent {
   prices = this.pricesService.prices;
   public readonly collapsed = signal(true); //for collapsed card
   protected index = 0;
-  lineWidths = [90, 70, 95, 60, 85, 80];
+  lineWidths = [90, 70, 95, 60, 85, 80, 60, 75, 85, 80];
 
   summary: string = '';
   enrichedContent: string = '';
