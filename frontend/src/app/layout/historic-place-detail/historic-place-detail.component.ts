@@ -24,7 +24,7 @@ import {
   maskitoNumberOptionsGenerator,
   maskitoRemoveOnBlurPlugin
 } from '@maskito/kit';
-import {TuiAutoFocus, TuiPlatform} from '@taiga-ui/cdk';
+import {TuiAutoFocus, TuiItem, TuiPlatform} from '@taiga-ui/cdk';
 import {TuiInputModule, TuiTextfieldControllerModule} from '@taiga-ui/legacy';
 import {TuiCarouselComponent, TuiChevron, TuiTooltip} from '@taiga-ui/kit';
 import {MaskitoDirective} from '@maskito/angular';
@@ -73,7 +73,8 @@ const numberOptions = maskitoNumberOptionsGenerator({
     TuiExpand,
     TuiSurface,
     TuiCarouselComponent,
-    TuiPlatform
+    TuiPlatform,
+    TuiItem
   ],
   templateUrl: './historic-place-detail.component.html',
   styleUrl: './historic-place-detail.component.less',
@@ -107,6 +108,15 @@ export class HistoricPlaceDetailComponent {
       this.initPrices(user);
     });
   }
+
+  tones = [
+    { key: 'academic', label: 'Historian', bg: 'historian-bg.png' },
+    { key: 'tour', label: 'Tour Guide', bg: 'tour-guide-bg.png' },
+    { key: 'poetic', label: 'Poetic', bg: 'poetic-bg.png' },
+    { key: 'dramatic', label: 'Dramatic', bg: 'dramatic-bg.png' },
+    { key: 'child-friendly', label: 'Child-Friendly', bg: 'child-friendly-bg.png' },
+    { key: 'funny', label: 'Funny', bg: 'funny-bg.jpg' },
+  ];
 
   protected dialogLabel = '';
   protected options: Partial<TuiResponsiveDialogOptions> = {};
