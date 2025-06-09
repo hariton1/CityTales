@@ -111,7 +111,40 @@
       tuiSurface
       type="button"
       class="tone"
-      [style.background-image]="'url(assets/images/funny-bg.png)'"
+      [style.background-image]="'url(assets/images/poetic-bg.png)'"
+      [style.color]="'#fff'"
+      (click)="startEnrichment('poetic')"
+    >
+      <h3 class="heading">Poetic</h3>
+    </button>
+
+    <button
+      tuiSurface
+      type="button"
+      class="tone"
+      [style.background-image]="'url(assets/images/dramatic-bg.png)'"
+      [style.color]="'#fff'"
+      (click)="startEnrichment('dramatic')"
+    >
+      <h3 class="heading">Dramatic</h3>
+    </button>
+
+    <button
+      tuiSurface
+      type="button"
+      class="tone"
+      [style.background-image]="'url(assets/images/child-friendly-bg.png)'"
+      [style.color]="'#fff'"
+      (click)="startEnrichment('child-friendly')"
+    >
+      <h3 class="heading">Child-Friendly</h3>
+    </button>
+
+    <button
+      tuiSurface
+      type="button"
+      class="tone"
+      [style.background-image]="'url(assets/images/funny-bg.jpg)'"
       [style.color]="'#fff'"
       (click)="startEnrichment('funny')"
     >

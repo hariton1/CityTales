@@ -24,7 +24,7 @@ import {
   maskitoNumberOptionsGenerator,
   maskitoRemoveOnBlurPlugin
 } from '@maskito/kit';
-import {TuiAutoFocus} from '@taiga-ui/cdk';
+import {TuiAutoFocus, TuiPlatform} from '@taiga-ui/cdk';
 import {TuiInputModule, TuiTextfieldControllerModule} from '@taiga-ui/legacy';
 import {TuiCarouselComponent, TuiChevron, TuiTooltip} from '@taiga-ui/kit';
 import {MaskitoDirective} from '@maskito/angular';
@@ -72,7 +72,8 @@ const numberOptions = maskitoNumberOptionsGenerator({
     TuiChevron,
     TuiExpand,
     TuiSurface,
-    TuiCarouselComponent
+    TuiCarouselComponent,
+    TuiPlatform
   ],
   templateUrl: './historic-place-detail.component.html',
   styleUrl: './historic-place-detail.component.less',
