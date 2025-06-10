@@ -110,37 +110,6 @@
     </tui-expand>
   </section>
 
-  <div class="tone-selector" *ngIf="selectedPlace.contentGerman">
-    <span style="font: var(--tui-font-heading-6); display: block; width: 100%">Choose how you want the story to be told <tui-icon
-      tuiHintDirection="bottom"
-      tuiTooltip="Select a tone to change the storytelling style — not the facts."
-    /></span>
-
-    <tui-carousel
-      [draggable]="true"
-      [itemsCount]="isMobile ? 2 : 4"
-      [(index)]="index1"
-    >
-      <ng-container *ngFor="let tone of tones">
-        <button
-          *tuiItem
-          tuiSurface
-          type="button"
-          class="tone"
-          [style.background-image]="'url(assets/images/' + tone.bg + ')'"
-          [style.color]="'#fff'"
-          (click)="startEnrichment(tone.key)"
-        >
-          <h3 class="heading">{{ tone.label }}</h3>
-        </button>
-      </ng-container>
-    </tui-carousel>
-  </div>
-
-  <div class="tone-selector" *ngIf="!selectedPlace.contentGerman">
-    <span style="font: var(--tui-font-heading-6); display: block; width: 100%">We haven’t written a story for this place yet — stay tuned!</span>
-  </div>
-
   <!-- prices -->
   <div class="content-section" *ngIf="this.prices().length > 0">
     <h3>Prices
@@ -207,15 +176,46 @@
     </form>
   </ng-template>
 
+  <div class="tone-selector" *ngIf="selectedPlace.contentGerman">
+    <span style="font: var(--tui-font-heading-6); display: block; width: 100%">Choose how you want the story to be told <tui-icon
+      tuiHintDirection="bottom"
+      tuiTooltip="Select a tone to change the storytelling style — not the facts."
+    /></span>
+
+    <tui-carousel
+      [draggable]="true"
+      [itemsCount]="isMobile ? 2 : 4"
+      [(index)]="index1"
+    >
+      <ng-container *ngFor="let tone of tones">
+        <button
+          *tuiItem
+          tuiSurface
+          type="button"
+          class="tone"
+          [style.background-image]="'url(assets/images/' + tone.bg + ')'"
+          [style.color]="'#fff'"
+          (click)="startEnrichment(tone.key)"
+        >
+          <h3 class="heading">{{ tone.label }}</h3>
+        </button>
+      </ng-container>
+    </tui-carousel>
+  </div>
+
+  <div class="tone-selector" *ngIf="!selectedPlace.contentGerman">
+    <span style="font: var(--tui-font-heading-6); display: block; width: 100%">We haven’t written a story for this place yet — stay tuned!</span>
+  </div>
+
   <!-- tone selector -->
   <div class="content">
     <!-- Skeleton Loader -->
-    <div *ngIf="enrichmentStarted && enrichmentLoading" class="fade-in">
+    <div *ngIf="enrichmentStarted && enrichmentLoading" class="fade-in tui-space_bottom-6">
       <div class="skeleton-line" *ngFor="let width of lineWidths" [style.width.%]="width"></div>
     </div>
 
     <!-- LLM Generated Content -->
-    <div *ngIf="enrichmentStarted && !enrichmentLoading" class="fade-in">
+    <div *ngIf="enrichmentStarted && !enrichmentLoading" class="fade-in tui-space_bottom-6">
       <section class="place-summary">
         <header tuiHeader class="tui-space_top-3 tui-space_bottom-3">
           <span class="tui-text_h6">Quick Facts & Highlights</span>
