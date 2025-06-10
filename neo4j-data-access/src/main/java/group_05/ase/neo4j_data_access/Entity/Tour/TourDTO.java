@@ -19,4 +19,5 @@ public class TourDTO {
     Double distance;
     Double durationEstimate;
     String userId;
+    Double tourPrice;
 }

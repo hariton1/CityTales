@@ -23,4 +23,5 @@ public class CreateTourRequestDTO {
     private double minDuration;
     private double maxBudget;
     private Integer minIntermediateStops;
+    private int[] personConfiguration;
 }

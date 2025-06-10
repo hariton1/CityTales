@@ -24,5 +24,6 @@ public class TourObject {
     private double distance;
     private double durationEstimate;
     private String userId;
+    private double tourPrice;
 
 }
