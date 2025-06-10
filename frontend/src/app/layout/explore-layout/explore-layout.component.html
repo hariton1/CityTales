@@ -17,6 +17,7 @@
     <div class="notification-button-container">
       <app-notification-inbox (selectPlaceEvent)="selectDetailEvent($event)"></app-notification-inbox>
     </div>
+
   <!-- Mobile: show only selected component -->
   <ng-container *ngIf="currentViewMobile === 'discover'">
     <app-sidebar [historicalPlaces]="historicalPlaces"></app-sidebar>
