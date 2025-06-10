@@ -108,7 +108,7 @@
     </tui-expand>
   </section>
 
-  <div class="tone-selector">
+  <div class="tone-selector" *ngIf="selectedPlace.contentGerman">
     <span style="font: var(--tui-font-heading-6); display: block; width: 100%">Choose how you want the story to be told <tui-icon
       tuiHintDirection="bottom"
       tuiTooltip="Select a tone to change the storytelling style — not the facts."
@@ -133,6 +133,10 @@
         </button>
       </ng-container>
     </tui-carousel>
+  </div>
+
+  <div class="tone-selector" *ngIf="!selectedPlace.contentGerman">
+    <span style="font: var(--tui-font-heading-6); display: block; width: 100%">We haven’t written a story for this place yet — stay tuned!</span>
   </div>
 
   <!-- prices -->
