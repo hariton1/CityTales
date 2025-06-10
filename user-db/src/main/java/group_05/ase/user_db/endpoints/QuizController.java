@@ -45,13 +45,13 @@ public class QuizController {
         }
     }
 
-    @PostMapping("/quiz/create")
+    @PostMapping("/quiz/create/{category}")
     @ResponseStatus(HttpStatus.OK)
-    public QuizDTO saveQuiz(@RequestBody QuizDTO quiz) {
+    public QuizDTO saveQuizForUsers(@PathVariable("category") String category, @RequestBody List<UUID> users) {
         try {
-            return service.saveQuiz(quiz);
+            return service.saveQuiz(category, users);
         } catch (Exception e) {
-            logger.error("Error saving quiz {}: {}", quiz, e.getMessage());
+            logger.error("Error creating quiz for {}: {}", users, e.getMessage());
             throw new RuntimeException("Error saving quiz", e);
         }
     }
