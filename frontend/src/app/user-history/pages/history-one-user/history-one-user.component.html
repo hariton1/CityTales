@@ -1,0 +1,31 @@
+<div class="centered-wrapper">
+  <table tuiTable [size]="'m'" [style.width.rem]="70" class="userHistories" >
+    <thead>
+    <tr>
+      <th tuiTh>Article</th>
+      <th tuiTh>Viewed at</th>
+    </tr>
+    </thead>
+    <tbody tuiTbody>
+    <tr *ngFor="let userHistory of userHistories">
+      <!-- First column -->
+      <td tuiTd>
+        <div [tuiCell]="'m'">
+                    <span tuiTitle>
+                      {{ userHistory.article_name }}
+                    </span>
+        </div>
+      </td>
+      <!-- Second column -->
+      <td tuiTd>
+        <div [tuiCell]="'m'">
+          <span tuiTitle>
+            {{ userHistory.open_dt | date: 'dd.MM.yyyy' }}
+          </span>
+        </div>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
+</div>

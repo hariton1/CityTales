@@ -1,0 +1,67 @@
+<h2 tuiTitle="m" class="title">
+    My Quizzes!
+    <div tuiSubtitle>What do you remember about your last tour?</div>
+</h2>
+
+<button (click)="generateNewQuiz()"> generate </button>
+
+<div>
+  {{newQuiz().id}}
+  {{newQuiz().name}}
+  {{newQuiz().description}}
+  {{newQuiz().category}}
+  {{newQuiz().questions}}
+  {{newQuiz().creator}}
+  {{newQuiz().createdAt}}
+</div>
+
+<tui-scrollbar>
+    <div class="horizontal-scroller">
+        <div *ngFor="let quiz of userQuizzes; index as i">
+
+            <div tuiAppearance="floating" tuiCardLarge class="quiz-item">
+                <header tuiHeader>
+                    <h3 tuiTitle>{{ quiz.header }}</h3>
+                </header>
+                <section>{{ quiz.description }}</section>
+                <footer>
+                    <tui-badge class="badge">
+                        Tour-based
+                    </tui-badge>
+                    <button appearance="primary" size="m" tuiButton type="button">
+                        Play!
+                    </button>
+                </footer>
+            </div>
+
+        </div>
+    </div>
+</tui-scrollbar>
+
+<h2 tuiTitle="m" class="title">
+    Play against Friends!
+    <div tuiSubtitle>Who has truly mastered their travel memorization skills?</div>
+</h2>
+
+<tui-scrollbar>
+    <div class="horizontal-scroller">
+        <div *ngFor="let quiz of sharedQuizzes; index as i">
+
+            <div tuiAppearance="floating" tuiCardLarge class="quiz-item">
+                <header tuiHeader>
+                    <h3 tuiTitle>{{ quiz.header }}</h3>
+                </header>
+                <section>{{ quiz.description }}</section>
+                <footer>
+                    <tui-badge class="badge">
+                        Tour-based
+                    </tui-badge>
+                    <button appearance="primary" size="m" tuiButton type="button">
+                        Play!
+                    </button>
+                </footer>
+            </div>
+
+        </div>
+    </div>
+</tui-scrollbar>

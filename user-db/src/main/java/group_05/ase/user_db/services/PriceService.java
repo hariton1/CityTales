@@ -5,6 +5,7 @@ import group_05.ase.user_db.repositories.PriceRepository;
 import group_05.ase.user_db.restData.PriceDTO;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -20,6 +21,16 @@ public class PriceService {
 
         List<PriceEntity> list = this.repository.findByLocationIdOrderByPriceIdAsc(location_id);
         return list.stream().map(this::mapEntityToDto).toList();
+    }
+
+    public List<List<PriceDTO>> getPricesByLocations(int[] location_ids) {
+
+        List<List<PriceDTO>> result = new ArrayList<>();
+        for (int location : location_ids) {
+            List<PriceDTO> pricesForLocation = getPricesByLocation(location);
+            result.add(pricesForLocation);
+        }
+        return result;
     }
 
     public PriceDTO createOrUpdatePrice(PriceDTO dto) {
