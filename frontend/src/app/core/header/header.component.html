@@ -15,41 +15,45 @@
     </tui-segmented>
 
   <div class="auth_buttons">
-    <button
-      appearance="secondary"
-      size="s"
-      tuiButton
-      type="button"
-      routerLink="admin-dashboard"
-    >
-      <tui-icon icon="@tui.users" [style.height.rem]="1"/>
-      Admin dashboard
-    </button>
-
     <button *ngIf="!loggedIn" appearance="flat" tuiButton type="button" routerLink="register">
       Sign Up
     </button>
 
-    <button
-      *ngIf="!loggedIn"
-      appearance="primary"
-      tuiButton
-      type="button"
-      routerLink="login"
-    >
+    <button *ngIf="!loggedIn" appearance="primary" tuiButton type="button" routerLink="login">
       Login
     </button>
 
     <!-- Show Logout if logged in -->
-    <button
-      *ngIf="loggedIn"
-      appearance="primary"
-      tuiButton
-      type="button"
-      (click)="logout()"
-    >
+    <!-- <button *ngIf="loggedIn" appearance="primary" tuiButton type="button" (click)="logout()">
       Logout
+    </button>-->
+
+    <button *ngIf="loggedIn"
+      appearance="flat"
+      iconStart="@tui.user"
+      tuiIconButton
+      type="button"
+      [tuiAppearanceState]="open ? 'hover' : null"
+      [tuiDropdown]="content"
+      [(tuiDropdownOpen)]="open"
+    >
+      Open
     </button>
+    <ng-template #content>
+      <tui-data-list tuiDataListDropdownManager [size]="size" >
+        <button appearance="secondary" size="s" tuiButton type="button" routerLink="admin-dashboard">
+          <tui-icon icon="@tui.users" [style.height.rem]="1"/>
+          Admin dashboard
+        </button>
+        <button tuiOption type="button" routerLink="profile">
+          Profile
+        </button>
+        <button tuiOption type="button" (click)="logout()">
+          Logout
+        </button>
+      </tui-data-list>
+    </ng-template>
+
   </div>
 
 </header>
