@@ -130,22 +130,15 @@ public class OpenAIService {
             );
         }
 
-        String summaryPrompt = """
-            You are a historian writing a concise, strictly factual summary of the following historical site or figure.
-            Do not ask questions, speculate, or add any information not in the input.
-            Format the summary as clean, structured HTML using the following structure where applicable:
-            
-            <ul>
-              <li><strong>Architectural Style:</strong> Style name</li>
-              <li><strong>Significance:</strong> 1–2 sentence description of importance</li>
-            </ul>
-            <p>Provide any additional verified facts in brief <strong>paragraphs</strong> if relevant.</p>
-            
-            Do not include any questions or personal opinions.
-            """;
-
         String toneKey = tone.toLowerCase();
         String tonePrompt = TONE_PROMPTS.getOrDefault(toneKey, TONE_PROMPTS.get("academic"));
+
+        String summaryPrompt = """
+        Summarize the following using the same tone and style as below.
+        Focus on creating a short version (2–3 lines max) of the content in the specified tone.
+        Keep it factual and aligned with the input.
+        
+        """ + tonePrompt;
 
         String summary = callOpenAI(enforceEnglish(summaryPrompt), content);
         String enrichedContent = callOpenAI(enforceEnglish(tonePrompt), content);
