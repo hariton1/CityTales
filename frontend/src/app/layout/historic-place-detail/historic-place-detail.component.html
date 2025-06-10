@@ -2,6 +2,18 @@
   <!-- TODO: make it responsive -->
 
 <div class="place-detail-container">
+  <button
+    tuiButton
+    type="button"
+    appearance="flat"
+    size="s"
+    class="back-button"
+    (click)="closeDetail()"
+  >
+    <tui-icon icon="@tui.chevron-left" class="mr-1" [style.height.rem]="1.2" />
+    Back to All Sites
+  </button>
+
   <section
     tuiCardLarge="compact"
     [tuiCardCollapsed]="collapsed()"
@@ -58,7 +70,18 @@
           </span>
         </div>
 
+        <div>
+          <button class="tui-space_top-4" appearance="outline" size="s" tuiButton type="button"
+                  (click)="navigateToFeedback()">
+            <tui-icon icon="@tui.message-circle-plus" [style.height.rem]="1"/>
+            Is something incorrect?
+          </button>
+        </div>
+
+
+
         <div class="bottom-right-button">
+
           <button
             appearance="secondary"
             size="s"
@@ -112,10 +135,7 @@
     </tui-carousel>
   </div>
 
-  <button
-    (click)="closeDetail()"
-  > Close </button>
-
+  <!-- prices -->
   <div class="content-section" *ngIf="this.prices().length > 0">
     <h3>Prices
       <button *ngIf="userHasPermission" tuiButton appearance="flat" size="xs" type="button" class="add-btn" tuiHint="Add a new price!"
@@ -181,6 +201,7 @@
     </form>
   </ng-template>
 
+  <!-- tone selector -->
   <div class="content">
     <!-- Skeleton Loader -->
     <div *ngIf="enrichmentStarted && enrichmentLoading" class="fade-in">
@@ -257,7 +278,7 @@
     </div>
 
     <div class="related-buildings tui-space_bottom-6" *ngIf="selectedPlace.relatedBuildings?.length">
-      <span class="tui-space_bottom-5" style="font: var(--tui-font-heading-6); display: block; width: 100%"><tui-icon icon="@tui.landmark" [style.height.rem]="1.5" /> Related Places</span>
+      <span class="tui-space_bottom-5" style="font: var(--tui-font-heading-6); display: block; width: 100%"><tui-icon icon="@tui.landmark" [style.height.rem]="1.5" /> Related Buildings</span>
 
       <tui-carousel
         [draggable]="true"
