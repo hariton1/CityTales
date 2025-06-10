@@ -5,13 +5,69 @@
     [(activeItemIndex)]="activeItemIndex"
   >
     <button
-      *ngFor="let item of items"
       tuiTabBarItem
       type="button"
-      [badge]="item.badge"
-      [icon]="item.icon"
+      [badge]="2"
+      [icon]="'@tui.earth'"
+      routerLink="/explore"
     >
-      {{ item.text }}
+      Explore
     </button>
+    <button
+      tuiTabBarItem
+      type="button"
+      [icon]="'@tui.earth'"
+      routerLink="/tours"
+    >
+      Tours
+    </button>
+    <button
+      tuiTabBarItem
+      type="button"
+      [icon]="'@tui.medal'"
+      routerLink="/scoreboard"
+    >
+      Scoreboard
+    </button>
+    <button
+      tuiTabBarItem
+      type="button"
+      [icon]="'@tui.users-round'"
+      routerLink="/friends"
+    >
+      Friends
+    </button>
+    <button
+      *ngIf="!loggedIn"
+      tuiTabBarItem
+      type="button"
+      [icon]="'@tui.log-in'"
+      routerLink="/login"
+    >
+      Log in
+    </button>
+    <button
+      *ngIf="loggedIn"
+      tuiTabBarItem
+      type="button"
+      [icon]="'@tui.user'"
+      [tuiDropdown]="content"
+      [(tuiDropdownOpen)]="open"
+    >
+      My Account
+    </button>
+
+    <ng-template #content>
+      <tui-data-list tuiDataListDropdownManager [size]="'l'" >
+        <button tuiOption appearance="secondary" size="s" type="button" routerLink="profile">
+          <tui-icon icon="@tui.user" [style.height.rem]="1"/>
+          Profile
+        </button>
+        <button tuiOption appearance="secondary" size="s" type="button" (click)="logout()">
+          <tui-icon icon="@tui.log-out" [style.height.rem]="1"/>
+          Logout
+        </button>
+      </tui-data-list>
+    </ng-template>
   </nav>
 </div>
