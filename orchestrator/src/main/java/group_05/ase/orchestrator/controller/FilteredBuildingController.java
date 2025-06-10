@@ -7,7 +7,9 @@ import group_05.ase.orchestrator.client.Neo4jBuildingClient;
 import group_05.ase.orchestrator.client.UserInterestClient;
 import group_05.ase.orchestrator.dto.UserInterestsDTO;
 import group_05.ase.orchestrator.service.FilteredBuildingService;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,7 +17,6 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/buildings")
-@RequiredArgsConstructor
 public class FilteredBuildingController {
 
     private final FilteredBuildingService filteredBuildingService;
@@ -23,9 +24,16 @@ public class FilteredBuildingController {
     private final Neo4jBuildingClient buildingClient;
     private final ArticleClient articleClient;
 
+    public FilteredBuildingController(FilteredBuildingService filteredBuildingService, UserInterestClient userInterestClient, Neo4jBuildingClient buildingClient, ArticleClient articleClient) {
+        this.filteredBuildingService = filteredBuildingService;
+        this.userInterestClient = userInterestClient;
+        this.articleClient = articleClient;
+        this.buildingClient = buildingClient;
+
+    }
 
     @GetMapping("/filtered/byUser/{userId}")
-    public List<ViennaHistoryWikiBuildingObject> getFilteredBuildingsForUser(
+    public ResponseEntity<List<ViennaHistoryWikiBuildingObject>> getFilteredBuildingsForUser(
             @PathVariable UUID userId,
             @RequestParam double latitude,
             @RequestParam double longitude,
@@ -34,7 +42,7 @@ public class FilteredBuildingController {
         List<UserInterestsDTO> interests = userInterestClient.getUserInterests(userId);
         List<ViennaHistoryWikiBuildingObject> buildings = buildingClient.getBuildingsByLocation(latitude, longitude, radius);
         List<ArticleWeightDTO> articleWeights = articleClient.getAllArticleWeights();
-        return filteredBuildingService.filterBuildingsByUserInterests(buildings, interests, articleWeights);
+        return ResponseEntity.ok(filteredBuildingService.filterBuildingsByUserInterests(buildings, interests, articleWeights));
     }
 
 }
