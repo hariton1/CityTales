@@ -3,6 +3,7 @@ package group05.ase.openai.adapter.Service;
 import group05.ase.openai.adapter.Controller.EnrichmentController;
 import group05.ase.openai.adapter.dto.EnrichmentResponse;
 import group05.ase.openai.adapter.dto.OpenAIResponseDTO;
+import group05.ase.openai.adapter.dto.QuizResponse;
 import lombok.RequiredArgsConstructor;
 
 import org.slf4j.Logger;
@@ -40,6 +41,15 @@ public class OpenAIService {
         String enrichedContent = callOpenAI(enforceEnglish(tonePrompt), content);
 
         return new EnrichmentResponse(summary, enrichedContent, tone);
+    }
+
+    public QuizResponse generateQuiz(String quizGenerationContentPrompt) {
+        String systemPrompt = "You are a quiz generator, that generates concise concise questions based " +
+                "on the following information. Generate exactly one Question along with one correct answer" +
+                " and 3 wrong answers.";
+        String generatedQuiz = callOpenAI(systemPrompt, quizGenerationContentPrompt);
+
+        return new QuizResponse(generatedQuiz);
     }
 
     protected String enforceEnglish(String prompt) {

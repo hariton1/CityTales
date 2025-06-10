@@ -61,7 +61,7 @@ export class ExploreLayoutComponent implements OnInit {
   }
 
   selectDetailEvent(event: any) {
-    if(event.type == 'building') {
+    if(event.buildingType == 'Gebäude') {
       this.selectedPlace = event;
       this.selectedPerson = null;
       this.selectedEvent = null;
