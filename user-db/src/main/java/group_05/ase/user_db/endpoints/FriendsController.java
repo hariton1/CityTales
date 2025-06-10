@@ -2,6 +2,8 @@ package group_05.ase.user_db.endpoints;
 
 import group_05.ase.user_db.restData.FriendsDTO;
 import group_05.ase.user_db.services.FriendsService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,6 +14,8 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/friends")
 public class FriendsController {
+
+    private static final Logger logger = LoggerFactory.getLogger(FriendsController.class);
 
     private final FriendsService friendsService;
 
@@ -25,7 +29,8 @@ public class FriendsController {
         try {
             return this.friendsService.getAllFriends();
         } catch (Exception e) {
-            return new ArrayList<FriendsDTO>(); //"An internal server error occurred => " + e.getMessage();
+            logger.error("Error fetching friends: {}", e.getMessage());
+            throw new RuntimeException("Error fetching friends", e);
         }
     }
 
@@ -35,7 +40,8 @@ public class FriendsController {
         try {
             return this.friendsService.getFriendsById(friendsId);
         } catch (Exception e) {
-            return new FriendsDTO(); //"An internal server error occurred => " + e.getMessage();
+            logger.error("Error fetching friends by id {}: {}", friendsId, e.getMessage());
+            throw new RuntimeException("Error fetching friends", e);
         }
     }
 
@@ -45,7 +51,8 @@ public class FriendsController {
         try {
             return this.friendsService.getFriendsByFriendOne(friendOne);
         } catch (Exception e) {
-            return new ArrayList<FriendsDTO>(); //"An internal server error occurred => " + e.getMessage();
+            logger.error("Error fetching friends by fiend_one_id {}: {}", friendOne.toString(), e.getMessage());
+            throw new RuntimeException("Error fetching friends", e);
         }
     }
 
@@ -55,7 +62,8 @@ public class FriendsController {
         try {
             return this.friendsService.getFriendsByFriendTwo(friendTwo);
         } catch (Exception e) {
-            return new ArrayList<FriendsDTO>(); //"An internal server error occurred => " + e.getMessage();
+            logger.error("Error fetching friends by fiend_two_id {}: {}", friendTwo.toString(), e.getMessage());
+            throw new RuntimeException("Error fetching friends", e);
         }
     }
 
@@ -65,7 +73,8 @@ public class FriendsController {
         try {
             this.friendsService.saveNewFriendsPair(friendsDTO);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            logger.error("Error creating friends {}: {}", friendsDTO.toString(), e.getMessage());
+            throw new RuntimeException("Error creating friends", e);
         }
     }
 
@@ -75,7 +84,8 @@ public class FriendsController {
         try {
             this.friendsService.deleteFriendsPair(friendsDTO);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            logger.error("Error deleting friends {}: {}", friendsDTO.toString(), e.getMessage());
+            throw new RuntimeException("Error deleting friends", e);
         }
     }
 }

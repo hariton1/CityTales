@@ -32,6 +32,71 @@
         </button>
       </div>
 
+      <div class="content-section" *ngIf="this.prices().length > 0">
+        <h3>Prices
+          <button *ngIf="userHasPermission" tuiButton appearance="flat" size="xs" type="button" class="add-btn" tuiHint="Add a new price!"
+                  tuiHintDirection="top" (click)="showDialog(-1)">
+            <tui-icon icon="@tui.circle-plus" class="prices"></tui-icon>
+          </button>
+        </h3>
+
+        <div *ngFor="let price of prices(); index as i" class="price-row">
+
+          <div class="price-bold" tuiHint="{{price.name}}">{{ price.name }}</div>
+          <div class="price-description" tuiHint="{{price.description}}">{{ price.description }}</div>
+          <div class="price-bold">{{ price.price }} €</div>
+
+          <button *ngIf="userHasPermission" tuiButton appearance="flat" size="xs" type="button" class="edit-btn" tuiHint="Edit or delete an existing price!"
+                  tuiHintDirection="top" (click)="showDialog(i.valueOf())">
+            <tui-icon icon="@tui.square-pen" class="prices"></tui-icon>
+          </button>
+        </div>
+
+      </div>
+
+      <ng-template let-observer [tuiDialogOptions]="options" [(tuiDialog)]="open">
+        <form [formGroup]="priceForm" class="textAreaContainerCtrl" (ngSubmit)="observer.complete()">
+          <div class="stack">
+            <tui-textfield #price tuiTextfieldSize="m" tuiAutoFocus [maskito]="maskitoOptions">
+              <label tuiLabel>Price value</label>
+              <input tuiTextfield required [placeholder]="price.focused() ? 'e.g. 15,00€' : 'Price value'"
+                     formControlName="priceFormValue"/>
+              <tui-icon tuiTooltip="The monetary value of the price."/>
+            </tui-textfield>
+          </div>
+
+          <div class="stack">
+            <tui-textfield #name tuiTextfieldSize="m">
+              <label tuiLabel>Name</label>
+              <input tuiTextfield required [placeholder]="name.focused() ? 'e.g. Adult' : 'Name'"
+                     formControlName="nameFormValue"/>
+              <tui-icon tuiTooltip="A short-hand name for the price."/>
+            </tui-textfield>
+          </div>
+
+          <div class="stack">
+            <tui-textfield #desc tuiTextfieldSize="m">
+              <label tuiLabel>Description</label>
+              <input tuiTextfield [placeholder]="desc.focused() ? 'e.g. Tour Ticket' : 'Description'"
+                     formControlName="descriptionFormValue"/>
+              <tui-icon tuiTooltip="Additional information for the price."/>
+            </tui-textfield>
+          </div>
+
+          <div class="price-dialog-buttons">
+            <button size="s" tuiButton type="submit" (click)="onSubmit()" class="save-button">
+              <tui-icon icon="@tui.save" [style.height.rem]="1.2"/>
+              Save
+            </button>
+
+            <button appearance="action-destructive" size="s" tuiButton type="submit" (click)="onDelete()" *ngIf="dialogLabel.startsWith('Edit')">
+              Delete
+            </button>
+          </div>
+
+        </form>
+      </ng-template>
+
       <div class="content-section">
         <h3>Building Information</h3>
         <div class="building-details">

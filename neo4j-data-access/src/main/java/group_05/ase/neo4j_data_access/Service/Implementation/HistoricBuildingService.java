@@ -6,7 +6,6 @@ import group_05.ase.neo4j_data_access.Entity.ViennaHistoryWikiEventObject;
 import group_05.ase.neo4j_data_access.Entity.ViennaHistoryWikiPersonObject;
 import group_05.ase.neo4j_data_access.Service.Interface.IHistoricBuildingService;
 import group_05.ase.neo4j_data_access.Service.Interface.IMappingService;
-import group_05.ase.neo4j_data_access.Service.Interface.IWikipediaExtractorService;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import org.neo4j.driver.*;
@@ -24,12 +23,9 @@ public class HistoricBuildingService implements IHistoricBuildingService {
     private final String NEO4J_USER;
     private final String NEO4J_PASSWORD;
     private Driver driver;
-    private final IWikipediaExtractorService wikipediaExtractorService;
     private final IMappingService mappingService;
 
-    public HistoricBuildingService(IWikipediaExtractorService wikipediaExtractorService, Neo4jProperties properties, IMappingService mappingService) {
-        this.wikipediaExtractorService = wikipediaExtractorService;
-
+    public HistoricBuildingService( Neo4jProperties properties, IMappingService mappingService) {
         this.NEO4J_URL = properties.getUrl();
         this.NEO4J_USER = properties.getUser();
         this.NEO4J_PASSWORD = properties.getPassword();
@@ -115,8 +111,8 @@ public class HistoricBuildingService implements IHistoricBuildingService {
                     tx.run(query, Values.parameters("latitude", latitude, "longitude", longitude, "radius", radius)).list()
             );
 
+            System.out.println("checking records");
             for (Record record : records) {
-                System.out.println("checking records");
                 Node mainNode = record.get("p").asNode();
 
                 ViennaHistoryWikiBuildingObject mainObj = convertToDTO(mainNode);

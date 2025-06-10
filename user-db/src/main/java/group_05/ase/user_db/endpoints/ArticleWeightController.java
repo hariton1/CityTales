@@ -2,6 +2,8 @@ package group_05.ase.user_db.endpoints;
 
 import group_05.ase.user_db.restData.ArticleWeightDTO;
 import group_05.ase.user_db.services.ArticleWeightService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,6 +13,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/articleWeights")
 public class ArticleWeightController {
+
+    private static final Logger logger = LoggerFactory.getLogger(ArticleWeightController.class);
 
     private final ArticleWeightService articleWeightService;
 
@@ -24,7 +28,8 @@ public class ArticleWeightController {
         try {
             return this.articleWeightService.getAllArticleWeights();
         } catch (Exception e) {
-            return new ArrayList<ArticleWeightDTO>(); //"An internal server error occurred => " + e.getMessage();
+            logger.error("Error fetching article weights: {}", e.getMessage());
+            throw new RuntimeException("Error fetching article weights", e);
         }
     }
 
@@ -34,7 +39,8 @@ public class ArticleWeightController {
         try {
             return this.articleWeightService.getArticleWeightByArticleId(articleId);
         } catch (Exception e) {
-            return new ArticleWeightDTO(); //"An internal server error occurred => " + e.getMessage();
+            logger.error("Error fetching article weight by id {}: {}", articleId, e.getMessage());
+            throw new RuntimeException("Error fetching article weight", e);
         }
     }
 
@@ -44,8 +50,8 @@ public class ArticleWeightController {
         try {
             return this.articleWeightService.saveNewArticleWeight(articleWeightDTO);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return new ArticleWeightDTO();
+            logger.error("Error when creating article weight {}: {}", articleWeightDTO.toString(), e.getMessage());
+            throw new RuntimeException("Error creating article weight", e);
         }
     }
 

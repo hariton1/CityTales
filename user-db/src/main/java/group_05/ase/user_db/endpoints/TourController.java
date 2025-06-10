@@ -3,6 +3,8 @@ package group_05.ase.user_db.endpoints;
 
 import group_05.ase.user_db.restData.TourDTO;
 import group_05.ase.user_db.services.TourService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,6 +14,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/tours")
 public class TourController {
+
+    private static final Logger logger = LoggerFactory.getLogger(TourController.class);
 
     private final TourService tourService;
     public TourController(TourService tourService) {
@@ -25,7 +29,8 @@ public class TourController {
         try {
             return this.tourService.findAllTours();
         } catch (Exception e) {
-            return new ArrayList<TourDTO>(); //"An internal server error occurred => " + e.getMessage();
+            logger.error("Error fetching tours: {}", e.getMessage());
+            throw new RuntimeException("Error fetching tours", e);
         }
     }
 
@@ -35,6 +40,7 @@ public class TourController {
         try {
             return this.tourService.findToursByUserId(userId);
         } catch (Exception e) {
+            logger.error("Error fetching tours by user_id {}: {}", userId, e.getMessage());
             throw new RuntimeException("Error fetching tours for user", e);
         }
     }
@@ -45,6 +51,7 @@ public class TourController {
         try {
             return this.tourService.findTourByTourId(tourId);
         } catch (Exception e) {
+            logger.error("Error fetching tours by id {}: {}", tourId, e.getMessage());
             throw new RuntimeException("Error fetching tours for user", e);
         }
     }
@@ -55,6 +62,7 @@ public class TourController {
         try {
             this.tourService.deleteTourById(tourId);
         } catch (Exception e) {
+            logger.error("Error deleting tour by id {}: {}", tourId, e.getMessage());
             throw new RuntimeException("Error deleting tour", e);
         }
     }
@@ -65,6 +73,7 @@ public class TourController {
         try {
             return this.tourService.updateTourById(tourId, updatedValues);
         } catch (Exception e) {
+            logger.error("Error updating tour by id {}, with {}: {}", tourId, updatedValues.toString(), e.getMessage());
             throw new RuntimeException("Error updating tour", e);
         }
     }
@@ -75,6 +84,7 @@ public class TourController {
         try {
             this.tourService.createTour(tourDTO);
         } catch (Exception e) {
+            logger.error("Error creating tour {}: {}", tourDTO.toString(), e.getMessage());
             throw new RuntimeException("Error creating tour", e);
         }
     }

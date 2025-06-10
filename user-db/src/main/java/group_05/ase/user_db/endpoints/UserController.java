@@ -29,7 +29,8 @@ public class UserController {
         try {
             return this.userService.getAllUsers();
         } catch (Exception e) {
-            return new ArrayList<UserDTO>(); //"An internal server error occurred => " + e.getMessage();
+            logger.error("Error fetching users: {}", e.getMessage());
+            throw new RuntimeException("Error fetching users", e);
         }
     }
 

@@ -15,7 +15,7 @@ export class UserService {
     return this.httpClient.get<UserDto[]>(this.DOMAIN)
       .pipe(
       map(userList => userList.map(user => {
-        return new UserDto(user.id, user.email, user.created_at);
+        return new UserDto(user.id, user.email, user.created_at, user.role, user.status);
       }))
     );
   }
@@ -23,7 +23,7 @@ export class UserService {
   public getUserById(id: string) : Observable<UserDto> {
     return this.httpClient.get<UserDto>(`${this.DOMAIN}/id=${id}`)
       .pipe(map(user => {
-        return new UserDto(user.id,user.email, user.created_at);
+        return new UserDto(user.id,user.email, user.created_at, user.role, user.status);
       }));
   }
 
@@ -36,12 +36,15 @@ export class UserService {
 
   public updateUser(user: UserDto) : Observable<UserDto> {
     const payload = {
+      id: user.id,
       email: user.email,
+      role: user.role,
+      status: user.status,
     };
 
     return this.httpClient.patch<UserDto>(`${this.DOMAIN}/id=${user.id}`, payload)
       .pipe(map(updatedUser => {
-        return new UserDto(updatedUser.id, updatedUser.email, updatedUser.created_at, updatedUser.role);
+        return new UserDto(updatedUser.id, updatedUser.email, updatedUser.created_at, updatedUser.role, updatedUser.status);
       }));
   }
 }

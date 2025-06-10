@@ -64,6 +64,10 @@ public class FeedbackServiceTest {
         FeedbackDTO feedbackDTO = feedbackService.getFeedbackById(feedbackEntity.getFeedbackId());
 
         assertThat(feedbackDTO.getFeedbackId()).isEqualTo(feedbackEntity.getFeedbackId());
+        assertThat(feedbackDTO.getUserId()).isEqualTo(feedbackEntity.getUserId());
+        assertThat(feedbackDTO.getArticleId()).isEqualTo(feedbackEntity.getArticleId());
+        assertThat(feedbackDTO.getRating()).isEqualTo(feedbackEntity.getRating());
+        assertThat(feedbackDTO.getFbContent()).isEqualTo(feedbackEntity.getFbContent());
 
         System.out.println("Test testGetFeedbackById passed!");
 

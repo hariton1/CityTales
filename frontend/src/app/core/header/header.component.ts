@@ -1,6 +1,6 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component} from '@angular/core';
-import {TuiButton, TuiIcon, TuiTextfield} from '@taiga-ui/core';
-import {TuiSegmented} from '@taiga-ui/kit';
+import {TuiButton, TuiDataListComponent, TuiDropdown, TuiIcon, TuiSizeL, TuiSizeS, TuiTextfield} from '@taiga-ui/core';
+import {TuiDataListDropdownManager, TuiSegmented} from '@taiga-ui/kit';
 
 import {TuiHeaderComponent, TuiLogoComponent} from '@taiga-ui/layout';
 import {Router, RouterLink, RouterLinkActive} from '@angular/router';
@@ -20,8 +20,12 @@ import { CommonModule } from '@angular/common';
     TuiLogoComponent,
     TuiHeaderComponent,
     TuiIcon,
+    TuiTextfield,
     RouterLink,
-    RouterLinkActive
+    RouterLinkActive,
+    TuiDropdown,
+    TuiDataListDropdownManager,
+    TuiDataListComponent
   ],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss',
@@ -30,7 +34,8 @@ import { CommonModule } from '@angular/common';
 export class HeaderComponent {
   filteredLocationList: BuildingEntity[] = [];
   loggedIn = false;
-  interestFiltering: boolean = true;
+  protected open = false;
+  protected size: TuiSizeL | TuiSizeS = 'l';
 
   constructor(private searchService: SearchService, private router: Router, private cdr: ChangeDetectorRef) {
     supabase.auth.getSession().then(({ data: { session } }) => {
