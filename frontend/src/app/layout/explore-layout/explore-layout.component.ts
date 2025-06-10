@@ -28,21 +28,19 @@ export class ExploreLayoutComponent implements OnInit {
   currentViewMobile: 'discover' | 'map' = 'discover';
   isMobile = false;
 
-
-  //Sidebar selectors
   selectedPlace: BuildingEntity | null = null;
   selectedPerson: PersonEntity | null = null;
   selectedEvent: EventEntity | null = null;
 
   historicalPlaces: BuildingEntity[] = [];
-
   setDetailedView: boolean = false;
 
-  constructor(readonly breakpointObserver: BreakpointObserver) {
-  }
+  constructor(
+    readonly breakpointObserver: BreakpointObserver
+  ) {}
 
   ngOnInit() {
-    this.breakpointObserver
+      this.breakpointObserver
       .observe([Breakpoints.HandsetPortrait, Breakpoints.HandsetLandscape])
       .subscribe(result => {
         this.isMobile = result.matches;

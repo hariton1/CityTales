@@ -34,7 +34,8 @@ export class MapViewComponent implements OnInit{
   constructor(private locationService: LocationService,
               private userLocationService: UserLocationService,
               private userService: UserService,
-              private zone: NgZone) {
+              private zone: NgZone
+              ) {
   }
 
   @Output() selectDetailEvent: EventEmitter<Object> = new EventEmitter<Object>();
@@ -173,7 +174,7 @@ export class MapViewComponent implements OnInit{
   // For testing in case navigator.geolocation breaks - happened to me for some reason...
   ngOnInit(): void {
 
-      this.locationService.getLocationsInRadius(this.center.lat, this.center.lng, 10000).subscribe(locations => {
+      this.locationService.getLocationsInRadius(this.center.lat, this.center.lng, 10000, true).subscribe(locations => {
         this.locationsNearby = locations;
         this.addMarkersToMap(locations);
         this.populatePlacesEvent.emit(locations);
