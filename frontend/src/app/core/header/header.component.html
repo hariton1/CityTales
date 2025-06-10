@@ -6,53 +6,56 @@
     <tui-segmented [size]="'m'" class="main-nav-desktop">
       <a routerLink="/explore" >🌎 Explore</a>
       <a routerLink="/tours">🧭 Tours</a>
-      <a routerLink="/feedback">Contribute</a>
-      <a routerLinkActive href="#">For Educators</a>
-      <a routerLinkActive href="#">About</a>
-      <a routerLink="/scoreboard">Scoreboard</a>
-      <a routerLinkActive href="/friends">Friends</a>
+      <!-- <a routerLink="/feedback">Contribute</a> -->
+      <!-- <a routerLinkActive href="#">For Educators</a> -->
+      <a *ngIf="loggedIn" routerLink="/scoreboard">Scoreboard</a>
+      <a *ngIf="loggedIn" routerLinkActive href="/friends">Friends</a>
+      <a routerLinkActive href="/about-us">About us</a>
       <!-- <a routerLink="/onboarding" >Onboarding</a> -->
     </tui-segmented>
 
   <div class="auth_buttons">
-    <button
-      appearance="secondary"
-      size="s"
-      tuiButton
-      type="button"
-      routerLink="admin/users"
-    >
-      <tui-icon
-        icon="@tui.users"
-        [style.height.rem]="1"
-      />
-      User Management
-    </button>
-
-    <button appearance="flat" tuiButton type="button" routerLink="register">
+    <button *ngIf="!loggedIn" appearance="flat" tuiButton type="button" routerLink="register">
       Sign Up
     </button>
 
-    <button
-      *ngIf="!loggedIn"
-      appearance="primary"
-      tuiButton
-      type="button"
-      routerLink="login"
-    >
+    <button *ngIf="!loggedIn" appearance="primary" tuiButton type="button" routerLink="login">
       Login
     </button>
 
     <!-- Show Logout if logged in -->
-    <button
-      *ngIf="loggedIn"
-      appearance="primary"
-      tuiButton
-      type="button"
-      (click)="logout()"
-    >
+    <!-- <button *ngIf="loggedIn" appearance="primary" tuiButton type="button" (click)="logout()">
       Logout
+    </button>-->
+
+    <button *ngIf="loggedIn"
+      appearance="flat"
+      iconStart="@tui.user"
+      tuiIconButton
+      type="button"
+      [tuiAppearanceState]="open ? 'hover' : null"
+      [tuiDropdown]="content"
+      [(tuiDropdownOpen)]="open"
+    >
+      Open
     </button>
+    <ng-template #content>
+      <tui-data-list tuiDataListDropdownManager [size]="size" >
+        <button tuiOption appearance="secondary" size="s" type="button" routerLink="admin-dashboard">
+          <tui-icon icon="@tui.users" [style.height.rem]="1"/>
+          Dashboard
+        </button>
+        <button tuiOption appearance="secondary" size="s" type="button" routerLink="profile">
+          <tui-icon icon="@tui.user" [style.height.rem]="1"/>
+          Profile
+        </button>
+        <button tuiOption appearance="secondary" size="s" type="button" (click)="logout()">
+          <tui-icon icon="@tui.log-out" [style.height.rem]="1"/>
+          Logout
+        </button>
+      </tui-data-list>
+    </ng-template>
+
   </div>
 
 </header>

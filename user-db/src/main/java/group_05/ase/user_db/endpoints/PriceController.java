@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -30,6 +29,17 @@ public class PriceController {
             return this.service.getPricesByLocation(location_id);
         } catch (Exception e) {
             logger.error("Error fetching prices for location {}: {}", location_id, e.getMessage());
+            throw new RuntimeException("Error fetching prices", e);
+        }
+    }
+
+    @GetMapping("/find/multiple")
+    @ResponseStatus(HttpStatus.OK)
+    public List<List<PriceDTO>> getPricesByLocations(@RequestBody int[] location_ids) {
+        try {
+            return this.service.getPricesByLocations(location_ids);
+        } catch (Exception e) {
+            logger.error("Error fetching prices for locations {}: {}", location_ids, e.getMessage());
             throw new RuntimeException("Error fetching prices", e);
         }
     }

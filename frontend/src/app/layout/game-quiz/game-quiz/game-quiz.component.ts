@@ -1,8 +1,10 @@
-import {ChangeDetectionStrategy, Component} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {TuiAppearance, TuiButton, TuiScrollbar, TuiTitle} from '@taiga-ui/core';
 import {TuiBadge} from '@taiga-ui/kit';
 import {TuiCardLarge, TuiHeader} from '@taiga-ui/layout';
 import {NgForOf} from '@angular/common';
+import {QuizService} from '../../../services/quiz.service';
+import {UUID} from 'node:crypto';
 
 @Component({
   selector: 'app-game-quiz',
@@ -21,6 +23,18 @@ import {NgForOf} from '@angular/common';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GameQuizComponent {
+
+  private readonly quizService = inject(QuizService);
+  creatorId: UUID = '' as UUID;
+  users: UUID[] = [];
+  newQuiz = this.quizService.newQuiz;
+
+  generateNewQuiz(): void {
+    let category = 'Tour';
+    this.retrieveUserID();
+    this.users.push(this.creatorId);
+    this.quizService.generateNewQuiz(category, this.users);
+  }
 
   protected readonly userQuizzes = [
     {
@@ -54,4 +68,12 @@ export class GameQuizComponent {
   ];
 
   protected readonly sharedQuizzes = this.userQuizzes;
+
+  retrieveUserID() {
+    const stored = localStorage.getItem("user_uuid") as UUID;
+    if (stored) {
+      this.creatorId = stored;
+    }
+  }
+
 }

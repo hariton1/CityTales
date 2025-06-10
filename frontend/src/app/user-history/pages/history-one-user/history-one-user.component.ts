@@ -62,7 +62,6 @@ export class HistoryOneUserComponent {
         console.error('Error fetching user histories:', error);
       }
     });
-
   }
 
 }
