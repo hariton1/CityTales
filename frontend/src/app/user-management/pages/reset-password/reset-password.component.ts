@@ -36,8 +36,7 @@ import {UUID} from 'node:crypto';
         TuiPassword,
         TuiTextfieldComponent,
         TuiTextfieldDirective,
-        TuiTitle,
-        TuiTooltip
+        TuiTitle
     ],
   templateUrl: './reset-password.component.html',
   styleUrl: './reset-password.component.scss'

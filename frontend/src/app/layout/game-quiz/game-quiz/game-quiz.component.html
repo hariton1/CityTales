@@ -3,6 +3,18 @@
     <div tuiSubtitle>What do you remember about your last tour?</div>
 </h2>
 
+<button (click)="generateNewQuiz()"> generate </button>
+
+<div>
+  {{newQuiz().id}}
+  {{newQuiz().name}}
+  {{newQuiz().description}}
+  {{newQuiz().category}}
+  {{newQuiz().questions}}
+  {{newQuiz().creator}}
+  {{newQuiz().createdAt}}
+</div>
+
 <tui-scrollbar>
     <div class="horizontal-scroller">
         <div *ngFor="let quiz of userQuizzes; index as i">
