@@ -103,8 +103,6 @@
               <a [href]="selectedPlace.url" target="_blank"> {{ selectedPlace.url }} </a>
             </span>
       </div>
-
-      <pre>{{ selectedPlace | json }}</pre>
     </tui-expand>
   </section>
 
@@ -331,40 +329,9 @@
         (indexChange)="onIndexBuildings($event)"
       />
     </div>
-      <!--<div class="related-persons-list">
-        <div
-          tuiAppearance="floating"
-          tuiCardLarge
-          *ngFor="let person of selectedPlace.relatedPersons"
-          class="person-card"
-        >
-          <div (click)="onPersonClick(person)">
-            <aside tuiAccessories>
-              <tui-avatar
-                class="avatar"
-                size="l"
-                [src]="
-              person.imageUrls[1] === 'https://www.geschichtewiki.wien.gv.at/images/7/7d/RDF.png'
-                ? 'assets/images/no-picture.png'
-                : (person.imageUrls[1] | tuiFallbackSrc: '@tui.user' | async)
-            "
-                [style.background]="
-              person.imageUrls[1] === 'https://www.geschichtewiki.wien.gv.at/images/7/7d/RDF.png'
-                ? 'transparent'
-                : (person.imageUrls[1] | tuiAutoColor)
-            "
-              />
-            </aside>
-            <h2 tuiTitle>
-              {{ person.name }}
-              <span tuiSubtitle *ngIf="person.deathDate != null">
-            †{{ person.deathDate }}
-          </span>
-            </h2>
-          </div>
-        </div>
-      </div>-->
-    <div class="related-buildings" *ngIf="selectedPlace.relatedEvents?.length">
+
+
+    <div class="related-events tui-space_bottom-6" *ngIf="selectedPlace.relatedEvents?.length">
       <span class="tui-space_bottom-5" style="font: var(--tui-font-heading-6); display: block; width: 100%"><tui-icon icon="@tui.calendar" [style.height.rem]="1.5" /> Related Events</span>
 
       <tui-carousel
