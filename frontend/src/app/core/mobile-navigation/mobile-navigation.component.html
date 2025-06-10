@@ -22,6 +22,7 @@
       Tours
     </button>
     <button
+      *ngIf="loggedIn"
       tuiTabBarItem
       type="button"
       [icon]="'@tui.medal'"
@@ -30,6 +31,7 @@
       Scoreboard
     </button>
     <button
+      *ngIf="loggedIn"
       tuiTabBarItem
       type="button"
       [icon]="'@tui.users-round'"
