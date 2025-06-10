@@ -230,4 +230,41 @@ public class HistoricBuildingService implements IHistoricBuildingService {
         }
         return linkedPersons;
     }
+
+    public List<ViennaHistoryWikiBuildingObject> findHistoricalBuildingWithinRadiusAndInterests(
+            double latitude, double longitude, double radius, List<String> interests) {
+
+        List<ViennaHistoryWikiBuildingObject> places = new ArrayList<>();
+
+        try (Session session = driver.session()) {
+            String query =
+                    "WITH point({latitude: $latitude, longitude: $longitude}) AS targetPoint " +
+                            "MATCH (p:WienGeschichteWikiBuildings) " +
+                            "WHERE p.latitude IS NOT NULL AND p.longitude IS NOT NULL " +
+                            "AND p.category IN $interests " +           // FILTER nach Interests!
+                            "WITH p, point({latitude: p.latitude, longitude: p.longitude}) AS placePoint, targetPoint " +
+                            "WHERE point.distance(placePoint, targetPoint) <= $radius " +
+                            "RETURN p";
+
+            List<Record> records = session.readTransaction(tx ->
+                    tx.run(query, Values.parameters(
+                                    "latitude", latitude,
+                                    "longitude", longitude,
+                                    "radius", radius,
+                                    "interests", interests))
+                            .list()
+            );
+
+            for (Record record : records) {
+                Node node = record.get("p").asNode();
+                places.add(convertToDTO(node));
+            }
+
+        } catch (Exception e) {
+            System.err.println("Error retrieving filtered places: " + e.getMessage());
+        }
+
+        return places;
+    }
+
 }
