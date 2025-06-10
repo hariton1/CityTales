@@ -41,14 +41,16 @@
     </button>
     <ng-template #content>
       <tui-data-list tuiDataListDropdownManager [size]="size" >
-        <button appearance="secondary" size="s" tuiButton type="button" routerLink="admin-dashboard">
+        <button tuiOption appearance="secondary" size="s" type="button" routerLink="admin-dashboard">
           <tui-icon icon="@tui.users" [style.height.rem]="1"/>
-          Admin dashboard
+          Dashboard
         </button>
-        <button tuiOption type="button" routerLink="profile">
+        <button tuiOption appearance="secondary" size="s" type="button" routerLink="profile">
+          <tui-icon icon="@tui.user" [style.height.rem]="1"/>
           Profile
         </button>
-        <button tuiOption type="button" (click)="logout()">
+        <button tuiOption appearance="secondary" size="s" type="button" (click)="logout()">
+          <tui-icon icon="@tui.log-out" [style.height.rem]="1"/>
           Logout
         </button>
       </tui-data-list>
