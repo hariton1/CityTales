@@ -9,26 +9,36 @@ import {UtilitiesService} from '../services/utilities.service';
 @Injectable({providedIn: 'root'})
 export class UserHistoriesService {
 
-  private DOMAIN = SERVER_ADDRESS + 'userHistories/';
+  private DOMAIN = SERVER_ADDRESS + 'userHistories';
 
   constructor(private httpClient: HttpClient,
               private utilitiesService: UtilitiesService) {
   }
 
   public getAllUserHistories(): Observable<UserHistoryDto[]> {
-    return this.httpClient.get<UserHistoryDto[]>(this.DOMAIN);
+    return this.httpClient.get<any[]>(this.DOMAIN)
+      .pipe(
+        map(data => data.map(item => {
+          return new UserHistoryDto(item.user_history_id, item.user_id, item.article_id, item.open_dt, item.close_dt, item.interest_id);
+        }))
+      );
   }
 
   public getUserHistoriesById(user_history_id: number): Observable<UserHistoryDto> {
-    return this.httpClient.get<UserHistoryDto>(this.DOMAIN + 'id=' + user_history_id);
+    return this.httpClient.get<UserHistoryDto>(this.DOMAIN + '/id=' + user_history_id);
   }
 
   public getUserHistoriesByUserId(user_id: UUID): Observable<UserHistoryDto[]> {
-    return this.httpClient.get<UserHistoryDto[]>(this.DOMAIN + 'user_id=' + user_id);
+    return this.httpClient.get<any[]>(this.DOMAIN + '/user_id=' + user_id)
+      .pipe(
+        map(data => data.map(item => {
+          return new UserHistoryDto(item.user_history_id, item.user_id, item.article_id, item.open_dt, item.close_dt, item.interest_id);
+        }))
+      );
   }
 
   public getUserHistoriesByArticleId(article_id: number): Observable<UserHistoryDto[]> {
-    return this.httpClient.get<UserHistoryDto[]>(this.DOMAIN + 'article_id=' + article_id);
+    return this.httpClient.get<UserHistoryDto[]>(this.DOMAIN + '/article_id=' + article_id);
   }
 
   public createNewUserHistory(user_history: UserHistoryDto): Observable<UserHistoryDto> {
@@ -41,7 +51,7 @@ export class UserHistoriesService {
     };
 
     return this.httpClient.post<any>(
-      this.DOMAIN + 'create',
+      this.DOMAIN + '/create',
       userHistoryToSend,
       {
         headers: new HttpHeaders({
@@ -73,7 +83,7 @@ export class UserHistoriesService {
     };
 
     return this.httpClient.put<UserHistoryDto>(
-      this.DOMAIN + 'update',
+      this.DOMAIN + '/update',
       userHistoryToSend,
       {
         headers: new HttpHeaders({
