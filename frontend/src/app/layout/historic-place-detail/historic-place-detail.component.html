@@ -22,7 +22,11 @@
 
     <div class="image-info-flex">
       <div class="image-container" *ngIf="selectedPlace.imageUrls.length > 0">
-        <img [src]="selectedPlace.imageUrls[1]" alt="Building" />
+        <img [src]="
+            selectedPlace.imageUrls[1] === 'https://www.geschichtewiki.wien.gv.at/images/7/7d/RDF.png'
+            ? 'assets/images/building-placeholder-500.jpeg'
+            : selectedPlace.imageUrls[1]"
+             alt="{{ selectedPlace.name }}" />
       </div>
 
       <div class="info-block">
@@ -249,7 +253,7 @@
                   size="l"
                   [src]="
               person.imageUrls[1] === 'https://www.geschichtewiki.wien.gv.at/images/7/7d/RDF.png'
-                ? 'assets/images/no-picture.png'
+                ? 'assets/images/person-placeholder-200.png'
                 : (person.imageUrls[1] | tuiFallbackSrc: '@tui.user' | async)
             "
                   [style.background]="
@@ -302,7 +306,7 @@
                   size="l"
                   [src]="
               building.imageUrls[1] === 'https://www.geschichtewiki.wien.gv.at/images/7/7d/RDF.png'
-                ? 'assets/images/no-picture.png'
+                ? 'assets/images/building-placeholder-200.jpeg'
                 : (building.imageUrls[1] | tuiFallbackSrc: '@tui.user' | async)
             "
                   [style.background]="
@@ -354,7 +358,7 @@
                   size="l"
                   [src]="
               event.imageUrls[1] === 'https://www.geschichtewiki.wien.gv.at/images/7/7d/RDF.png'
-                ? 'assets/images/no-picture.png'
+                ? 'assets/images/event-placeholder-200.jpeg'
                 : (event.imageUrls[1] | tuiFallbackSrc: '@tui.user' | async)
             "
                   [style.background]="
