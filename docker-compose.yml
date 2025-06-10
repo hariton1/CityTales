@@ -52,16 +52,12 @@ services:
 
   user-db:
     container_name: user-db
-    build:
-      context: .
-      dockerfile: user-db/Dockerfile
+    build: ./user-db
     ports:
       - "8090:8090"
   orchestrator:
     container_name: orchestrator
-    build:
-      context: .
-      dockerfile: orchestrator/Dockerfile
+    build: ./orchestrator
     ports:
       - "9098:9098"
     dns:
