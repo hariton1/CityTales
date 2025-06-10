@@ -46,6 +46,7 @@ public class WebClientConfig {
     public WebClient neo4jClient(@Value("${neo4j.baseUrl}") String neo4jBaseUrl) {
         return WebClient.builder()
                 .baseUrl(neo4jBaseUrl)
+                .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(40 * 1024 * 1024))
                 .build();
     }
 }
