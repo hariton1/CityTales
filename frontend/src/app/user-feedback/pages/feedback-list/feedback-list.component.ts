@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {NgForOf} from "@angular/common";
-import {TuiAutoColorPipe, TuiButton, TuiInitialsPipe, TuiTitle} from "@taiga-ui/core";
+import {TuiAlertService, TuiAutoColorPipe, TuiButton, TuiInitialsPipe, TuiTitle} from "@taiga-ui/core";
 import {TuiAvatar, TuiStatus} from "@taiga-ui/kit";
 import {TuiTableDirective, TuiTableTbody, TuiTableTd, TuiTableTh} from "@taiga-ui/addon-table";
 import {UserService} from '../../../user_db.services/user.service';
@@ -31,6 +31,7 @@ import {catchError, forkJoin, of} from 'rxjs';
 export class FeedbackListComponent {
 
   protected feedbacks: any[];
+  private readonly alerts = inject(TuiAlertService);
 
   constructor(private userService: UserService,
               private feedbackService: FeedbackService,
@@ -90,6 +91,9 @@ export class FeedbackListComponent {
     this.feedbackService.approveFeedback(feedback.feedback_id).subscribe({
       next: (results) => {
         console.log('works', results);
+        this.alerts
+          .open('Feedback has been approved', {label: 'Success!', appearance: 'success', autoClose: 3000})
+          .subscribe();
       },
       error: (err) => {
         console.error('no works', err);
@@ -107,6 +111,9 @@ export class FeedbackListComponent {
     this.feedbackService.deleteFeedback(feedback.feedback_id).subscribe({
       next: (results) => {
         console.log('works', results);
+        this.alerts
+          .open('Feedback has been deleted', {label: 'Success!', appearance: 'success', autoClose: 3000})
+          .subscribe();
       },
       error: (err) => {
         console.error('no works', err);
