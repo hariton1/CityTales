@@ -1,7 +1,7 @@
 package group_05.ase.orchestrator.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import group_05.ase.orchestrator.dto.UserInterestWithWeightDTO;
+import group_05.ase.orchestrator.dto.UserInterestsDTO;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.*;
@@ -18,6 +18,7 @@ import org.testcontainers.containers.Neo4jContainer;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class FilteredBuildingControllerIntegrationTest {
@@ -82,8 +83,9 @@ class FilteredBuildingControllerIntegrationTest {
 
     @Test
     void returnsFilteredBuildings() throws Exception {
-        List<UserInterestWithWeightDTO> interests = List.of(
-                new UserInterestWithWeightDTO(1, "Religious", 1.0f)
+        UUID uuid = UUID.randomUUID();
+        List<UserInterestsDTO> interests = List.of(
+                new UserInterestsDTO(uuid,  1,"Religious")
         );
         mockUserDbServer.enqueue(new MockResponse()
                 .setBody(MAPPER.writeValueAsString(interests))

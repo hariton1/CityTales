@@ -9,10 +9,6 @@ import {SearchService} from '../../services/search.service'
 import {BuildingEntity} from '../../dto/db_entity/BuildingEntity';
 import { supabase } from '../../user-management/supabase.service';
 import { CommonModule } from '@angular/common';
-import {TuiSwitch} from '@taiga-ui/kit';
-import {FormsModule} from '@angular/forms';
-import { InterestFilterService } from '../../services/interest-filter.service';
-import {Breakpoints} from '@angular/cdk/layout';
 
 @Component({
   selector: 'app-header',
@@ -25,8 +21,6 @@ import {Breakpoints} from '@angular/cdk/layout';
     TuiHeaderComponent,
     TuiIcon,
     RouterLink,
-    TuiSwitch,
-    FormsModule,
     RouterLinkActive
   ],
   templateUrl: './header.component.html',
@@ -38,7 +32,7 @@ export class HeaderComponent {
   loggedIn = false;
   interestFiltering: boolean = true;
 
-  constructor(private searchService: SearchService, private router: Router, private cdr: ChangeDetectorRef,private interestFilterService: InterestFilterService) {
+  constructor(private searchService: SearchService, private router: Router, private cdr: ChangeDetectorRef) {
     supabase.auth.getSession().then(({ data: { session } }) => {
       this.loggedIn = !!session;
       this.cdr.markForCheck();
@@ -53,15 +47,5 @@ export class HeaderComponent {
     this.loggedIn = false;
     this.cdr.markForCheck();
     this.router.navigate(['/login']);
-  }
-  onInterestFilteringChange(value: boolean) {
-    this.interestFilterService.setFiltering(value);
-  }
-
-  ngOnInit() {
-    this.interestFilterService.getFiltering$().subscribe(active => {
-      this.interestFiltering = active;
-      console.log('interestFiltering' )
-    });
   }
 }
