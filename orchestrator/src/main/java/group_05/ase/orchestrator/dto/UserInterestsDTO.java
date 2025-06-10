@@ -5,12 +5,12 @@ import java.util.UUID;
 public class UserInterestsDTO {
     private UUID userId;
     private int interestId;
-    private String interestNameEn;
+    private String interestNameDe;
 
-    public UserInterestsDTO(UUID userId, int interestId, String interestNameEn) {
+    public UserInterestsDTO(UUID userId, int interestId, String interestNameDe) {
         this.userId = userId;
         this.interestId = interestId;
-        this.interestNameEn = interestNameEn;
+        this.interestNameDe = interestNameDe;
     }
 
     public UUID getUserId() {
@@ -29,11 +29,11 @@ public class UserInterestsDTO {
         this.interestId = interestId;
     }
 
-    public String getInterestNameEn() {
-        return interestNameEn;
+    public String getInterestNameDe() {
+        return interestNameDe;
     }
 
-    public void setInterestNameEn(String interestNameEn) {
-        this.interestNameEn = interestNameEn;
+    public void setInterestNameDe(String interestNameDe) {
+        this.interestNameDe = interestNameDe;
     }
 }

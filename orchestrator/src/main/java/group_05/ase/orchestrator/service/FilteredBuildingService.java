@@ -1,9 +1,12 @@
 package group_05.ase.orchestrator.service;
 
 import group_05.ase.orchestrator.dto.ArticleWeightDTO;
+import group_05.ase.orchestrator.dto.MatchRequest;
 import group_05.ase.orchestrator.dto.UserInterestsDTO;
 import group_05.ase.orchestrator.dto.ViennaHistoryWikiBuildingObject;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -11,7 +14,8 @@ import java.util.stream.Collectors;
 @Service
 public class FilteredBuildingService {
 
-
+    private final RestTemplate restTemplate = new RestTemplate();
+    private final String QDRANT_URL = "http://qdrant-adapter:8081/";
 
     public List<ViennaHistoryWikiBuildingObject> filterBuildingsByUserInterests(
             List<ViennaHistoryWikiBuildingObject> buildings,
@@ -30,12 +34,21 @@ public class FilteredBuildingService {
 
         List<String> interestNames = interests == null ? List.of() :
                 interests.stream()
-                        .map(UserInterestsDTO::getInterestNameEn)
+                        .map(UserInterestsDTO::getInterestNameDe)
                         .map(String::toLowerCase)
                         .toList();
 
+        List<Integer> interestFilteredBuildings = (interests == null || interests.isEmpty())
+                ? null
+                : this.getEntititesFromQdrant(interestNames, "WienGeschichteWikiBuildings");
+
         List<ViennaHistoryWikiBuildingObject> filtered = buildings.stream()
-                .filter(b -> interests == null || interests.isEmpty() || matchesAnyInterest(b, interestNames))
+                .filter(b -> {
+                    if (interests == null || interests.isEmpty() || interestFilteredBuildings == null) {
+                        return true; // keine Filterung nötig
+                    }
+                    return interestFilteredBuildings.contains(b.getViennaHistoryWikiId());
+                })
                 .toList();
 
         // Make a mutable copy and sort
@@ -49,116 +62,26 @@ public class FilteredBuildingService {
         return sorted;
     }
 
-    private boolean matchesAnyInterest(ViennaHistoryWikiBuildingObject building, List<String> interestNames) {
-        for (String interest : interestNames) {
-            Set<String> allSynonyms = INTEREST_SYNONYMS.getOrDefault(interest, Set.of(interest));
-            for (String synonym : allSynonyms) {
-                if (
-                        containsIgnoreCase(building.getName(), synonym) ||
-                                containsIgnoreCase(building.getBuildingType().orElse(""), synonym) ||
-                                containsIgnoreCase(building.getNamedAfter().orElse(""), synonym) ||
-                                containsIgnoreCase(building.getOtherName().orElse(""), synonym) ||
-                                containsIgnoreCase(building.getSeeAlso().orElse(""), synonym) //||
-//                                containsIgnoreCase(building.getContentEnglish(), synonym) ||
-//                                containsIgnoreCase(building.getContentGerman(), synonym)
-                ) {
-                    return true;
-                }
-            }
-        }
-        return false;
+    private List<Integer> getEntititesFromQdrant(List<String> interestsNames, String collectionName) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+        headers.add("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36");
+
+        MatchRequest dto = new MatchRequest();
+        dto.setCollectionName(collectionName);
+        dto.setInterests(interestsNames);
+        dto.setResultSize(100);
+
+        System.out.println(dto);
+
+        HttpEntity<MatchRequest> entity = new HttpEntity<>(dto, headers);
+        ResponseEntity<List> response = restTemplate.exchange(QDRANT_URL + "categorize/match", HttpMethod.POST, entity, List.class);
+        return response.getBody();
     }
 
     private boolean containsIgnoreCase(String haystack, String needle) {
         return haystack != null && haystack.toLowerCase().contains(needle);
     }
-
-    private static final Map<String, Set<String>> INTEREST_SYNONYMS = Map.ofEntries(
-            Map.entry("music", Set.of(
-                    "music", "musician", "song", "songs", "concert", "concerts", "opera", "band", "choir", "orchestra", "composer", "instrument", "instruments",
-                    "musik", "musiker", "lied", "lieder", "konzert", "konzerte", "oper", "chor", "orchester", "komponist", "instrumente"
-            )),
-            Map.entry("literature", Set.of(
-                    "literature", "book", "books", "novel", "novels", "writer", "author", "authors", "library", "story", "stories", "poetry", "poet", "reading",
-                    "literatur", "buch", "bücher", "roman", "romane", "schriftsteller", "autor", "autoren", "bibliothek", "geschichte", "geschichten", "dichtung", "dichter", "lesen"
-            )),
-            Map.entry("buildings", Set.of(
-                    "building", "buildings", "architecture", "structure", "structures", "edifice", "palace", "hall", "halls", "tower", "castle", "monument", "landmark",
-                    "gebäude", "architektur", "struktur", "strukturen", "bauwerk", "palast", "halle", "hallen", "turm", "schloss", "denkmal", "wahrzeichen"
-            )),
-            Map.entry("medic", Set.of(
-                    "medic", "medical", "medicine", "hospital", "clinic", "pharmacy", "doctor", "nurse", "health", "care", "treatment", "cure",
-                    "medizin", "medizinisch", "krankenhaus", "klinik", "apotheke", "arzt", "ärztin", "pflege", "gesundheit", "behandlung", "heilung", "patient"
-            )),
-            Map.entry("movies", Set.of(
-                    "movie", "movies", "film", "cinema", "actor", "actress", "director", "screen", "festival",
-                    "filme", "kino", "theater", "schauspieler", "schauspielerin", "regisseur", "leinwand"
-            )),
-            Map.entry("paintings", Set.of(
-                    "painting", "paintings", "art", "artist", "gallery", "museum", "exhibition", "portrait", "canvas",
-                    "gemälde", "malerei", "kunst", "künstler", "künstlerin", "galerie", "ausstellung", "porträt", "leinwand"
-            )),
-            Map.entry("banking", Set.of(
-                    "bank", "banking", "finance", "financial", "account", "accounts", "money", "currency", "institution", "loan", "branch",
-                    "bankwesen", "finanz", "finanzen", "konto", "konten", "geld", "währung", "institut", "kredit", "filiale"
-            )),
-            Map.entry("newspapers", Set.of(
-                    "newspaper", "newspapers", "news", "journal", "press", "article", "articles", "headline", "editor", "publisher",
-                    "zeitung", "zeitungen", "nachrichten", "presse", "artikel", "schlagzeile", "redakteur", "verleger"
-            )),
-            Map.entry("maps", Set.of(
-                    "map", "maps", "atlas", "plan", "district", "city", "layout", "street", "streets",
-                    "karte", "karten", "stadtplan", "bezirk", "stadt", "lageplan", "straße", "straßen"
-            )),
-            Map.entry("relations", Set.of(
-                    "relation", "relations", "relationship", "relationships", "connection", "connections", "network", "association", "link", "links",
-                    "beziehung", "beziehungen", "verbindung", "verbindungen", "netzwerk", "assoziation"
-            )),
-            Map.entry("baths", Set.of(
-                    "bath", "baths", "bathhouse", "spa", "thermal", "hot spring", "pool", "wellness",
-                    "badehaus", "bad", "bäder", "thermalbad", "therme", "quelle"
-            )),
-            Map.entry("hills", Set.of(
-                    "hill", "hills", "mount", "mountain", "elevation", "summit", "peak", "ridge",
-                    "hügel", "berg", "berge", "anhöhe", "gipfel", "kamm"
-            )),
-            Map.entry("education", Set.of(
-                    "education", "school", "schools", "university", "universities", "college", "academy", "institution", "learning", "class", "classes",
-                    "ausbildung", "schule", "schulen", "universität", "hochschule", "akademie", "institut", "lernen", "klasse", "klassen"
-            )),
-            Map.entry("breweries", Set.of(
-                    "brewery", "breweries", "beer", "beers", "brewing", "taproom", "pub", "brew", "lager",
-                    "brauerei", "brauereien", "bier", "biere", "brauen", "schankraum", "lokal", "ale"
-            )),
-            Map.entry("bridges", Set.of(
-                    "bridge", "bridges", "viaduct", "span", "footbridge", "overpass",
-                    "brücke", "brücken", "viadukt", "überführung", "steg"
-            )),
-            Map.entry("fountains", Set.of(
-                    "fountain", "fountains", "well", "spring", "water feature", "monument", "sculpture",
-                    "brunnen", "quelle", "wasserspiel", "denkmal", "skulptur"
-            )),
-            Map.entry("statues", Set.of(
-                    "statue", "statues", "sculpture", "sculptures", "monument", "memorial", "bust", "figure",
-                    "statuen", "skulptur", "skulpturen", "büste", "figur"
-            )),
-            Map.entry("monuments", Set.of(
-                    "monument", "monuments", "memorial", "statue", "sculpture", "plaque", "obelisk",
-                    "denkmal", "denkmäler", "tafel"
-            )),
-            Map.entry("cemeteries", Set.of(
-                    "cemetery", "cemeteries", "graveyard", "grave", "tomb", "burial", "mausoleum",
-                    "friedhof", "friedhöfe", "grab", "grabstätte", "begräbnis"
-            )),
-            Map.entry("parks", Set.of(
-                    "park", "parks", "garden", "gardens", "green", "playground", "area", "open space", "meadow",
-                    "gärten", "garten", "grünanlage", "spielplatz", "fläche", "wiese"
-            )),
-            Map.entry("religion", Set.of(
-                    "religion", "religious", "church", "churches", "chapel", "synagogue", "mosque", "temple", "parish", "congregation", "faith", "belief",
-                    "religiös", "kirche", "kirchen", "kapelle", "synagoge", "moschee", "tempel", "pfarre", "gemeinde", "glaube"
-            ))
-    );
 
 
 
