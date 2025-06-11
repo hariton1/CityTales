@@ -15,8 +15,8 @@ export class InterestsService {
   public getAllInterests(): Observable<InterestDto[]> {
     return this.httpClient.get<any>(this.DOMAIN)
       .pipe(
-        map(data => data.map((item: { interest_id: number; interest_name: string; description: string; }) => {
-          return new InterestDto(item.interest_id, item.interest_name, item.description);
+        map(data => data.map((item: { interest_id: number; interest_name: string; description: string; interest_name_de: string;}) => {
+          return new InterestDto(item.interest_id, item.interest_name, item.description, item.interest_name_de);
         }))
       );
   }
@@ -26,7 +26,7 @@ export class InterestsService {
       .pipe(
         map(item => {
           // Create a proper UserInterestDto instance from the raw JSON
-          return new InterestDto(item.interest_id, item.interest_name, item.description);
+          return new InterestDto(item.interest_id, item.interest_name, item.description, item.interest_name_de);
         })
       );
   }
