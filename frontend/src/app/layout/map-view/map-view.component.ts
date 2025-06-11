@@ -19,7 +19,7 @@ import {UserService} from '../../services/user.service';
 import { MarkerClusterer } from '@googlemaps/markerclusterer';
 import {QdrantService} from '../../services/qdrant.service';
 import {UserInterestsService} from '../../user_db.services/user-interests.service';
-import {forkJoin, of, switchMap} from 'rxjs';
+import {catchError, forkJoin, map, Observable, of, switchMap} from 'rxjs';
 import {InterestsService} from '../../user_db.services/interests.service';
 import {PersonEntity} from '../../dto/db_entity/PersonEntity';
 import {EventEntity} from '../../dto/db_entity/EventEntity';
@@ -267,7 +267,10 @@ export class MapViewComponent implements OnInit{
     }
 
     location = this.userService.enterHistoricNode(location);
-    this.combinedLocations = this.getCombinedItems(location);
+    this.getCombinedItems(location).subscribe(combined => {
+      console.log('Combined items: ', combined);
+      this.combinedLocations = combined;
+    });
     this.hoveredLocation = location;
 
     const relatedContent = this.relatedContentToLocationRef.nativeElement;
@@ -306,66 +309,64 @@ export class MapViewComponent implements OnInit{
     return `translate(${x}px, ${y}px)`;
   }
 
-  getCombinedItems(location: any): any[] {
-    let filteredBuildings: number[] = [];
-    let filteredPersons: number[] = [];
-    let filteredEvents: number[] = [];
+  getCombinedItems(location: any): Observable<any[]> {
     let interestNames: string[] = [];
 
-    // 1. get logged in user's interest names
-    this.userInterestService.getMyInterests()
-      .pipe(
-        switchMap(interests => {
-          // If no interests, return an empty array observable
-          if (interests.length === 0) {
-            return of([]);
-          }
-
-          // Create an array of observables for each interest detail request
-          const detailRequests = interests.map(interest =>
-            this.interestsService.getInterestByInterestId(interest.getInterestId())
-          );
-
-          // Use forkJoin to wait for all detail requests to complete
-          return forkJoin(detailRequests);
-        })
-      )
-      .subscribe({
-        next: (interestDetails) => {
-          // Extract names from the interest details
-          interestNames = interestDetails.map(detail => detail.getInterestNameDe());
-          console.log('Interest names:', interestNames);
-        },
-        error: (err) => {
-          console.error('Error fetching interests or details:', err);
+    // Start the observable pipeline and return it
+    return this.userInterestService.getMyInterests().pipe(
+      switchMap(interests => {
+        // If no interests, emit an empty array
+        if (interests.length === 0) {
+          return of([]);
         }
-      });
 
-    // 2. do semantic filtering for each category
-    this.qdrantService.getFilteredHistoryEntities(interestNames, 'WienGeschichteWikiBuildings').subscribe(historyEntities => {
-      filteredBuildings = historyEntities;
-    });
-    this.qdrantService.getFilteredHistoryEntities(interestNames, 'WienGeschichteWikiPersons').subscribe(historyEntities => {
-      filteredPersons = historyEntities;
-    });
-    this.qdrantService.getFilteredHistoryEntities(interestNames, 'WienGeschichteWikiEvents').subscribe(historyEntities => {
-      filteredEvents = historyEntities;
-    });
+        // Map the interests into requests for their details
+        const detailRequests = interests.map(interest =>
+          this.interestsService.getInterestByInterestId(interest.getInterestId())
+        );
 
-    // 3. apply semantic filtering for each category
-    const buildings = (location.relatedBuildings.filter((building: BuildingEntity) =>
-        filteredBuildings.some(filteredBuilding => filteredBuilding.toString() === building.viennaHistoryWikiId)
-      ) || []).map((item: any) => ({ ...item, type: 'building' }));
-    const persons = (location.relatedPersons.filter((person: PersonEntity) =>
-      filteredPersons.some(filteredPerson => filteredPerson.toString() === person.viennaHistoryWikiId)
-    ) || []).map((item: any) => ({ ...item, type: 'person' }));
-    const events = (location.relatedEvents.filter((event: EventEntity) =>
-      filteredEvents.some(filteredEvent => filteredEvent === event.viennaHistoryWikiId)
-    ) || []).map((item: any) => ({ ...item, type: 'event' }));
+        // Use forkJoin to wait for all detail requests to complete
+        return forkJoin(detailRequests);
+      }),
+      switchMap(interestDetails => {
+        // Extract names from the interest details
+        interestNames = interestDetails.map(detail => detail.getInterestNameDe());
+        console.log('Interest names:', interestNames);
 
-    // 4. combine the results
-    const combined = [...buildings, ...persons, ...events];
-    return combined;
+        // Perform semantic filtering for each category
+        const buildings$ = this.qdrantService.getFilteredHistoryEntities(interestNames, 'WienGeschichteWikiBuildings');
+        const persons$ = this.qdrantService.getFilteredHistoryEntities(interestNames, 'WienGeschichteWikiPersons');
+        const events$ = this.qdrantService.getFilteredHistoryEntities(interestNames, 'WienGeschichteWikiEvents');
+
+        // Use forkJoin to get all filtered entities at once
+        return forkJoin([buildings$, persons$, events$]);
+      }),
+      map(([filteredBuildings, filteredPersons, filteredEvents]) => {
+        // Apply semantic filtering for each category
+        const buildings = (location.relatedBuildings && location.relatedBuildings.length > 0 ? location.relatedBuildings.filter((building: BuildingEntity) =>
+          filteredBuildings.some(filteredBuilding => filteredBuilding.toString() === building.viennaHistoryWikiId)
+        ) : []).map((item: any) => ({ ...item, type: 'building' }));
+
+        const persons = (location.relatedPersons && location.relatedPersons.length > 0 ? location.relatedPersons.filter((person: PersonEntity) =>
+          filteredPersons.some(filteredPerson => filteredPerson.toString() === person.viennaHistoryWikiId)
+        ) : []).map((item: any) => ({ ...item, type: 'person' }));
+
+        const events = (location.relatedEvents && location.relatedEvents.length > 0 ? location.relatedEvents.filter((event: EventEntity) =>
+          filteredEvents.some(filteredEvent => filteredEvent === event.viennaHistoryWikiId)
+        ) : []).map((item: any) => ({ ...item, type: 'event' }));
+
+        // Combine the results
+        const combined = [...buildings, ...persons, ...events];
+
+        // Return the combined results
+        return combined;
+      }),
+      catchError(err => {
+        console.error('Error fetching interests or details:', err);
+        // Emit an empty array if an error occurs
+        return of([]);
+      })
+    );
   }
 
   generatePolylines(location: BuildingEntity): void {
