@@ -265,4 +265,23 @@ export class TourDetailComponent {
       pdf.save(`${tourName || 'tour-detail'}.pdf`);
     });
   }
+
+  generateGoogleMapsTourLink() {
+    const stops = this.tour.getStops();
+
+    const locations: string[] = [];
+
+    locations.push(`${this.tour.getStart_lat()},${this.tour.getStart_lng()}`);
+
+    for (const stop of stops) {
+      locations.push(`${stop.latitude},${stop.longitude}`);
+    }
+
+    locations.push(`${this.tour.getEnd_lat()},${this.tour.getEnd_lng()}`);
+
+    const baseUrl = 'https://www.google.com/maps/dir/';
+    const url = baseUrl + locations.map(encodeURIComponent).join('/');
+
+    window.open(url, '_blank');
+  }
 }
