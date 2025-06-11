@@ -8,7 +8,6 @@ import {TourDto} from "../dto/tour.dto";
 import {FunFactDto} from "../dto/fun-fact.dto";
 import {GamificationDto} from "../dto/gamificationDto";
 import {Injectable} from "@angular/core";
-import {InterestDto} from '../user_db.dto/interest.dto';
 import {UserHistoryDto} from '../user_db.dto/user-history.dto';
 import {UserPointDto} from '../user_db.dto/user-point.dto';
 import {UserBadgeDTO} from '../user_db.dto/user-badge.dto';
@@ -66,15 +65,6 @@ export class UserService {
         });
     }
 
-  public getAllInterests(): Observable<InterestDto[]> {
-      return this.httpClient.get<any>(SERVER_ADDRESS + 'interests')
-        .pipe(
-          map(data => data.map((item: { interest_id: number; interest_name: string; description: string; }) => {
-            return new InterestDto(item.interest_id, item.interest_name, item.description);
-          }))
-        );
-  }
-
     public readInterests(userId: string): Observable<UserInterestDto[]> {
       return this.httpClient.get<any[]>(SERVER_ADDRESS + 'userInterests/user_id=' + userId)
         .pipe(
@@ -83,16 +73,6 @@ export class UserService {
           }))
         );
     }
-
-  public readInterestDetail(interestId: number): Observable<InterestDto> {
-    return this.httpClient.get<any>(SERVER_ADDRESS + 'interests/id=' + interestId)
-      .pipe(
-        map(item => {
-          // Create a proper UserInterestDto instance from the raw JSON
-          return new InterestDto(item.interest_id, item.interest_name, item.description);
-        })
-      );
-  }
 
     public updateInterests(userInterestDto: UserInterestDto): Observable<UserInterestDto> {
         return this.httpClient.put<UserInterestDto>(SERVER_ADDRESS + 'interests/update', {
@@ -254,7 +234,7 @@ export class UserService {
       if (stored) {
         this.userId = stored;
       } else {
-        return;
+        return node;
       }
 
       node.userHistoryEntry = this.createUserHistoryEntry(node);
