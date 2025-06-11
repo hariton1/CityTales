@@ -85,6 +85,7 @@ export class LoginComponent {
         this.userService.getUserById(uuid).subscribe(user => {
           console.log(user);
           localStorage.setItem('user_role', user.role)
+          localStorage.setItem('interest_filtering', 'true')
         });
         this.userPointsService.createNewPoints(new UserPointDto(
           -1,
