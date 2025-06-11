@@ -109,7 +109,7 @@
   </section>
 
   <!-- prices -->
-  <div class="content-section" *ngIf="this.prices().length > 0">
+  <div class="prices-section" *ngIf="this.prices().length > 0">
     <h3>Prices
       <button *ngIf="userHasPermission" tuiButton appearance="flat" size="xs" type="button" class="add-btn" tuiHint="Add a new price!"
               tuiHintDirection="top" (click)="showDialog(-1)">
