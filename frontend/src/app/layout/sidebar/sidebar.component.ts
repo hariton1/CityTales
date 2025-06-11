@@ -6,7 +6,7 @@ import {TuiSearchResults} from '@taiga-ui/experimental';
 import {ReactiveFormsModule, FormControl} from '@angular/forms';
 import {BuildingEntity} from '../../dto/db_entity/BuildingEntity';
 import {EnrichmentService} from '../../services/enrichment.service';
-import {TuiAppearance, TuiTitle, TuiTextfield} from '@taiga-ui/core';
+import {TuiAppearance, TuiTitle, TuiTextfield, TuiIcon} from '@taiga-ui/core';
 import {TuiCell, TuiInputSearch} from '@taiga-ui/layout';
 import {debounceTime, filter, Observable, switchMap} from 'rxjs';
 import {SearchService} from '../../services/search.service';
@@ -34,7 +34,8 @@ import {HistoricPersonDetailComponent} from '../historic-person-detail/historic-
     CommonModule,
     NotificationInboxComponent,
     HistoricEventDetailComponent,
-    HistoricPersonDetailComponent
+    HistoricPersonDetailComponent,
+    TuiIcon
   ],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.less'
@@ -142,7 +143,8 @@ export class SidebarComponent implements OnInit{
 
   protected readonly control = new FormControl('');
 
-  open = false;
+  @Input() searchOpen = false;
+  @Output() searchOpenChange = new EventEmitter<boolean>();
 
   lastSearches: string[] = [];
 

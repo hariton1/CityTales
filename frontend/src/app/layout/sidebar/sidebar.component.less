@@ -2,14 +2,45 @@
 
 .header-container {
   display: flex;
-  justify-content: space-between; /* Space between button and search field */
-  align-items: center;            /* Align them vertically in the middle */
-  margin-bottom: 1rem;            /* Space between header and the preview container */
+  justify-content: space-between;
+  align-items: flex-start;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  padding: 1.5rem;
+  background: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  border: none !important;
+}
+
+.search-bar-container {
+  width: 70%;
+  position: relative;
+  z-index: 10;
+}
+
+.notification-button-container {
+  position: relative;
+  top: 0.5rem; /* distance from top as you scroll */
+  z-index: 10;
+}
+
+.hidden {
+  display: none !important;
 }
 
 .search-field {
   flex-grow: 1; /* Makes the search field grow to take remaining space */
-  max-width: 500px; /* Optional: limit the width of the search field */
+  //max-width: 500px; /* Optional: limit the width of the search field */
+  background: rgba(255, 255, 255, 0.3) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  border-radius: 50px !important;
+  color: var(--tui-text-primary) !important;
+  //padding: 0.5rem 1rem; // You might need this to avoid text overflow
 }
 
 .enrich-button {
@@ -39,10 +70,3 @@
   font: var(--tui-font-text-m) !important;
 }
 
-.notification-button-container {
-  position: sticky;
-  top: 1.5rem; /* distance from top as you scroll */
-  margin-left: auto; /* pushes it to the right */
-  margin-right: 1rem; /* spacing from right edge */
-  z-index: 10;
-}

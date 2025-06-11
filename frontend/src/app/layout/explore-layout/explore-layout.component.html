@@ -1,4 +1,15 @@
 <ng-container *ngIf="isMobile">
+  <div class="search-button-container" *ngIf="!searchOpen">
+    <button
+      tuiButton
+      size="m"
+      type="button"
+      class="mobile-search-button"
+      (click)="toggleSearch()">
+      <tui-icon icon="@tui.search" [style.height.rem]="1.2" />
+    </button>
+  </div>
+
     <div class="mobile-view-toggle">
       <tui-segmented [size]="'m'" [style.border-radius.rem]="10">
         <button
@@ -20,7 +31,11 @@
 
   <!-- Mobile: show only selected component -->
   <ng-container *ngIf="currentViewMobile === 'discover'">
-    <app-sidebar [historicalPlaces]="historicalPlaces"></app-sidebar>
+    <app-sidebar
+      [searchOpen]="searchOpen"
+      [historicalPlaces]="historicalPlaces"
+      (searchOpenChange)="searchOpen = $event">
+    </app-sidebar>
   </ng-container>
 
   <ng-container *ngIf="currentViewMobile === 'map'">

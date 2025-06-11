@@ -5,7 +5,7 @@ import {BuildingEntity} from '../../dto/db_entity/BuildingEntity';
 import {TuiSegmented} from '@taiga-ui/kit';
 import {BreakpointObserver, Breakpoints} from '@angular/cdk/layout';
 import {NgIf} from '@angular/common';
-import {TuiIcon} from '@taiga-ui/core';
+import {TuiButton, TuiIcon} from '@taiga-ui/core';
 import {NotificationInboxComponent} from '../../core/notification-inbox/notification-inbox.component';
 import {PersonEntity} from '../../dto/db_entity/PersonEntity';
 import {EventEntity} from '../../dto/db_entity/EventEntity';
@@ -18,7 +18,8 @@ import {EventEntity} from '../../dto/db_entity/EventEntity';
     TuiSegmented,
     NgIf,
     TuiIcon,
-    NotificationInboxComponent
+    NotificationInboxComponent,
+    TuiButton
   ],
   templateUrl: './explore-layout.component.html',
   styleUrl: './explore-layout.component.less'
@@ -46,6 +47,12 @@ export class ExploreLayoutComponent implements OnInit {
         this.isMobile = result.matches;
         this.currentViewMobile = 'discover';
       });
+  }
+
+  searchOpen = false;
+
+  toggleSearch() {
+    this.searchOpen = !this.searchOpen;
   }
 
   setSelectedPlace(place: BuildingEntity) {
