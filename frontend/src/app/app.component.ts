@@ -24,5 +24,13 @@ export class AppComponent implements OnInit{
 
   ngOnInit() {
     this.userLocationService.startTracking();
+
+
+    this.preloadRoutes();
+  }
+
+  preloadRoutes() {
+    console.log('preload routes!')
+    import('./core/about/about.component');
   }
 }

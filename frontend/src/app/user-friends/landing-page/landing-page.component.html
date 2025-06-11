@@ -1,4 +1,8 @@
-<div class="dashboard-container">
+<div *ngIf="!(online$ | async)" class="offline-banner">
+  ⚠️ You are currently offline. The 'Friends' feature does not work under these circumstances
+</div>
+
+<div *ngIf="(online$ | async)" class="dashboard-container">
   <app-friend-list></app-friend-list>
   <app-invite-users></app-invite-users>
   <app-search-users></app-search-users>
