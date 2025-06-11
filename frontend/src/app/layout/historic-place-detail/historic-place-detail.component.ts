@@ -1,13 +1,26 @@
-import {ChangeDetectionStrategy, Component, effect, EventEmitter, inject, Input, Output, signal} from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  effect,
+  EventEmitter,
+  inject,
+  Input,
+  Output,
+  signal,
+  ChangeDetectorRef,
+  OnInit
+} from '@angular/core';
 import {CommonModule, NgIf} from '@angular/common';
 import {
+  TuiAppearance,
+  TuiAutoColorPipe,
   TuiButton,
-  TuiDialog,
+  TuiDialog, TuiFallbackSrcPipe,
   TuiHint,
   TuiIcon,
   TuiLabel,
-  TuiScrollbar,
-  TuiTextfieldComponent, TuiTextfieldDirective, TuiTextfieldOptionsDirective
+  TuiScrollbar, TuiSurface,
+  TuiTextfieldComponent, TuiTextfieldDirective, TuiTextfieldOptionsDirective, TuiTitle
 } from '@taiga-ui/core';
 import {UserHistoriesService} from '../../user_db.services/user-histories.service';
 import { Router } from '@angular/router';
@@ -24,14 +37,18 @@ import {
   maskitoNumberOptionsGenerator,
   maskitoRemoveOnBlurPlugin
 } from '@maskito/kit';
-import {TuiAutoFocus} from '@taiga-ui/cdk';
+import {TuiAutoFocus, TuiItem} from '@taiga-ui/cdk';
 import {TuiInputModule, TuiTextfieldControllerModule} from '@taiga-ui/legacy';
-import {TuiTooltip} from '@taiga-ui/kit';
+import {TuiAvatar, TuiCarouselComponent, TuiChevron, TuiPagination, TuiTooltip} from '@taiga-ui/kit';
 import {MaskitoDirective} from '@maskito/angular';
 import {TuiResponsiveDialogOptions} from '@taiga-ui/addon-mobile';
 import {MaskitoOptions} from '@maskito/core';
 import {UUID} from 'node:crypto';
 import {UserDto} from '../../user_db.dto/user.dto';
+import {TuiCard, TuiHeader} from '@taiga-ui/layout';
+import {TuiExpand} from '@taiga-ui/experimental';
+import {EnrichmentService} from '../../services/enrichment.service';
+import {BreakpointObserver, Breakpoints} from '@angular/cdk/layout';
 
 const postfix = ' €';
 const numberOptions = maskitoNumberOptionsGenerator({
@@ -61,29 +78,72 @@ const numberOptions = maskitoNumberOptionsGenerator({
     TuiTextfieldDirective,
     TuiTextfieldOptionsDirective,
     TuiTooltip,
-    MaskitoDirective
+    MaskitoDirective,
+    TuiCard,
+    TuiHeader,
+    TuiTitle,
+    TuiChevron,
+    TuiExpand,
+    TuiSurface,
+    TuiCarouselComponent,
+    TuiItem,
+    TuiAvatar,
+    TuiFallbackSrcPipe,
+    TuiAutoColorPipe,
+    TuiAppearance,
+    TuiPagination
   ],
   templateUrl: './historic-place-detail.component.html',
-  styleUrl: './historic-place-detail.component.scss',
+  styleUrl: './historic-place-detail.component.less',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class HistoricPlaceDetailComponent {
+export class HistoricPlaceDetailComponent implements OnInit{
 
   private readonly pricesService = inject(PricesService);
   locationId= signal(0);
   prices = this.pricesService.prices;
+  public readonly collapsed = signal(true); //for collapsed card
+  protected index1 = 0; //tone slider
+  lineWidths = [90, 70, 95, 60, 85, 80, 60, 75, 85, 80];
+  isMobile = false;
+
+  summary: string = '';
+  enrichedContent: string = '';
+  enrichmentStarted = false;
+  enrichmentLoading = false;
 
 
   constructor(private userService: UserService,
               private userHistoriesService: UserHistoriesService,
-              private router: Router) {
+              private router: Router,
+              readonly EnrichmentService: EnrichmentService,
+              readonly cdr: ChangeDetectorRef,
+              readonly breakpointObserver: BreakpointObserver) {
     effect(() => {
       this.pricesService.getPricesByLocation(this.locationId());
+      this.cdr.markForCheck();
     })
     let userId = localStorage.getItem("user_uuid") as UUID;
     this.userService.getUserWithRoleById(userId).subscribe((user) => {
       this.initPrices(user);
     });
+  }
+
+  tones = [
+    { key: 'academic', label: 'Historian', bg: 'historian-bg.png' },
+    { key: 'tour', label: 'Tour Guide', bg: 'tour-guide-bg.png' },
+    { key: 'poetic', label: 'Poetic', bg: 'poetic-bg.png' },
+    { key: 'dramatic', label: 'Dramatic', bg: 'dramatic-bg.png' },
+    { key: 'child-friendly', label: 'Child-Friendly', bg: 'child-friendly-bg.png' },
+    { key: 'funny', label: 'Funny', bg: 'funny-bg.jpg' },
+  ];
+
+  ngOnInit() {
+    this.breakpointObserver
+      .observe([Breakpoints.Handset])
+      .subscribe(result => {
+        this.isMobile = result.matches;
+      });
   }
 
   protected dialogLabel = '';
@@ -155,7 +215,18 @@ export class HistoricPlaceDetailComponent {
     return this._selectedPlace;
   }
   set selectedPlace(value: any) {
-    this._selectedPlace = value;
+    this._selectedPlace = {
+      ...value,
+      relatedPersons: value.relatedPersons ?? this._selectedPlace?.relatedPersons,
+      relatedBuildings: value.relatedBuildings ?? this._selectedPlace?.relatedBuildings,
+      relatedEvents: value.relatedEvents ?? this._selectedPlace?.relatedEvents,
+    };
+
+    this.summary = '';
+    this.enrichedContent = '';
+    this.enrichmentStarted = false;
+    this.enrichmentLoading = false;
+    this.cdr.markForCheck();
   }
   private _selectedPlace: any;
 
@@ -180,9 +251,12 @@ export class HistoricPlaceDetailComponent {
   }
 
   closeDetail():void{
-    this._selectedPlace.userHistoryEntry.setCloseDt(new Date());
+    console.log(this.selectedPlace)
+    let userId = localStorage.getItem("user_uuid");
+    if(userId !== null) {
+      this._selectedPlace.userHistoryEntry.setCloseDt(new Date());
 
-    this.userHistoriesService.updateUserHistory(this._selectedPlace.userHistoryEntry).subscribe({
+      this.userHistoriesService.updateUserHistory(this._selectedPlace.userHistoryEntry).subscribe({
         next: (results) => {
           console.log('User history entry updated successfully', results);
           /*this.alerts
@@ -192,9 +266,15 @@ export class HistoricPlaceDetailComponent {
         error: (err) => {
           console.error('Error updating user history entry:', err);
         }
-    });
+      });
+    }
 
     this.onCloseEvent.emit();
+    this.summary = '';
+    this.enrichedContent = '';
+    this.enrichmentStarted = false;
+    this.enrichmentLoading = false;
+    this.cdr.markForCheck();
   }
 
   navigateToFeedback(): void {
@@ -239,6 +319,76 @@ export class HistoricPlaceDetailComponent {
     }
 
     this.userHasPermission = contributor && emailMatchesLocation;
+  }
+
+  startEnrichment(tone: string): void {
+    this.enrichmentStarted = true;
+    this.enrichmentLoading = true;
+
+    let content = this.selectedPlace.contentGerman;
+
+    this.EnrichmentService.enrichContentWithTone(tone, content).subscribe({
+      next: (response) => {
+        console.log('tone: ' + response.tone);
+        console.log('summary: ' + response.summary);
+        console.log('enrichedContent: ' + response.enrichedContent);
+
+        this.summary = response.summary;
+        this.enrichedContent = response.enrichedContent;
+      },
+      error: (error: any) => {
+        console.error(error);
+      },
+      complete: () => {
+        console.log('Completed');
+        this.enrichmentLoading = false;
+        this.cdr.detectChanges();
+      }
+    })
+  }
+
+  protected readonly itemsCount = 3;
+  protected index2 = 0; //related persons slider
+  protected index3 = 0; //related buildings slider
+  protected index4 = 0; //related events slider
+
+  protected get roundedPersons(): number {
+    return Math.floor(this.index2 / this.itemsCount);
+  }
+
+  protected onIndexPersons(index: number): void {
+    this.index2 = index * this.itemsCount;
+    this.cdr.detectChanges();
+  }
+
+  protected get roundedBuildings(): number {
+    return Math.floor(this.index3 / this.itemsCount);
+  }
+
+  protected onIndexBuildings(index: number): void {
+    this.index3 = index * this.itemsCount;
+    this.cdr.detectChanges();
+  }
+
+  protected get roundedEvents(): number {
+    return Math.floor(this.index4 / this.itemsCount);
+  }
+
+  protected onIndexEvents(index: number): void {
+    this.index4 = index * this.itemsCount;
+    this.cdr.detectChanges();
+  }
+
+  get personsPageCount(): number {
+    return Math.ceil(this.selectedPlace?.relatedPersons?.length / this.itemsCount);
+  }
+
+  get buildingsPageCount(): number {
+    return Math.ceil(this.selectedPlace?.relatedBuildings?.length / this.itemsCount);
+  }
+
+  get eventsPageCount(): number {
+    return Math.ceil(this.selectedPlace?.relatedEvents?.length / this.itemsCount);
   }
 }
 

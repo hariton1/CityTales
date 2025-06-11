@@ -1,173 +1,391 @@
+<tui-scrollbar class="scrollable-content" [style]="'overflow-y: auto'">
+  <!-- TODO: make it responsive -->
+
 <div class="place-detail-container">
-  <div class="place-detail-card">
-    <!-- Header with building information -->
-    <div class="place-detail-header">
-      <h2 class="place-detail-title">{{selectedPlace.name}}</h2>
-      <div class="place-location" *ngIf="selectedPlace?.latitude != null && selectedPlace?.longitude != null">
-        <span class="coordinates">
-          {{ selectedPlace.latitude }}°N, {{ selectedPlace.longitude }}°E
-        </span>
+  <button
+    tuiButton
+    type="button"
+    appearance="flat"
+    size="s"
+    class="back-button"
+    (click)="closeDetail()"
+  >
+    <tui-icon icon="@tui.chevron-left" class="mr-1" [style.height.rem]="1.2" />
+    Back to All Sites
+  </button>
+
+  <section
+    tuiCardLarge="compact"
+    [tuiCardCollapsed]="collapsed()"
+    class="tui-space_bottom-5"
+  >
+
+    <div class="image-info-flex">
+      <div class="image-container" *ngIf="selectedPlace.imageUrls.length > 0">
+        <img [src]="
+            selectedPlace.imageUrls[1] === 'https://www.geschichtewiki.wien.gv.at/images/7/7d/RDF.png'
+            ? 'assets/images/building-placeholder-500.jpeg'
+            : selectedPlace.imageUrls[1]"
+             alt="{{ selectedPlace.name }}" />
       </div>
 
+      <div class="info-block">
+        <header tuiHeader class="tui-space_bottom-5">
+          <hgroup>
+            <h1 class="place-title tui-space_bottom-2" tuiTitle>{{selectedPlace.name}}</h1>
+            <p tuiSubtitle>
+               <span class="icon-and-text">
+                <span class="icon">
+                  <tui-icon icon="@tui.compass" [style.height.rem]="1.3" />
+                </span>
+                 {{ selectedPlace.latitude }}°N, {{ selectedPlace.longitude }}°E
+              </span>
+            </p>
+          </hgroup>
+        </header>
 
-      <button tuiButton size="s"
-        (click)="closeDetail()"
-      > Close</button>
+        <div class="detail-row icon-and-text tui-space_bottom-3" *ngIf="selectedPlace.dateFrom">
+          <span class="icon-and-text">
+            <span class="icon">
+              <tui-icon icon="@tui.hammer" [style.height.rem]="1.2" />
+            </span>
+
+            <strong> Built in: </strong> {{ selectedPlace.dateFrom }}
+          </span>
+        </div>
+
+        <div class="detail-row icon-and-text tui-space_bottom-3" *ngIf="selectedPlace.dateTo">
+          <span class="icon-and-text">
+            <span class="icon">
+              <tui-icon icon="@tui.octagon-minus" [style.height.rem]="1.2" />
+            </span>
+
+            <strong> Demolished in: </strong> {{ selectedPlace.dateTo }}
+          </span>
+        </div>
+
+        <div class="detail-row icon-and-text tui-space_bottom-3" *ngIf="selectedPlace.architect">
+          <span class="icon-and-text">
+            <span class="icon">
+              <tui-icon icon="@tui.pencil" [style.height.rem]="1.2" />
+            </span>
+
+            <strong> Architect: </strong> {{ selectedPlace.architect }}
+          </span>
+        </div>
+
+        <div>
+          <button class="tui-space_top-4" appearance="outline" size="s" tuiButton type="button"
+                  (click)="navigateToFeedback()">
+            <tui-icon icon="@tui.message-circle-plus" [style.height.rem]="1"/>
+            Is something incorrect?
+          </button>
+        </div>
 
 
+
+        <div class="bottom-right-button">
+
+          <button
+            appearance="secondary"
+            size="s"
+            tuiButton
+            type="button"
+            [tuiChevron]="!collapsed()"
+            (click)="collapsed.set(!collapsed())"
+          >
+            Sources
+          </button>
+        </div>
+      </div>
     </div>
 
+    <tui-expand [expanded]="!collapsed()">
+      <div class="detail-row" *ngIf="selectedPlace.url">
+        <span class="label">Wiki URL: </span>
+        <span class="value">
+              <a [href]="selectedPlace.url" target="_blank"> {{ selectedPlace.url }} </a>
+            </span>
+      </div>
+    </tui-expand>
+  </section>
 
-    <!-- Main content -->
-    <tui-scrollbar class="scrollable-content">
-    <div class="place-detail-content">
-      <div class="content-section">
-        <h3>Description</h3>
-        <p>{{ selectedPlace.contentGerman }}</p>
+  <!-- prices -->
+  <div class="content-section" *ngIf="this.prices().length > 0">
+    <h3>Prices
+      <button *ngIf="userHasPermission" tuiButton appearance="flat" size="xs" type="button" class="add-btn" tuiHint="Add a new price!"
+              tuiHintDirection="top" (click)="showDialog(-1)">
+        <tui-icon icon="@tui.circle-plus" class="prices"></tui-icon>
+      </button>
+    </h3>
+
+    <div *ngFor="let price of prices(); index as i" class="price-row">
+
+      <div class="price-bold" tuiHint="{{price.name}}">{{ price.name }}</div>
+      <div class="price-description" tuiHint="{{price.description}}">{{ price.description }}</div>
+      <div class="price-bold">{{ price.price }} €</div>
+
+      <button *ngIf="userHasPermission" tuiButton appearance="flat" size="xs" type="button" class="edit-btn" tuiHint="Edit or delete an existing price!"
+              tuiHintDirection="top" (click)="showDialog(i.valueOf())">
+        <tui-icon icon="@tui.square-pen" class="prices"></tui-icon>
+      </button>
+    </div>
+
+  </div>
+
+  <ng-template let-observer [tuiDialogOptions]="options" [(tuiDialog)]="open">
+    <form [formGroup]="priceForm" class="textAreaContainerCtrl" (ngSubmit)="observer.complete()">
+      <div class="stack">
+        <tui-textfield #price tuiTextfieldSize="m" tuiAutoFocus [maskito]="maskitoOptions">
+          <label tuiLabel>Price value</label>
+          <input tuiTextfield required [placeholder]="price.focused() ? 'e.g. 15,00€' : 'Price value'"
+                 formControlName="priceFormValue"/>
+          <tui-icon tuiTooltip="The monetary value of the price."/>
+        </tui-textfield>
       </div>
 
-      <div>
-        <button class="feedback-button" appearance="secondary" size="m" tuiButton type="button" (click)="navigateToFeedback()">
-          <tui-icon icon="@tui.message-circle-plus" [style.height.rem]="1"/> Give us feedback
+      <div class="stack">
+        <tui-textfield #name tuiTextfieldSize="m">
+          <label tuiLabel>Name</label>
+          <input tuiTextfield required [placeholder]="name.focused() ? 'e.g. Adult' : 'Name'"
+                 formControlName="nameFormValue"/>
+          <tui-icon tuiTooltip="A short-hand name for the price."/>
+        </tui-textfield>
+      </div>
+
+      <div class="stack">
+        <tui-textfield #desc tuiTextfieldSize="m">
+          <label tuiLabel>Description</label>
+          <input tuiTextfield [placeholder]="desc.focused() ? 'e.g. Tour Ticket' : 'Description'"
+                 formControlName="descriptionFormValue"/>
+          <tui-icon tuiTooltip="Additional information for the price."/>
+        </tui-textfield>
+      </div>
+
+      <div class="price-dialog-buttons">
+        <button size="s" tuiButton type="submit" (click)="onSubmit()" class="save-button">
+          <tui-icon icon="@tui.save" [style.height.rem]="1.2"/>
+          Save
+        </button>
+
+        <button appearance="action-destructive" size="s" tuiButton type="submit" (click)="onDelete()" *ngIf="dialogLabel.startsWith('Edit')">
+          Delete
         </button>
       </div>
 
-      <div class="content-section" *ngIf="this.prices().length > 0">
-        <h3>Prices
-          <button *ngIf="userHasPermission" tuiButton appearance="flat" size="xs" type="button" class="add-btn" tuiHint="Add a new price!"
-                  tuiHintDirection="top" (click)="showDialog(-1)">
-            <tui-icon icon="@tui.circle-plus" class="prices"></tui-icon>
-          </button>
-        </h3>
+    </form>
+  </ng-template>
 
-        <div *ngFor="let price of prices(); index as i" class="price-row">
+  <div class="tone-selector" *ngIf="selectedPlace.contentGerman">
+    <span style="font: var(--tui-font-heading-6); display: block; width: 100%">Choose how you want the story to be told <tui-icon
+      tuiHintDirection="bottom"
+      tuiTooltip="Select a tone to change the storytelling style — not the facts."
+    /></span>
 
-          <div class="price-bold" tuiHint="{{price.name}}">{{ price.name }}</div>
-          <div class="price-description" tuiHint="{{price.description}}">{{ price.description }}</div>
-          <div class="price-bold">{{ price.price }} €</div>
-
-          <button *ngIf="userHasPermission" tuiButton appearance="flat" size="xs" type="button" class="edit-btn" tuiHint="Edit or delete an existing price!"
-                  tuiHintDirection="top" (click)="showDialog(i.valueOf())">
-            <tui-icon icon="@tui.square-pen" class="prices"></tui-icon>
-          </button>
-        </div>
-
-      </div>
-
-      <ng-template let-observer [tuiDialogOptions]="options" [(tuiDialog)]="open">
-        <form [formGroup]="priceForm" class="textAreaContainerCtrl" (ngSubmit)="observer.complete()">
-          <div class="stack">
-            <tui-textfield #price tuiTextfieldSize="m" tuiAutoFocus [maskito]="maskitoOptions">
-              <label tuiLabel>Price value</label>
-              <input tuiTextfield required [placeholder]="price.focused() ? 'e.g. 15,00€' : 'Price value'"
-                     formControlName="priceFormValue"/>
-              <tui-icon tuiTooltip="The monetary value of the price."/>
-            </tui-textfield>
-          </div>
-
-          <div class="stack">
-            <tui-textfield #name tuiTextfieldSize="m">
-              <label tuiLabel>Name</label>
-              <input tuiTextfield required [placeholder]="name.focused() ? 'e.g. Adult' : 'Name'"
-                     formControlName="nameFormValue"/>
-              <tui-icon tuiTooltip="A short-hand name for the price."/>
-            </tui-textfield>
-          </div>
-
-          <div class="stack">
-            <tui-textfield #desc tuiTextfieldSize="m">
-              <label tuiLabel>Description</label>
-              <input tuiTextfield [placeholder]="desc.focused() ? 'e.g. Tour Ticket' : 'Description'"
-                     formControlName="descriptionFormValue"/>
-              <tui-icon tuiTooltip="Additional information for the price."/>
-            </tui-textfield>
-          </div>
-
-          <div class="price-dialog-buttons">
-            <button size="s" tuiButton type="submit" (click)="onSubmit()" class="save-button">
-              <tui-icon icon="@tui.save" [style.height.rem]="1.2"/>
-              Save
-            </button>
-
-            <button appearance="action-destructive" size="s" tuiButton type="submit" (click)="onDelete()" *ngIf="dialogLabel.startsWith('Edit')">
-              Delete
-            </button>
-          </div>
-
-        </form>
-      </ng-template>
-
-      <div class="content-section">
-        <h3>Building Information</h3>
-        <div class="building-details">
-          <div class="detail-row" *ngIf="selectedPlace.name">
-            <span class="label">Name:</span>
-            <span class="value">{{ selectedPlace.name }}</span>
-          </div>
-          <div class="detail-row" *ngIf="selectedPlace.dateFrom">
-            <span class="label">Build in:</span>
-            <span class="value">{{ selectedPlace.dateFrom }}</span>
-          </div>
-          <div class="detail-row" *ngIf="selectedPlace.dateTo">
-            <span class="label">Demolished in:</span>
-            <span class="value">{{ selectedPlace.dateTo }}</span>
-          </div>
-          <div class="detail-row" *ngIf="selectedPlace.architect">
-            <span class="label">Responsible Architect:</span>
-            <span class="value">{{ selectedPlace.architect }}</span>
-          </div>
-          <div class="detail-row" *ngIf="selectedPlace.url">
-            <span class="label">Wiki URL:</span>
-            <span class="value">
-              <a [href]="selectedPlace.url" target="_blank"> {{ selectedPlace.url }} </a>
-            </span>
-          </div>
-          <div class="detail-row" *ngIf="selectedPlace.imageUrls.length > 0">
-            <img [src]="selectedPlace.imageUrls[1]" alt="Building image" class="building-image">
-          </div>
-
-          <div class="content-section" *ngIf="selectedPlace.relatedPersons?.length">
-            <h3>Related Persons</h3>
-            <div class="related-items">
-              <div class="related-item" *ngFor="let person of selectedPlace.relatedPersons">
-            <span class="value">
-              <div (click)="onPersonClick(person)">
-                <span>{{ person.name }}</span>
-              </div>
-            </span>
-              </div>
-            </div>
-          </div>
-
-          <div class="content-section" *ngIf="selectedPlace.relatedBuildings?.length">
-            <h3>Related Places</h3>
-            <div class="related-items">
-              <div class="related-item" *ngFor="let place of selectedPlace.relatedBuildings">
-            <span class="value">
-              <div (click)="onBuildingClick(place)">
-                <span>{{ place.name }}</span>
-              </div>
-            </span>
-              </div>
-            </div>
-          </div>
-
-          <div class="content-section" *ngIf="selectedPlace.relatedEvents?.length">
-            <h3>Related Events</h3>
-            <div class="related-items">
-              <div class="related-item" *ngFor="let event of selectedPlace.relatedEvents">
-            <span class="value">
-              <div (click)="onEventClick(event)">
-                <span>{{ event.name }}</span>
-              </div>
-            </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    </tui-scrollbar>
+    <tui-carousel
+      [draggable]="true"
+      [itemsCount]="isMobile ? 2 : 4"
+      [(index)]="index1"
+    >
+      <ng-container *ngFor="let tone of tones">
+        <button
+          *tuiItem
+          tuiSurface
+          type="button"
+          class="tone"
+          [style.background-image]="'url(assets/images/' + tone.bg + ')'"
+          [style.color]="'#fff'"
+          (click)="startEnrichment(tone.key)"
+        >
+          <h3 class="heading">{{ tone.label }}</h3>
+        </button>
+      </ng-container>
+    </tui-carousel>
   </div>
-</div>
 
+  <div class="tone-selector" *ngIf="!selectedPlace.contentGerman">
+    <span style="font: var(--tui-font-heading-6); display: block; width: 100%">We haven’t written a story for this place yet — stay tuned!</span>
+  </div>
+
+  <!-- tone selector -->
+  <div class="content">
+    <!-- Skeleton Loader -->
+    <div *ngIf="enrichmentStarted && enrichmentLoading" class="fade-in place-summary tui-space_bottom-8">
+      <div class="skeleton-line" *ngFor="let width of lineWidths" [style.width.%]="width"></div>
+    </div>
+
+    <!-- LLM Generated Content -->
+    <div *ngIf="enrichmentStarted && !enrichmentLoading" class="fade-in tui-space_bottom-8">
+      <section class="place-summary">
+        <header tuiHeader class="tui-space_top-3 tui-space_bottom-3">
+          <span class="tui-text_h6">Quick Facts & Highlights</span>
+        </header>
+        <div class="place-summary-text" [innerHTML]="summary"></div>
+
+        <header tuiHeader class="tui-space_top-5 tui-space_bottom-3">
+          <span class="tui-text_h6">Deep Dive into the {{ selectedPlace.name }}</span>
+        </header>
+        <div class="place-summary-text" [innerHTML]="enrichedContent"></div>
+      </section>
+    </div>
+
+
+    <div class="related-persons tui-space_bottom-6" *ngIf="selectedPlace.relatedPersons?.length">
+      <span class="tui-space_bottom-5" style="font: var(--tui-font-heading-6); display: block; width: 100%"><tui-icon icon="@tui.user" [style.height.rem]="1.5" /> Related Persons</span>
+
+      <tui-carousel
+        [draggable]="true"
+        [itemsCount]="3"
+        [(index)]="index2"
+        [style.--tui-carousel-padding] = "isMobile ? '0' : '0 15px 0 0'"
+      >
+        <ng-container *ngFor="let person of selectedPlace.relatedPersons">
+          <div
+            tuiAppearance="outline-grayscale"
+            tuiCardLarge
+            *tuiItem
+            class="person-card"
+          >
+            <div (click)="onPersonClick(person)">
+              <aside tuiAccessories>
+                <tui-avatar
+                  class="avatar"
+                  size="l"
+                  [src]="
+              person.imageUrls[1] === 'https://www.geschichtewiki.wien.gv.at/images/7/7d/RDF.png'
+                ? 'assets/images/person-placeholder-200.png'
+                : (person.imageUrls[1] | tuiFallbackSrc: '@tui.user' | async)
+            "
+                  [style.background]="
+              person.imageUrls[1] === 'https://www.geschichtewiki.wien.gv.at/images/7/7d/RDF.png'
+                ? 'transparent'
+                : (person.imageUrls[1] | tuiAutoColor)
+            "
+                />
+              </aside>
+              <h2 tuiTitle>
+                {{ person.name }}
+                <span tuiSubtitle *ngIf="person.deathDate != null">
+            †{{ person.deathDate }}
+          </span>
+              </h2>
+            </div>
+          </div>
+        </ng-container>
+      </tui-carousel>
+      <tui-pagination
+        *ngIf="selectedPlace.relatedPersons?.length > 3"
+        size="s"
+        class="tui-space_top-4"
+        [index]="roundedPersons"
+        [length]="personsPageCount"
+        (indexChange)="onIndexPersons($event)"
+      />
+    </div>
+
+    <div class="related-buildings tui-space_bottom-6" *ngIf="selectedPlace.relatedBuildings?.length">
+      <span class="tui-space_bottom-5" style="font: var(--tui-font-heading-6); display: block; width: 100%"><tui-icon icon="@tui.landmark" [style.height.rem]="1.5" /> Related Buildings</span>
+
+      <tui-carousel
+        [draggable]="true"
+        [itemsCount]="3"
+        [(index)]="index3"
+        [style.--tui-carousel-padding] = "isMobile ? '0' : '0 15px 0 0'"
+      >
+        <ng-container *ngFor="let building of selectedPlace.relatedBuildings">
+          <div
+            tuiAppearance="outline-grayscale"
+            tuiCardLarge
+            *tuiItem
+            class="person-card"
+          >
+            <div (click)="onBuildingClick(building)">
+              <aside tuiAccessories>
+                <tui-avatar
+                  class="avatar"
+                  size="l"
+                  [src]="
+              building.imageUrls[1] === 'https://www.geschichtewiki.wien.gv.at/images/7/7d/RDF.png'
+                ? 'assets/images/building-placeholder-200.jpeg'
+                : (building.imageUrls[1] | tuiFallbackSrc: '@tui.user' | async)
+            "
+                  [style.background]="
+              building.imageUrls[1] === 'https://www.geschichtewiki.wien.gv.at/images/7/7d/RDF.png'
+                ? 'transparent'
+                : (building.imageUrls[1] | tuiAutoColor)
+            "
+                />
+              </aside>
+              <h2 tuiTitle>
+                {{ building.name }}
+
+              </h2>
+            </div>
+          </div>
+        </ng-container>
+      </tui-carousel>
+      <tui-pagination
+        *ngIf="selectedPlace.relatedBuildings?.length > 3"
+        size="s"
+        class="tui-space_top-4"
+        [index]="roundedBuildings"
+        [length]="buildingsPageCount"
+        (indexChange)="onIndexBuildings($event)"
+      />
+    </div>
+
+
+    <div class="related-events tui-space_bottom-6" *ngIf="selectedPlace.relatedEvents?.length">
+      <span class="tui-space_bottom-5" style="font: var(--tui-font-heading-6); display: block; width: 100%"><tui-icon icon="@tui.calendar" [style.height.rem]="1.5" /> Related Events</span>
+
+      <tui-carousel
+        [draggable]="true"
+        [itemsCount]="3"
+        [(index)]="index4"
+        [style.--tui-carousel-padding] = "isMobile ? '0' : '0 15px 0 0'"
+      >
+        <ng-container *ngFor="let event of selectedPlace.relatedEvents">
+          <div
+            tuiAppearance="outline-grayscale"
+            tuiCardLarge
+            *tuiItem
+            class="person-card"
+          >
+            <div (click)="onEventClick(event)">
+              <aside tuiAccessories>
+                <tui-avatar
+                  class="avatar"
+                  size="l"
+                  [src]="
+              event.imageUrls[1] === 'https://www.geschichtewiki.wien.gv.at/images/7/7d/RDF.png'
+                ? 'assets/images/event-placeholder-200.jpeg'
+                : (event.imageUrls[1] | tuiFallbackSrc: '@tui.user' | async)
+            "
+                  [style.background]="
+              event.imageUrls[1] === 'https://www.geschichtewiki.wien.gv.at/images/7/7d/RDF.png'
+                ? 'transparent'
+                : (event.imageUrls[1] | tuiAutoColor)
+            "
+                />
+              </aside>
+              <h2 tuiTitle>
+                {{ event.name }}
+              </h2>
+            </div>
+          </div>
+        </ng-container>
+      </tui-carousel>
+      <tui-pagination
+        *ngIf="selectedPlace.relatedEvents?.length > 3"
+        size="s"
+        class="tui-space_top-4"
+        [index]="roundedEvents"
+        [length]="eventsPageCount"
+        (indexChange)="onIndexEvents($event)"
+      />
+    </div>
+
+    </div>
+  </div>
+
+</tui-scrollbar>

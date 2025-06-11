@@ -1,6 +1,7 @@
 package group_05.ase.user_db.endpoints;
 
 import group_05.ase.user_db.restData.UserInterestDTO;
+import group_05.ase.user_db.restData.UserInterestWithWeightDTO;
 import group_05.ase.user_db.services.UserInterestService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,6 +81,12 @@ public class UserInterestsController {
             logger.error("Error fetching user interests by user_id {}: {}", jwt.getSubject(), e.getMessage());
             throw new RuntimeException("Error fetching user interests", e);
         }
+    }
+
+    @GetMapping("/user/{userId}/interests/with-weight")
+    @ResponseStatus(HttpStatus.OK)
+    public List<UserInterestWithWeightDTO> getUserInterestsWithWeightByUserId(@PathVariable("userId") UUID userId) {
+        return userInterestService.getUserInterestsWithWeightByUserId(userId);
     }
 
 
