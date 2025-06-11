@@ -1,5 +1,5 @@
 <ng-container *ngIf="isMobile">
-  <div class="search-button-container" *ngIf="!searchOpen">
+  <div class="search-button-container" *ngIf="!searchOpen && currentViewMobile === 'discover'">
     <button
       tuiButton
       size="m"
@@ -39,7 +39,9 @@
   </ng-container>
 
   <ng-container *ngIf="currentViewMobile === 'map'">
-    <app-map-view (populatePlacesEvent)="setHistoricalPlaces($event)" (selectDetailEvent)="selectDetailEvent($event)"></app-map-view>
+    <app-map-view
+      (populatePlacesEvent)="setHistoricalPlaces($event)"
+      (selectDetailEvent)="selectDetailEvent($event)"></app-map-view>
   </ng-container>
 </ng-container>
 
