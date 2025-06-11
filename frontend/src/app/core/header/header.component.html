@@ -48,7 +48,7 @@
           [tuiPlatform]="platform"
         >
           Use interests?
-          <input tuiSwitch type="checkbox" [ngModel]="true" [showIcons]="first" [size]="getSize(first)" (click)="handleToggle()"/>
+          <input tuiSwitch type="checkbox" [(ngModel)]="isChecked" [showIcons]="first" [size]="getSize(first)" (click)="handleToggle()"/>
         </div>
         <button tuiOption appearance="secondary" type="button" routerLink="admin-dashboard">
           <tui-icon icon="@tui.users" [style.height.rem]="1"/>
