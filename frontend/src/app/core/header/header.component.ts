@@ -58,6 +58,9 @@ export class HeaderComponent {
     await supabase.auth.signOut();
     this.loggedIn = false;
     this.cdr.markForCheck();
+    localStorage.removeItem('user_uuid');
+    localStorage.removeItem('user_role');
+    localStorage.removeItem('interest_filtering');
     this.router.navigate(['/login']);
   }
 
@@ -66,11 +69,11 @@ export class HeaderComponent {
   }
 
   protected handleToggle() {
-    let interestFiltering = localStorage.getItem('interestFiltering');
+    let interestFiltering = localStorage.getItem('interest_filtering');
     if (interestFiltering === 'true') {
-      localStorage.setItem('interestFiltering', 'false');
+      localStorage.setItem('interest_filtering', 'false');
     } else {
-      localStorage.setItem('interestFiltering', 'true');
+      localStorage.setItem('interest_filtering', 'true');
     }
   }
 }

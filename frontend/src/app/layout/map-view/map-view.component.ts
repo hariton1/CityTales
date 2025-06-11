@@ -36,6 +36,7 @@ import {EventEntity} from '../../dto/db_entity/EventEntity';
 export class MapViewComponent implements OnInit{
 
   private readonly alerts = inject(TuiAlertService);
+  private interestFiltering: string | null = null;
 
   constructor(private locationService: LocationService,
               private userLocationService: UserLocationService,
@@ -182,8 +183,8 @@ export class MapViewComponent implements OnInit{
   // TODO: remove later on
   // For testing in case navigator.geolocation breaks - happened to me for some reason...
   ngOnInit(): void {
-      let interestFiltering = localStorage.getItem("interestFiltering");
-      this.locationService.getLocationsInRadius(this.center.lat, this.center.lng, 10000, interestFiltering === 'true').subscribe(locations => {
+      this.interestFiltering = localStorage.getItem("interest_filtering");
+      this.locationService.getLocationsInRadius(this.center.lat, this.center.lng, 10000, this.interestFiltering === 'true').subscribe(locations => {
         this.locationsNearby = locations;
         this.addMarkersToMap(locations);
         this.populatePlacesEvent.emit(locations);
@@ -267,10 +268,14 @@ export class MapViewComponent implements OnInit{
     }
 
     location = this.userService.enterHistoricNode(location);
-    this.getCombinedItems(location).subscribe(combined => {
-      console.log('Combined items: ', combined);
-      this.combinedLocations = combined;
-    });
+    if(this.interestFiltering === 'true') {
+      this.getCombinedItems(location).subscribe(combined => {
+        console.log('Combined items: ', combined);
+        this.combinedLocations = combined;
+      });
+    } else {
+      this.combinedLocations = this.getCombinedItemsUnfiltered(location);
+    }
     this.hoveredLocation = location;
 
     const relatedContent = this.relatedContentToLocationRef.nativeElement;
@@ -307,6 +312,15 @@ export class MapViewComponent implements OnInit{
     const x = radius * Math.cos(angle);
     const y = radius * Math.sin(angle);
     return `translate(${x}px, ${y}px)`;
+  }
+
+  getCombinedItemsUnfiltered(location: any): any[] {
+    const buildings = (location.relatedBuildings || []).map((item: any) => ({ ...item, type: 'building' }));
+    const persons = (location.relatedPersons || []).map((item: any) => ({ ...item, type: 'person' }));
+    const events = (location.relatedEvents || []).map((item: any) => ({ ...item, type: 'event' }));
+
+    const combined = [...buildings, ...persons, ...events];
+    return combined;
   }
 
   getCombinedItems(location: any): Observable<any[]> {
