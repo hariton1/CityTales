@@ -234,7 +234,7 @@ export class UserService {
       if (stored) {
         this.userId = stored;
       } else {
-        return;
+        return node;
       }
 
       node.userHistoryEntry = this.createUserHistoryEntry(node);
