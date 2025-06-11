@@ -38,6 +38,23 @@ app-map-view {
   flex: 1;
 }
 
+.search-button-container {
+  position: fixed;
+  top: 1.5rem;
+  left: 1.5rem;
+  z-index: 1000;
+}
+
+.mobile-search-button {
+  background: rgba(255, 255, 255, 0.3) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  border-radius: 50% !important;
+  color: var(--tui-text-primary) !important;
+}
+
 .mobile-view-toggle {
   position: fixed;
   top: 1.5rem;
