@@ -228,8 +228,6 @@ export class TourDetailComponent {
   }
 
   exportSiteToPdf() {
-    console.log('export to pdf')
-
     const element = document.getElementById('pdf-content');
 
     if (!element) return;
@@ -249,10 +247,21 @@ export class TourDetailComponent {
       const imgHeight = (canvas.height * pageWidth) / canvas.width;
 
       let heightLeft = imgHeight;
-      let position = 0;
+      let position = 30;
+
+      const tourName = this.tour.getName();
+      const tourNameSafe = tourName.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+      const currentDate = new Date().toLocaleDateString();
+
 
       pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
       heightLeft -= pageHeight;
+
+      pdf.setFontSize(16);
+      pdf.text(tourName, pageWidth / 2, 15, { align: 'center' });
+
+      pdf.setFontSize(10);
+      pdf.text(currentDate, pageWidth - 10, 10, { align: 'right' });
 
       while (heightLeft > 0) {
         position = heightLeft - imgHeight;
@@ -261,8 +270,7 @@ export class TourDetailComponent {
         heightLeft -= pageHeight;
       }
 
-      const tourName = this.tour.getName().replace(/[^a-z0-9]/gi, '_').toLowerCase();
-      pdf.save(`${tourName || 'tour-detail'}.pdf`);
+      pdf.save(`${tourNameSafe || 'tour-detail'}.pdf`);
     });
   }
 
