@@ -1,8 +1,11 @@
 package group_05.ase.user_db.services;
 
+import group_05.ase.user_db.entities.InterestEntity;
 import group_05.ase.user_db.entities.UserInterestEntity;
+import group_05.ase.user_db.repositories.InterestRepository;
 import group_05.ase.user_db.repositories.UserInterestRepository;
 import group_05.ase.user_db.restData.UserInterestDTO;
+import group_05.ase.user_db.restData.UserInterestWithWeightDTO;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -13,9 +16,11 @@ import java.util.UUID;
 public class UserInterestService {
 
     private final UserInterestRepository repository;
+    private InterestRepository interestRepository;
 
-    public UserInterestService(UserInterestRepository repository) {
+    public UserInterestService(UserInterestRepository repository, InterestRepository interestRepository) {
         this.repository = repository;
+        this.interestRepository = interestRepository;
     }
 
     public List<UserInterestDTO> getAllUserInterests() {
@@ -79,6 +84,22 @@ public class UserInterestService {
 
         this.repository.delete(tmp);
 
+    }
+
+    public List<UserInterestWithWeightDTO> getUserInterestsWithWeightByUserId(UUID userId) {
+        List<UserInterestEntity> userInterests = repository.findByUserIdOrderByInterestIdAsc(userId);
+        List<UserInterestWithWeightDTO> dtos = new ArrayList<>();
+        for (UserInterestEntity userInterest : userInterests) {
+            interestRepository.findById(userInterest.getInterestId()).ifPresent(interest -> dtos.add(new UserInterestWithWeightDTO(
+                    interest.getInterestId(),
+                    interest.getInterestNameEn(),
+                    interest.getDescription(),
+                    interest.getInterestNameDe(),
+                    userInterest.getInterestWeight(),
+                    userInterest.getCreDat()
+            )));
+        }
+        return dtos;
     }
 
 }
