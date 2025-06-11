@@ -1,19 +1,17 @@
+<button
+  tuiButton
+  type="button"
+  appearance="flat"
+  size="s"
+  class="back-button"
+  (click)="closeDetail()"
+>
+  <tui-icon icon="@tui.chevron-left" class="mr-1" [style.height.rem]="1.2" />
+  Back to All Sites
+</button>
+
 <tui-scrollbar class="scrollable-content" [style]="'overflow-y: auto'">
-  <!-- TODO: make it responsive -->
-
 <div class="place-detail-container">
-  <button
-    tuiButton
-    type="button"
-    appearance="flat"
-    size="s"
-    class="back-button"
-    (click)="closeDetail()"
-  >
-    <tui-icon icon="@tui.chevron-left" class="mr-1" [style.height.rem]="1.2" />
-    Back to All Sites
-  </button>
-
   <section
     tuiCardLarge="compact"
     [tuiCardCollapsed]="collapsed()"
