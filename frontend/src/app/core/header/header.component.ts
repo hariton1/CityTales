@@ -40,9 +40,19 @@ export class HeaderComponent {
   loggedIn = false;
   protected open = false;
   protected size: TuiSizeL | TuiSizeS = 'l';
+  protected isChecked = true;
   protected readonly platforms: ReadonlyArray<'android' | 'ios' | 'web'> = [
     'web'
   ];
+
+  ngOnInit() {
+    let interestFiltering = localStorage.getItem('interest_filtering');
+    if (interestFiltering === 'true') {
+      this.isChecked = true;
+    } else {
+      this.isChecked = false;
+    }
+  }
 
   constructor(private searchService: SearchService, private router: Router, private cdr: ChangeDetectorRef) {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -72,8 +82,11 @@ export class HeaderComponent {
     let interestFiltering = localStorage.getItem('interest_filtering');
     if (interestFiltering === 'true') {
       localStorage.setItem('interest_filtering', 'false');
+      this.isChecked = false;
     } else {
       localStorage.setItem('interest_filtering', 'true');
+      this.isChecked = true;
     }
+    window.location.reload();
   }
 }
