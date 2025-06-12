@@ -87,7 +87,8 @@ export class TourLayoutComponent {
       this.selectedBuildings,
       +this.tourDistance,
       +this.tourDuration,
-      this.userId ?? 'NONE');
+      this.userId ?? 'NONE',
+      0); //TODO: Add price estimation for user defined tours
 
 
       this.tourDistance = (tour.getDistance() / 1000).toFixed(2);
@@ -356,11 +357,11 @@ export class TourLayoutComponent {
 
   generateAdvancedTour() {
 
-    if(!this.startMarker || !this.endMarker){
-      this.alerts.open('Please select a start and end point!', {label: 'Failure!', appearance: 'warning', autoClose: 3000}).subscribe();
-      return;
-    }
-
+    //if(!this.startMarker || !this.endMarker){
+    //  this.alerts.open('Please select a start and end point!', {label: 'Failure!', appearance: 'warning', autoClose: 3000}).subscribe();
+    //  return;
+    //}
+    console.log("Nearby stops length: " + this.buildingData.length)
     console.log("Generating tour for user " + this.userId)
     var user = this.userId!;
     var entity: TourRequestEntity = {
@@ -369,13 +370,14 @@ export class TourLayoutComponent {
       start_lng: this.startMarker?.getPosition()?.lng()!,
       end_lat: this.endMarker?.getPosition()?.lat()!,
       end_lng: this.endMarker?.getPosition()?.lng()!,
-      predefined_stops: [],
+      predefinedStops: [],
       maxDistance: this.maxDistance * 1000,
       minDistance: this.minDistance * 1000,
       maxDuration: 0,
       minDuration: 0,
       maxBudget: this.maxBudget,
-      minIntermediateStops: this.minSites
+      numStops: this.minSites,
+      personConfiguration: [2,2,0] //multiset for adults, children, seniors
     }
     this.alerts.open('Your tour is being generated...', {label: 'Success!', appearance: 'success', autoClose: 6000}).subscribe();
     this.tourService.createTour(entity).subscribe(data => {
@@ -390,7 +392,7 @@ export class TourLayoutComponent {
         tourdtos.push(TourDto.fromTourEntity(tour))});
 
 
-      var selectedTour: TourDto = tourdtos[tourdtos.length - 1];
+      var selectedTour: TourDto = tourdtos[0];
 
       this.tourService.createTourInDB(selectedTour).subscribe({
         next: tour => {console.log("Tour created successfully!");

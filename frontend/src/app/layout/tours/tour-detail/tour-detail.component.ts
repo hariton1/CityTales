@@ -25,7 +25,7 @@ import {firstValueFrom} from 'rxjs';
 export class TourDetailComponent {
 
   tourId: number = 0;
-  tour: TourDto = new TourDto(0, '', '', 0, 0, 0, 0, [], 0, 0, 'NONE');
+  tour: TourDto = new TourDto(0, '', '', 0, 0, 0, 0, [], 0, 0, 'NONE', 0);
   private tourService: TourService;
   private router: Router;
   private readonly alerts = inject(TuiAlertService);
@@ -117,7 +117,8 @@ export class TourDetailComponent {
           this.tour.getStops(),
           estimate.distance,
           estimate.duration,
-          this.tour.getUserId()
+          this.tour.getUserId(),
+          this.tour.getTourPrice()
         );
         console.log(this.tour.getDistance());
         console.log(this.tour.getDurationEstimate());

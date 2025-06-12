@@ -6,6 +6,7 @@ import group_05.ase.neo4j_data_access.Entity.ViennaHistoryWikiBuildingObject;
 import lombok.*;
 
 import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -25,5 +26,5 @@ public class TourObject {
     private double durationEstimate;
     private String userId;
     private double tourPrice;
-
+    private Map<Integer, List<PriceDTO>> pricePerStop;
 }

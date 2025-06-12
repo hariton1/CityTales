@@ -14,6 +14,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/userInterests")
@@ -88,6 +89,27 @@ public class UserInterestsController {
     public List<UserInterestWithWeightDTO> getUserInterestsWithWeightByUserId(@PathVariable("userId") UUID userId) {
         return userInterestService.getUserInterestsWithWeightByUserId(userId);
     }
+
+    @GetMapping("/user_id={userId}")
+    @ResponseStatus(HttpStatus.OK)
+    public List<UserInterestDTO> getUserInterestsByUserId(@PathVariable("userId") UUID userId) {
+        try {
+            return this.userInterestService.getUserInterestsByUserId(userId);
+        } catch (Exception e) {
+            return new ArrayList<UserInterestDTO>(); //"An internal server error occurred => " + e.getMessage();
+        }
+    }
+
+    @GetMapping("/interest_ids_user_id={userId}")
+    @ResponseStatus(HttpStatus.OK)
+    public List<Integer> getUserInterestIdsByUserId(@PathVariable("userId") UUID userId) {
+        try {
+            return this.userInterestService.getUserInterestsByUserId(userId).stream().map(UserInterestDTO::getInterestId).collect(Collectors.toList());
+        } catch (Exception e) {
+            return new ArrayList<Integer>(); //"An internal server error occurred => " + e.getMessage();
+        }
+    }
+
 
 
 }

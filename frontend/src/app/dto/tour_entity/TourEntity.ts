@@ -9,5 +9,6 @@ export interface TourEntity {
   stops: string,
   distance: number,
   durationEstimate: number,
-  userId: string
+  userId: string,
+  tourPrice: number
 }

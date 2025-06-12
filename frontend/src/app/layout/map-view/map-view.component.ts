@@ -51,6 +51,9 @@ export class MapViewComponent implements OnInit{
   @Output() selectDetailEvent: EventEmitter<Object> = new EventEmitter<Object>();
   @Output() populatePlacesEvent = new EventEmitter<BuildingEntity[]>();
 
+  private selectedMarker: google.maps.Marker | null = null;
+  private selectedBuildingType: string | null = null;
+
 
   @ViewChild(MapInfoWindow) infoWindow: any;
   private nativeInfoWindow = new google.maps.InfoWindow();
@@ -68,8 +71,10 @@ export class MapViewComponent implements OnInit{
     strokeWeight: 2,
   };
 
-  markers: any[] = [];
+  markers: google.maps.Marker[] = [];
+  public location_marker_dict = new Map<any, google.maps.Marker>
   center: google.maps.LatLngLiteral = {lat: 48.19865798950195, lng: 16.3714542388916};
+  user_location: google.maps.LatLngLiteral = {lat: 48.19865798950195, lng: 16.3714542388916};
   zoom = 15;
 
   polylines: google.maps.LatLngLiteral[][] = [];
@@ -144,18 +149,6 @@ export class MapViewComponent implements OnInit{
       }
     ]
   };
-
-  markerOptions: google.maps.MarkerOptions = {
-    draggable: false,
-    animation: google.maps.Animation.DROP,
-    icon: {
-      url: 'https://cdn-icons-png.flaticon.com/512/263/263633.png',
-      scaledSize: new google.maps.Size(25, 25),
-      origin: new google.maps.Point(0, 0),
-      anchor: new google.maps.Point(17, 34),
-      labelOrigin: new google.maps.Point(12, 34)
-    }
-  }
   locationMarkerOptions: google.maps.MarkerOptions = {
     draggable: false,
     icon: {
@@ -164,6 +157,16 @@ export class MapViewComponent implements OnInit{
       origin: new google.maps.Point(0, 0),
       anchor: new google.maps.Point(17, 34),
       labelOrigin: new google.maps.Point(12, 34)
+    }
+  }
+  selectedMarkerOptions: google.maps.MarkerOptions = {
+    draggable: false,
+    icon: {
+      url: 'assets/icons/selected_location_marker.svg',
+      scaledSize: new google.maps.Size(50, 50),
+      origin: new google.maps.Point(0, 0),
+      anchor: new google.maps.Point(17, 34),
+      labelOrigin: new google.maps.Point(12, 34),
     }
   }
 
@@ -225,7 +228,7 @@ export class MapViewComponent implements OnInit{
               this.detailAction(marker, location);
             })
           });
-
+          this.location_marker_dict.set(location.viennaHistoryWikiId, marker)
           return marker;
         });
 
@@ -285,7 +288,46 @@ export class MapViewComponent implements OnInit{
 
     this.selectDetailEvent.emit(location);
 
+    //Center map around selected marker & change icion
+    this.selectMarker(marker, location);
+
     this.generatePolylines(location);
+  }
+
+  selectMarker(marker: google.maps.Marker, location: BuildingEntity): void {
+    if (marker == null) {
+      console.log("Could not select marker since the desired object has no coordinates.");
+      this.unselectMarker()
+      return
+    }
+    this.center = {lat: marker.getPosition()?.lat()!, lng: marker.getPosition()?.lng()!}
+    //Reset old marker
+    if (this.selectedMarker && this.selectedMarker !== marker) {
+      this.selectedMarker.setIcon({
+        url: this.getIconForBuildingType(this.selectedBuildingType!),
+        scaledSize: new google.maps.Size(28, 28),
+        anchor: new google.maps.Point(12, 12),
+        labelOrigin: new google.maps.Point(12, 30),
+      })
+    }
+
+    //Set new marker and flags
+    marker.setOptions(this.selectedMarkerOptions);
+    this.selectedMarker = marker;
+    this.selectedBuildingType = location.buildingType;
+  }
+
+  unselectMarker() {
+    if (this.selectedMarker != null) {
+      this.selectedMarker.setIcon({
+        url: this.getIconForBuildingType(this.selectedBuildingType!),
+        scaledSize: new google.maps.Size(28, 28),
+        anchor: new google.maps.Point(12, 12),
+        labelOrigin: new google.maps.Point(12, 30),
+      })
+    }
+    this.selectedMarker = null;
+    this.selectedBuildingType = null;
   }
 
   closeInfoWindow() {
@@ -423,5 +465,16 @@ export class MapViewComponent implements OnInit{
 
   onCircleClick(loc: any): void {
     this.selectDetailEvent.emit(loc);
+    this.selectMarker(this.getMarkerToLocation(loc), loc)
+    this.closeInfoWindow();
+  }
+
+  getMarkerToLocation(location: any): any {
+    var marker = this.location_marker_dict.get(location.viennaHistoryWikiId)
+    if(!marker){
+      console.warn("Could not find location marker for location object!");
+      return
+    }
+    return marker;
   }
 }
