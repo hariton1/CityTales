@@ -62,7 +62,12 @@ export class SidebarComponent implements OnInit{
 
   ngOnInit() {
     this.breakpointObserver
-      .observe([Breakpoints.HandsetPortrait, Breakpoints.HandsetLandscape])
+      .observe([
+        Breakpoints.HandsetPortrait,
+        Breakpoints.HandsetLandscape,
+        Breakpoints.TabletPortrait,
+        Breakpoints.TabletLandscape
+      ])
       .subscribe(result => {
         this.isMobile = result.matches;
       });

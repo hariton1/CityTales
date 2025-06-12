@@ -41,8 +41,13 @@ export class ExploreLayoutComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-      this.breakpointObserver
-      .observe([Breakpoints.HandsetPortrait, Breakpoints.HandsetLandscape])
+    this.breakpointObserver
+      .observe([
+        Breakpoints.HandsetPortrait,
+        Breakpoints.HandsetLandscape,
+        Breakpoints.TabletPortrait,
+        Breakpoints.TabletLandscape
+      ])
       .subscribe(result => {
         this.isMobile = result.matches;
         this.currentViewMobile = 'discover';
