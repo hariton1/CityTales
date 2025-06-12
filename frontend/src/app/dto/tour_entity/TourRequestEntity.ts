@@ -6,11 +6,12 @@ export interface TourRequestEntity {
   start_lng: number,
   end_lat: number,
   end_lng: number,
-  predefined_stops: BuildingEntity[],
+  predefinedStops: BuildingEntity[],
   maxDistance: number,
   minDistance: number,
   maxDuration: number,
   minDuration: number,
   maxBudget: number,
-  minIntermediateStops: number
+  numStops: number,
+  personConfiguration: number[]
 }

@@ -5,6 +5,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.google.ortools.sat.*;
+import group_05.ase.neo4j_data_access.Client.QdrantClient;
+import group_05.ase.neo4j_data_access.Client.UserDBClient;
 import group_05.ase.neo4j_data_access.Entity.Tour.*;
 import group_05.ase.neo4j_data_access.Entity.ViennaHistoryWikiBuildingObject;
 import group_05.ase.neo4j_data_access.Service.Interface.ITourService;
@@ -22,96 +25,78 @@ import java.util.stream.Collectors;
 public class TourService implements ITourService {
 
     private HistoricBuildingService historicBuildingService;
-    private HistoricPersonService historicPersonService;
-    private HistoricEventService historicEventService;
+    private UserDBClient userDBClient;
+    private QdrantClient qdrantClient;
 
-    public TourService(HistoricBuildingService historicBuildingService, HistoricPersonService historicPersonService, HistoricEventService historicEventService) {
+    public TourService(HistoricBuildingService historicBuildingService, UserDBClient userDBClient, QdrantClient qdrantClient) {
         this.historicBuildingService = historicBuildingService;
-        this.historicPersonService = historicPersonService;
-        this.historicEventService = historicEventService;
+        this.userDBClient = userDBClient;
+        this.qdrantClient = qdrantClient;
         this.mapper.registerModule(new Jdk8Module());
     }
 
     private final ObjectMapper mapper = new ObjectMapper();
-    private final RestTemplate restTemplate = new RestTemplate();
-    private final String USERDB_URL = "http://localhost:8090/";
-    private final String QDRANT_URL = "http://localhost:8081/";
     private final Integer MAX_ROUTES = 10;
-
-    //Multiset of persons that come on the tour, with index 0 = adults, 1=children, 2=seniors
-    private final int[] person_configuration = {2,2,0};
-
 
     @Override
     public List<TourDTO> createTours(CreateTourRequestDTO dto) {
 
-        //HTTP Request to User Interst DB
-        List<String> interest_ids = getInterestsFromDB(dto.getUserId());
-        System.out.println(interest_ids);
-
-        //HTTP Request to QDRANT for related articles
-        //TODO: Replace with extra service when ready
-        List<Integer> buildings_wikidata_ids = getEntititesFromQdrant(interest_ids, "WienGeschichteWikiBuildings");
-        List<Integer> events_wikidata_ids = getEntititesFromQdrant(interest_ids, "WienGeschichteWikiEvents");
-        List<Integer> persons_wikidata_ids = getEntititesFromQdrant(interest_ids, "WienGeschichteWikiPersons");
-
-        Set<Integer> related_building_wikidata_ids = new HashSet<>();
-        for(Integer event_id: events_wikidata_ids){
-            this.historicEventService.getAllLinkedHistoricBuildingsById(event_id).forEach(event -> related_building_wikidata_ids.add(event.getViennaHistoryWikiId()));
-        }
-
-        for(Integer event_id: persons_wikidata_ids){
-            this.historicPersonService.getAllLinkedHistoricBuildingsById(event_id).forEach(person -> related_building_wikidata_ids.add(person.getViennaHistoryWikiId()));
-        }
-
-
-        System.out.println("Direct buildungs size: " + buildings_wikidata_ids.size());
-        System.out.println("Related buildings size: " + related_building_wikidata_ids.size());
-
-        //Add to buildings that come into consideration for the tour
-        buildings_wikidata_ids.addAll(related_building_wikidata_ids);
-        buildings_wikidata_ids = buildings_wikidata_ids.stream().distinct().toList();
+        List<Integer> interests = getInterestsFromDB(dto.getUserId());
+        System.out.println(interests);
+        List<Integer> buildingIds = getBuildingEntititesFromQdrant(interests.stream().map(Object::toString).toList());
+        System.out.println("Building list size: " + buildingIds.size());
 
         List<GeographicPoint2d> stops = new ArrayList<>();
-
-
-
         Map<GeographicPoint2d, Integer> building_dict = new HashMap<>();
 
-        for(Integer building_id : buildings_wikidata_ids) {
-            ViennaHistoryWikiBuildingObject building = historicBuildingService.getBuildingById(building_id);
-            System.out.println(building);
-            if(building.getLatitude().isEmpty() || building.getLongitude().isEmpty() ) {
+        for(Integer stopId: buildingIds) {
+            ViennaHistoryWikiBuildingObject viennaHistoryWikiBuildingObject = historicBuildingService.getBuildingById(stopId);
+            if(viennaHistoryWikiBuildingObject.getLatitude().isEmpty() || viennaHistoryWikiBuildingObject.getLongitude().isEmpty() ) {
                 continue;
             }
-            GeographicPoint2d stop = new GeographicPoint2d(building.getLatitude().get(), building.getLongitude().get());
-            building_dict.put(stop, building_id);
+            GeographicPoint2d stop = new GeographicPoint2d(viennaHistoryWikiBuildingObject.getLatitude().get(), viennaHistoryWikiBuildingObject.getLongitude().get());
+            building_dict.put(stop, viennaHistoryWikiBuildingObject.getViennaHistoryWikiId());
             System.out.println(stop);
             stops.add(stop);
         }
+        System.out.println("Stops array size: "+ stops.size());
 
-        if(dto.getPredefined_stops() != null && dto.getPredefined_stops().size() > 0) {
-            dto.getPredefined_stops().forEach(stop -> stops.add(new GeographicPoint2d(stop.getLatitude().get(), stop.getLongitude().get())));
 
-        }
+        //assert that all predefined stops are in the stops list, should be anyway since qdrant returns all buildings
+        dto.getPredefinedStops().forEach(stop -> {assert stops.contains(new GeographicPoint2d(stop.getLatitude().get(), stop.getLongitude().get()));});
 
-        List<List<Float>> distanceMatrix = getMetricMatrix(stops, "distance");
-        System.out.println("Distance Matrix: " + distanceMatrix);
 
         Optional<GeographicPoint2d> startOptional;
+        Optional<GeographicPoint2d> endOptional;
         if(dto.getStart_lat() != 0.0 && dto.getStart_lng() != 0.0) {
             startOptional = Optional.of(new GeographicPoint2d(dto.getStart_lat(), dto.getStart_lng()));
         } else { startOptional = Optional.empty(); }
-
-        Optional<GeographicPoint2d> endOptional;
         if(dto.getEnd_lng() != 0.0 && dto.getEnd_lat() != 0.0) {
             endOptional = Optional.of(new GeographicPoint2d(dto.getEnd_lat(), dto.getEnd_lng()));
         } else { endOptional = Optional.empty(); }
-        List<GeographicPoint2d> mandatoryStops = dto.getPredefined_stops().stream().map(stop -> new GeographicPoint2d(stop.getLatitude().get(), stop.getLongitude().get())).toList();
 
-        List<TourObject> routes = findRoutesBFS(startOptional, endOptional, mandatoryStops,  ,distanceMatrix);
+        if(startOptional.isPresent()) {
+            //Prepend start
+            stops.add(0, startOptional.get());
+        }
+        if(endOptional.isPresent()) {
+            //Append end
+            stops.add(endOptional.get());
+        }
 
-        return tours.stream().map(this::tourObjectToTourDTO).toList();
+
+        List<List<Float>> distanceMatrix = getMetricMatrix(stops, "distance");
+
+        List<GeographicPoint2d> mandatoryStops = dto.getPredefinedStops().stream().map(stop -> new GeographicPoint2d(stop.getLatitude().get(), stop.getLongitude().get())).toList();
+
+        //List<TourObject> foundTours = findRoutesBFS(startOptional, endOptional, mandatoryStops, stops  ,distanceMatrix, dto, MAX_ROUTES, building_dict);
+
+        findRoutesSATSolving(distanceMatrix);
+
+        // System.out.println("Found " + foundTours.size() + " tours");
+
+        //return foundTours.stream().map(this::tourObjectToTourDTO).toList();
+        return null;
     }
 
     private TourDTO tourObjectToTourDTO(TourObject tourObject) {
@@ -135,7 +120,7 @@ public class TourService implements ITourService {
     }
 
 
-    private TourObject buildTourObject(List<GeographicPoint2d> stops, String userId, Map<GeographicPoint2d, Integer> building_dict, Double tourPrice) {
+    private TourObject buildTourObject(List<GeographicPoint2d> stops, String userId, Map<GeographicPoint2d, Integer> building_dict, Double tourPrice, Map<Integer, List<PriceDTO>> pricePerStop) {
         TourObject tourObject = new TourObject();
         tourObject.setStartLng(stops.get(0).getLongitude());
         tourObject.setStartLat(stops.get(0).getLatitude());
@@ -155,8 +140,175 @@ public class TourService implements ITourService {
         Map<String, Double> durations = getLengthDurationOfTour(tourObject);
         tourObject.setDistance(durations.get("distance"));
         tourObject.setDurationEstimate(durations.get("duration"));
+        tourObject.setPricePerStop(pricePerStop);
 
         return tourObject;
+    }
+
+    public void findRoutesSATSolving(List<List<Float>> distanceMatrix) {
+        System.out.println("Called findRoutesSATSolving");
+
+        // ─────────────────────────  INPUT DATA  ──────────────────────────
+        /** index 0 = start, 1 = end, 2..N-1 = candidate stops */
+        double[][] distanceMatrixArray = new double[distanceMatrix.size()][distanceMatrix.get(0).size()];
+        for(int i = 0; i < distanceMatrix.size(); i++) {
+            for(int j = 0; j < distanceMatrix.get(i).size(); j++) {
+                distanceMatrixArray[i][j] = distanceMatrix.get(i).get(j);
+            }
+        }
+
+
+
+        final double[][] DIST = distanceMatrixArray;
+
+        /** price[i] = entrance fee (0 for start/end) */
+        final double[] PRICE = { /* <-- fill prices for each location */ };
+
+        /** how many intermediate stops you want (fixed) */
+        final int K = 4;                            // example: 4 stops
+
+        /** maximum total distance allowed for the tour */
+        final double MAX_DISTANCE = 10000;         // metres, km,…
+
+        /** maximum total budget allowed for the tour */
+        final double MAX_BUDGET   =  50.0;
+
+        //System.loadLibrary("jniortools");                // native loader
+        int N = DIST.length;                             // number of nodes
+
+        CpModel model = new CpModel();
+
+        // ---- 1. Decision variables -----------------------------------
+        // x[i][j] = 1 if we travel directly i -> j
+        BoolVar[][] x = new BoolVar[N][N];
+        for (int i = 0; i < N; i++)
+            for (int j = 0; j < N; j++)
+                x[i][j] = model.newBoolVar("x_" + i + "_" + j);
+
+        // pos[i] = order position of node i along the path (only for subtour cut)
+        IntVar[] pos = new IntVar[N];
+        for (int i = 0; i < N; i++)
+            pos[i] = model.newIntVar(0, N - 1, "pos_" + i);
+
+        // ---- 2. Path-building constraints ----------------------------
+        int START = 0, END = 1;
+
+        // Each node has at most one outgoing arc
+        for (int i = 0; i < N; i++) {
+            LinearExpr outgoing = LinearExpr.sum(x[i]);     // Σ_j x[i][j]
+            if (i == END)
+                model.addEquality(outgoing, 0);               // end has none
+            else if (i == START)
+                model.addEquality(outgoing, 1);               // start has exactly 1
+            else
+                model.addLessOrEqual(outgoing, 1);            // normal node ≤ 1
+        }
+
+        // Each node has at most one incoming arc
+        for (int j = 0; j < N; j++) {
+            LinearExpr incoming = sumColumn(x, j);
+            if (j == START)
+                model.addEquality(incoming, 0);               // start has none
+            else if (j == END)
+                model.addEquality(incoming, 1);               // end has exactly 1
+            else
+                model.addLessOrEqual(incoming, 1);            // normal node ≤ 1
+        }
+
+        // Exactly K intermediate nodes must be visited
+        IntVar[] visit = new IntVar[N];
+        for (int i = 0; i < N; i++)
+            visit[i] = model.newBoolVar("visit_" + i);
+
+        // visit[i] is 1 if either we enter or leave i (except start/end)
+//        for (int i = 2; i < N; i++)
+//            model.addEquality(
+//                    LinearExpr.sum(new IntVar[]{sumRow(x, i), sumColumn(x, i)}),
+//                    LinearExpr.term(visit[i], 1));
+
+        // total #visited = K
+        model.addEquality(LinearExpr.sum(Arrays.copyOfRange(visit, 2, N)), K);
+
+//        // ---- 3. Subtour elimination  (Miller–Tucker–Zemlin) ----------
+//        // pos[START] = 0
+//        model.addEquality(pos[START], 0);
+//        // pos[END] = K+1
+//        model.addEquality(pos[END], K + 1);
+//
+//        for (int i = 0; i < N; i++)
+//            for (int j = 0; j < N; j++)
+//                if (i != j)
+//                    // If x[i][j]==1 then pos[j] = pos[i] + 1
+//                    model.addEquality(pos[j], LinearExpr.sum(pos[i], 1))
+//                            .onlyEnforceIf(x[i][j]);
+
+        // ---- 4. Distance and budget constraints ----------------------
+        LinearExpr totalDistance = LinearExpr.weightedSum(flatten(x), flattenDistances(DIST));
+        model.addLessOrEqual(totalDistance, (long) Math.round(MAX_DISTANCE));
+
+//        LinearExpr totalBudget = LinearExpr.weightedSum(visit, doubleToLong(PRICE));
+//        model.addLessOrEqual(totalBudget, (long) Math.round(MAX_BUDGET * 100)); // scale if needed
+
+        // ---- 5. Objective (optional – e.g., minimise distance) -------
+        model.minimize(totalDistance);
+
+        // ---- 6. Solve -------------------------------------------------
+        CpSolver solver = new CpSolver();
+        solver.getParameters().setMaxTimeInSeconds(30);
+        CpSolverStatus status = solver.solve(model);
+
+        if (status == CpSolverStatus.OPTIMAL || status == CpSolverStatus.FEASIBLE) {
+            System.out.println("Total distance = " + solver.value(totalDistance));
+//            System.out.println("Total budget   = " + solver.value(totalBudget) / 100.0);
+            printPath(solver, x, START, END);
+        } else {
+            System.out.println("No tour found under given constraints.");
+        }
+
+
+
+    }
+
+    private LinearExpr sumRow(IntVar[][] m, int r) {
+        return LinearExpr.sum(m[r]);
+    }
+
+    private LinearExpr sumColumn(IntVar[][] m, int c) {
+        IntVar[] col = new IntVar[m.length];
+        for (int i = 0; i < m.length; i++) col[i] = m[i][c];
+        return LinearExpr.sum(col);
+    }
+
+    private IntVar[] flatten(IntVar[][] matrix) {
+        return Arrays.stream(matrix).flatMap(Arrays::stream).toArray(IntVar[]::new);
+    }
+
+    private long[] flattenDistances(double[][] d) {
+        return Arrays.stream(d)
+                .flatMapToDouble(Arrays::stream)
+                .mapToLong(Math::round)
+                .toArray();
+    }
+
+    private long[] doubleToLong(double[] arr) {
+        long[] out = new long[arr.length];
+        for (int i = 0; i < arr.length; i++) out[i] = Math.round(arr[i] * 100); // 2-decimal cents
+        return out;
+    }
+
+    private void printPath(CpSolver s, BoolVar[][] x, int start, int end) {
+        int n = x.length, current = start;
+        System.out.print("Path: " + current);
+        while (current != end) {
+            for (int j = 0; j < n; j++) {
+                if (s.booleanValue(x[current][j])) {
+                    current = j;
+                    System.out.print(" -> " + current);
+                    break;
+                }
+            }
+        }
+        System.out.println();
     }
 
 
@@ -165,7 +317,7 @@ public class TourService implements ITourService {
             Optional<GeographicPoint2d> startOptional,
             Optional<GeographicPoint2d> endOptional,
             List<GeographicPoint2d> mandatoryStops,
-            List<GeographicPoint2d> avaliableStops,
+            List<GeographicPoint2d> availableStops,
             List<List<Float>> distanceMatrix,
             CreateTourRequestDTO createTourRequestDTO,
             int maxRoutes,
@@ -184,7 +336,7 @@ public class TourService implements ITourService {
             if (!allStops.contains(stop)) allStops.add(stop);
         }
 
-        for (GeographicPoint2d stop : avaliableStops) {
+        for (GeographicPoint2d stop : availableStops) {
             if (!allStops.contains(stop)) allStops.add(stop);
         }
 
@@ -230,6 +382,7 @@ public class TourService implements ITourService {
         queue.add(new RouteState(initialPath, 0.0, visitedMandatoryStops));
 
         while (!queue.isEmpty()) {
+            System.out.println("Current RAM Usage: " + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1000000000);
             if (validRoutes.size() >= maxRoutes) break;
 
             RouteState state = queue.poll();
@@ -239,7 +392,7 @@ public class TourService implements ITourService {
 
             int currentStopIdx = path.get(path.size() - 1);
 
-            if (path.size() > createTourRequestDTO.getMinIntermediateStops() + 2) {
+            if (path.size() > createTourRequestDTO.getNumStops() + 2) {
                 continue; // Prune paths that are already too long
             }
 
@@ -257,11 +410,12 @@ public class TourService implements ITourService {
                 }
 
                 if (allMandatoryStopsVisited &&
-                        intermediateStopsCount == createTourRequestDTO.getMinIntermediateStops() &&
+                        intermediateStopsCount == createTourRequestDTO.getNumStops() &&
                         currentDistance >= createTourRequestDTO.getMinDistance() &&
                         currentDistance <= createTourRequestDTO.getMaxDistance()
                 ) {
-                    Map<Integer, List<PriceDTO>> pricePerStop = getPriceFromDB(path);
+                    List<Integer> pathBuildingIds = path.stream().map(index -> building_dict.get(availableStops.get(index))).filter(Objects::nonNull).toList();
+                    Map<Integer, List<PriceDTO>> pricePerStop = getPriceFromDB(pathBuildingIds);
                     double currentPrice = 0;
 
                     for (Integer stopId : path) {
@@ -289,7 +443,7 @@ public class TourService implements ITourService {
                                 .map(allStops::get)
                                 .collect(Collectors.toList());
 
-                        validRoutes.add(buildTourObject(routeGeographicPoints, createTourRequestDTO.getUserId(), building_dict, currentPrice));
+                        validRoutes.add(buildTourObject(routeGeographicPoints, createTourRequestDTO.getUserId(), building_dict, currentPrice, pricePerStop));
                     }
                 }
                 continue; // Continue to next state in queue after processing a complete path
@@ -298,7 +452,7 @@ public class TourService implements ITourService {
             for (int nextStopIdx = 0; nextStopIdx < N; nextStopIdx++) {
                 if (path.contains(nextStopIdx)) continue;
 
-                if (path.size() + 1 > createTourRequestDTO.getMinIntermediateStops() + 2) {
+                if (path.size() + 1 > createTourRequestDTO.getNumStops() + 2) {
                     continue;
                 }
 
@@ -386,52 +540,31 @@ public class TourService implements ITourService {
         return null;
     }
 
-    private List<String> getInterestsFromDB(String userId) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-        headers.add("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36");
-        HttpEntity<String> entity = new HttpEntity<>("parameters", headers);
-        ResponseEntity<List> response = restTemplate.exchange(USERDB_URL + "userInterests/user_id=" + userId, HttpMethod.GET, entity, List.class);
-        return response.getBody().stream().map(i ->((Map<String, Object>) i).get("interest_id").toString()).toList();
+    private List<Integer> getInterestsFromDB(String userId) {
+        return this.userDBClient.getUserInterestsIds(UUID.fromString(userId));
     }
 
     private Map<Integer, List<PriceDTO>> getPriceFromDB(List<Integer> location_ids) {
-        ParameterizedTypeReference<List<List<PriceDTO>>> typeRef = new ParameterizedTypeReference<List<List<PriceDTO>>>() {};
-        Map<Integer, List<PriceDTO>> resultMap = new HashMap<>();
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-        headers.add("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36");
-        HttpEntity<String> entity = new HttpEntity<>(location_ids.toString(), headers);
-        ResponseEntity<List<List<PriceDTO>>> response = restTemplate.exchange(USERDB_URL + "prices/find/multiple", HttpMethod.GET, entity, typeRef);
-        if(!response.getStatusCode().is2xxSuccessful()) {
-         System.out.println("Error: " + response.getBody());
+        System.out.println("Prices for location ids: " + location_ids);
+        List<PriceDTO> prices = this.userDBClient.getPricesFromDB(location_ids);
+        if(prices.isEmpty()) {
+         System.out.println("Error: Could not retrieve prices from User DB! Either there are no prices available, or there was an issue with the DB connection.");
         }
-        for(int i = 0; i<response.getBody().size(); i++){
-            if(response.getBody().get(i).isEmpty()){
-                continue;
-            }
-            resultMap.put(location_ids.get(i), response.getBody().get(i));
+        Map<Integer, List<PriceDTO>> priceMap = new HashMap<>();
+        for(Integer location_id : prices.stream().map(PriceDTO::getLocationId).distinct().toList()) {
+            List<PriceDTO> pricesToLocation = prices.stream().filter(priceDTO -> priceDTO.getLocationId() == location_id).toList();
+            priceMap.put(location_id, pricesToLocation);
         }
 
-        return resultMap;
+        return priceMap;
     }
 
-    private List<Integer> getEntititesFromQdrant(List<String> interestsIds, String collectionName) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-        headers.add("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36");
-
+    private List<Integer> getBuildingEntititesFromQdrant(List<String> interestsIds) {
         MatchRequest dto = new MatchRequest();
-        dto.setCollectionName(collectionName);
+        dto.setCollectionName("WienGeschichteWikiBuildings");
         dto.setInterests(interestsIds);
-        dto.setResultSize(10);
-
-        System.out.println(dto);
-
-        HttpEntity<MatchRequest> entity = new HttpEntity<>(dto, headers);
-        ResponseEntity<List> response = restTemplate.exchange(QDRANT_URL + "categorize/match", HttpMethod.POST, entity, List.class);
-        return response.getBody();
+        dto.setResultSize(50);
+        return qdrantClient.getBuildingEntityIdsFromQdrant(dto);
     }
 
     @Override

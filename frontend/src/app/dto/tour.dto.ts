@@ -13,8 +13,9 @@ export class TourDto {
   private distance: number;
   private durationEstimate: number;
   private userId: string;
+  private tourPrice: number;
 
-  constructor(id:number, name: string, description: string, start_lat: number, start_lng: number, end_lat: number, end_lng: number, stops: BuildingEntity[], distance: number, durationEstimate: number, userId: string) {
+  constructor(id:number, name: string, description: string, start_lat: number, start_lng: number, end_lat: number, end_lng: number, stops: BuildingEntity[], distance: number, durationEstimate: number, userId: string, tourPrice: number) {
     this.id = id;
     this.name = name;
     this.description = description;
@@ -26,6 +27,7 @@ export class TourDto {
     this.distance = distance;
     this.durationEstimate = durationEstimate;
     this.userId = userId;
+    this.tourPrice = tourPrice;
   }
 
   public static fromTourEntity(tourEntity:TourEntity): TourDto {
@@ -43,7 +45,8 @@ export class TourDto {
       stops,
       tourEntity.distance,
       tourEntity.durationEstimate,
-      tourEntity.userId
+      tourEntity.userId,
+      tourEntity.tourPrice
     )
   }
 
@@ -59,7 +62,8 @@ export class TourDto {
       stops: JSON.stringify(tourDto.getStops()),
       distance: tourDto.getDistance(),
       durationEstimate: tourDto.getDurationEstimate(),
-      userId: tourDto.getUserId()
+      userId: tourDto.getUserId(),
+      tourPrice: tourDto.getTourPrice()
     }
     return entity;
 
@@ -155,6 +159,14 @@ export class TourDto {
 
   setUserId(userId: string): void {
     this.userId = userId;
+  }
+
+  getTourPrice(): number {
+    return this.tourPrice;
+  }
+
+  setTourPrice(tourPrice: number): void {
+    this.tourPrice = tourPrice;
   }
 
 
