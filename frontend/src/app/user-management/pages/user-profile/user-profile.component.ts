@@ -137,6 +137,11 @@ export class UserProfileComponent {
     this.router.navigate(['/my-history']);
   }
 
+  handleDisplayFunFactsClick () {
+    this.router.navigate(['/fun-fact-list']);
+  }
+
+
   get role(): string {
     return this.user?.role ?? '';
   }
