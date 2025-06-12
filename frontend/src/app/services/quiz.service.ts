@@ -8,18 +8,25 @@ import {Quiz} from '../dto/quiz.dto';
 export class QuizService {
   private httpClient = inject(HttpClient);
   private PATH = SERVER_ADDRESS + 'quizzes/';
-  private newQuizSignal = signal<Quiz>(this.getNewQuizDefaultData());
+  private newQuizSignal = signal<Quiz>(this.getNewQuizDefaultData('', '' as UUID));
+  private quizzesSignal = signal<Quiz[]>([]);
   newQuiz = computed(() => this.newQuizSignal());
-
+  quizzes = computed(() => this.quizzesSignal());
 
   generateNewQuiz(category: string, userIds : UUID[]) {
-    this.httpClient.post<Quiz>(this.PATH + 'quiz/create/' + category, userIds).subscribe((data) => {
-      console.log(data);
-      this.newQuizSignal.set(data);
+    this.quizzes().push(this.getNewQuizDefaultData(category, userIds.at(0) as UUID));
+    //this.httpClient.post<Quiz>(this.PATH + 'quiz/create/' + category, userIds).subscribe((data) => {
+      //this.newQuizSignal.set(data);
+    //});
+  }
+
+  getQuizzesByUserId(userId : UUID) {
+    this.httpClient.get<Quiz[]>(this.PATH + `quiz/user=${userId}`).subscribe((data) => {
+      this.quizzesSignal.set(data);
     });
   }
 
-  getNewQuizDefaultData() {
-    return {id: 0, name: 'new quiz', description: 'default', category: 'Tour', creator: '' as UUID, questions: [], createdAt: new Date()};
+  getNewQuizDefaultData(category: string, creator: UUID) {
+    return {id: 0, name: 'new quiz', description: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna', category: category, creator: creator, questions: [], createdAt: new Date()};
   }
 }
