@@ -182,7 +182,7 @@
 
     <tui-carousel
       [draggable]="true"
-      [itemsCount]="isMobile ? 2 : 4"
+      [itemsCount]="tonesItemCount"
       [(index)]="index1"
     >
       <ng-container *ngFor="let tone of tones">

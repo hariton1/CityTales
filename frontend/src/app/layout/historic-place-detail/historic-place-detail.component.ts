@@ -49,6 +49,7 @@ import {TuiCard, TuiHeader} from '@taiga-ui/layout';
 import {TuiExpand} from '@taiga-ui/experimental';
 import {EnrichmentService} from '../../services/enrichment.service';
 import {BreakpointObserver, Breakpoints} from '@angular/cdk/layout';
+import {BreakpointService} from '../../services/breakpoints.service';
 
 const postfix = ' €';
 const numberOptions = maskitoNumberOptionsGenerator({
@@ -109,10 +110,14 @@ export class HistoricPlaceDetailComponent implements OnInit{
   lineWidths = [90, 70, 95, 60, 85, 80, 60, 75, 85, 80];
   isMobile = false;
 
+  customBreakpointLevel: CustomBreakpointLevel = null;
+
+
   summary: string = '';
   enrichedContent: string = '';
   enrichmentStarted = false;
   enrichmentLoading = false;
+  tonesItemCount = 3;
 
 
   constructor(private userService: UserService,
@@ -120,7 +125,8 @@ export class HistoricPlaceDetailComponent implements OnInit{
               private router: Router,
               readonly EnrichmentService: EnrichmentService,
               readonly cdr: ChangeDetectorRef,
-              readonly breakpointObserver: BreakpointObserver) {
+              readonly breakpointObserver: BreakpointObserver,
+              private breakpoint: BreakpointService,) {
     effect(() => {
       this.pricesService.getPricesByLocation(this.locationId());
       this.cdr.markForCheck();
@@ -141,12 +147,12 @@ export class HistoricPlaceDetailComponent implements OnInit{
   ];
 
   ngOnInit() {
-    this.breakpointObserver
-      .observe([Breakpoints.Handset])
-      .subscribe(result => {
-        this.isMobile = result.matches;
-      });
+    this.breakpoint.level$.subscribe(() => {
+      this.tonesItemCount = this.breakpoint.tonesItemCount;
+      this.cdr.detectChanges();
+    });
   }
+
 
   protected dialogLabel = '';
   protected options: Partial<TuiResponsiveDialogOptions> = {};
@@ -390,6 +396,19 @@ export class HistoricPlaceDetailComponent implements OnInit{
     return Math.ceil(this.selectedPlace?.relatedEvents?.length / this.itemsCount);
   }
 }
+
+
+type CustomBreakpointLevel =
+  | 'mobile'          // 360–767px
+  | 'tablet'          // 768–1023px
+  | 'desktop'         // 1024–1279px
+  | '1280-1499'
+  | '1500-1899'
+  | '1900-2559'
+  | '2560+'
+  | 'unknown'
+  | null;
+
 
 class PriceDTO implements Price {
   priceId: number | null | undefined;
