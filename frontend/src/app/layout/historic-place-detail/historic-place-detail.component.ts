@@ -18,7 +18,7 @@ import {
   TuiDialog, TuiFallbackSrcPipe,
   TuiHint,
   TuiIcon,
-  TuiLabel, TuiLink,
+  TuiLabel,
   TuiScrollbar, TuiSurface,
   TuiTextfieldComponent, TuiTextfieldDirective, TuiTextfieldOptionsDirective, TuiTitle
 } from '@taiga-ui/core';
@@ -37,7 +37,7 @@ import {
   maskitoNumberOptionsGenerator,
   maskitoRemoveOnBlurPlugin
 } from '@maskito/kit';
-import {TuiAutoFocus, TuiItem, TuiPlatform} from '@taiga-ui/cdk';
+import {TuiAutoFocus, TuiItem} from '@taiga-ui/cdk';
 import {TuiInputModule, TuiTextfieldControllerModule} from '@taiga-ui/legacy';
 import {TuiAvatar, TuiCarouselComponent, TuiChevron, TuiPagination, TuiTooltip} from '@taiga-ui/kit';
 import {MaskitoDirective} from '@maskito/angular';
@@ -82,12 +82,10 @@ const numberOptions = maskitoNumberOptionsGenerator({
     TuiCard,
     TuiHeader,
     TuiTitle,
-    TuiLink,
     TuiChevron,
     TuiExpand,
     TuiSurface,
     TuiCarouselComponent,
-    TuiPlatform,
     TuiItem,
     TuiAvatar,
     TuiFallbackSrcPipe,
@@ -254,9 +252,11 @@ export class HistoricPlaceDetailComponent implements OnInit{
 
   closeDetail():void{
     console.log(this.selectedPlace)
-    this._selectedPlace.userHistoryEntry.setCloseDt(new Date());
+    let userId = localStorage.getItem("user_uuid");
+    if(userId !== null) {
+      this._selectedPlace.userHistoryEntry.setCloseDt(new Date());
 
-    this.userHistoriesService.updateUserHistory(this._selectedPlace.userHistoryEntry).subscribe({
+      this.userHistoriesService.updateUserHistory(this._selectedPlace.userHistoryEntry).subscribe({
         next: (results) => {
           console.log('User history entry updated successfully', results);
           /*this.alerts
@@ -266,7 +266,8 @@ export class HistoricPlaceDetailComponent implements OnInit{
         error: (err) => {
           console.error('Error updating user history entry:', err);
         }
-    });
+      });
+    }
 
     this.onCloseEvent.emit();
     this.summary = '';

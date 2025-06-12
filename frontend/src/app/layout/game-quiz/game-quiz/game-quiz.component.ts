@@ -1,8 +1,14 @@
-import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
-import {TuiAppearance, TuiButton, TuiScrollbar, TuiTitle} from '@taiga-ui/core';
-import {TuiBadge} from '@taiga-ui/kit';
+import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
+import {
+  TuiButton, TuiDataList,
+  TuiDropdown,
+  TuiHint, TuiSizeL, TuiSizeS,
+  TuiSurface,
+  TuiTitle
+} from '@taiga-ui/core';
+import {TuiAvatar, TuiDataListDropdownManager} from '@taiga-ui/kit';
 import {TuiCardLarge, TuiHeader} from '@taiga-ui/layout';
-import {NgForOf} from '@angular/common';
+import {NgForOf, NgIf} from '@angular/common';
 import {QuizService} from '../../../services/quiz.service';
 import {UUID} from 'node:crypto';
 
@@ -10,70 +16,59 @@ import {UUID} from 'node:crypto';
   selector: 'app-game-quiz',
   imports: [
     TuiTitle,
-    TuiScrollbar,
-    TuiBadge,
     TuiButton,
-    TuiAppearance,
     TuiHeader,
     TuiCardLarge,
-    NgForOf
+    NgForOf,
+    TuiSurface,
+    TuiAvatar,
+    TuiHint,
+    NgIf,
+    TuiDropdown,
+    TuiDataList,
+    TuiDataListDropdownManager
   ],
   templateUrl: './game-quiz.component.html',
   styleUrl: './game-quiz.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class GameQuizComponent {
+export class GameQuizComponent implements OnInit {
 
   private readonly quizService = inject(QuizService);
+  protected size: TuiSizeL | TuiSizeS = 's';
+  protected open = false;
   creatorId: UUID = '' as UUID;
   users: UUID[] = [];
   newQuiz = this.quizService.newQuiz;
+  quizzes = this.quizService.quizzes;
+  chosenCategory = '';
 
-  generateNewQuiz(): void {
-    let category = 'Tour';
+  protected dropdownOpen = false;
+
+  ngOnInit(): void {
     this.retrieveUserID();
-    this.users.push(this.creatorId);
-    this.quizService.generateNewQuiz(category, this.users);
+    this.quizService.getQuizzesByUserId(this.creatorId);
+    console.log(this.quizzes());
   }
 
-  protected readonly userQuizzes = [
-    {
-      header: 'Quiz 1',
-      description: 'on tours'
-    },
-    {
-      header: 'Quiz 2',
-      description: 'on interests'
-    },
-    {
-      header: 'Quiz 3',
-      description: 'on tours'
-    },
-    {
-      header: 'Quiz 4',
-      description: 'on random'
-    },
-    {
-      header: 'Quiz 5',
-      description: 'on random'
-    },
-    {
-      header: 'Quiz 6',
-      description: 'on random'
-    },
-    {
-      header: 'Quiz 7',
-      description: 'on random'
-    },
-  ];
-
-  protected readonly sharedQuizzes = this.userQuizzes;
+  generateQuiz(category: string) {
+    this.open = false;
+    this.chosenCategory = category;
+    this.retrieveUserID();
+    this.users.push(this.creatorId);
+    this.quizService.generateNewQuiz(this.chosenCategory, this.users);
+  }
 
   retrieveUserID() {
     const stored = localStorage.getItem("user_uuid") as UUID;
     if (stored) {
       this.creatorId = stored;
     }
+    // todo retrieve user name
+  }
+
+  playQuiz(index: number): void {
+    console.log(index);
   }
 
 }
