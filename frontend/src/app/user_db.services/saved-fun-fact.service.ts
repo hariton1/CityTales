@@ -80,7 +80,7 @@ export class SavedFunFactService {
       body: deletedFunFactToSend
     };
 
-    return this.httpClient.delete(this.DOMAIN + 'delete', options);
+    return this.httpClient.delete(this.DOMAIN + '/delete', options);
   }
 
 }
