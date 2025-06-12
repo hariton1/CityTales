@@ -12,7 +12,6 @@ import {debounceTime, filter, Observable, switchMap} from 'rxjs';
 import {SearchService} from '../../services/search.service';
 import {UserService} from '../../services/user.service';
 import {NotificationInboxComponent} from '../../core/notification-inbox/notification-inbox.component';
-import {BreakpointObserver, Breakpoints} from '@angular/cdk/layout';
 import {PersonEntity} from '../../dto/db_entity/PersonEntity';
 import {EventEntity} from '../../dto/db_entity/EventEntity';
 import {HistoricEventDetailComponent} from '../historic-event-detail/historic-event-detail.component';
@@ -41,7 +40,7 @@ import {BreakpointService} from '../../services/breakpoints.service';
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.less'
 })
-export class SidebarComponent implements OnInit{
+export class SidebarComponent {
 
   @Input() selectedPlace: BuildingEntity | null = null;
   @Input() selectedPerson: PersonEntity | null = null;
@@ -58,10 +57,6 @@ export class SidebarComponent implements OnInit{
   constructor(readonly EnrichmentService: EnrichmentService, readonly searchService: SearchService,
               private userService: UserService,
               readonly breakpointService: BreakpointService,) {
-  }
-
-  ngOnInit() {
-
   }
 
   get isMobile(): boolean {

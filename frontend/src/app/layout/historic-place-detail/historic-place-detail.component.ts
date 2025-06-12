@@ -48,7 +48,6 @@ import {UserDto} from '../../user_db.dto/user.dto';
 import {TuiCard, TuiHeader} from '@taiga-ui/layout';
 import {TuiExpand} from '@taiga-ui/experimental';
 import {EnrichmentService} from '../../services/enrichment.service';
-import {BreakpointObserver, Breakpoints} from '@angular/cdk/layout';
 import {BreakpointService} from '../../services/breakpoints.service';
 
 const postfix = ' €';
@@ -125,8 +124,7 @@ export class HistoricPlaceDetailComponent implements OnInit{
               private router: Router,
               readonly EnrichmentService: EnrichmentService,
               readonly cdr: ChangeDetectorRef,
-              readonly breakpointObserver: BreakpointObserver,
-              private breakpoint: BreakpointService,) {
+              private breakpointService: BreakpointService,) {
     effect(() => {
       this.pricesService.getPricesByLocation(this.locationId());
       this.cdr.markForCheck();
@@ -147,8 +145,8 @@ export class HistoricPlaceDetailComponent implements OnInit{
   ];
 
   ngOnInit() {
-    this.breakpoint.level$.subscribe(() => {
-      this.tonesItemCount = this.breakpoint.tonesItemCount;
+    this.breakpointService.level$.subscribe(() => {
+      this.tonesItemCount = this.breakpointService.tonesItemCount;
       this.cdr.detectChanges();
     });
   }
