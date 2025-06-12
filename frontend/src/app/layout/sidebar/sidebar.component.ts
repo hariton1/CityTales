@@ -17,6 +17,7 @@ import {PersonEntity} from '../../dto/db_entity/PersonEntity';
 import {EventEntity} from '../../dto/db_entity/EventEntity';
 import {HistoricEventDetailComponent} from '../historic-event-detail/historic-event-detail.component';
 import {HistoricPersonDetailComponent} from '../historic-person-detail/historic-person-detail.component';
+import {BreakpointService} from '../../services/breakpoints.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -53,24 +54,18 @@ export class SidebarComponent implements OnInit{
   enrichedContent: string = '';
   enrichmentStarted = false;
   enrichmentLoading = false;
-  isMobile = false;
 
   constructor(readonly EnrichmentService: EnrichmentService, readonly searchService: SearchService,
               private userService: UserService,
-              readonly breakpointObserver: BreakpointObserver) {
+              readonly breakpointService: BreakpointService,) {
   }
 
   ngOnInit() {
-    this.breakpointObserver
-      .observe([
-        Breakpoints.HandsetPortrait,
-        Breakpoints.HandsetLandscape,
-        Breakpoints.TabletPortrait,
-        Breakpoints.TabletLandscape
-      ])
-      .subscribe(result => {
-        this.isMobile = result.matches;
-      });
+
+  }
+
+  get isMobile(): boolean {
+    return ['mobile', 'tablet'].includes(this.breakpointService.currentLevel ?? '');
   }
 
   setSelectedPlace(place: any) {
