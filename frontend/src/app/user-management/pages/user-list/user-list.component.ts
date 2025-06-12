@@ -73,6 +73,7 @@ export class UserListComponent implements OnInit {
     const id = user.id;
     const email = user.email;
     this.confirmDelete(id,email);
+    window.location.reload();
   }
 
   protected confirmDelete(userId: string,email: string): void {

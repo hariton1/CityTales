@@ -23,9 +23,9 @@ public class QuizController {
         this.service = service;
     }
 
-    @GetMapping("/quiz/user")
+    @GetMapping("/quiz/user={userId}")
     @ResponseStatus(HttpStatus.OK)
-    public List<QuizDTO> getQuizzesForUser(@RequestBody UUID user) {
+    public List<QuizDTO> getQuizzesForUser(@PathVariable UUID user) {
         try {
             return service.getQuizzesForUser(user);
         } catch (Exception e) {
