@@ -127,6 +127,45 @@ public class QuizService {
         //todo call build creation criteria based on users and category (tours, interests, fun facts ect.)
         UUID creator = users.getFirst();
 
+
+
+
+
+
+        // todo temp
+        QuizDTO result = new QuizDTO();
+        QuestionDTO tempQuestion = new QuestionDTO();
+        tempQuestion.setId(1);
+        tempQuestion.setQuiz(1);
+        tempQuestion.setQuestion("In welchem Jahr wurde die Franziskanerkirche in Wien geweiht?");
+        tempQuestion.setAnswer("1611");
+        tempQuestion.setWrongAnswerA("1529");
+        tempQuestion.setWrongAnswerB("1603");
+        tempQuestion.setWrongAnswerC("1451");
+        tempQuestion.setImage("https://www.geschichtewiki.wien.gv.at/images/c/cf/Palmenhaus_Burggarten.jpg");
+        tempQuestion.setCreatedAt(LocalDateTime.now());
+
+        result.setId(1);
+        result.setName("Franziskanerkirche");
+        result.setDescription("Basierend auf deinem letzten Besuch");
+        result.setCreator(creator);
+        result.setCategory("Tour");
+        result.setQuestions(List.of(tempQuestion, tempQuestion, tempQuestion));
+        result.setCreatedAt(LocalDateTime.now());
+
+        if(category != null) {
+            return result;
+        }
+
+
+
+
+
+
+
+
+
+
         List<Pair<String, String>> contentData = fetchGenerationDataByCategoryForUser(creator, category);
 
         List<QuizResponse> responses = new ArrayList<>();
@@ -138,7 +177,7 @@ public class QuizService {
         List<String> imageData = getColumn(contentData, false);
         enrichResponseWithImageData(responses, imageData);
 
-        QuizDTO result = new QuizDTO();
+        //QuizDTO result = new QuizDTO();
 
         result.setId(100);
         result.setName("persisted Quiz");
