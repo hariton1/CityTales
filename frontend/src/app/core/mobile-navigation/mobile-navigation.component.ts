@@ -58,6 +58,10 @@ export class MobileNavigationComponent {
     });
   }
 
+  get showNotificationBadge(): boolean {
+    return this.router.url !== '/explore';
+  }
+
   private checkSession(): void {
     supabase.auth.getSession().then(({ data: { session } }) => {
       this.ngZone.run(() => {
