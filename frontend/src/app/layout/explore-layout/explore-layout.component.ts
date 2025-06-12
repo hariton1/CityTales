@@ -9,6 +9,7 @@ import {TuiButton, TuiIcon} from '@taiga-ui/core';
 import {NotificationInboxComponent} from '../../core/notification-inbox/notification-inbox.component';
 import {PersonEntity} from '../../dto/db_entity/PersonEntity';
 import {EventEntity} from '../../dto/db_entity/EventEntity';
+import {BreakpointService} from '../../services/breakpoints.service';
 
 @Component({
   selector: 'app-explore-layout',
@@ -27,7 +28,6 @@ import {EventEntity} from '../../dto/db_entity/EventEntity';
 export class ExploreLayoutComponent implements OnInit {
 
   currentViewMobile: 'discover' | 'map' = 'discover';
-  isMobile = false;
 
   selectedPlace: BuildingEntity | null = null;
   selectedPerson: PersonEntity | null = null;
@@ -37,20 +37,15 @@ export class ExploreLayoutComponent implements OnInit {
   setDetailedView: boolean = false;
 
   constructor(
-    readonly breakpointObserver: BreakpointObserver
+    readonly breakpointService: BreakpointService
   ) {}
 
   ngOnInit() {
-    this.breakpointObserver
-      .observe([
-        Breakpoints.HandsetPortrait,
-        Breakpoints.HandsetLandscape,
-        Breakpoints.TabletPortrait,
-      ])
-      .subscribe(result => {
-        this.isMobile = result.matches;
-        this.currentViewMobile = 'discover';
-      });
+
+  }
+
+  get isMobile(): boolean {
+    return ['mobile', 'tablet'].includes(this.breakpointService.currentLevel ?? '');
   }
 
   searchOpen = false;
