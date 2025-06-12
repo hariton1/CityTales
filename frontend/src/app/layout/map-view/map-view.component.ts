@@ -252,10 +252,27 @@ export class MapViewComponent implements OnInit{
 
   @ViewChild('relatedContentToLocation', { static: false }) relatedContentToLocationRef!: ElementRef;
 
+  private activeMarker: google.maps.Marker | null = null;
+
   detailAction(marker: google.maps.Marker, location: BuildingEntity): void {
     if (!this.nativeInfoWindow) {
       this.nativeInfoWindow = new google.maps.InfoWindow();
     }
+
+    // Reset the previous active marker (if any)
+    if (this.activeMarker && this.activeMarker !== marker) {
+      this.activeMarker.setIcon(this.getIconForBuildingType(location.buildingType)); // or a default icon
+    }
+
+    // Set the new icon for the active marker
+    marker.setIcon({
+      url: 'assets/icons/town-hall-active.svg',
+      scaledSize: new google.maps.Size(28, 28),
+      anchor: new google.maps.Point(12, 12),
+      labelOrigin: new google.maps.Point(12, 30),
+    });
+
+    this.activeMarker = marker; // store the new active marker
 
     location = this.userService.enterHistoricNode(location);
     this.combinedLocations = this.getCombinedItems(location);
@@ -276,6 +293,15 @@ export class MapViewComponent implements OnInit{
     this.relatedContentToLocationRef.nativeElement.style.display = 'none';
     this.hoveredLocation = null;
     this.polylines = [];
+    if (this.activeMarker) {
+      this.activeMarker.setIcon({
+        url: 'assets/icons/town-hall-11.svg',
+        scaledSize: new google.maps.Size(28, 28),
+        anchor: new google.maps.Point(12, 12),
+        labelOrigin: new google.maps.Point(12, 30),
+      });
+      this.activeMarker = null;
+    }
   }
 
   //hide the info window when clicking outside it
