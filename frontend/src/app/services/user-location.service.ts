@@ -8,6 +8,9 @@ import { BehaviorSubject } from 'rxjs';
 })
 export class UserLocationService {
 
+  private _nrOfHistoricalPlaces = new BehaviorSubject<number>(0);
+  readonly nrOfHistoricalPlaces$ = this._nrOfHistoricalPlaces.asObservable();
+
   constructor(readonly locationService: LocationService) { }
 
   getPosition(): Promise<any>
@@ -53,6 +56,7 @@ export class UserLocationService {
             .getLocationsInRadius(position.coords.latitude, position.coords.longitude, radius, true)
             .subscribe(historicalPlaces => {
               console.log(historicalPlaces.length);
+              this._nrOfHistoricalPlaces.next(historicalPlaces.length);
               this.historicalPlacesSubject.next(historicalPlaces);
             })
         }
@@ -97,6 +101,9 @@ export class UserLocationService {
     return deg * (Math.PI/180);
   }
 
+  get nrOfHistoricalPlaces(): number {
+    return this._nrOfHistoricalPlaces.value;
+  }
 
   //Stop tracking the user's location
   stopTracking(): void {
