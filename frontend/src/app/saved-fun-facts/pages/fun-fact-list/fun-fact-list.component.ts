@@ -39,7 +39,7 @@ export class FunFactListComponent {
   }
 
   ngOnInit(): void {
-    let user_id = localStorage.getItem('user_id');
+    let user_id = localStorage.getItem('user_uuid');
 
     if(user_id !== null) {
       this.savedFunFactService.getFunFactsByUserId(user_id as UUID).subscribe({
@@ -91,7 +91,7 @@ export class FunFactListComponent {
       savedFunFact.score,
       savedFunFact.reason,
       savedFunFact.saved_at
-    ));
+    )).subscribe();
   };
 
 }
