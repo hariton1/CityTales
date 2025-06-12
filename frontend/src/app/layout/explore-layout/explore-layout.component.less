@@ -2,21 +2,41 @@
 
 :host {
   display: flex;
-  height: calc(100vh - 48px);  /* full viewport minus header */
+  height: calc(100vh - 59.65px);  /* full viewport minus header */
   overflow: hidden;
 }
 
 @media @tui-mobile-interval {
+  :host {
+    display: flex;
+    height: calc(100vh - 56px);  /* full viewport minus header */
+    overflow: hidden;
+  }
+
   app-sidebar {
     width: 100%;
     background-color: #f0f0f0;
   }
+
+  .back-button{
+    margin-top: 6rem;
+  }
 }
 
 @media @tui-tablet-interval {
+  :host {
+    display: flex;
+    height: calc(100vh - 56px);  /* full viewport minus header */
+    overflow: hidden;
+  }
+
   app-sidebar {
     width: 50%;
     background-color: #f0f0f0;
+  }
+
+  .back-button{
+    margin-top: 6rem;
   }
 }
 
