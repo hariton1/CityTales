@@ -7,7 +7,7 @@
     <button
       tuiTabBarItem
       type="button"
-      [badge]="notificationNumber"
+      [badge]="showNotificationBadge ? notificationNumber : null"
       [icon]="'@tui.earth'"
       routerLink="/explore"
     >
