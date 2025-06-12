@@ -114,6 +114,7 @@ export class FeedbackListComponent {
         this.alerts
           .open('Feedback has been deleted', {label: 'Success!', appearance: 'success', autoClose: 3000})
           .subscribe();
+        window.location.reload();
       },
       error: (err) => {
         console.error('no works', err);
