@@ -3,7 +3,6 @@ import {SidebarComponent} from '../sidebar/sidebar.component';
 import {MapViewComponent} from '../map-view/map-view.component';
 import {BuildingEntity} from '../../dto/db_entity/BuildingEntity';
 import {TuiSegmented} from '@taiga-ui/kit';
-import {BreakpointObserver, Breakpoints} from '@angular/cdk/layout';
 import {NgIf} from '@angular/common';
 import {TuiButton, TuiIcon} from '@taiga-ui/core';
 import {NotificationInboxComponent} from '../../core/notification-inbox/notification-inbox.component';
@@ -25,7 +24,7 @@ import {BreakpointService} from '../../services/breakpoints.service';
   templateUrl: './explore-layout.component.html',
   styleUrl: './explore-layout.component.less'
 })
-export class ExploreLayoutComponent implements OnInit {
+export class ExploreLayoutComponent {
 
   currentViewMobile: 'discover' | 'map' = 'discover';
 
@@ -39,10 +38,6 @@ export class ExploreLayoutComponent implements OnInit {
   constructor(
     readonly breakpointService: BreakpointService
   ) {}
-
-  ngOnInit() {
-
-  }
 
   get isMobile(): boolean {
     return ['mobile', 'tablet'].includes(this.breakpointService.currentLevel ?? '');
