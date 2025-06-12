@@ -46,7 +46,6 @@ export class ExploreLayoutComponent implements OnInit {
         Breakpoints.HandsetPortrait,
         Breakpoints.HandsetLandscape,
         Breakpoints.TabletPortrait,
-        Breakpoints.TabletLandscape
       ])
       .subscribe(result => {
         this.isMobile = result.matches;
