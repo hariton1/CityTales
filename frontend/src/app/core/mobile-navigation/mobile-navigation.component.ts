@@ -14,6 +14,7 @@ import {SearchService} from '../../services/search.service';
 import {Router, RouterLink} from '@angular/router';
 import {supabase} from '../../user-management/supabase.service';
 import {TuiDataListDropdownManager} from '@taiga-ui/kit';
+import {UserLocationService} from '../../services/user-location.service';
 
 @Component({
   selector: 'app-mobile-navigation',
@@ -38,16 +39,23 @@ export class MobileNavigationComponent {
 
   loggedIn: boolean = false;
   protected open: boolean = false;
+  protected notificationNumber = 0;
 
   constructor(
     private router: Router,
     private cdr: ChangeDetectorRef,
-    protected ngZone: NgZone
+    protected ngZone: NgZone,
+    readonly userLocationService: UserLocationService
   ) {}
 
   ngOnInit(): void {
     this.checkSession();
     this.listenToAuthChanges();
+    this.userLocationService.nrOfHistoricalPlaces$.subscribe(count => {
+      console.log("Notification received count:", count);
+      this.notificationNumber = count;
+      this.cdr.markForCheck();
+    });
   }
 
   private checkSession(): void {
