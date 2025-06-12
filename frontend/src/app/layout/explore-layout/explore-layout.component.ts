@@ -56,8 +56,9 @@ export class ExploreLayoutComponent implements OnInit {
 
   searchOpen = false;
 
-  toggleSearch() {
-    this.searchOpen = !this.searchOpen;
+  toggleSearch(event: MouseEvent) {
+    event.stopPropagation();
+    this.searchOpen = true;
   }
 
   setSelectedPlace(place: BuildingEntity) {
