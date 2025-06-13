@@ -3,9 +3,9 @@ export interface Question {
   quiz: number;
   question: string;
   answer: string;
-  wrongAnswerA: string;
-  wrongAnswerB: string;
-  wrongAnswerC: string;
+  wrong_answer_a: string;
+  wrong_answer_b: string;
+  wrong_answer_c: string;
   image: string;
   createdAt: Date;
 }

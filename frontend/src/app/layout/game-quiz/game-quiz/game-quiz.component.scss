@@ -54,7 +54,6 @@ h1 {
 .quiz-bottom-row {
   display: flex;
   justify-content: space-between;
-  height: 5rem;
 }
 
 .single-quiz {
@@ -64,8 +63,6 @@ h1 {
 .question-image img {
   display: flex;
   justify-content: center;
-  width: 300px;
-  height: auto;
   margin-bottom: 1.5rem;
 }
 
@@ -86,13 +83,24 @@ h1 {
   margin-bottom: 2rem;
 }
 
-.answer-card {
-
-}
-
 [tuiProgressBar]._segmented {
   --tui-segment-gap: 0.25rem;
   border-radius: 0;
   mask-image: linear-gradient(to left, transparent 0 var(--tui-segment-gap), #999 var(--tui-segment-gap) 100%);
-  margin: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.image{
+  width: 100px;
+  height: auto;
+}
+
+.next-button-style {
+  width: 10rem;
+}
+
+.single-quiz-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
 }

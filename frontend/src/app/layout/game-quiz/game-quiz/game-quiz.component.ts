@@ -1,5 +1,6 @@
-import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, inject, OnInit, signal} from '@angular/core';
 import {
+  TuiAlertService,
   TuiButton, TuiDataList, TuiDialog,
   TuiDropdown,
   TuiHint, TuiSizeL, TuiSizeS,
@@ -8,11 +9,12 @@ import {
 } from '@taiga-ui/core';
 import {TuiAvatar, TuiDataListDropdownManager, TuiProgress} from '@taiga-ui/kit';
 import {TuiCardLarge, TuiHeader} from '@taiga-ui/layout';
-import {NgForOf, NgIf, NgOptimizedImage} from '@angular/common';
+import {NgForOf, NgIf} from '@angular/common';
 import {QuizService} from '../../../services/quiz.service';
 import {UUID} from 'node:crypto';
 import {TuiResponsiveDialogOptions} from '@taiga-ui/addon-mobile';
 import {Quiz} from '../../../dto/quiz.dto';
+import {UserService} from '../../../services/user.service';
 
 @Component({
   selector: 'app-game-quiz',
@@ -31,7 +33,6 @@ import {Quiz} from '../../../dto/quiz.dto';
     TuiDataListDropdownManager,
     TuiDialog,
     TuiProgress,
-    NgOptimizedImage,
   ],
   templateUrl: './game-quiz.component.html',
   styleUrl: './game-quiz.component.scss',
@@ -40,6 +41,8 @@ import {Quiz} from '../../../dto/quiz.dto';
 export class GameQuizComponent implements OnInit {
 
   private readonly quizService = inject(QuizService);
+  private readonly userService = inject(UserService);
+  private readonly alerts = inject(TuiAlertService);
   protected options: Partial<TuiResponsiveDialogOptions> = {};
   protected openQuizPlay = false;
   protected value = '';
@@ -49,18 +52,33 @@ export class GameQuizComponent implements OnInit {
   users: UUID[] = [];
   quizzes = this.quizService.quizzes;
   chosenCategory = '';
+  userName = '';
   playingQuiz: Quiz | undefined;
-  answers: string[] = [];
-  image: string = '';
+  numberOfQuestions = 0;
+  currentQuizIndex = 0;
+  currentQuestionIndex = 0;
+  correctAnswer = '';
+  score = 0;
+  toggleScoreEditable = false;
 
+  currentQuestionSignal = signal<string>('');
+  currentAnswer1Signal = signal<string>('');
+  currentAnswer2Signal = signal<string>('');
+  currentAnswer3Signal = signal<string>('');
+  currentAnswer4Signal = signal<string>('');
+  currentImageSignal = signal<string>('');
+  currentQuestion = computed(() => this.currentQuestionSignal());
+  currentAnswer1 = computed(() => this.currentAnswer1Signal());
+  currentAnswer2 = computed(() => this.currentAnswer2Signal());
+  currentAnswer3 = computed(() => this.currentAnswer3Signal());
+  currentAnswer4 = computed(() => this.currentAnswer4Signal());
+  currentImage = computed(() => this.currentImageSignal());
 
   protected dropdownOpen = false;
 
   ngOnInit(): void {
     this.retrieveUserID();
-    console.log('load quizzes for ', this.creatorId)
     this.quizService.getQuizzesByUserId(this.creatorId);
-    console.log('LOAD QUIZZES ON INIT', this.quizzes());
   }
 
   generateQuiz(category: string) {
@@ -76,26 +94,75 @@ export class GameQuizComponent implements OnInit {
     if (stored) {
       this.creatorId = stored;
     }
-    // todo retrieve user name
+    this.userService.getUserWithRoleById(this.creatorId).subscribe((user) => {
+      this.userName = user.email.substring(0, user.email.indexOf('@'));
+    });
   }
 
   playQuiz(index: number): void {
+    this.score = 0;
+    this.currentQuestionIndex = 0;
+    this.currentQuizIndex = index;
     this.playingQuiz = this.quizzes()[index];
+    this.numberOfQuestions = this.quizzes()[this.currentQuizIndex].questions.length;
     console.log(this.playingQuiz);
     this.options = {
       label: this.playingQuiz.name,
       size: 'l',
     };
 
-    let question = this.playingQuiz.questions.at(0);
-
-    this.answers.push(question!.answer);
-    this.answers.push(question!.wrongAnswerA);
-    this.answers.push(question!.wrongAnswerB);
-    this.answers.push(question!.wrongAnswerC);
-    this.image = question!.image;
+    this.loadNextQuestion()
 
     this.openQuizPlay = true;
   }
 
+  loadNextQuestion(): void {
+    this.toggleScoreEditable = true;
+    if (this.currentQuestionIndex < this.numberOfQuestions) {
+      this.currentQuestionIndex++;
+    } else {
+      this.openQuizPlay = false;
+      this.alerts.open(`Good job!`, {
+        label: `Final score: ${this.score}`,
+        appearance: 'primary',
+        autoClose: 5000
+      }).subscribe()
+      // todo persist score
+    }
+
+    let question = this.quizzes()[this.currentQuizIndex].questions[this.currentQuestionIndex];
+    this.correctAnswer = question.answer;
+
+    //todo mix which gets assigned where
+    this.currentQuestionSignal.set(question.question);
+    const shuffledAnswers = [question.answer, question.wrong_answer_a, question.wrong_answer_b, question.wrong_answer_c]
+      .sort(() => Math.random() - 0.5);
+
+    [this.currentAnswer1Signal, this.currentAnswer2Signal, this.currentAnswer3Signal, this.currentAnswer4Signal]
+      .forEach((signal, index) => signal.set(shuffledAnswers[index]));
+    this.currentImageSignal.set(question.image);
+
+    this.openQuizPlay = true;
+  }
+
+  check(answer: string) {
+    if (answer === this.correctAnswer) {
+      if (this.toggleScoreEditable) {
+        this.score++;
+        this.toggleScoreEditable = false;
+      }
+      this.alerts.open('Good Job!', {
+        label: 'Correct!',
+        appearance: 'positive',
+        autoClose: 1000
+      }).subscribe()
+    } else {
+      this.toggleScoreEditable = false;
+      this.alerts.open('Too bad!', {
+        label: 'Wrong!',
+        appearance: 'negative',
+        autoClose: 1000
+      }).subscribe()
+    }
+  }
 }
