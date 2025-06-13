@@ -10,6 +10,7 @@
       <!-- <a routerLinkActive href="#">For Educators</a> -->
       <a *ngIf="loggedIn" routerLink="/scoreboard">Scoreboard</a>
       <a *ngIf="loggedIn" routerLinkActive href="/friends">Friends</a>
+      <a *ngIf="loggedIn" routerLinkActive href="/quizzes">Quizzes</a>
       <a routerLinkActive href="/about-us">About us</a>
       <!-- <a routerLink="/onboarding" >Onboarding</a> -->
     </tui-segmented>
@@ -41,15 +42,24 @@
     </button>
     <ng-template #content>
       <tui-data-list tuiDataListDropdownManager [size]="size" >
-        <button tuiOption appearance="secondary" size="s" type="button" routerLink="admin-dashboard">
+        <div
+          *ngFor="let platform of platforms; let first = first"
+          class="wrapper"
+          [class.wrapper_web]="platform === 'web'"
+          [tuiPlatform]="platform"
+        >
+          Use interests?
+          <input tuiSwitch type="checkbox" [(ngModel)]="isChecked" [showIcons]="first" [size]="getSize(first)" (click)="handleToggle()"/>
+        </div>
+        <button tuiOption appearance="secondary" type="button" routerLink="admin-dashboard">
           <tui-icon icon="@tui.users" [style.height.rem]="1"/>
           Dashboard
         </button>
-        <button tuiOption appearance="secondary" size="s" type="button" routerLink="profile">
+        <button tuiOption appearance="secondary" type="button" routerLink="profile">
           <tui-icon icon="@tui.user" [style.height.rem]="1"/>
           Profile
         </button>
-        <button tuiOption appearance="secondary" size="s" type="button" (click)="logout()">
+        <button tuiOption appearance="secondary" type="button" (click)="logout()">
           <tui-icon icon="@tui.log-out" [style.height.rem]="1"/>
           Logout
         </button>
