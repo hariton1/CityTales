@@ -154,9 +154,10 @@ public class QuizService {
         result.setQuestions(mapQuestionResponsesToQuestionDTOList(responses, result.getId()));
 
         List<QuestionEntity> questionEntities = questionRepository.saveAll(mapToQuestionEntityList(result.getQuestions()));
-        return mapToQuizDTO(quizEntity, questionEntities);
 
-        //todo add users to quiz via quiz_user table
+        addUsersToQuiz(users, result.getId());
+
+        return mapToQuizDTO(quizEntity, questionEntities);
     }
 
     private QuizDTO mapToQuizDTO(QuizEntity quiz, List<QuestionEntity> questions) {
@@ -373,6 +374,16 @@ public class QuizService {
         for (int i = 0; i < responses.size(); i++) {
             System.out.println("IMAGE: " + images.get(i));
             responses.get(i).setImage(images.get(i));
+        }
+    }
+
+    private void addUsersToQuiz(List<UUID> users, int quiz) {
+        for (UUID user : users) {
+            QuizUserEntity quizUserEntity = new QuizUserEntity();
+            quizUserEntity.setQuiz(quiz);
+            quizUserEntity.setPlayer(user);
+            quizUserEntity.setCreatedAt(LocalDateTime.now());
+            quizUserRepository.save(quizUserEntity);
         }
     }
 }

@@ -1,4 +1,3 @@
-<!-- Quiz List View -->
 <section id="quizListView" class="quiz-list-view">
   <h1>Ready for a Challenge?</h1>
 
@@ -47,7 +46,7 @@
               {{ quiz.name }}
             </h3>
             <h6>
-              {{ quiz.creator }}
+              {{ userName }}
             </h6>
           </div>
 
@@ -70,45 +69,48 @@
 
 <ng-template let-observer [tuiDialogOptions]="options" [(tuiDialog)]="openQuizPlay">
 
-  <div class="single-quiz">
-    <h2 class="question-text">
-      {{ playingQuiz?.questions }}
-    </h2>
+  <h2 class="question-text">
+    {{ currentQuestion() }}
+  </h2>
 
-    <div class="question-image">
-      <img ngSrc="{{ image }}" alt="image" fill>
+  <div class="question-image" *ngIf="currentImage().length > 0">
+    <img src="{{ currentImage() }}" alt="image" class="image">
+  </div>
+
+  <div class="answer-list">
+    <div>
+      <button tuiSurface="floating" type="button" class="offset" (click)="check(currentAnswer1())">
+        {{ currentAnswer1() }}
+      </button>
     </div>
-
-
-    <div class="answer-list">
-      <div class="answer-card">
-        <button tuiSurface="floating" type="button" class="offset">
-          {{ answers.at(0) }}
-        </button>
-      </div>
-      <div class="answer-card">
-        <button tuiSurface="floating" type="button" class="offset">
-          {{ answers.at(1) }}
-        </button>
-      </div>
-      <div class="answer-card">
-        <button tuiSurface="floating" type="button" class="offset">
-          {{ answers.at(2) }}
-        </button>
-      </div>
-      <div class="answer-card">
-        <button tuiSurface="floating" type="button" class="offset">
-          {{ answers.at(3) }}
-        </button>
-      </div>
+    <div>
+      <button tuiSurface="floating" type="button" class="offset" (click)="check(currentAnswer2())">
+        {{ currentAnswer2() }}
+      </button>
     </div>
+    <div>
+      <button tuiSurface="floating" type="button" class="offset" (click)="check(currentAnswer3())">
+        {{ currentAnswer3() }}
+      </button>
+    </div>
+    <div>
+      <button tuiSurface="floating" type="button" class="offset" (click)="check(currentAnswer4())">
+        {{ currentAnswer4() }}
+      </button>
+    </div>
+  </div>
 
+  <div class="single-quiz-footer">
     <progress
       tuiProgressBar
-      [max]="5"
-      [segments]="5"
-      [value]="3"
+      [max]="numberOfQuestions"
+      [segments]="numberOfQuestions"
+      [value]="currentQuestionIndex"
     ></progress>
+
+    <button class="next-button-style" appearance="primary" tuiButton type="button" (click)="loadNextQuestion()">
+      Next
+    </button>
   </div>
 
 </ng-template>
