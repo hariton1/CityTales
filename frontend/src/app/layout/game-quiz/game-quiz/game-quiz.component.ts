@@ -135,10 +135,11 @@ export class GameQuizComponent implements OnInit {
 
     //todo mix which gets assigned where
     this.currentQuestionSignal.set(question.question);
-    this.currentAnswer2Signal.set(question.answer);
-    this.currentAnswer1Signal.set(question.wrong_answer_a);
-    this.currentAnswer3Signal.set(question.wrong_answer_b);
-    this.currentAnswer4Signal.set(question.wrong_answer_c);
+    const shuffledAnswers = [question.answer, question.wrong_answer_a, question.wrong_answer_b, question.wrong_answer_c]
+      .sort(() => Math.random() - 0.5);
+
+    [this.currentAnswer1Signal, this.currentAnswer2Signal, this.currentAnswer3Signal, this.currentAnswer4Signal]
+      .forEach((signal, index) => signal.set(shuffledAnswers[index]));
     this.currentImageSignal.set(question.image);
 
     this.openQuizPlay = true;
