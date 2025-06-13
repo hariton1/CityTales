@@ -1,4 +1,4 @@
-import {Component, inject, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject, ViewChild, ChangeDetectorRef} from '@angular/core';
 import {Router} from '@angular/router';
 import {FormControl, ReactiveFormsModule} from '@angular/forms';
 import {TuiAlertService, TuiButton, TuiTextfield} from '@taiga-ui/core';
@@ -12,16 +12,17 @@ import {BuildingEntity} from '../../../dto/db_entity/BuildingEntity';
 import {TourDto} from '../../../dto/tour.dto';
 import {TourRequestEntity} from '../../../dto/tour_entity/TourRequestEntity';
 import {FormsModule} from '@angular/forms';
-import {TuiSlider} from '@taiga-ui/kit';
+import {TuiInputNumber, TuiSlider, TuiTabs} from '@taiga-ui/kit';
 
 
 @Component({
   selector: 'app-tour-layout-component',
   imports: [TuiButton,
-    TuiInputModule, ReactiveFormsModule, CommonModule, GoogleMap, TuiTextfield, MapPolyline, FormsModule, TuiSlider],
+    TuiInputModule, ReactiveFormsModule, CommonModule, GoogleMap, TuiTextfield, MapPolyline, FormsModule, TuiSlider, TuiTabs, TuiInputNumber],
   templateUrl: './tour-layout-component.html',
   standalone: true,
-  styleUrl: './tour-layout-component.scss'
+  styleUrl: './tour-layout-component.scss',
+  changeDetection: ChangeDetectionStrategy.Default
 })
 export class TourLayoutComponent {
 
@@ -29,31 +30,40 @@ export class TourLayoutComponent {
   private tourService: TourService;
   private router: Router;
   private userId: string | null = null;
+  private cdr: ChangeDetectorRef;
   private readonly alerts = inject(TuiAlertService);
 
-  constructor(locationService: LocationService, tourService: TourService, router: Router) {
+  constructor(locationService: LocationService, tourService: TourService, router: Router, cdr: ChangeDetectorRef) {
     this.locationService = locationService;
     this.tourService = tourService;
     this.router = router;
-    this.getUserId().then(userId => {
-      this.userId = userId;
-      console.log('async user id ' + userId);
-      this.tourService.getToursForUserId(userId!).subscribe(tours => {
-        this.userTours = tours.map(tour => TourDto.fromTourEntity(tour))
-        console.log("User tours length: " + this.userTours.length);
-      })
-    })
+    this.cdr = cdr;
   }
 
-  async getUserId(): Promise<string | null> {
+  ngOnChanges(): void {
+    this.cdr.detectChanges();
+  }
+
+  async ngOnInit() {
+    console.log('ngOnViewInit');
     const { data } = await supabase.auth.getSession();
-    const userId = data.session?.user?.id ?? null;
-    return userId;
+    const userId = data.session?.user?.id;
+    console.log('async user id ' + userId);
+    if (userId) {
+      this.tourService.getToursForUserId(userId!).subscribe(tours => {
+        this.userTours = [...tours.map(tour => TourDto.fromTourEntity(tour))];
+        console.log("User tours length: " + this.userTours.length);
+        this.cdr.detectChanges();
+      }) // Proceed to load tours for a valid user
+    } else {
+      console.error("User ID is null or undefined");
+      // Handle the error accordingly (e.g., show an alert, redirect to login)
+    }
+
   }
 
 
-
-  userTours: TourDto[] = [];
+  userTours: TourDto[] | null = null;
 
 
   recommendedTours = [
@@ -66,6 +76,15 @@ export class TourLayoutComponent {
   tourDescription = new FormControl('');
   tourDuration: string = "0";
   tourDistance: string = "0";
+  protected noAdults: number | null = 0;
+  noChildren = 0;
+  noSeniors = 0;
+
+  selectedTab = 0;
+
+  onTabClick(tab: number) {
+    this.selectedTab = tab;
+  }
 
 
   createTour(){
@@ -106,7 +125,7 @@ export class TourLayoutComponent {
             appearance: 'warning',
             autoClose: 3000
           }).subscribe()}});
-        this.userTours.push(tour);
+        this.userTours!.push(tour);
         this.resetInterface();
       } else {
         this.alerts.open('No user logged in! Cannot create tour.', {
@@ -248,7 +267,7 @@ export class TourLayoutComponent {
 
     this.updateEstimate()
     this.updatePolylinePath();
-
+    this.cdr.detectChanges();
   }
 
   addBuildingToRoute(building: any) {
@@ -279,7 +298,7 @@ export class TourLayoutComponent {
   deleteTour(tour: TourDto): void{
     console.log(tour.getId())
     this.tourService.deleteTourById(tour.getId());
-    this.userTours = this.userTours.filter(t => t.getId() !== tour.getId());
+    this.userTours = this.userTours!.filter(t => t.getId() !== tour.getId());
     this.alerts.open('Your tour is deleted!', {label: 'Success!', appearance: 'success', autoClose: 3000}).subscribe();
   }
 
@@ -348,9 +367,9 @@ export class TourLayoutComponent {
     this.updatePolylinePath()
   }
 
-  minDistance = 1.0; // km
+  minDistance = 0; // km
   maxDistance = 10.0; // km
-  minSites = 2;
+  numberOfSites = 2;
   maxBudget = 10;
 
   generatedTours: TourDto[] = [];
@@ -376,8 +395,8 @@ export class TourLayoutComponent {
       maxDuration: 0,
       minDuration: 0,
       maxBudget: this.maxBudget,
-      numStops: this.minSites,
-      personConfiguration: [2,2,0] //multiset for adults, children, seniors
+      numStops: this.numberOfSites,
+      personConfiguration: [this.noAdults!, this.noChildren, this.noSeniors] //multiset for adults, children, seniors
     }
     this.alerts.open('Your tour is being generated...', {label: 'Success!', appearance: 'success', autoClose: 6000}).subscribe();
     this.tourService.createTour(entity).subscribe(data => {
