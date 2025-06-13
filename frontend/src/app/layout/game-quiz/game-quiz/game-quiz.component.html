@@ -19,10 +19,9 @@
   </ng-template>
 
   <div class="quiz-card-list">
-    <div *ngFor="let quiz of quizzes; index as i">
+    <div *ngFor="let quiz of quizzes(); index as i">
       <button tuiCardLarge tuiHeader tuiSurface="floating" type="button" (click)="playQuiz(i)">
         <div class="quiz-card">
-
           <div class="quiz-top-row">
             <div class="quiz-category">
               <div *ngIf="quiz.category === 'LATEST_TOUR'" tuiHint="based on your latest tour">
@@ -73,11 +72,11 @@
 
   <div class="single-quiz">
     <h2 class="question-text">
-      What famous institution is located on the Ringstrasse and known for its magnificent dome?
+      {{ playingQuiz?.questions }}
     </h2>
 
     <div class="question-image">
-      <img src="https://www.geschichtewiki.wien.gv.at/images/e/e9/Altmannsdorfer_Lichtspiele.jpg" alt="image">
+      <img ngSrc="{{ image }}" alt="image" fill>
     </div>
 
 
