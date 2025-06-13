@@ -21,6 +21,7 @@ import {TuiExpand} from '@taiga-ui/experimental';
 import {TuiItem} from '@taiga-ui/cdk';
 import {BreakpointService} from '../../services/breakpoints.service';
 import {EnrichmentService} from '../../services/enrichment.service';
+import { FunFactService, FunFactCardDTO } from '../../services/fun-fact.service';
 
 @Component({
   selector: 'app-historic-event-detail',
@@ -66,7 +67,11 @@ export class HistoricEventDetailComponent implements OnInit {
 
   public readonly collapsed = signal(true);
 
-  constructor(private router: Router,
+  funFact: FunFactCardDTO | null = null;
+  funFactSaved = false;
+
+  constructor(private funFactService: FunFactService,
+              private router: Router,
               private userService: UserService,
               readonly EnrichmentService: EnrichmentService,
               readonly cdr: ChangeDetectorRef,
@@ -92,6 +97,7 @@ export class HistoricEventDetailComponent implements OnInit {
 
   @Input()
   get selectedEvent(): any {
+    this.loadFunFact();
     return this._selectedEvent;
   }
   set selectedEvent(value: any) {
@@ -202,7 +208,27 @@ export class HistoricEventDetailComponent implements OnInit {
   get eventsPageCount(): number {
     return Math.ceil(this.selectedEvent?.relatedEvents?.length / this.itemsCount);
   }
+  loadFunFact() {
+    if (this._selectedEvent && (this._selectedEvent.id || this._selectedEvent.viennaHistoryWikiId)) {
+      const id = this._selectedEvent.id ?? this._selectedEvent.viennaHistoryWikiId;
+      this.funFactService.getEventFunFact(id).subscribe({
+        next: fact => { this.funFact = fact; },
+        error: () => { this.funFact = null; }
+      });
+    } else {
+      this.funFact = null;
+    }
+  }
+
+  saveFunFact() {
+    if (!this.funFact) return;
+    // TODO: Hier echten UserService-Aufruf einbauen!
+    this.funFactSaved = true;
+    setTimeout(() => this.funFactSaved = false, 2000);
+  }
 }
+
+
 
 type CustomBreakpointLevel =
   | 'mobile'          // 360–767px
