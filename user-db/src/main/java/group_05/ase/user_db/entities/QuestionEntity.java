@@ -22,11 +22,11 @@ public class QuestionEntity {
 
     private String answer;
 
-    private String wrongAnswerA;
+    private String wrong_answer_a;
 
-    private String wrongAnswerB;
+    private String wrong_answer_b;
 
-    private String wrongAnswerC;
+    private String wrong_answer_c;
 
     private String image;
 

@@ -1,5 +1,6 @@
 package group_05.ase.user_db.services;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import group_05.ase.user_db.entities.QuestionEntity;
 import group_05.ase.user_db.entities.QuestionResultsEntity;
 import group_05.ase.user_db.entities.QuizEntity;
@@ -9,6 +10,9 @@ import group_05.ase.user_db.repositories.QuestionResultsRepository;
 import group_05.ase.user_db.repositories.QuizRepository;
 import group_05.ase.user_db.repositories.QuizUserRepository;
 import group_05.ase.user_db.restData.*;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.data.util.Pair;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -23,15 +27,27 @@ public class QuizService {
     private final QuestionResultsRepository questionResultsRepository;
     private final QuizRepository quizRepository;
     private final QuizUserRepository quizUserRepository;
+    private final TourService tourService;
 
     private final RestTemplate restTemplate = new RestTemplate();
     private final String OPENAI_ADDRESS = "http://openai-adapter:8088/";
+    private final String ORCHESTRATOR_ADDRESS = "http://orchestrator:9098/";
 
-    public QuizService(QuestionRepository questionRepository, QuestionResultsRepository questionResultsRepository, QuizRepository quizRepository, QuizUserRepository quizUserRepository) {
+    private enum Category {
+        LATEST_TOUR,
+        SPECIFIC_TOUR,
+        INTERESTS,
+        FUN_FACTS,
+        POPULAR,
+        PARTY
+    }
+
+    public QuizService(QuestionRepository questionRepository, QuestionResultsRepository questionResultsRepository, QuizRepository quizRepository, QuizUserRepository quizUserRepository, TourService tourService) {
         this.questionRepository = questionRepository;
         this.questionResultsRepository = questionResultsRepository;
         this.quizRepository = quizRepository;
         this.quizUserRepository = quizUserRepository;
+        this.tourService = tourService;
     }
 
     public List<QuizDTO> getQuizzesForUser(UUID user) {
@@ -112,30 +128,36 @@ public class QuizService {
 
     public QuizDTO saveQuiz(String category, List<UUID> users) {
         //todo call build creation criteria based on users and category (tours, interests, fun facts ect.)
-        String prompt = "Die Staatsoper war in der Monarchie bis 1918 - wie das Burgtheater - ein Hoftheater, das vom Obersthofmeisteramt des Kaisers beaufsichtigt wurde. Das Hofärar (öffentliche Gelder in der Verwaltung des Kaiserhofes) sorgte für die Finanzierung. In der Republik wird sie als Staatstheater geführt (siehe Bundestheater), die Finanzierung obliegt der Bundesregierung.Bevor das alte Kärntnertortheater 1870 demoliert wurde, ging man an die Erbauung eines neuen Opernhauses, das (über einem Teil des ehemaligen Stadtgrabens, auf den Stadterweiterungsgründen, gelegen) von Eduard van der Nüll und August Sicard von Sicardsburg in romantisch-historisierendem Stil errichtet wurde (Wettbewerbsausschreibung am 10. Juni 1860, Entscheidung der Jury am 28. Oktober 1861, Grundsteinlegung am 20. Mai 1863, Hauptgesimsgleiche am 7. Oktober 1865, Beendigung der Innenausgestaltung im Frühjahr 1869). Nach dem Tod der beiden Architekten 1868 wurde die Hofoper von Gustav Gugitz und Josef Storck vollendet. Das Opernhaus wurde am 25. Mai 1869 mit Mozarts \"Don Giovanni\" eröffnet (Generalprobe 30. April). Bei dem durch einen Fliegerangriff am 12. März 1945 hervorgerufenen Brand wurde die Staatsoper bis auf die Hauptmauern und das große Stiegenhaus am Ring zerstört.In der offenen (heute verglasten) Loggia ober den Haupteingängen Gemälde von Moritz von Schwind, in den fünf Öffnungen allegorischen Bronzefiguren von Ernst Julius Hähnel, auf den beiden Postamenten oberhalb der Loggia je ein Pegasus vom selben Meister (zwei ursprünglich für diesen Platz hergestellte Pegasusfiguren von Vinzenz Pilz erwiesen sich als zu monumental, wurden im April 1870 wieder von ihren Piedestalen entfernt und nach Philadelphia, United States of America, verkauft). Restaurierung der Fassade am Ring ab 2004.Die sieben Statuen im Treppenhaus (Bildhauer Josef Gasser) stellen die sieben freien Künste dar (1869). An der Ausstattung der Räume beteiligten sich die damals bekanntesten Künstler Wiens, wie Carl Rahl, Moritz von Schwind, Johann Preleuthner, Franz Dobiaschofsky, Franz Schönthaler, Hanns und Josef Gasser, Eduard Bitterlich, Christian Griepenkerl, Eduard Engerth, Franz Melnitzky. Die Hochreliefs an der Hinterwand des Stiegenhauses (\"Oper\", \"Ballett\") schuf Johann Baptist Preleuthner , die darunter angebrachten Medaillonreliefs (Nüll, Sicard) Josef Cesar.1905 spendeten die Großindustriellen A. und F. Böhler zwei Kandelaber mit Bronzefiguren, die vor der Oper am Ring aufgestellt wurden. Die eine der beiden Statuen - sie stammten von Fritz Zerritsch, stellte Siegfried dar, das Schwert in der Rechten, in der Linken den Nibelungenring, zu Füßen den getöteten Fafner. Der Held hielt den Kopf horchend erhoben: Es war die Szene, wo er in Wagners Oper der Stimme des Waldvögleins lauschte. Die zweite Figur zeigte den Steinernen Gast mit dem sterbenden Don Juan zu Füßen (Mozart). Beide Figuren wurden während des Zweiten Weltkriegs entfernt, sie sollten eingeschmolzen werden. Nachforschungen über ihr Schicksal ergaben widersprüchliche Angaben: Ein Gewährsmann versichert, er habe beide Statuen 1947 bei einer Firma am Donaukanal gesehen; ihr Metall sei zu schlecht gewesen, um für militärische Zwecke eingeschmolzen zu werden. Später seien sie von dort verschwunden gewesen. Der zweite Gewährsmann behauptet, die beiden Figuren seien gar nicht während des Kriegs abmontiert worden, sondern noch Anfang 1946 vor der Oper gestanden, die russischen Besatzungssoldaten hätten ihre Telephonleitungen an ihnen befestigt, und erst in diesem Jahr seien sie dann verschwunden.Bei dem nach wenigen Jahren einsetzenden Wiederaufbau übernahm Erich Boltenstern die Neugestaltung des Zuschauerraums, der Stiegenaufgänge zwischen den Rängen, der Publikumsgarderoben und der Pausenräume in den oberen Rängen. (Die Deckenbilder des alten Zuschauerraums von Carl Rahl sowie der vom selben Künstler gestaltete Vorhang waren ein Raub der Flammen geworden. Lediglich die Fresken von Eduard Engerth im Kaisersaal konnten teilweise gerettet und später übertragen werden.) Zeno Kosak gestaltete den Gobelinsaal, die Architekten Otto Prossinger und Felix Cewela restaurierten die Seitenfronten und den Marmorsaal, den gesamten Neubau der Bühne besorgte die Bauleitung des Bundesministeriums für Handel und Wiederaufbau in Eigenregie. Rudolf Hermann Eisenmenger schuf die Kartons für die Gobelins im Gobelinsaal sowie die Monumentalmalerei auf dem eisernen Vorhang (Orpheus und Eurydike). Nach Kriegsende wurde der Spielbetrieb im Theater an der Wien (6. Oktober 1945) und in der Volksoper (1. Mai 1945; Figaros Hochzeit) aufgenommen. Die restaurierte Oper wurde am 5. November 1955 mit einer festlichen Aufführung von Beethovens \"Fidelio\" unter Karl Böhm eröffnet. Es war ein gesellschaftliches Ereignis ersten Rangs, aus allen Teilen der Erde kamen prominenteste Gäste nach Wien, um diese Eröffnung mitzuerleben.Seit 1998 erhält der Eiserne Vorhang in jeder Saison ein durch ein besonderes Ereignis (beispielsweise 2003/2004 Parsifal-Jahr) inspiriertes Bild. Es handelt sich dabei um Projekte des \"museum in progress\" in Kooperation mit der Wiener Staatsoper, finanziell ermöglicht durch Sponsoren. Bisher wurden folgende Künstler(innen) beauftragt:Übersiedlung aus dem Hanuschhof (1., Hanuschgasse 3/Goethegasse 1) in die neu adaptierten Räume 1, Operngasse 2 (Eröffnung 14. Februar 2004).Ehrenmitglieder Staatsoper.";
+        UUID creator = users.getFirst();
 
-        //todo call chatGPT to create a new quiz based on category
-        QuizResponse answer = generateQuizByLLM(prompt);
+        List<Pair<String, String>> contentData = fetchGenerationDataByCategoryForUser(creator, category);
 
-        //todo save quiz
+        List<QuizResponse> responses = new ArrayList<>();
+        List<String> questionData = getColumn(contentData, true);
+        for (String questionPrompt : questionData) {
+            responses.add(generateQuizByLLM(questionPrompt));
+        }
+
+        List<String> imageData = getColumn(contentData, false);
+        enrichResponseWithImageData(responses, imageData);
+
         QuizDTO result = new QuizDTO();
-
-        result.setId(100);
         result.setName("persisted Quiz");
-        result.setDescription(answer.getAnswer());
+        result.setDescription("generated");
         result.setCategory(category);
-        result.setCreator(users.getFirst());
-        result.setQuestions(null);
+        result.setCreator(creator);
         result.setCreatedAt(LocalDateTime.now());
 
-        //QuizEntity quizEntity = quizRepository.save(mapToQuizEntity(quiz));
-        //List<QuestionEntity> questionEntities = questionRepository.saveAll(mapToQuestionEntityList(quiz.getQuestions()));
-        //return mapToQuizDTO(quizEntity, questionEntities);
+        QuizEntity quizEntity = quizRepository.save(mapToQuizEntity(result));
 
-        //todo add users to quiz via quiz_user table
+        result = mapToQuizDTOWithEmptyQuestions(quizEntity);
+        result.setQuestions(mapQuestionResponsesToQuestionDTOList(responses, result.getId()));
 
-        //todo return quiz
-        return result;
+        List<QuestionEntity> questionEntities = questionRepository.saveAll(mapToQuestionEntityList(result.getQuestions()));
+
+        addUsersToQuiz(users, result.getId());
+
+        return mapToQuizDTO(quizEntity, questionEntities);
     }
 
     private QuizDTO mapToQuizDTO(QuizEntity quiz, List<QuestionEntity> questions) {
@@ -152,6 +174,19 @@ public class QuizService {
         return result;
     }
 
+    private QuizDTO mapToQuizDTOWithEmptyQuestions(QuizEntity quiz) {
+        QuizDTO result = new QuizDTO();
+
+        result.setId(quiz.getId());
+        result.setName(quiz.getName());
+        result.setDescription(quiz.getDescription());
+        result.setCategory(quiz.getCategory());
+        result.setCreator(quiz.getCreator());
+        result.setCreatedAt(quiz.getCreatedAt());
+
+        return result;
+    }
+
     private List<QuestionDTO> mapToQuestionDTOList(List<QuestionEntity> questions) {
         List<QuestionDTO> result = new ArrayList<>();
 
@@ -162,9 +197,9 @@ public class QuizService {
             dto.setQuiz(entity.getQuiz());
             dto.setQuestion(entity.getQuestion());
             dto.setAnswer(entity.getAnswer());
-            dto.setWrongAnswerA(entity.getWrongAnswerA());
-            dto.setWrongAnswerB(entity.getWrongAnswerB());
-            dto.setWrongAnswerC(entity.getWrongAnswerC());
+            dto.setWrongAnswerA(entity.getWrong_answer_a());
+            dto.setWrongAnswerB(entity.getWrong_answer_b());
+            dto.setWrongAnswerC(entity.getWrong_answer_c());
             dto.setImage(entity.getImage());
             dto.setCreatedAt(entity.getCreated_at());
 
@@ -215,9 +250,9 @@ public class QuizService {
             entity.setQuiz(dto.getQuiz());
             entity.setQuestion(dto.getQuestion());
             entity.setAnswer(dto.getAnswer());
-            entity.setWrongAnswerA(dto.getWrongAnswerA());
-            entity.setWrongAnswerB(dto.getWrongAnswerB());
-            entity.setWrongAnswerC(dto.getWrongAnswerC());
+            entity.setWrong_answer_a(dto.getWrongAnswerA());
+            entity.setWrong_answer_b(dto.getWrongAnswerB());
+            entity.setWrong_answer_c(dto.getWrongAnswerC());
             entity.setImage(dto.getImage());
             entity.setCreated_at(dto.getCreatedAt());
 
@@ -233,7 +268,122 @@ public class QuizService {
         headers.add("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36");
         HttpEntity<String> entity = new HttpEntity<>(prompt, headers);
         ResponseEntity<QuizResponse> response = restTemplate.exchange(OPENAI_ADDRESS + "/api/quiz/generate", HttpMethod.POST, entity, QuizResponse.class);
-        System.out.println("RESPONSE: " + response);
         return response.getBody();
+    }
+
+    private List<Pair<String, String>> fetchGenerationDataByCategoryForUser(UUID user, String category) {
+        List<Pair<String, String>> results = new ArrayList<>(); //first: content, second: image
+        TourDTO tour = null;
+        int tourId = -1;
+
+        if (category.startsWith("SPECIFIC_TOUR")) {
+            tourId = Integer.parseInt(category.substring(category.indexOf("=")+1, category.length()-1));
+            category = "SPECIFIC_TOUR";
+        }
+
+        switch (Category.valueOf(category)) {
+            case LATEST_TOUR -> {
+                tour = this.tourService.findToursByUserId(String.valueOf(user)).getLast();
+
+                List<Pair<String, String>> result = extractStringsFromTour(tour).values().stream().toList();
+                results = result.stream().filter((item) -> item.getFirst().length() > 100).toList();
+            }
+            case SPECIFIC_TOUR -> {
+                tour = this.tourService.findTourByTourId(tourId);
+
+                List<Pair<String, String>> result = extractStringsFromTour(tour).values().stream().toList();
+                results = result.stream().filter((item) -> item.getFirst().length() > 100).toList();
+            }  /*
+            case INTERESTS -> {
+            http://localhost:9098/buildings/filtered/byUser/57cbf83e-919d-4b20-baa7-113cdf116db0?latitude=48.19994406631644&longitude=16.371089994357767&radius=1000
+                // todo gather articles by interest -> need to extract long, lat and radius for that
+                System.out.println("INTERESTS: not implemented yet");
+            }
+            case FUN_FACTS -> {
+                // todo gather fun facts
+                System.out.println("FUN_FACTS: not implemented yet");
+            }
+            case POPULAR -> {
+                // todo gather articles by article weights
+                System.out.println("POPULAR: not implemented yet");
+            }
+            case PARTY -> {
+                // todo gather random entries from above from random users from the list
+                System.out.println("PARTY: not implemented yet");
+            } */
+        }
+
+        return results;
+    }
+
+    private Map<String, Pair<String, String>> extractStringsFromTour(TourDTO tour) {
+        String stops = tour.getStops();
+        String[] res = stops.split("\"viennaHistoryWikiId\":");
+        Map<String, Pair<String, String>> map = new HashMap<>();
+
+        for (int i = 1; i< res.length; i++) {
+            String viennaHistoryWikiId = res[i].substring(0, res[i].indexOf(","));
+            String imageTillEnd = res[i].substring(res[i].indexOf("\"imageUrls\":["), res[i].length()-1);
+            String images = imageTillEnd.substring("\"imageUrls\":[".length()+1, imageTillEnd.indexOf("\"]"));
+            String[] imageArr = images.split("\",\"");
+            String image = Objects.equals(imageArr[1], "https://www.geschichtewiki.wien.gv.at/images/7/7d/RDF.png") ? "" : imageArr[1];
+            String contentTillEnd = res[i].substring(res[i].indexOf("contentGerman\":"), res[i].length()-1);
+            String contentGerman = contentTillEnd.substring("contentGerman\":".length()+1, contentTillEnd.indexOf("\","));
+            map.put(viennaHistoryWikiId, Pair.of(contentGerman, image));
+        }
+
+        return map;
+    }
+
+    private List<QuestionDTO> mapQuestionResponsesToQuestionDTOList(List<QuizResponse> responses, int quiz) {
+        List<QuestionDTO> result = new ArrayList<>();
+
+        for (QuizResponse response : responses) {
+            QuestionDTO dto = new QuestionDTO();
+
+            dto.setQuiz(quiz);
+            dto.setQuestion(response.getQuestion());
+            dto.setAnswer(response.getAnswer());
+            dto.setWrongAnswerA(response.getWrongAnswerA());
+            dto.setWrongAnswerB(response.getWrongAnswerB());
+            dto.setWrongAnswerC(response.getWrongAnswerC());
+            dto.setImage(response.getImage());
+            dto.setCreatedAt(LocalDateTime.now());
+
+            result.add(dto);
+        }
+
+        return result;
+    }
+
+    private List<String> getColumn(List<Pair<String, String>> content, boolean getFirst) {
+        List<String> list = new ArrayList<>();
+
+        for (Pair<String, String> pair : content) {
+            if (getFirst) {
+                list.add(pair.getFirst());
+            } else {
+                list.add(pair.getSecond());
+            }
+        }
+
+        return list;
+    }
+
+    private void enrichResponseWithImageData(List<QuizResponse> responses, List<String> images) {
+        for (int i = 0; i < responses.size(); i++) {
+            System.out.println("IMAGE: " + images.get(i));
+            responses.get(i).setImage(images.get(i));
+        }
+    }
+
+    private void addUsersToQuiz(List<UUID> users, int quiz) {
+        for (UUID user : users) {
+            QuizUserEntity quizUserEntity = new QuizUserEntity();
+            quizUserEntity.setQuiz(quiz);
+            quizUserEntity.setPlayer(user);
+            quizUserEntity.setCreatedAt(LocalDateTime.now());
+            quizUserRepository.save(quizUserEntity);
+        }
     }
 }
