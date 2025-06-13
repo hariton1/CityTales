@@ -48,10 +48,7 @@ import {UserDto} from '../../user_db.dto/user.dto';
 import {TuiCard, TuiHeader} from '@taiga-ui/layout';
 import {TuiExpand} from '@taiga-ui/experimental';
 import {EnrichmentService} from '../../services/enrichment.service';
-import {BreakpointObserver, Breakpoints} from '@angular/cdk/layout';
-import { FunFactService, FunFactCardDTO } from '../../services/fun-fact.service';
-
-
+import {BreakpointService} from '../../services/breakpoints.service';
 
 const postfix = ' €';
 const numberOptions = maskitoNumberOptionsGenerator({
@@ -102,8 +99,6 @@ const numberOptions = maskitoNumberOptionsGenerator({
 })
 export class HistoricPlaceDetailComponent implements OnInit{
 
-  funFact: FunFactCardDTO | null = null;
-
   private readonly pricesService = inject(PricesService);
   locationId= signal(0);
   prices = this.pricesService.prices;
@@ -112,19 +107,23 @@ export class HistoricPlaceDetailComponent implements OnInit{
   lineWidths = [90, 70, 95, 60, 85, 80, 60, 75, 85, 80];
   isMobile = false;
 
+  customBreakpointLevel: CustomBreakpointLevel = null;
+
+
   summary: string = '';
   enrichedContent: string = '';
   enrichmentStarted = false;
   enrichmentLoading = false;
+  tonesItemCount = 3;
+  relatedItemCount = 3;
 
 
-  constructor( private funFactService: FunFactService,
-               private userService: UserService,
+  constructor(private userService: UserService,
               private userHistoriesService: UserHistoriesService,
               private router: Router,
               readonly EnrichmentService: EnrichmentService,
               readonly cdr: ChangeDetectorRef,
-              readonly breakpointObserver: BreakpointObserver) {
+              private breakpointService: BreakpointService,) {
     effect(() => {
       this.pricesService.getPricesByLocation(this.locationId());
       this.cdr.markForCheck();
@@ -145,12 +144,13 @@ export class HistoricPlaceDetailComponent implements OnInit{
   ];
 
   ngOnInit() {
-    this.breakpointObserver
-      .observe([Breakpoints.Handset])
-      .subscribe(result => {
-        this.isMobile = result.matches;
-      });
+    this.breakpointService.level$.subscribe(() => {
+      this.tonesItemCount = this.breakpointService.tonesItemCount;
+      this.relatedItemCount = this.breakpointService.relatedItemCount;
+      this.cdr.detectChanges();
+    });
   }
+
 
   protected dialogLabel = '';
   protected options: Partial<TuiResponsiveDialogOptions> = {};
@@ -232,7 +232,6 @@ export class HistoricPlaceDetailComponent implements OnInit{
     this.enrichedContent = '';
     this.enrichmentStarted = false;
     this.enrichmentLoading = false;
-    this.loadFunFact();
     this.cdr.markForCheck();
   }
   private _selectedPlace: any;
@@ -354,90 +353,63 @@ export class HistoricPlaceDetailComponent implements OnInit{
     })
   }
 
-  protected readonly itemsCount = 3;
+
   protected index2 = 0; //related persons slider
   protected index3 = 0; //related buildings slider
   protected index4 = 0; //related events slider
 
   protected get roundedPersons(): number {
-    return Math.floor(this.index2 / this.itemsCount);
+    return Math.floor(this.index2 / this.relatedItemCount);
   }
 
   protected onIndexPersons(index: number): void {
-    this.index2 = index * this.itemsCount;
+    this.index2 = index * this.relatedItemCount;
     this.cdr.detectChanges();
   }
 
   protected get roundedBuildings(): number {
-    return Math.floor(this.index3 / this.itemsCount);
+    return Math.floor(this.index3 / this.relatedItemCount);
   }
 
   protected onIndexBuildings(index: number): void {
-    this.index3 = index * this.itemsCount;
+    this.index3 = index * this.relatedItemCount;
     this.cdr.detectChanges();
   }
 
   protected get roundedEvents(): number {
-    return Math.floor(this.index4 / this.itemsCount);
+    return Math.floor(this.index4 / this.relatedItemCount);
   }
 
   protected onIndexEvents(index: number): void {
-    this.index4 = index * this.itemsCount;
+    this.index4 = index * this.relatedItemCount;
     this.cdr.detectChanges();
   }
 
   get personsPageCount(): number {
-    return Math.ceil(this.selectedPlace?.relatedPersons?.length / this.itemsCount);
+    return Math.ceil(this.selectedPlace?.relatedPersons?.length / this.relatedItemCount);
   }
 
   get buildingsPageCount(): number {
-    return Math.ceil(this.selectedPlace?.relatedBuildings?.length / this.itemsCount);
+    return Math.ceil(this.selectedPlace?.relatedBuildings?.length / this.relatedItemCount);
   }
 
   get eventsPageCount(): number {
-    return Math.ceil(this.selectedPlace?.relatedEvents?.length / this.itemsCount);
-  }
-
-  loadFunFact() {
-    console.log('FunFact wird geladen für:', this._selectedPlace?.viennaHistoryWikiId);
-    if (this._selectedPlace && this._selectedPlace.viennaHistoryWikiId) {
-      this.funFact = null;
-      this.funFactService.getBuildingFunFact(this._selectedPlace.viennaHistoryWikiId).subscribe({
-        next: fact => {
-          this.funFact = fact;
-          this.cdr.markForCheck();
-        },
-        error: () => {
-          this.funFact = null;
-          this.cdr.markForCheck();
-        }
-      });
-    } else {
-      this.funFact = null;
-    }
-  }
-
-  funFactSaved = false;
-
-// Diese Methode wird vom Button geklickt
-  saveFunFact() {
-    if (!this.funFact) return;
-
-    // Hier später deinen User-DB-Service einbinden.
-    // Für jetzt: Dummy-Logik, in Realität rufst du deinen UserService oder eine eigene Service-Methode:
-    // this.userService.saveUserFunFact(this.funFact) oder ähnlich.
-
-    // --- DUMMY (zum Testen) ---
-    this.funFactSaved = true;
-    setTimeout(() => this.funFactSaved = false, 2000); // Button springt nach 2 Sekunden zurück
-
-    // --- ECHTE LOGIK ---
-    // this.userService.saveFunFactForUser(this.funFact).subscribe({
-    //   next: () => { this.funFactSaved = true; },
-    //   error: () => { /* Fehlerbehandlung */ }
-    // });
+    return Math.ceil(this.selectedPlace?.relatedEvents?.length / this.relatedItemCount);
   }
 }
+
+
+type CustomBreakpointLevel =
+  | 'mobile'          // 360–767px
+  | 'tablet'          // 768–1023px
+  | 'desktop'         // 1024–1279px
+  | '1280-1499'
+  | '1500-1899'
+  | '1900-2559'
+  | '2560+'
+  | 'unknown'
+  | null;
+
 
 class PriceDTO implements Price {
   priceId: number | null | undefined;

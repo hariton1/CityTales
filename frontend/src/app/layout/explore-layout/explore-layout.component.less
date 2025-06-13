@@ -2,32 +2,74 @@
 
 :host {
   display: flex;
-  height: calc(100vh - 48px);  /* full viewport minus header */
+  height: calc(100vh - 59.65px);  /* full viewport minus header */
   overflow: hidden;
 }
 
 @media @tui-mobile-interval {
+  :host {
+    display: flex;
+    height: calc(100vh - 56px);  /* full viewport minus header */
+    overflow: hidden;
+  }
+
   app-sidebar {
     width: 100%;
     background-color: #f0f0f0;
   }
+
+  .back-button{
+    margin-top: 6rem;
+  }
 }
 
 @media @tui-tablet-interval {
+  :host {
+    display: flex;
+    height: calc(100vh - 56px);  /* full viewport minus header */
+    overflow: hidden;
+  }
+
+  app-sidebar {
+    width: 100%;
+    background-color: #f0f0f0;
+  }
+
+  .back-button{
+    margin-top: 6rem;
+  }
+}
+
+@media @tui-desktop-interval {
   app-sidebar {
     width: 50%;
     background-color: #f0f0f0;
   }
 }
 
-@media @tui-desktop-interval {
+@media screen and (min-width: 1280px) and (max-width: 1499px) {
+  app-sidebar {
+    width: 50%;
+    background-color: #f0f0f0;
+  }
+}
+
+
+@media screen and (min-width: 1500px) and (max-width: 1899px) {
   app-sidebar {
     width: 45%;
     background-color: #f0f0f0;
   }
 }
 
-@media @tui-desktop-lg-min {
+@media screen and (min-width: 1900px) and (max-width: 2559px) {
+  app-sidebar {
+    width: 40%;
+    background-color: #f0f0f0;
+  }
+}
+
+@media screen and (min-width: 2560px) {
   app-sidebar {
     width: 35%;
     background-color: #f0f0f0;
@@ -36,6 +78,23 @@
 
 app-map-view {
   flex: 1;
+}
+
+.search-button-container {
+  position: fixed;
+  top: 1.5rem;
+  left: 1.5rem;
+  z-index: 1000;
+}
+
+.mobile-search-button {
+  background: rgba(255, 255, 255, 0.3) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  border-radius: 50% !important;
+  color: var(--tui-text-primary) !important;
 }
 
 .mobile-view-toggle {
