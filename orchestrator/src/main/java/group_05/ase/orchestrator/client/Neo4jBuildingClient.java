@@ -16,7 +16,6 @@ public class Neo4jBuildingClient {
         this.webClient = webClient;
     }
 
-    // Im Neo4jBuildingClient:
     public List<ViennaHistoryWikiBuildingObject> getBuildingsByLocation(double latitude, double longitude, double radius) {
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder
@@ -30,5 +29,4 @@ public class Neo4jBuildingClient {
                 .collectList()
                 .block();
     }
-
 }
