@@ -31,6 +31,23 @@
           <header tuiHeader class="tui-space_bottom-5">
             <hgroup>
               <h1 class="place-title tui-space_bottom-2" tuiTitle>{{selectedEvent.name}}</h1>
+              <div *ngIf="funFact" class="fun-fact-card tui-space_bottom-3">
+                <tui-icon icon="@tui.star" [style.height.rem]="1.2" class="mr-2"></tui-icon>
+                <strong>Fun Fact:</strong> {{ funFact.fact }}
+                <span *ngIf="funFact.score">&nbsp;(Score: {{ funFact.score }})</span>
+                <button
+                  tuiButton
+                  appearance="outline"
+                  size="s"
+                  class="tui-space_left-3"
+                  (click)="saveFunFact()"
+                  [disabled]="funFactSaved"
+                >
+                  <tui-icon icon="@tui.heart" [style.height.rem]="1.1" class="mr-1"></tui-icon>
+                  <span *ngIf="!funFactSaved">Merken</span>
+                  <span *ngIf="funFactSaved">Gespeichert!</span>
+                </button>
+              </div>
               <p tuiSubtitle>
                <span class="icon-and-text">
                 <span class="icon">

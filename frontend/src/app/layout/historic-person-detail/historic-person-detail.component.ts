@@ -22,6 +22,8 @@ import {TuiAvatar, TuiCarouselComponent, TuiChevron, TuiPagination, TuiTooltip} 
 import {BreakpointService} from '../../services/breakpoints.service';
 import {EnrichmentService} from '../../services/enrichment.service';
 import {TuiItem} from '@taiga-ui/cdk';
+import { FunFactService, FunFactCardDTO } from '../../services/fun-fact.service';
+
 
 @Component({
   selector: 'app-historic-person-detail',
@@ -67,7 +69,11 @@ export class HistoricPersonDetailComponent implements OnInit{
 
   public readonly collapsed = signal(true);
 
-  constructor(private router: Router,
+  funFact: FunFactCardDTO | null = null;
+  funFactSaved = false;
+
+  constructor(private funFactService: FunFactService,
+             private router: Router,
               private userService: UserService,
               readonly EnrichmentService: EnrichmentService,
               readonly cdr: ChangeDetectorRef,
@@ -92,6 +98,7 @@ export class HistoricPersonDetailComponent implements OnInit{
 
   @Input()
   get selectedPerson(): any {
+    this.loadFunFact();
     return this._selectedPerson;
   }
   set selectedPerson(value: any) {
@@ -201,6 +208,26 @@ export class HistoricPersonDetailComponent implements OnInit{
 
   get eventsPageCount(): number {
     return Math.ceil(this.selectedPerson?.relatedEvents?.length / this.itemsCount);
+  }
+
+  loadFunFact() {
+    console.log('Person/Event FunFact laden für:', this._selectedPerson?.id ?? this._selectedPerson?.viennaHistoryWikiId);
+    if (this._selectedPerson && (this._selectedPerson.id || this._selectedPerson.viennaHistoryWikiId)) {
+      const id = this._selectedPerson.id ?? this._selectedPerson.viennaHistoryWikiId;
+      this.funFactService.getPersonFunFact(id).subscribe({
+        next: fact => { this.funFact = fact; },
+        error: () => { this.funFact = null; }
+      });
+    } else {
+      this.funFact = null;
+    }
+  }
+
+  saveFunFact() {
+    if (!this.funFact) return;
+    // TODO: Hier echten UserService-Aufruf einbauen!
+    this.funFactSaved = true;
+    setTimeout(() => this.funFactSaved = false, 2000);
   }
 }
 

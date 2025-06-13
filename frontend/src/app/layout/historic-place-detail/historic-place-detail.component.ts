@@ -49,6 +49,9 @@ import {TuiCard, TuiHeader} from '@taiga-ui/layout';
 import {TuiExpand} from '@taiga-ui/experimental';
 import {EnrichmentService} from '../../services/enrichment.service';
 import {BreakpointService} from '../../services/breakpoints.service';
+import { FunFactService, FunFactCardDTO } from '../../services/fun-fact.service';
+import {SavedFunFactDto} from '../../user_db.dto/saved-fun-fact.dto';
+import {SavedFunFactService} from '../../user_db.services/saved-fun-fact.service';
 
 const postfix = ' €';
 const numberOptions = maskitoNumberOptionsGenerator({
@@ -98,6 +101,7 @@ const numberOptions = maskitoNumberOptionsGenerator({
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class HistoricPlaceDetailComponent implements OnInit{
+  funFact: FunFactCardDTO | null = null;
 
   private readonly pricesService = inject(PricesService);
   locationId= signal(0);
@@ -118,7 +122,9 @@ export class HistoricPlaceDetailComponent implements OnInit{
   relatedItemCount = 3;
 
 
-  constructor(private userService: UserService,
+  constructor (private savedFunFactService: SavedFunFactService,
+              private funFactService: FunFactService,
+              private userService: UserService,
               private userHistoriesService: UserHistoriesService,
               private router: Router,
               readonly EnrichmentService: EnrichmentService,
@@ -232,6 +238,7 @@ export class HistoricPlaceDetailComponent implements OnInit{
     this.enrichedContent = '';
     this.enrichmentStarted = false;
     this.enrichmentLoading = false;
+    this.loadFunFact();
     this.cdr.markForCheck();
   }
   private _selectedPlace: any;
@@ -396,6 +403,59 @@ export class HistoricPlaceDetailComponent implements OnInit{
   get eventsPageCount(): number {
     return Math.ceil(this.selectedPlace?.relatedEvents?.length / this.relatedItemCount);
   }
+
+  loadFunFact() {
+    console.log('FunFact wird geladen für:', this._selectedPlace?.viennaHistoryWikiId);
+    if (this._selectedPlace && this._selectedPlace.viennaHistoryWikiId) {
+      this.funFact = null;
+      this.funFactService.getBuildingFunFact(this._selectedPlace.viennaHistoryWikiId).subscribe({
+        next: fact => {
+          this.funFact = fact;
+          this.cdr.markForCheck();
+        },
+        error: () => {
+          this.funFact = null;
+          this.cdr.markForCheck();
+        }
+      });
+    } else {
+      this.funFact = null;
+    }
+  }
+
+  funFactSaved = false;
+
+  saveFunFact() {
+    if (!this.funFact) return;
+
+    const userId = localStorage.getItem('user_uuid');
+    const now = new Date();
+
+    const savedFunFact = new SavedFunFactDto(
+      0,
+      userId,
+      this.selectedPlace?.id ?? this.selectedPlace?.viennaHistoryWikiId, // Artikel/Gebäude-ID
+      this.selectedPlace?.name,
+      this.funFact.fact,
+      this.selectedPlace?.imageUrls?.[0] || '',
+      this.funFact.score,
+      '', // reason (leer)
+      now
+    );
+
+    this.savedFunFactService.createNewSavedFunFact(savedFunFact).subscribe({
+      next: (resp) => {
+        console.log('Erfolg beim Speichern!', resp);
+        this.funFactSaved = true;
+        setTimeout(() => this.funFactSaved = false, 2000);
+      },
+      error: (err) => {
+        // Optional: Fehlerbehandlung
+      }
+    });
+  }
+
+
 }
 
 
