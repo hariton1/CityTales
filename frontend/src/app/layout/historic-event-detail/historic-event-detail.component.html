@@ -1,111 +1,332 @@
-<div class="place-detail-container">
-  <div class="place-detail-card">
-    <!-- Header with building information -->
-    <div class="place-detail-header">
-      <h2 class="place-detail-title">{{selectedEvent.name}}</h2>
-      <div class="place-location">
-        <span class="coordinates" *ngIf="selectedEvent.dateFrom != '' && selectedEvent.dateTo != '' ">
-          {{ selectedEvent.dateFrom}} until {{selectedEvent.dateTo}}
-        </span>
-      </div>
+<button
+  tuiButton
+  type="button"
+  appearance="flat"
+  size="s"
+  class="back-button"
+  (click)="closeDetail()"
+>
+  <tui-icon icon="@tui.chevron-left" class="mr-1" [style.height.rem]="1.2" />
+  Back to All Sites
+</button>
 
+<tui-scrollbar class="scrollable-content" [style]="'overflow-y: auto'">
+  <div class="place-detail-container">
+    <section
+      tuiCardLarge="compact"
+      [tuiCardCollapsed]="collapsed()"
+      class="tui-space_bottom-5"
+    >
 
-      <button
-        (click)="closeDetail()"
-      > Close </button>
-
-
-    </div>
-
-
-    <!-- Main content -->
-    <tui-scrollbar class="scrollable-content">
-      <div class="place-detail-content">
-        <div class="content-section">
-          <h3>Description</h3>
-          <p>{{ selectedEvent.contentGerman }}</p>
+      <div class="image-info-flex">
+        <div class="image-container" *ngIf="selectedEvent.imageUrls.length > 0">
+          <img [src]="
+            selectedEvent.imageUrls[1] === 'https://www.geschichtewiki.wien.gv.at/images/7/7d/RDF.png'
+            ? 'assets/images/building-placeholder-500.jpeg'
+            : selectedEvent.imageUrls[1]"
+               alt="{{ selectedEvent.name }}" />
         </div>
 
-        <div>
-          <button class="feedback-button" appearance="secondary" size="m" tuiButton type="button" (click)="navigateToFeedback()">
-            <tui-icon icon="@tui.message-circle-plus" [style.height.rem]="1"/> Give us feedback
-          </button>
-        </div>
+        <div class="info-block">
+          <header tuiHeader class="tui-space_bottom-5">
+            <hgroup>
+              <h1 class="place-title tui-space_bottom-2" tuiTitle>{{selectedEvent.name}}</h1>
+              <p tuiSubtitle>
+               <span class="icon-and-text">
+                <span class="icon">
+                  <tui-icon icon="@tui.calendar-1" [style.height.rem]="1.3" />
+                </span>
+                 <span *ngIf="selectedEvent.dateFrom != null">
+                  From {{ selectedEvent.dateFrom }}
+                </span>
+                <span *ngIf="selectedEvent.dateTo != null">
+                  to {{ selectedEvent.dateTo }}
+                </span>
+              </span>
+              </p>
+            </hgroup>
+          </header>
 
-        <div class="content-section">
-          <h3>Person Information</h3>
-          <div class="building-details">
-            <div class="detail-row" *ngIf="selectedEvent.name">
-              <span class="label">Name:</span>
-              <span class="value">{{ selectedEvent.name }}</span>
-            </div>
-            <div class="detail-row" *ngIf="selectedEvent.organizer">
-              <span class="label">Jobs:</span>
-              <span class="value">{{ selectedEvent.organizer }}</span>
-            </div>
-            <div class="detail-row" *ngIf="selectedEvent.participantCount">
-              <span class="label">Sex:</span>
-              <span class="value">{{ selectedEvent.participantCount }}</span>
-            </div>
-            <div class="detail-row" *ngIf="selectedEvent.topic">
-              <span class="label">Birth Place:</span>
-              <span class="value">{{ selectedEvent.topic }}</span>
-            </div>
-            <div class="detail-row" *ngIf="selectedEvent.imageUrls.length > 0">
-              <img [src]="selectedEvent.imageUrls[0]" alt="Building image" class="building-image">
-            </div>
-            <div class="detail-row" *ngIf="selectedEvent.url">
-              <span class="label">Wiki URL:</span>
-              <span class="value">
-              <a [href]="selectedEvent.url" target="_blank"> {{ selectedEvent.url }} </a>
+          <div class="detail-row icon-and-text tui-space_bottom-3" *ngIf="selectedEvent.organizer">
+          <span class="icon-and-text">
+            <span class="icon">
+              <tui-icon icon="@tui.users-round" [style.height.rem]="1.2" />
             </span>
-            </div>
 
-            <div class="content-section" *ngIf="selectedEvent.relatedPersons?.length">
-              <h3>Related Persons</h3>
-              <div class="related-items">
-                <div class="related-item" *ngFor="let person of selectedEvent.relatedPersons">
-            <span class="value">
-              <div (click)="onPersonClick(person)">
-                <span>{{ person.name }}</span>
-              </div>
+            <strong> Organizer: </strong> {{ selectedEvent.organizer }}
+          </span>
+          </div>
+
+          <div class="detail-row icon-and-text tui-space_bottom-3" *ngIf="selectedEvent.topic">
+          <span class="icon-and-text">
+            <span class="icon">
+              <tui-icon icon="@tui.goal" [style.height.rem]="1.2" />
             </span>
-                </div>
-              </div>
-            </div>
 
-            <div class="content-section" *ngIf="selectedEvent.relatedBuildings?.length">
-              <h3>Related Places</h3>
-              <div class="related-items">
-                <div class="related-item" *ngFor="let place of selectedEvent.relatedBuildings">
-            <span class="value">
-              <div (click)="onBuildingClick(place)">
-                <span>{{ place.name }}</span>
-              </div>
+            <strong> Topic: </strong> {{ selectedEvent.topic }}
+          </span>
+          </div>
+
+          <div class="detail-row icon-and-text tui-space_bottom-3" *ngIf="selectedEvent.birthPlace">
+            <span class="icon-and-text">
+                <span class="icon">
+                  <tui-icon icon="@tui.swords" [style.height.rem]="1.2"/>
+                </span>
+
+                <span *ngIf="selectedEvent.violence" style="color: darkred">
+                  <em> Violence was used</em>
+              </span>
             </span>
-                </div>
-              </div>
-            </div>
+          </div>
 
-            <div class="content-section" *ngIf="selectedEvent.relatedEvents?.length">
-              <h3>Related Events</h3>
-              <div class="related-items">
-                <div class="related-item" *ngFor="let event of selectedEvent.relatedEvents">
-            <span class="value">
-              <div (click)="onEventClick(event)">
-                <span>{{ event.name }}</span>
-              </div>
-            </span>
-                </div>
-              </div>
-            </div>
+          <div>
+            <button class="tui-space_top-4" appearance="outline" size="s" tuiButton type="button"
+                    (click)="navigateToFeedback()">
+              <tui-icon icon="@tui.message-circle-plus" [style.height.rem]="1"/>
+              Is something incorrect?
+            </button>
+          </div>
 
 
 
+          <div class="bottom-right-button">
+
+            <button
+              appearance="secondary"
+              size="s"
+              tuiButton
+              type="button"
+              [tuiChevron]="!collapsed()"
+              (click)="collapsed.set(!collapsed())"
+            >
+              Sources
+            </button>
           </div>
         </div>
       </div>
-    </tui-scrollbar>
+
+      <tui-expand [expanded]="!collapsed()">
+        <div class="detail-row" *ngIf="selectedEvent.url">
+          <span class="label">Wiki URL: </span>
+          <span class="value">
+              <a [href]="selectedEvent.url" target="_blank"> {{ selectedEvent.url }} </a>
+            </span>
+        </div>
+      </tui-expand>
+    </section>
+
+
+    <div class="tone-selector" *ngIf="selectedEvent.contentGerman">
+    <span style="font: var(--tui-font-heading-6); display: block; width: 100%">Choose how you want the story to be told <tui-icon
+      tuiHintDirection="bottom"
+      tuiTooltip="Select a tone to change the storytelling style — not the facts."
+    /></span>
+
+      <tui-carousel
+        [draggable]="true"
+        [itemsCount]="tonesItemCount"
+        [(index)]="index1"
+      >
+        <ng-container *ngFor="let tone of tones">
+          <button
+            *tuiItem
+            tuiSurface
+            type="button"
+            class="tone"
+            [style.background-image]="'url(assets/images/' + tone.bg + ')'"
+            [style.color]="'#fff'"
+            (click)="startEnrichment(tone.key)"
+          >
+            <h3 class="heading">{{ tone.label }}</h3>
+          </button>
+        </ng-container>
+      </tui-carousel>
+    </div>
+
+    <div class="tone-selector" *ngIf="!selectedEvent.contentGerman">
+      <span style="font: var(--tui-font-heading-6); display: block; width: 100%">We haven’t written a story for this person yet — stay tuned!</span>
+    </div>
+
+    <!-- tone selector -->
+    <div class="content">
+      <!-- Skeleton Loader -->
+      <div *ngIf="enrichmentStarted && enrichmentLoading" class="fade-in place-summary tui-space_bottom-8">
+        <div class="skeleton-line" *ngFor="let width of lineWidths" [style.width.%]="width"></div>
+      </div>
+
+      <!-- LLM Generated Content -->
+      <div *ngIf="enrichmentStarted && !enrichmentLoading" class="fade-in tui-space_bottom-12">
+        <section class="place-summary">
+          <header tuiHeader class="tui-space_top-3 tui-space_bottom-3">
+            <span class="tui-text_h6">Quick Facts & Highlights</span>
+          </header>
+          <div class="place-summary-text" [innerHTML]="summary"></div>
+
+          <header tuiHeader class="tui-space_top-5 tui-space_bottom-3">
+            <span class="tui-text_h6">Deep Dive into the {{ selectedEvent.name }}</span>
+          </header>
+          <div class="place-summary-text" [innerHTML]="enrichedContent"></div>
+        </section>
+      </div>
+
+
+      <div class="related-persons tui-space_bottom-6" *ngIf="selectedEvent.relatedPersons?.length">
+        <span class="tui-space_bottom-5" style="font: var(--tui-font-heading-6); display: block; width: 100%"><tui-icon icon="@tui.user" [style.height.rem]="1.5" /> Related Persons</span>
+
+        <tui-carousel
+          [draggable]="true"
+          [itemsCount]="3"
+          [(index)]="index2"
+          [style.--tui-carousel-padding] = "isMobile ? '0' : '0 15px 0 0'"
+        >
+          <ng-container *ngFor="let person of selectedEvent.relatedPersons">
+            <div
+              tuiAppearance="outline-grayscale"
+              tuiCardLarge
+              *tuiItem
+              class="person-card"
+            >
+              <div (click)="onPersonClick(person)">
+                <aside tuiAccessories>
+                  <tui-avatar
+                    class="avatar"
+                    size="l"
+                    [src]="
+              person.imageUrls[1] === 'https://www.geschichtewiki.wien.gv.at/images/7/7d/RDF.png'
+                ? 'assets/images/person-placeholder-200.png'
+                : (person.imageUrls[1] | tuiFallbackSrc: '@tui.user' | async)
+            "
+                    [style.background]="
+              person.imageUrls[1] === 'https://www.geschichtewiki.wien.gv.at/images/7/7d/RDF.png'
+                ? 'transparent'
+                : (person.imageUrls[1] | tuiAutoColor)
+            "
+                  />
+                </aside>
+                <h2 tuiTitle>
+                  {{ person.name }}
+                  <span tuiSubtitle *ngIf="person.deathDate != null">
+            †{{ person.deathDate }}
+          </span>
+                </h2>
+              </div>
+            </div>
+          </ng-container>
+        </tui-carousel>
+        <tui-pagination
+          *ngIf="selectedEvent.relatedPersons?.length > 3"
+          size="s"
+          class="tui-space_top-4"
+          [index]="roundedPersons"
+          [length]="personsPageCount"
+          (indexChange)="onIndexPersons($event)"
+        />
+      </div>
+
+      <div class="related-buildings tui-space_bottom-6" *ngIf="selectedEvent.relatedBuildings?.length">
+        <span class="tui-space_bottom-5" style="font: var(--tui-font-heading-6); display: block; width: 100%"><tui-icon icon="@tui.landmark" [style.height.rem]="1.5" /> Related Buildings</span>
+
+        <tui-carousel
+          [draggable]="true"
+          [itemsCount]="3"
+          [(index)]="index3"
+          [style.--tui-carousel-padding] = "isMobile ? '0' : '0 15px 0 0'"
+        >
+          <ng-container *ngFor="let building of selectedEvent.relatedBuildings">
+            <div
+              tuiAppearance="outline-grayscale"
+              tuiCardLarge
+              *tuiItem
+              class="person-card"
+            >
+              <div (click)="onBuildingClick(building)">
+                <aside tuiAccessories>
+                  <tui-avatar
+                    class="avatar"
+                    size="l"
+                    [src]="
+              building.imageUrls[1] === 'https://www.geschichtewiki.wien.gv.at/images/7/7d/RDF.png'
+                ? 'assets/images/building-placeholder-200.jpeg'
+                : (building.imageUrls[1] | tuiFallbackSrc: '@tui.user' | async)
+            "
+                    [style.background]="
+              building.imageUrls[1] === 'https://www.geschichtewiki.wien.gv.at/images/7/7d/RDF.png'
+                ? 'transparent'
+                : (building.imageUrls[1] | tuiAutoColor)
+            "
+                  />
+                </aside>
+                <h2 tuiTitle>
+                  {{ building.name }}
+
+                </h2>
+              </div>
+            </div>
+          </ng-container>
+        </tui-carousel>
+        <tui-pagination
+          *ngIf="selectedEvent.relatedBuildings?.length > 3"
+          size="s"
+          class="tui-space_top-4"
+          [index]="roundedBuildings"
+          [length]="buildingsPageCount"
+          (indexChange)="onIndexBuildings($event)"
+        />
+      </div>
+
+
+      <div class="related-events tui-space_bottom-6" *ngIf="selectedEvent.relatedEvents?.length">
+        <span class="tui-space_bottom-5" style="font: var(--tui-font-heading-6); display: block; width: 100%"><tui-icon icon="@tui.calendar" [style.height.rem]="1.5" /> Related Events</span>
+
+        <tui-carousel
+          [draggable]="true"
+          [itemsCount]="3"
+          [(index)]="index4"
+          [style.--tui-carousel-padding] = "isMobile ? '0' : '0 15px 0 0'"
+        >
+          <ng-container *ngFor="let event of selectedEvent.relatedEvents">
+            <div
+              tuiAppearance="outline-grayscale"
+              tuiCardLarge
+              *tuiItem
+              class="person-card"
+            >
+              <div (click)="onEventClick(event)">
+                <aside tuiAccessories>
+                  <tui-avatar
+                    class="avatar"
+                    size="l"
+                    [src]="
+              event.imageUrls[1] === 'https://www.geschichtewiki.wien.gv.at/images/7/7d/RDF.png'
+                ? 'assets/images/event-placeholder-200.jpeg'
+                : (event.imageUrls[1] | tuiFallbackSrc: '@tui.user' | async)
+            "
+                    [style.background]="
+              event.imageUrls[1] === 'https://www.geschichtewiki.wien.gv.at/images/7/7d/RDF.png'
+                ? 'transparent'
+                : (event.imageUrls[1] | tuiAutoColor)
+            "
+                  />
+                </aside>
+                <h2 tuiTitle>
+                  {{ event.name }}
+                </h2>
+              </div>
+            </div>
+          </ng-container>
+        </tui-carousel>
+        <tui-pagination
+          *ngIf="selectedEvent.relatedEvents?.length > 3"
+          size="s"
+          class="tui-space_top-4"
+          [index]="roundedEvents"
+          [length]="eventsPageCount"
+          (indexChange)="onIndexEvents($event)"
+        />
+      </div>
+
+    </div>
   </div>
-</div>
+
+</tui-scrollbar>
 
