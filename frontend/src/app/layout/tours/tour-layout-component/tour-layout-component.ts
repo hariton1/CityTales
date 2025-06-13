@@ -76,7 +76,7 @@ export class TourLayoutComponent {
   userTours: TourDto[] | null = null;
 
 
-  recommendedToursIds: number[] = [153]
+  recommendedToursIds: number[] = [153, 154, 155]
   recommendedTours: TourDto[] = []
 
   tourName = new FormControl('');
@@ -224,7 +224,7 @@ export class TourLayoutComponent {
 
     //TODO: replace with user location
     console.log()
-    this.locationService.getLocationsInRadius(48.19994406631644, 16.371089994357767, 1000, this.interestFiltering === 'true').subscribe(locations => {
+    this.locationService.getLocationsInRadius(48.19994406631644, 16.371089994357767, 3000, this.interestFiltering === 'true').subscribe(locations => {
       this.buildingData = locations;
       console.log(this.buildingData.length);
 
