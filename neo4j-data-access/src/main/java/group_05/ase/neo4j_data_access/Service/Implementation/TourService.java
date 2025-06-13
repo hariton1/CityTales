@@ -5,7 +5,16 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.google.ortools.sat.*;
+import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithm;
+import com.graphhopper.jsprit.core.algorithm.box.Jsprit;
+import com.graphhopper.jsprit.core.problem.Location;
+import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
+import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
+import com.graphhopper.jsprit.core.problem.solution.route.activity.TourActivity;
+import com.graphhopper.jsprit.core.problem.vehicle.VehicleImpl;
+import com.graphhopper.jsprit.core.problem.vehicle.VehicleTypeImpl;
+import com.graphhopper.jsprit.core.reporting.SolutionPrinter;
+import com.graphhopper.jsprit.core.util.Solutions;
 import group_05.ase.neo4j_data_access.Client.QdrantClient;
 import group_05.ase.neo4j_data_access.Client.UserDBClient;
 import group_05.ase.neo4j_data_access.Entity.Tour.*;
@@ -42,6 +51,7 @@ public class TourService implements ITourService {
     public List<TourDTO> createTours(CreateTourRequestDTO dto) {
 
         List<Integer> interests = getInterestsFromDB(dto.getUserId());
+        //List<Integer> interests = List.of(2,3,4,5,6,7,10,12);
         System.out.println(interests);
         List<Integer> buildingIds = getBuildingEntititesFromQdrant(interests.stream().map(Object::toString).toList());
         System.out.println("Building list size: " + buildingIds.size());
@@ -89,14 +99,12 @@ public class TourService implements ITourService {
 
         List<GeographicPoint2d> mandatoryStops = dto.getPredefinedStops().stream().map(stop -> new GeographicPoint2d(stop.getLatitude().get(), stop.getLongitude().get())).toList();
 
-        //List<TourObject> foundTours = findRoutesBFS(startOptional, endOptional, mandatoryStops, stops  ,distanceMatrix, dto, MAX_ROUTES, building_dict);
+        List<TourObject> foundTours = findRoutesBFS(startOptional, endOptional, mandatoryStops, stops  ,distanceMatrix, dto, MAX_ROUTES, building_dict);
 
-        findRoutesSATSolving(distanceMatrix);
+        System.out.println("Found " + foundTours.size() + " tours");
 
-        // System.out.println("Found " + foundTours.size() + " tours");
-
-        //return foundTours.stream().map(this::tourObjectToTourDTO).toList();
-        return null;
+        return foundTours.stream().map(this::tourObjectToTourDTO).toList();
+        //return null;
     }
 
     private TourDTO tourObjectToTourDTO(TourObject tourObject) {
@@ -145,170 +153,143 @@ public class TourService implements ITourService {
         return tourObject;
     }
 
-    public void findRoutesSATSolving(List<List<Float>> distanceMatrix) {
-        System.out.println("Called findRoutesSATSolving");
 
-        // ─────────────────────────  INPUT DATA  ──────────────────────────
-        /** index 0 = start, 1 = end, 2..N-1 = candidate stops */
-        double[][] distanceMatrixArray = new double[distanceMatrix.size()][distanceMatrix.get(0).size()];
-        for(int i = 0; i < distanceMatrix.size(); i++) {
-            for(int j = 0; j < distanceMatrix.get(i).size(); j++) {
+    public List<GeographicPoint2d> findRoutesRoutingAlgo(
+            Optional<GeographicPoint2d> startOptional,
+            Optional<GeographicPoint2d> endOptional,
+            List<GeographicPoint2d> mandatoryStops,
+            List<GeographicPoint2d> availableStops,
+            List<List<Float>> distanceMatrix,
+            Integer stopCount,
+            Double maxDistance
+    ) {
+        //Fill distance matrix
+        double[][] distanceMatrixArray = new double[availableStops.size()][availableStops.size()];
+        for(int i = 0; i < availableStops.size(); i++) {
+            for(int j = 0; j < availableStops.size(); j++) {
                 distanceMatrixArray[i][j] = distanceMatrix.get(i).get(j);
             }
         }
 
+        // Create vehicle type
+        VehicleTypeImpl vehicleType = VehicleTypeImpl.Builder.newInstance("vehicleType")
+                .addCapacityDimension(0, 1)
+                .build();
 
+        VehicleImpl vehicle;
 
-        final double[][] DIST = distanceMatrixArray;
-
-        /** price[i] = entrance fee (0 for start/end) */
-        final double[] PRICE = { /* <-- fill prices for each location */ };
-
-        /** how many intermediate stops you want (fixed) */
-        final int K = 4;                            // example: 4 stops
-
-        /** maximum total distance allowed for the tour */
-        final double MAX_DISTANCE = 10000;         // metres, km,…
-
-        /** maximum total budget allowed for the tour */
-        final double MAX_BUDGET   =  50.0;
-
-        //System.loadLibrary("jniortools");                // native loader
-        int N = DIST.length;                             // number of nodes
-
-        CpModel model = new CpModel();
-
-        // ---- 1. Decision variables -----------------------------------
-        // x[i][j] = 1 if we travel directly i -> j
-        BoolVar[][] x = new BoolVar[N][N];
-        for (int i = 0; i < N; i++)
-            for (int j = 0; j < N; j++)
-                x[i][j] = model.newBoolVar("x_" + i + "_" + j);
-
-        // pos[i] = order position of node i along the path (only for subtour cut)
-        IntVar[] pos = new IntVar[N];
-        for (int i = 0; i < N; i++)
-            pos[i] = model.newIntVar(0, N - 1, "pos_" + i);
-
-        // ---- 2. Path-building constraints ----------------------------
-        int START = 0, END = 1;
-
-        // Each node has at most one outgoing arc
-        for (int i = 0; i < N; i++) {
-            LinearExpr outgoing = LinearExpr.sum(x[i]);     // Σ_j x[i][j]
-            if (i == END)
-                model.addEquality(outgoing, 0);               // end has none
-            else if (i == START)
-                model.addEquality(outgoing, 1);               // start has exactly 1
-            else
-                model.addLessOrEqual(outgoing, 1);            // normal node ≤ 1
-        }
-
-        // Each node has at most one incoming arc
-        for (int j = 0; j < N; j++) {
-            LinearExpr incoming = sumColumn(x, j);
-            if (j == START)
-                model.addEquality(incoming, 0);               // start has none
-            else if (j == END)
-                model.addEquality(incoming, 1);               // end has exactly 1
-            else
-                model.addLessOrEqual(incoming, 1);            // normal node ≤ 1
-        }
-
-        // Exactly K intermediate nodes must be visited
-        IntVar[] visit = new IntVar[N];
-        for (int i = 0; i < N; i++)
-            visit[i] = model.newBoolVar("visit_" + i);
-
-        // visit[i] is 1 if either we enter or leave i (except start/end)
-//        for (int i = 2; i < N; i++)
-//            model.addEquality(
-//                    LinearExpr.sum(new IntVar[]{sumRow(x, i), sumColumn(x, i)}),
-//                    LinearExpr.term(visit[i], 1));
-
-        // total #visited = K
-        model.addEquality(LinearExpr.sum(Arrays.copyOfRange(visit, 2, N)), K);
-
-//        // ---- 3. Subtour elimination  (Miller–Tucker–Zemlin) ----------
-//        // pos[START] = 0
-//        model.addEquality(pos[START], 0);
-//        // pos[END] = K+1
-//        model.addEquality(pos[END], K + 1);
-//
-//        for (int i = 0; i < N; i++)
-//            for (int j = 0; j < N; j++)
-//                if (i != j)
-//                    // If x[i][j]==1 then pos[j] = pos[i] + 1
-//                    model.addEquality(pos[j], LinearExpr.sum(pos[i], 1))
-//                            .onlyEnforceIf(x[i][j]);
-
-        // ---- 4. Distance and budget constraints ----------------------
-        LinearExpr totalDistance = LinearExpr.weightedSum(flatten(x), flattenDistances(DIST));
-        model.addLessOrEqual(totalDistance, (long) Math.round(MAX_DISTANCE));
-
-//        LinearExpr totalBudget = LinearExpr.weightedSum(visit, doubleToLong(PRICE));
-//        model.addLessOrEqual(totalBudget, (long) Math.round(MAX_BUDGET * 100)); // scale if needed
-
-        // ---- 5. Objective (optional – e.g., minimise distance) -------
-        model.minimize(totalDistance);
-
-        // ---- 6. Solve -------------------------------------------------
-        CpSolver solver = new CpSolver();
-        solver.getParameters().setMaxTimeInSeconds(30);
-        CpSolverStatus status = solver.solve(model);
-
-        if (status == CpSolverStatus.OPTIMAL || status == CpSolverStatus.FEASIBLE) {
-            System.out.println("Total distance = " + solver.value(totalDistance));
-//            System.out.println("Total budget   = " + solver.value(totalBudget) / 100.0);
-            printPath(solver, x, START, END);
+        // Define start location (optional, use one of the locations)
+        if(startOptional.isPresent() && endOptional.isPresent()) {
+            Location start = Location.newInstance(String.valueOf(0));
+            Location end = Location.newInstance(String.valueOf(distanceMatrixArray.length -1));
+            vehicle = VehicleImpl.Builder.newInstance("walker")
+                    .setStartLocation(start)
+                    .setEndLocation(end)
+                    .setType(vehicleType)
+                    .build();
+        } else if(startOptional.isPresent()) {
+            Location start = Location.newInstance(String.valueOf(0));
+            vehicle = VehicleImpl.Builder.newInstance("walker")
+                    .setStartLocation(start)
+                    .setType(vehicleType)
+                    .build();
+        } else if(endOptional.isPresent()) {
+            Location end = Location.newInstance(String.valueOf(distanceMatrixArray.length -1));
+            vehicle = VehicleImpl.Builder.newInstance("walker")
+                    .setEndLocation(end)
+                    .setType(vehicleType)
+                    .build();
         } else {
-            System.out.println("No tour found under given constraints.");
+            vehicle = VehicleImpl.Builder.newInstance("walker")
+                    .setType(vehicleType)
+                    .build();
         }
 
 
+        VehicleRoutingProblem.Builder vrpBuilder = VehicleRoutingProblem.Builder.newInstance();
+        vrpBuilder.addVehicle(vehicle);
 
-    }
+        // Add all service locations (except depot)
+        for (int i = 1; i < distanceMatrixArray.length - 1; i++) {
+            vrpBuilder.addJob(com.graphhopper.jsprit.core.problem.job.Service.Builder.newInstance(String.valueOf(i))
+                    .setLocation(Location.newInstance(String.valueOf(i)))
+                    .build());
+        }
 
-    private LinearExpr sumRow(IntVar[][] m, int r) {
-        return LinearExpr.sum(m[r]);
-    }
+        // Use your own distance matrix
+        vrpBuilder.setFleetSize(VehicleRoutingProblem.FleetSize.FINITE);
+        vrpBuilder.setRoutingCost(new CustomMatrixCost(distanceMatrixArray));
 
-    private LinearExpr sumColumn(IntVar[][] m, int c) {
-        IntVar[] col = new IntVar[m.length];
-        for (int i = 0; i < m.length; i++) col[i] = m[i][c];
-        return LinearExpr.sum(col);
-    }
+        VehicleRoutingProblem problem = vrpBuilder.build();
 
-    private IntVar[] flatten(IntVar[][] matrix) {
-        return Arrays.stream(matrix).flatMap(Arrays::stream).toArray(IntVar[]::new);
-    }
+        // Solve
+        VehicleRoutingAlgorithm algorithm = Jsprit.createAlgorithm(problem);
+        Collection<VehicleRoutingProblemSolution> solutions = algorithm.searchSolutions();
 
-    private long[] flattenDistances(double[][] d) {
-        return Arrays.stream(d)
-                .flatMapToDouble(Arrays::stream)
-                .mapToLong(Math::round)
-                .toArray();
-    }
 
-    private long[] doubleToLong(double[] arr) {
-        long[] out = new long[arr.length];
-        for (int i = 0; i < arr.length; i++) out[i] = Math.round(arr[i] * 100); // 2-decimal cents
-        return out;
-    }
+        //Fitler soltions to match number of stops and include necessary stops and the keep budget
 
-    private void printPath(CpSolver s, BoolVar[][] x, int start, int end) {
-        int n = x.length, current = start;
-        System.out.print("Path: " + current);
-        while (current != end) {
-            for (int j = 0; j < n; j++) {
-                if (s.booleanValue(x[current][j])) {
-                    current = j;
-                    System.out.print(" -> " + current);
-                    break;
-                }
+        // Extract best solution
+        List<VehicleRoutingProblemSolution> filteredSolutions = solutions.stream()
+                .filter(solution -> solution.getCost() <= maxDistance)
+                .filter(solution ->
+                        solution.getRoutes().stream()
+                                .allMatch(route -> route.getActivities().size() == stopCount)
+                )
+                .toList();
+
+
+        List<List<Integer>> routes = new ArrayList<>();
+        filteredSolutions.forEach(solution -> {
+            solution.getRoutes().forEach(route -> {
+                List<Integer> routeIds = new ArrayList<>();
+                route.getActivities().forEach(activity -> {
+                    if(activity instanceof TourActivity.JobActivity jobActivity) {
+                        routeIds.add(Integer.valueOf(jobActivity.getJob().getId()));
+                    }
+                });
+                routes.add(routeIds);
+            });
+        });
+
+        System.out.println("Available routes: " + routes.size());
+
+        if(routes.isEmpty()) {
+            System.out.println("No routes found");
+            return List.of();
+        }
+
+
+        //Map list indexes back to coordinate list
+        //Choose arbitrarily first route
+        List<Integer> chosenRoute = routes.get(0);
+        System.out.println("Chosen route: " + chosenRoute.toString());
+
+        List<GeographicPoint2d> chosenRouteCoords = new ArrayList<>();
+
+
+        if(startOptional.isPresent() && endOptional.isPresent()) {
+            chosenRouteCoords.add(startOptional.get());
+            for (int i = 1; i < routes.size() - 1; i++) {
+                chosenRouteCoords.add(availableStops.get(chosenRoute.get(i)));
+            }
+            chosenRouteCoords.add(endOptional.get());
+        } else if(startOptional.isPresent()) {
+            chosenRouteCoords.add(startOptional.get());
+            for (int i = 1; i < routes.size(); i++) {
+                chosenRouteCoords.add(availableStops.get(chosenRoute.get(i)));
+            }
+        } else if(endOptional.isPresent()) {
+            for (int i = 0; i < routes.size() - 1; i++) {
+                chosenRouteCoords.add(availableStops.get(chosenRoute.get(i)));
+            }
+            chosenRouteCoords.add(endOptional.get());
+        } else {
+            for (int i = 0; i < routes.size(); i++) {
+                chosenRouteCoords.add(availableStops.get(chosenRoute.get(i)));
             }
         }
-        System.out.println();
+        return chosenRouteCoords;
     }
 
 
@@ -382,7 +363,7 @@ public class TourService implements ITourService {
         queue.add(new RouteState(initialPath, 0.0, visitedMandatoryStops));
 
         while (!queue.isEmpty()) {
-            System.out.println("Current RAM Usage: " + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1000000000);
+            System.out.println("Current RAM Usage: " + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1000000000 + "GB");
             if (validRoutes.size() >= maxRoutes) break;
 
             RouteState state = queue.poll();
@@ -563,7 +544,7 @@ public class TourService implements ITourService {
         MatchRequest dto = new MatchRequest();
         dto.setCollectionName("WienGeschichteWikiBuildings");
         dto.setInterests(interestsIds);
-        dto.setResultSize(50);
+        dto.setResultSize(20);
         return qdrantClient.getBuildingEntityIdsFromQdrant(dto);
     }
 

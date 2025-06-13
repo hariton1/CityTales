@@ -31,6 +31,7 @@
   <div class="tour-summary tui-space_top-3">
     <p><strong>Total Distance:</strong> {{ tour.getDistance().toFixed(2) }} km</p>
     <p><strong>Estimated Walking Duration:</strong> {{ tour.getDurationEstimate().toFixed(2) }} hours</p>
+    <p><strong>Tour cost:</strong> {{ tour.getTourPrice() || 0}}€</p>
   </div>
 
   <!-- Tour Stops Section -->

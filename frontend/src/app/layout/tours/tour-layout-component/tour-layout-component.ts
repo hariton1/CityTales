@@ -31,6 +31,7 @@ export class TourLayoutComponent {
   private router: Router;
   private userId: string | null = null;
   private cdr: ChangeDetectorRef;
+  private interestFiltering: string | null = null;
   private readonly alerts = inject(TuiAlertService);
 
   constructor(locationService: LocationService, tourService: TourService, router: Router, cdr: ChangeDetectorRef) {
@@ -46,10 +47,19 @@ export class TourLayoutComponent {
 
   async ngOnInit() {
     console.log('ngOnViewInit');
+    this.interestFiltering = localStorage.getItem("interest_filtering");
     const { data } = await supabase.auth.getSession();
     const userId = data.session?.user?.id;
     console.log('async user id ' + userId);
     if (userId) {
+      this.userId = userId;
+      for(var id of this.recommendedToursIds){
+        this.tourService.getTourForTourId(id).subscribe(tour => {
+          this.recommendedTours.push(TourDto.fromTourEntity(tour));
+          console.log("Fetched recommended tour: " + tour);
+        })
+      }
+
       this.tourService.getToursForUserId(userId!).subscribe(tours => {
         this.userTours = [...tours.map(tour => TourDto.fromTourEntity(tour))];
         console.log("User tours length: " + this.userTours.length);
@@ -66,11 +76,8 @@ export class TourLayoutComponent {
   userTours: TourDto[] | null = null;
 
 
-  recommendedTours = [
-    { name: 'Vienna Highlights', duration: '2 hours', description: 'Visit iconic landmarks in central Vienna.' },
-    { name: 'Hidden Gems Walk', duration: '3 hours', description: 'Explore less-known but charming spots.' },
-    { name: 'Imperial Architecture', duration: '1.5 hours', description: 'Admire the grandeur of Vienna’s palaces.' },
-  ];
+  recommendedToursIds: number[] = [153]
+  recommendedTours: TourDto[] = []
 
   tourName = new FormControl('');
   tourDescription = new FormControl('');
@@ -216,7 +223,8 @@ export class TourLayoutComponent {
     }
 
     //TODO: replace with user location
-    this.locationService.getLocationsInRadius(48.19994406631644, 16.371089994357767, 1000, true).subscribe(locations => {
+    console.log()
+    this.locationService.getLocationsInRadius(48.19994406631644, 16.371089994357767, 1000, this.interestFiltering === 'true').subscribe(locations => {
       this.buildingData = locations;
       console.log(this.buildingData.length);
 
@@ -410,6 +418,17 @@ export class TourLayoutComponent {
       data.forEach(tour => {
         tourdtos.push(TourDto.fromTourEntity(tour))});
 
+      tourdtos.sort((dto1, dto2) => {
+        if(dto1.getDistance() < dto2.getDistance()){
+          return -1;
+        }
+        if(dto1.getDistance() > dto2.getDistance()){
+          return 1;
+        }
+        return 0;
+      });
+
+      tourdtos.forEach(tour => {console.log(tour.getId(), tour.getDistance())})
 
       var selectedTour: TourDto = tourdtos[0];
 
