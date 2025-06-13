@@ -7,6 +7,7 @@ import {PersonEntity} from '../../dto/db_entity/PersonEntity';
 import {EventEntity} from '../../dto/db_entity/EventEntity';
 import {BuildingEntity} from '../../dto/db_entity/BuildingEntity';
 import {UserService} from '../../services/user.service';
+import { FunFactService, FunFactCardDTO } from '../../services/fun-fact.service';
 
 @Component({
   selector: 'app-historic-event-detail',
@@ -21,13 +22,18 @@ import {UserService} from '../../services/user.service';
 })
 export class HistoricEventDetailComponent {
 
-  constructor(private router: Router, private userService: UserService) {
+  funFact: FunFactCardDTO | null = null;
+  funFactSaved = false;
+
+  constructor(private funFactService: FunFactService , private router: Router, private userService: UserService) {
   }
 
 
   @Input()
   get selectedEvent(): any {
+    this.loadFunFact();
     return this._selectedEvent;
+
   }
   set selectedEvent(value: any) {
     this._selectedEvent = value;
@@ -66,6 +72,25 @@ export class HistoricEventDetailComponent {
         wikiId: this.selectedEvent.viennaHistoryWikiId
       }
     });
+  }
+
+  loadFunFact() {
+    if (this._selectedEvent && (this._selectedEvent.id || this._selectedEvent.viennaHistoryWikiId)) {
+      const id = this._selectedEvent.id ?? this._selectedEvent.viennaHistoryWikiId;
+      this.funFactService.getEventFunFact(id).subscribe({
+        next: fact => { this.funFact = fact; },
+        error: () => { this.funFact = null; }
+      });
+    } else {
+      this.funFact = null;
+    }
+  }
+
+  saveFunFact() {
+    if (!this.funFact) return;
+    // TODO: Hier echten UserService-Aufruf einbauen!
+    this.funFactSaved = true;
+    setTimeout(() => this.funFactSaved = false, 2000);
   }
 
 }
