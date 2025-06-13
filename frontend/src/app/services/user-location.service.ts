@@ -1,7 +1,8 @@
-import { Injectable } from '@angular/core';
+import {ChangeDetectorRef, Injectable, NgZone} from '@angular/core';
 import {LocationService} from './location.service';
 import {BuildingEntity} from '../dto/db_entity/BuildingEntity';
 import { BehaviorSubject } from 'rxjs';
+import {supabase} from '../user-management/supabase.service';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +12,19 @@ export class UserLocationService {
   private _nrOfHistoricalPlaces = new BehaviorSubject<number>(0);
   readonly nrOfHistoricalPlaces$ = this._nrOfHistoricalPlaces.asObservable();
 
-  constructor(readonly locationService: LocationService) { }
+  loggedIn: boolean = false;
+
+  constructor(readonly locationService: LocationService,
+              protected ngZone: NgZone,
+              ) { }
+
+  private checkSession(): void {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      this.ngZone.run(() => {
+        this.loggedIn = !!session;
+      });
+    });
+  }
 
   getPosition(): Promise<any>
   {
@@ -53,7 +66,7 @@ export class UserLocationService {
           };
           //send location to backend
           this.locationService
-            .getLocationsInRadius(position.coords.latitude, position.coords.longitude, radius, true)
+            .getLocationsInRadius(position.coords.latitude, position.coords.longitude, radius, this.loggedIn)
             .subscribe(historicalPlaces => {
               console.log(historicalPlaces.length);
               this._nrOfHistoricalPlaces.next(historicalPlaces.length);
