@@ -54,4 +54,45 @@ h1 {
 .quiz-bottom-row {
   display: flex;
   justify-content: space-between;
+  height: 5rem;
+}
+
+.single-quiz {
+  justify-content: center;
+}
+
+.question-image img {
+  display: flex;
+  justify-content: center;
+  width: 300px;
+  height: auto;
+  margin-bottom: 1.5rem;
+}
+
+.offset {
+  width: 100%;
+  height: 4rem;
+  border-radius: var(--tui-radius-l);
+}
+
+.offset:hover {
+  transform: translate3d(0, -0.25rem, 0);
+}
+
+.answer-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.answer-card {
+
+}
+
+[tuiProgressBar]._segmented {
+  --tui-segment-gap: 0.25rem;
+  border-radius: 0;
+  mask-image: linear-gradient(to left, transparent 0 var(--tui-segment-gap), #999 var(--tui-segment-gap) 100%);
+  margin: 0.5rem;
 }

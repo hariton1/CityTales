@@ -320,6 +320,7 @@ export class MapViewComponent implements OnInit{
     const events = (location.relatedEvents || []).map((item: any) => ({ ...item, type: 'event' }));
 
     const combined = [...buildings, ...persons, ...events];
+    console.log(combined)
     return combined;
   }
 
@@ -358,26 +359,24 @@ export class MapViewComponent implements OnInit{
       map(([filteredBuildings, filteredPersons, filteredEvents]) => {
         // Apply semantic filtering for each category
         const buildings = (location.relatedBuildings && location.relatedBuildings.length > 0 ? location.relatedBuildings.filter((building: BuildingEntity) =>
-          filteredBuildings.some(filteredBuilding => filteredBuilding.toString() === building.viennaHistoryWikiId)
+          filteredBuildings.some(filteredBuilding => filteredBuilding === parseInt(building.viennaHistoryWikiId))
         ) : []).map((item: any) => ({ ...item, type: 'building' }));
-
-        const persons = (location.relatedPersons && location.relatedPersons.length > 0 ? location.relatedPersons.filter((person: PersonEntity) =>
-          filteredPersons.some(filteredPerson => filteredPerson.toString() === person.viennaHistoryWikiId)
-        ) : []).map((item: any) => ({ ...item, type: 'person' }));
 
         const events = (location.relatedEvents && location.relatedEvents.length > 0 ? location.relatedEvents.filter((event: EventEntity) =>
           filteredEvents.some(filteredEvent => filteredEvent === event.viennaHistoryWikiId)
         ) : []).map((item: any) => ({ ...item, type: 'event' }));
 
-        // Combine the results
+        const persons = (location.relatedPersons && location.relatedPersons.length > 0 ? location.relatedPersons.filter((person: PersonEntity) =>
+          filteredPersons.some(filteredPerson => filteredPerson === parseInt(person.viennaHistoryWikiId))
+        ) : []).map((item: any) => ({ ...item, type: 'person' }));
+
         const combined = [...buildings, ...persons, ...events];
 
-        // Return the combined results
         return combined;
       }),
       catchError(err => {
         console.error('Error fetching interests or details:', err);
-        // Emit an empty array if an error occurs
+        // Emit error
         return of([]);
       })
     );
