@@ -40,12 +40,12 @@ public class FilteredBuildingService {
 
         List<Integer> interestFilteredBuildings = (interests == null || interests.isEmpty())
                 ? null
-                : this.getEntititesFromQdrant(interestNames, "WienGeschichteWikiBuildings");
+                : this.getEntitiesFromQdrant(interestNames, "WienGeschichteWikiBuildings");
 
         List<ViennaHistoryWikiBuildingObject> filtered = buildings.stream()
                 .filter(b -> {
                     if (interests == null || interests.isEmpty() || interestFilteredBuildings == null) {
-                        return true; // keine Filterung nötig
+                        return true;
                     }
                     return interestFilteredBuildings.contains(b.getViennaHistoryWikiId());
                 })
@@ -62,7 +62,7 @@ public class FilteredBuildingService {
         return sorted;
     }
 
-    private List<Integer> getEntititesFromQdrant(List<String> interestsNames, String collectionName) {
+    private List<Integer> getEntitiesFromQdrant(List<String> interestsNames, String collectionName) {
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
         headers.add("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36");
@@ -78,11 +78,4 @@ public class FilteredBuildingService {
         ResponseEntity<List> response = restTemplate.exchange(QDRANT_URL + "categorize/match", HttpMethod.POST, entity, List.class);
         return response.getBody();
     }
-
-    private boolean containsIgnoreCase(String haystack, String needle) {
-        return haystack != null && haystack.toLowerCase().contains(needle);
-    }
-
-
-
 }

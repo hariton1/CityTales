@@ -2,18 +2,19 @@
 <section id="quizListView" class="quiz-list-view">
   <h1>Ready for a Challenge?</h1>
 
-  <button class="button-style" appearance="primary" tuiButton type="button"
-    [tuiAppearanceState]="open ? 'hover' : null" [tuiDropdown]="content" [(tuiDropdownOpen)]="open">
-    Generate New Quiz using...
+  <button class="button-style" appearance="primary" tuiButton type="button" iconEnd="@tui.chevron-down"
+          [tuiAppearanceState]="openGenerateMenu ? 'hover' : null" [tuiDropdown]="content"
+          [(tuiDropdownOpen)]="openGenerateMenu">
+    Generate New Quiz using
   </button>
   <ng-template #content class="category-list">
     <tui-data-list tuiDataListDropdownManager [size]="size">
-      <button tuiOption type="button" (click)="generateQuiz('LATEST_TOUR')"> your latest tour </button>
-      <button tuiOption type="button" (click)="generateQuiz('SPECIFIC_TOUR')"> a specific tour </button>
-      <button tuiOption type="button" (click)="generateQuiz('INTERESTS')"> your interests </button>
-      <button tuiOption type="button" (click)="generateQuiz('FUN_FACTS')"> your favorite fun facts </button>
-      <button tuiOption type="button" (click)="generateQuiz('POPULAR')"> general popularity </button>
-      <button tuiOption type="button" (click)="generateQuiz('PARTY')"> randomized based on players </button>
+      <button tuiOption type="button" (click)="generateQuiz('LATEST_TOUR')"> your latest tour</button>
+      <button tuiOption type="button" (click)="generateQuiz('SPECIFIC_TOUR')"> a specific tour</button>
+      <button tuiOption type="button" (click)="generateQuiz('INTERESTS')"> your interests</button>
+      <button tuiOption type="button" (click)="generateQuiz('FUN_FACTS')"> your favorite fun facts</button>
+      <button tuiOption type="button" (click)="generateQuiz('POPULAR')"> general popularity</button>
+      <button tuiOption type="button" (click)="generateQuiz('PARTY')"> randomized based on players</button>
     </tui-data-list>
   </ng-template>
 
@@ -21,7 +22,6 @@
     <div *ngFor="let quiz of quizzes(); index as i">
       <button tuiCardLarge tuiHeader tuiSurface="floating" type="button" (click)="playQuiz(i)">
         <div class="quiz-card">
-
           <div class="quiz-top-row">
             <div class="quiz-category">
               <div *ngIf="quiz.category === 'LATEST_TOUR'" tuiHint="based on your latest tour">
@@ -68,42 +68,47 @@
 
 </section>
 
-<!-- Single Quiz Question View - Initially hidden and positioned off-screen
-<section id="singleQuizView" class="single-quiz-view hidden">
-  <div class="quiz-content-box">
-    <button id="backToQuizzesBtn" class="back-button" (click)="showQuizList()">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
-      </svg>
-      <span>Back to Challenges</span>
-    </button>
+<ng-template let-observer [tuiDialogOptions]="options" [(tuiDialog)]="openQuizPlay">
 
-    <h3 class="question-number">Question 5 of 10</h3>
+  <div class="single-quiz">
     <h2 class="question-text">
-      What famous institution is located on the Ringstrasse and known for its magnificent dome?
+      {{ playingQuiz?.questions }}
     </h2>
 
-    <img src="https://placehold.co/800x450/AFD9EF/262626?text=Parliament+Building"
-         alt="Location related to the question" class="question-image">
-
-    <div class="answer-options-grid">
-      <button class="answer-option">
-        A) Vienna State Opera
-      </button>
-      <button class="answer-option">
-        B) Austrian Parliament Building
-      </button>
-      <button class="answer-option">
-        C) Burgtheater
-      </button>
-      <button class="answer-option">
-        D) Rathaus (City Hall)
-      </button>
+    <div class="question-image">
+      <img ngSrc="{{ image }}" alt="image" fill>
     </div>
 
-    <div class="progress-bar-container">
-      <div class="progress-bar" style="width: 50%;"></div>
-      <span class="progress-text">5/10 Questions</span>
+
+    <div class="answer-list">
+      <div class="answer-card">
+        <button tuiSurface="floating" type="button" class="offset">
+          {{ answers.at(0) }}
+        </button>
+      </div>
+      <div class="answer-card">
+        <button tuiSurface="floating" type="button" class="offset">
+          {{ answers.at(1) }}
+        </button>
+      </div>
+      <div class="answer-card">
+        <button tuiSurface="floating" type="button" class="offset">
+          {{ answers.at(2) }}
+        </button>
+      </div>
+      <div class="answer-card">
+        <button tuiSurface="floating" type="button" class="offset">
+          {{ answers.at(3) }}
+        </button>
+      </div>
     </div>
-</section>
--->
+
+    <progress
+      tuiProgressBar
+      [max]="5"
+      [segments]="5"
+      [value]="3"
+    ></progress>
+  </div>
+
+</ng-template>

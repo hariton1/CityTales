@@ -1,0 +1,79 @@
+<div class="centered-wrapper">
+  <table tuiTable [size]="'m'" [style.width.rem]="70" class="funFacts">
+    <thead>
+    <tr>
+      <th tuiTh>Article name</th>
+      <th tuiTh>Headline</th>
+      <th tuiTh>Fun fact</th>
+      <th tuiTh>Score</th>
+      <th tuiTh>Reason</th>
+      <th tuiTh>Saved at</th>
+      <th tuiTh>Actions</th>
+    </tr>
+    </thead>
+    <tbody tuiTbody>
+    <tr *ngFor="let savedFunFact of savedFunFacts">
+      <!-- First column -->
+      <td tuiTd>
+        <div [tuiCell]="'m'">
+          <span tuiTitle>
+            {{ savedFunFact.article_name }}
+          </span>
+        </div>
+      </td>
+      <!-- Second column -->
+      <td tuiTd>
+        <div [tuiCell]="'m'">
+          <span tuiTitle>
+            {{ savedFunFact.headline }}
+          </span>
+        </div>
+      </td>
+      <!-- Third column -->
+      <td tuiTd>
+        <div [tuiCell]="'m'">
+          <span tuiTitle>
+            {{ savedFunFact.fun_fact }}
+          </span>
+        </div>
+      </td>
+      <!-- Fourth column -->
+      <td tuiTd>
+        <div [tuiCell]="'m'">
+          <span tuiTitle>
+            {{ savedFunFact.score }}
+          </span>
+        </div>
+      </td>
+      <!-- Fifth column -->
+      <td tuiTd>
+        <div [tuiCell]="'m'">
+          <span tuiTitle>
+            {{ savedFunFact.reason }}
+          </span>
+        </div>
+      </td>
+      <!-- Sixth column -->
+      <td tuiTd>
+        <div [tuiCell]="'m'">
+          <span tuiTitle>
+            {{ savedFunFact.saved_at | date: 'dd.MM.yyyy' }}
+          </span>
+        </div>
+      </td>
+
+      <!-- edit / more options -->
+      <td tuiTd>
+        <span tuiStatus>
+            <button appearance="action" iconStart="@tui.trash" size="s" tuiIconButton type="button" (click)="handleDeleteClick(savedFunFact)">
+                More
+            </button>
+        </span>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
+</div>
+
+

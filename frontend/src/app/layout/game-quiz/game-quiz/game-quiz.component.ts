@@ -1,16 +1,18 @@
 import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
 import {
-  TuiButton, TuiDataList,
+  TuiButton, TuiDataList, TuiDialog,
   TuiDropdown,
   TuiHint, TuiSizeL, TuiSizeS,
   TuiSurface,
   TuiTitle
 } from '@taiga-ui/core';
-import {TuiAvatar, TuiDataListDropdownManager} from '@taiga-ui/kit';
+import {TuiAvatar, TuiDataListDropdownManager, TuiProgress} from '@taiga-ui/kit';
 import {TuiCardLarge, TuiHeader} from '@taiga-ui/layout';
-import {NgForOf, NgIf} from '@angular/common';
+import {NgForOf, NgIf, NgOptimizedImage} from '@angular/common';
 import {QuizService} from '../../../services/quiz.service';
 import {UUID} from 'node:crypto';
+import {TuiResponsiveDialogOptions} from '@taiga-ui/addon-mobile';
+import {Quiz} from '../../../dto/quiz.dto';
 
 @Component({
   selector: 'app-game-quiz',
@@ -26,7 +28,10 @@ import {UUID} from 'node:crypto';
     NgIf,
     TuiDropdown,
     TuiDataList,
-    TuiDataListDropdownManager
+    TuiDataListDropdownManager,
+    TuiDialog,
+    TuiProgress,
+    NgOptimizedImage,
   ],
   templateUrl: './game-quiz.component.html',
   styleUrl: './game-quiz.component.scss',
@@ -35,24 +40,31 @@ import {UUID} from 'node:crypto';
 export class GameQuizComponent implements OnInit {
 
   private readonly quizService = inject(QuizService);
+  protected options: Partial<TuiResponsiveDialogOptions> = {};
+  protected openQuizPlay = false;
+  protected value = '';
   protected size: TuiSizeL | TuiSizeS = 's';
-  protected open = false;
+  protected openGenerateMenu = false;
   creatorId: UUID = '' as UUID;
   users: UUID[] = [];
-  newQuiz = this.quizService.newQuiz;
   quizzes = this.quizService.quizzes;
   chosenCategory = '';
+  playingQuiz: Quiz | undefined;
+  answers: string[] = [];
+  image: string = '';
+
 
   protected dropdownOpen = false;
 
   ngOnInit(): void {
     this.retrieveUserID();
+    console.log('load quizzes for ', this.creatorId)
     this.quizService.getQuizzesByUserId(this.creatorId);
-    console.log(this.quizzes());
+    console.log('LOAD QUIZZES ON INIT', this.quizzes());
   }
 
   generateQuiz(category: string) {
-    this.open = false;
+    this.openGenerateMenu = false;
     this.chosenCategory = category;
     this.retrieveUserID();
     this.users.push(this.creatorId);
@@ -68,7 +80,22 @@ export class GameQuizComponent implements OnInit {
   }
 
   playQuiz(index: number): void {
-    console.log(index);
+    this.playingQuiz = this.quizzes()[index];
+    console.log(this.playingQuiz);
+    this.options = {
+      label: this.playingQuiz.name,
+      size: 'l',
+    };
+
+    let question = this.playingQuiz.questions.at(0);
+
+    this.answers.push(question!.answer);
+    this.answers.push(question!.wrongAnswerA);
+    this.answers.push(question!.wrongAnswerB);
+    this.answers.push(question!.wrongAnswerC);
+    this.image = question!.image;
+
+    this.openQuizPlay = true;
   }
 
 }
