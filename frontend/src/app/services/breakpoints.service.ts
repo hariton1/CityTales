@@ -79,4 +79,25 @@ export class BreakpointService {
         return 3;
     }
   }
+
+  get relatedItemCount(): number {
+    switch (this.currentLevel) {
+      case 'mobile':
+      case 'tablet':
+        return 2;
+      case 'desktop':
+        return 2;
+      case '1280-1499':
+        return 2;
+      case '1500-1899':
+        return 2;
+      case '1900-2559':
+        return 3;
+      case '2560+':
+        return 3;
+      default:
+        return 3;
+    }
+  }
+
 }

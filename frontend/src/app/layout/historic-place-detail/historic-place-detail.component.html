@@ -233,7 +233,7 @@
 
       <tui-carousel
         [draggable]="true"
-        [itemsCount]="3"
+        [itemsCount]="relatedItemCount"
         [(index)]="index2"
         [style.--tui-carousel-padding] = "isMobile ? '0' : '0 15px 0 0'"
       >
@@ -272,7 +272,7 @@
         </ng-container>
       </tui-carousel>
       <tui-pagination
-        *ngIf="selectedPlace.relatedPersons?.length > 3"
+        *ngIf="selectedPlace.relatedPersons?.length > relatedItemCount"
         size="s"
         class="tui-space_top-4"
         [index]="roundedPersons"
@@ -286,7 +286,7 @@
 
       <tui-carousel
         [draggable]="true"
-        [itemsCount]="3"
+        [itemsCount]="relatedItemCount"
         [(index)]="index3"
         [style.--tui-carousel-padding] = "isMobile ? '0' : '0 15px 0 0'"
       >
@@ -323,7 +323,7 @@
         </ng-container>
       </tui-carousel>
       <tui-pagination
-        *ngIf="selectedPlace.relatedBuildings?.length > 3"
+        *ngIf="selectedPlace.relatedBuildings?.length > relatedItemCount"
         size="s"
         class="tui-space_top-4"
         [index]="roundedBuildings"
@@ -338,7 +338,7 @@
 
       <tui-carousel
         [draggable]="true"
-        [itemsCount]="3"
+        [itemsCount]="relatedItemCount"
         [(index)]="index4"
         [style.--tui-carousel-padding] = "isMobile ? '0' : '0 15px 0 0'"
       >
@@ -374,7 +374,7 @@
         </ng-container>
       </tui-carousel>
       <tui-pagination
-        *ngIf="selectedPlace.relatedEvents?.length > 3"
+        *ngIf="selectedPlace.relatedEvents?.length > relatedItemCount"
         size="s"
         class="tui-space_top-4"
         [index]="roundedEvents"
