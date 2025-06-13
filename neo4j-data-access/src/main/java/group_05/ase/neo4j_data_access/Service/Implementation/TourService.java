@@ -5,24 +5,16 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithm;
-import com.graphhopper.jsprit.core.algorithm.box.Jsprit;
-import com.graphhopper.jsprit.core.problem.Location;
-import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
-import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
-import com.graphhopper.jsprit.core.problem.solution.route.activity.TourActivity;
-import com.graphhopper.jsprit.core.problem.vehicle.VehicleImpl;
-import com.graphhopper.jsprit.core.problem.vehicle.VehicleTypeImpl;
-import com.graphhopper.jsprit.core.reporting.SolutionPrinter;
-import com.graphhopper.jsprit.core.util.Solutions;
 import group_05.ase.neo4j_data_access.Client.QdrantClient;
 import group_05.ase.neo4j_data_access.Client.UserDBClient;
 import group_05.ase.neo4j_data_access.Entity.Tour.*;
 import group_05.ase.neo4j_data_access.Entity.ViennaHistoryWikiBuildingObject;
 import group_05.ase.neo4j_data_access.Service.Interface.ITourService;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.neo4j.types.GeographicPoint2d;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -151,145 +143,6 @@ public class TourService implements ITourService {
         tourObject.setPricePerStop(pricePerStop);
 
         return tourObject;
-    }
-
-
-    public List<GeographicPoint2d> findRoutesRoutingAlgo(
-            Optional<GeographicPoint2d> startOptional,
-            Optional<GeographicPoint2d> endOptional,
-            List<GeographicPoint2d> mandatoryStops,
-            List<GeographicPoint2d> availableStops,
-            List<List<Float>> distanceMatrix,
-            Integer stopCount,
-            Double maxDistance
-    ) {
-        //Fill distance matrix
-        double[][] distanceMatrixArray = new double[availableStops.size()][availableStops.size()];
-        for(int i = 0; i < availableStops.size(); i++) {
-            for(int j = 0; j < availableStops.size(); j++) {
-                distanceMatrixArray[i][j] = distanceMatrix.get(i).get(j);
-            }
-        }
-
-        // Create vehicle type
-        VehicleTypeImpl vehicleType = VehicleTypeImpl.Builder.newInstance("vehicleType")
-                .addCapacityDimension(0, 1)
-                .build();
-
-        VehicleImpl vehicle;
-
-        // Define start location (optional, use one of the locations)
-        if(startOptional.isPresent() && endOptional.isPresent()) {
-            Location start = Location.newInstance(String.valueOf(0));
-            Location end = Location.newInstance(String.valueOf(distanceMatrixArray.length -1));
-            vehicle = VehicleImpl.Builder.newInstance("walker")
-                    .setStartLocation(start)
-                    .setEndLocation(end)
-                    .setType(vehicleType)
-                    .build();
-        } else if(startOptional.isPresent()) {
-            Location start = Location.newInstance(String.valueOf(0));
-            vehicle = VehicleImpl.Builder.newInstance("walker")
-                    .setStartLocation(start)
-                    .setType(vehicleType)
-                    .build();
-        } else if(endOptional.isPresent()) {
-            Location end = Location.newInstance(String.valueOf(distanceMatrixArray.length -1));
-            vehicle = VehicleImpl.Builder.newInstance("walker")
-                    .setEndLocation(end)
-                    .setType(vehicleType)
-                    .build();
-        } else {
-            vehicle = VehicleImpl.Builder.newInstance("walker")
-                    .setType(vehicleType)
-                    .build();
-        }
-
-
-        VehicleRoutingProblem.Builder vrpBuilder = VehicleRoutingProblem.Builder.newInstance();
-        vrpBuilder.addVehicle(vehicle);
-
-        // Add all service locations (except depot)
-        for (int i = 1; i < distanceMatrixArray.length - 1; i++) {
-            vrpBuilder.addJob(com.graphhopper.jsprit.core.problem.job.Service.Builder.newInstance(String.valueOf(i))
-                    .setLocation(Location.newInstance(String.valueOf(i)))
-                    .build());
-        }
-
-        // Use your own distance matrix
-        vrpBuilder.setFleetSize(VehicleRoutingProblem.FleetSize.FINITE);
-        vrpBuilder.setRoutingCost(new CustomMatrixCost(distanceMatrixArray));
-
-        VehicleRoutingProblem problem = vrpBuilder.build();
-
-        // Solve
-        VehicleRoutingAlgorithm algorithm = Jsprit.createAlgorithm(problem);
-        Collection<VehicleRoutingProblemSolution> solutions = algorithm.searchSolutions();
-
-
-        //Fitler soltions to match number of stops and include necessary stops and the keep budget
-
-        // Extract best solution
-        List<VehicleRoutingProblemSolution> filteredSolutions = solutions.stream()
-                .filter(solution -> solution.getCost() <= maxDistance)
-                .filter(solution ->
-                        solution.getRoutes().stream()
-                                .allMatch(route -> route.getActivities().size() == stopCount)
-                )
-                .toList();
-
-
-        List<List<Integer>> routes = new ArrayList<>();
-        filteredSolutions.forEach(solution -> {
-            solution.getRoutes().forEach(route -> {
-                List<Integer> routeIds = new ArrayList<>();
-                route.getActivities().forEach(activity -> {
-                    if(activity instanceof TourActivity.JobActivity jobActivity) {
-                        routeIds.add(Integer.valueOf(jobActivity.getJob().getId()));
-                    }
-                });
-                routes.add(routeIds);
-            });
-        });
-
-        System.out.println("Available routes: " + routes.size());
-
-        if(routes.isEmpty()) {
-            System.out.println("No routes found");
-            return List.of();
-        }
-
-
-        //Map list indexes back to coordinate list
-        //Choose arbitrarily first route
-        List<Integer> chosenRoute = routes.get(0);
-        System.out.println("Chosen route: " + chosenRoute.toString());
-
-        List<GeographicPoint2d> chosenRouteCoords = new ArrayList<>();
-
-
-        if(startOptional.isPresent() && endOptional.isPresent()) {
-            chosenRouteCoords.add(startOptional.get());
-            for (int i = 1; i < routes.size() - 1; i++) {
-                chosenRouteCoords.add(availableStops.get(chosenRoute.get(i)));
-            }
-            chosenRouteCoords.add(endOptional.get());
-        } else if(startOptional.isPresent()) {
-            chosenRouteCoords.add(startOptional.get());
-            for (int i = 1; i < routes.size(); i++) {
-                chosenRouteCoords.add(availableStops.get(chosenRoute.get(i)));
-            }
-        } else if(endOptional.isPresent()) {
-            for (int i = 0; i < routes.size() - 1; i++) {
-                chosenRouteCoords.add(availableStops.get(chosenRoute.get(i)));
-            }
-            chosenRouteCoords.add(endOptional.get());
-        } else {
-            for (int i = 0; i < routes.size(); i++) {
-                chosenRouteCoords.add(availableStops.get(chosenRoute.get(i)));
-            }
-        }
-        return chosenRouteCoords;
     }
 
 
