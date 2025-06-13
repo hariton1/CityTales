@@ -6,7 +6,7 @@ import {TuiSearchResults} from '@taiga-ui/experimental';
 import {ReactiveFormsModule, FormControl} from '@angular/forms';
 import {BuildingEntity} from '../../dto/db_entity/BuildingEntity';
 import {EnrichmentService} from '../../services/enrichment.service';
-import {TuiAppearance, TuiTitle, TuiTextfield, TuiIcon} from '@taiga-ui/core';
+import {TuiAppearance, TuiTitle, TuiTextfield, TuiIcon, TuiScrollbar} from '@taiga-ui/core';
 import {TuiCell, TuiInputSearch} from '@taiga-ui/layout';
 import {debounceTime, filter, Observable, switchMap} from 'rxjs';
 import {SearchService} from '../../services/search.service';
@@ -35,7 +35,8 @@ import {BreakpointService} from '../../services/breakpoints.service';
     NotificationInboxComponent,
     HistoricEventDetailComponent,
     HistoricPersonDetailComponent,
-    TuiIcon
+    TuiIcon,
+    TuiScrollbar
   ],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.less'

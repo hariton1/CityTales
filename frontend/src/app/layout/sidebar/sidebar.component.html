@@ -34,7 +34,7 @@
   </div>
 </div>
 
-
+<tui-scrollbar class="scrollable-content">
 <div class="sidebar-container" *ngIf="this.selectedPlace || this.selectedEvent || this.selectedPerson">
 
   <!-- Show Place -->
@@ -69,6 +69,7 @@
   </app-historic-person-detail>
 
 </div>
+</tui-scrollbar>
 
 
 <div class="place-preview-container" *ngIf="!this.selectedPlace && !this.selectedEvent && !this.selectedPerson">
