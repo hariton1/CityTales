@@ -14,7 +14,6 @@ import {QuizService} from '../../../services/quiz.service';
 import {UUID} from 'node:crypto';
 import {TuiResponsiveDialogOptions} from '@taiga-ui/addon-mobile';
 import {Quiz} from '../../../dto/quiz.dto';
-import {Question} from '../../../dto/question.dto';
 import {UserService} from '../../../services/user.service';
 
 @Component({
@@ -124,7 +123,7 @@ export class GameQuizComponent implements OnInit {
     } else {
       this.openQuizPlay = false;
       this.alerts.open(`Good job!`, {
-        label: 'Final score: ${this.score}',
+        label: `Final score: ${this.score}`,
         appearance: 'primary',
         autoClose: 5000
       }).subscribe()

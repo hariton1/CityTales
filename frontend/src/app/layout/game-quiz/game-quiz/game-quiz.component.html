@@ -9,11 +9,11 @@
   <ng-template #content class="category-list">
     <tui-data-list tuiDataListDropdownManager [size]="size">
       <button tuiOption type="button" (click)="generateQuiz('LATEST_TOUR')"> your latest tour</button>
-      <button tuiOption type="button" (click)="generateQuiz('SPECIFIC_TOUR')"> a specific tour</button>
+      <!--button tuiOption type="button" (click)="generateQuiz('SPECIFIC_TOUR')"> a specific tour</button>
       <button tuiOption type="button" (click)="generateQuiz('INTERESTS')"> your interests</button>
       <button tuiOption type="button" (click)="generateQuiz('FUN_FACTS')"> your favorite fun facts</button>
       <button tuiOption type="button" (click)="generateQuiz('POPULAR')"> general popularity</button>
-      <button tuiOption type="button" (click)="generateQuiz('PARTY')"> randomized based on players</button>
+      <button tuiOption type="button" (click)="generateQuiz('PARTY')"> randomized based on players</button-->
     </tui-data-list>
   </ng-template>
 
@@ -43,7 +43,8 @@
               </div>
             </div>
             <h3 tuiTitle>
-              {{ quiz.name }}
+              awesome quiz
+              <!--{{ quiz.name }}-->
             </h3>
             <h6>
               {{ userName }}
