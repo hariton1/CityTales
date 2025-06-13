@@ -49,6 +49,9 @@ import {TuiCard, TuiHeader} from '@taiga-ui/layout';
 import {TuiExpand} from '@taiga-ui/experimental';
 import {EnrichmentService} from '../../services/enrichment.service';
 import {BreakpointObserver, Breakpoints} from '@angular/cdk/layout';
+import { FunFactService, FunFactCardDTO } from '../../services/fun-fact.service';
+
+
 
 const postfix = ' €';
 const numberOptions = maskitoNumberOptionsGenerator({
@@ -99,6 +102,8 @@ const numberOptions = maskitoNumberOptionsGenerator({
 })
 export class HistoricPlaceDetailComponent implements OnInit{
 
+  funFact: FunFactCardDTO | null = null;
+
   private readonly pricesService = inject(PricesService);
   locationId= signal(0);
   prices = this.pricesService.prices;
@@ -113,7 +118,8 @@ export class HistoricPlaceDetailComponent implements OnInit{
   enrichmentLoading = false;
 
 
-  constructor(private userService: UserService,
+  constructor( private funFactService: FunFactService,
+               private userService: UserService,
               private userHistoriesService: UserHistoriesService,
               private router: Router,
               readonly EnrichmentService: EnrichmentService,
@@ -226,6 +232,7 @@ export class HistoricPlaceDetailComponent implements OnInit{
     this.enrichedContent = '';
     this.enrichmentStarted = false;
     this.enrichmentLoading = false;
+    this.loadFunFact();
     this.cdr.markForCheck();
   }
   private _selectedPlace: any;
@@ -389,6 +396,46 @@ export class HistoricPlaceDetailComponent implements OnInit{
 
   get eventsPageCount(): number {
     return Math.ceil(this.selectedPlace?.relatedEvents?.length / this.itemsCount);
+  }
+
+  loadFunFact() {
+    console.log('FunFact wird geladen für:', this._selectedPlace?.viennaHistoryWikiId);
+    if (this._selectedPlace && this._selectedPlace.viennaHistoryWikiId) {
+      this.funFact = null;
+      this.funFactService.getBuildingFunFact(this._selectedPlace.viennaHistoryWikiId).subscribe({
+        next: fact => {
+          this.funFact = fact;
+          this.cdr.markForCheck();
+        },
+        error: () => {
+          this.funFact = null;
+          this.cdr.markForCheck();
+        }
+      });
+    } else {
+      this.funFact = null;
+    }
+  }
+
+  funFactSaved = false;
+
+// Diese Methode wird vom Button geklickt
+  saveFunFact() {
+    if (!this.funFact) return;
+
+    // Hier später deinen User-DB-Service einbinden.
+    // Für jetzt: Dummy-Logik, in Realität rufst du deinen UserService oder eine eigene Service-Methode:
+    // this.userService.saveUserFunFact(this.funFact) oder ähnlich.
+
+    // --- DUMMY (zum Testen) ---
+    this.funFactSaved = true;
+    setTimeout(() => this.funFactSaved = false, 2000); // Button springt nach 2 Sekunden zurück
+
+    // --- ECHTE LOGIK ---
+    // this.userService.saveFunFactForUser(this.funFact).subscribe({
+    //   next: () => { this.funFactSaved = true; },
+    //   error: () => { /* Fehlerbehandlung */ }
+    // });
   }
 }
 
