@@ -16,6 +16,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.Instant;
@@ -88,6 +89,10 @@ public class TourService implements ITourService {
 
 
         List<List<Float>> distanceMatrix = getMetricMatrix(stops, "distance");
+        if(distanceMatrix == null) {
+            System.out.println("Distance matrix is null");
+            return null;
+        }
 
         List<GeographicPoint2d> mandatoryStops = dto.getPredefinedStops().stream().map(stop -> new GeographicPoint2d(stop.getLatitude().get(), stop.getLongitude().get())).toList();
 
@@ -339,10 +344,11 @@ public class TourService implements ITourService {
 
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(payload, headers);
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
-
-        if (!response.getStatusCode().is2xxSuccessful()) {
-            System.out.println("Error: " + response.getBody());
+        ResponseEntity<String> response;
+        try{
+            response = restTemplate.postForEntity(url, request, String.class);
+        } catch (RestClientException e) {
+            System.out.println(e.getMessage());
             return null;
         }
 

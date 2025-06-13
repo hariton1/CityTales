@@ -13,6 +13,10 @@ import {TourDto} from '../../../dto/tour.dto';
 import {TourRequestEntity} from '../../../dto/tour_entity/TourRequestEntity';
 import {FormsModule} from '@angular/forms';
 import {TuiInputNumber, TuiSlider, TuiTabs} from '@taiga-ui/kit';
+import {UserPointsService} from '../../../user_db.services/user-points.service';
+import {UserPointDto} from '../../../user_db.dto/user-point.dto';
+import {UserService} from '../../../services/user.service';
+import {UUID} from 'node:crypto';
 
 
 @Component({
@@ -28,16 +32,20 @@ export class TourLayoutComponent {
 
   private locationService: LocationService;
   private tourService: TourService;
+  private userPointsService: UserPointsService;
+  private userService: UserService;
   private router: Router;
   private userId: string | null = null;
   private cdr: ChangeDetectorRef;
   private interestFiltering: string | null = null;
   private readonly alerts = inject(TuiAlertService);
 
-  constructor(locationService: LocationService, tourService: TourService, router: Router, cdr: ChangeDetectorRef) {
+  constructor(locationService: LocationService, tourService: TourService, router: Router, cdr: ChangeDetectorRef, userPointsService: UserPointsService, userService: UserService) {
     this.locationService = locationService;
     this.tourService = tourService;
+    this.userPointsService = userPointsService;
     this.router = router;
+    this.userService = userService;
     this.cdr = cdr;
   }
 
@@ -408,6 +416,10 @@ export class TourLayoutComponent {
     }
     this.alerts.open('Your tour is being generated...', {label: 'Success!', appearance: 'success', autoClose: 6000}).subscribe();
     this.tourService.createTour(entity).subscribe(data => {
+      if(!data){
+        this.alerts.open('Could not connect to backend tour creation service!', {label: 'Failure!', appearance: 'warning', autoClose: 6000}).subscribe();
+        return;
+      }
       if(data.length === 0) {
         this.alerts.open('No tour found for your parameters! Please choose other parameters.', {label: 'Failure!', appearance: 'warning', autoClose: 6000}).subscribe();
         return;
@@ -431,6 +443,11 @@ export class TourLayoutComponent {
       tourdtos.forEach(tour => {console.log(tour.getId(), tour.getDistance())})
 
       var selectedTour: TourDto = tourdtos[0];
+
+      //Create points for tour with article id tour id
+      const stored = localStorage.getItem("user_uuid") as UUID;
+      var pointDTO = new UserPointDto(-1, stored, 4, new Date(),Date.now() / 1000)
+      this.userPointsService.createNewPoints(pointDTO).subscribe(data => {console.log("Tour points created")});
 
       this.tourService.createTourInDB(selectedTour).subscribe({
         next: tour => {console.log("Tour created successfully!");
