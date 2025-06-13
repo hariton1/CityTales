@@ -14,10 +14,10 @@ export class QuizService {
   quizzes = computed(() => this.quizzesSignal());
 
   generateNewQuiz(category: string, userIds : UUID[]) {
-    this.quizzes().push(this.getNewQuizDefaultData(category, userIds.at(0) as UUID));
-    //this.httpClient.post<Quiz>(this.PATH + 'quiz/create/' + category, userIds).subscribe((data) => {
-      //this.newQuizSignal.set(data);
-    //});
+    this.httpClient.post<Quiz>(this.PATH + 'quiz/create/' + category, userIds).subscribe((newQuiz) => {
+      const currentQuizzes = this.quizzes();
+      this.quizzesSignal.set([...currentQuizzes, newQuiz]);
+    });
   }
 
   getQuizzesByUserId(userId : UUID) {

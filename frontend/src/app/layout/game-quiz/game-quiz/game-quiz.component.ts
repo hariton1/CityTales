@@ -8,10 +8,11 @@ import {
 } from '@taiga-ui/core';
 import {TuiAvatar, TuiDataListDropdownManager, TuiProgress} from '@taiga-ui/kit';
 import {TuiCardLarge, TuiHeader} from '@taiga-ui/layout';
-import {NgForOf, NgIf} from '@angular/common';
+import {NgForOf, NgIf, NgOptimizedImage} from '@angular/common';
 import {QuizService} from '../../../services/quiz.service';
 import {UUID} from 'node:crypto';
 import {TuiResponsiveDialogOptions} from '@taiga-ui/addon-mobile';
+import {Quiz} from '../../../dto/quiz.dto';
 
 @Component({
   selector: 'app-game-quiz',
@@ -30,6 +31,7 @@ import {TuiResponsiveDialogOptions} from '@taiga-ui/addon-mobile';
     TuiDataListDropdownManager,
     TuiDialog,
     TuiProgress,
+    NgOptimizedImage,
   ],
   templateUrl: './game-quiz.component.html',
   styleUrl: './game-quiz.component.scss',
@@ -45,18 +47,20 @@ export class GameQuizComponent implements OnInit {
   protected openGenerateMenu = false;
   creatorId: UUID = '' as UUID;
   users: UUID[] = [];
-  newQuiz = this.quizService.newQuiz();
-  quizzes = this.quizService.quizzes();
+  quizzes = this.quizService.quizzes;
   chosenCategory = '';
+  playingQuiz: Quiz | undefined;
   answers: string[] = [];
+  image: string = '';
 
 
   protected dropdownOpen = false;
 
   ngOnInit(): void {
     this.retrieveUserID();
+    console.log('load quizzes for ', this.creatorId)
     this.quizService.getQuizzesByUserId(this.creatorId);
-    console.log(this.quizzes);
+    console.log('LOAD QUIZZES ON INIT', this.quizzes());
   }
 
   generateQuiz(category: string) {
@@ -76,16 +80,20 @@ export class GameQuizComponent implements OnInit {
   }
 
   playQuiz(index: number): void {
-    let quiz = this.quizzes[index];
+    this.playingQuiz = this.quizzes()[index];
+    console.log(this.playingQuiz);
     this.options = {
-      label: quiz.name,
+      label: this.playingQuiz.name,
       size: 'l',
     };
 
-    this.answers.push('1654');
-    this.answers.push('1912');
-    this.answers.push('1835');
-    this.answers.push('1745');
+    let question = this.playingQuiz.questions.at(0);
+
+    this.answers.push(question!.answer);
+    this.answers.push(question!.wrongAnswerA);
+    this.answers.push(question!.wrongAnswerB);
+    this.answers.push(question!.wrongAnswerC);
+    this.image = question!.image;
 
     this.openQuizPlay = true;
   }
