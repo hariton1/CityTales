@@ -8,6 +8,8 @@ import {CommonModule} from '@angular/common';
 import {BuildingEntity} from '../../../dto/db_entity/BuildingEntity';
 import {TuiCard} from '@taiga-ui/layout';
 import {firstValueFrom} from 'rxjs';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 
 @Component({
   selector: 'app-tour-detail',
@@ -49,11 +51,11 @@ export class TourDetailComponent {
     this.tourService = tourService;
     this.router = router;
 
-  this.tourService.getTourForTourId(this.tourId).subscribe(tour => {
+  this.tourService.getTourForTourId(this.tourId).subscribe(async tour => {
     this.tour = TourDto.fromTourEntity(tour);
     this.nameControl.setValue(this.tour.getName());
     this.descriptionControl.setValue(this.tour.getDescription());
-    this.recalculateStopDistances();
+    await this.recalculateStopDistances();
     console.log(this.tour)
 
     this.tour.getStops().forEach(stop => {
@@ -225,5 +227,69 @@ export class TourDetailComponent {
     return result.duration*60; // in minutes
   }
 
+  exportSiteToPdf() {
+    const element = document.getElementById('pdf-content');
 
+    if (!element) return;
+
+    html2canvas(element, {
+      scrollY: -window.scrollY,
+      scale: 2,
+      useCORS: false
+    }).then((canvas) => {
+      const imgData = canvas.toDataURL('image/png');
+
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+
+      const imgWidth = pageWidth;
+      const imgHeight = (canvas.height * pageWidth) / canvas.width;
+
+      let heightLeft = imgHeight;
+      let position = 30;
+
+      const tourName = this.tour.getName();
+      const tourNameSafe = tourName.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+      const currentDate = new Date().toLocaleDateString();
+
+
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      pdf.setFontSize(16);
+      pdf.text(tourName, pageWidth / 2, 15, { align: 'center' });
+
+      pdf.setFontSize(10);
+      pdf.text(currentDate, pageWidth - 10, 10, { align: 'right' });
+
+      while (heightLeft > 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
+      pdf.save(`${tourNameSafe || 'tour-detail'}.pdf`);
+    });
+  }
+
+  generateGoogleMapsTourLink() {
+    const stops = this.tour.getStops();
+
+    const locations: string[] = [];
+
+    locations.push(`${this.tour.getStart_lat()},${this.tour.getStart_lng()}`);
+
+    for (const stop of stops) {
+      locations.push(`${stop.latitude},${stop.longitude}`);
+    }
+
+    locations.push(`${this.tour.getEnd_lat()},${this.tour.getEnd_lng()}`);
+
+    const baseUrl = 'https://www.google.com/maps/dir/';
+    const url = baseUrl + locations.map(encodeURIComponent).join('/');
+
+    window.open(url, '_blank');
+  }
 }

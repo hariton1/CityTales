@@ -57,6 +57,7 @@ export const routes: Routes = [
   { path: 'history', component: HistoryAllUsersComponent },
   { path: 'quizzes', component: GameQuizComponent },
   { path: 'admin-dashboard', component: AdminDashboardComponent },
-  { path: 'about-us', component: AboutComponent },
+  { path: 'about-us',
+  loadComponent: () => import("./core/about/about.component").then(about => about.AboutComponent)},
   { path: '', redirectTo: '/explore', pathMatch: 'full' } //default page, to be changed
 ];
