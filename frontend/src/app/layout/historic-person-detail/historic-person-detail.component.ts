@@ -142,10 +142,8 @@ export class HistoricPersonDetailComponent implements OnInit{
     this.EnrichmentService.enrichContentWithTone(tone, content).subscribe({
       next: (response) => {
         console.log('tone: ' + response.tone);
-        console.log('summary: ' + response.summary);
         console.log('enrichedContent: ' + response.enrichedContent);
 
-        this.summary = response.summary;
         this.enrichedContent = response.enrichedContent;
       },
       error: (error: any) => {
