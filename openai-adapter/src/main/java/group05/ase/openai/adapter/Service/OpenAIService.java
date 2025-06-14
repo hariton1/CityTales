@@ -148,12 +148,29 @@ public class OpenAIService {
     }
 
     public QuizResponse generateQuiz(String quizGenerationContentPrompt) {
-        String systemPrompt = "You are a quiz generator, that generates concise concise questions based " +
-                "on the following information. Generate exactly one Question along with one correct answer" +
-                " and 3 wrong answers.";
+        String systemPrompt = """
+                You are a quiz question generator. Based on the provided input information, generate exactly one concise multiple-choice question.
+                Each output must always be in german and returned as a single line string in the following format:
+                "Question;CorrectAnswer;WrongAnswerA;WrongAnswerB;WrongAnswerC;empty"
+                Here is an example:
+                "What is the capital of France?;Paris;London;Berlin;Rome;empty"
+                Important requirements:
+                Separate each field strictly with a semicolon (;) — no extra spaces.
+                The first field is the quiz question.
+                The second field is the correct answer to the question.
+                The next three fields are incorrect but plausible answers.
+                The final field must always be the string "empty" (without quotes).
+                Do not include any other text, explanation, or formatting — return only the semicolon-separated string exactly as specified.
+                """;
         String generatedQuiz = callOpenAI(systemPrompt, quizGenerationContentPrompt);
 
-        return new QuizResponse(generatedQuiz);
+        String[] generatedContent = generatedQuiz.split(";");
+        String[] quizContent = new String[6];
+        for (int i = 0; i < quizContent.length; i++) {
+            quizContent[i] = generatedQuiz.length() - 1 >= i ? generatedContent[i] : "";
+        }
+
+        return new QuizResponse(quizContent[0], quizContent[1], quizContent[2], quizContent[3], quizContent[4], quizContent[5]);
     }
 
     protected String enforceEnglish(String prompt) {

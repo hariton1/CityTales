@@ -1,5 +1,6 @@
 package group_05.ase.user_db.services;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import group_05.ase.user_db.entities.QuestionEntity;
 import group_05.ase.user_db.entities.QuestionResultsEntity;
 import group_05.ase.user_db.entities.QuizEntity;
@@ -9,6 +10,8 @@ import group_05.ase.user_db.repositories.QuestionResultsRepository;
 import group_05.ase.user_db.repositories.QuizRepository;
 import group_05.ase.user_db.repositories.QuizUserRepository;
 import group_05.ase.user_db.restData.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.util.Pair;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -139,20 +142,22 @@ public class QuizService {
         enrichResponseWithImageData(responses, imageData);
 
         QuizDTO result = new QuizDTO();
-
-        result.setId(100);
         result.setName("persisted Quiz");
         result.setDescription("generated");
         result.setCategory(category);
         result.setCreator(creator);
-        result.setQuestions(mapQuestionResponsesToQuestionDTOList(responses));
         result.setCreatedAt(LocalDateTime.now());
 
         QuizEntity quizEntity = quizRepository.save(mapToQuizEntity(result));
-        List<QuestionEntity> questionEntities = questionRepository.saveAll(mapToQuestionEntityList(result.getQuestions()));
-        return mapToQuizDTO(quizEntity, questionEntities);
 
-        //todo add users to quiz via quiz_user table
+        result = mapToQuizDTOWithEmptyQuestions(quizEntity);
+        result.setQuestions(mapQuestionResponsesToQuestionDTOList(responses, result.getId()));
+
+        List<QuestionEntity> questionEntities = questionRepository.saveAll(mapToQuestionEntityList(result.getQuestions()));
+
+        addUsersToQuiz(users, result.getId());
+
+        return mapToQuizDTO(quizEntity, questionEntities);
     }
 
     private QuizDTO mapToQuizDTO(QuizEntity quiz, List<QuestionEntity> questions) {
@@ -169,6 +174,19 @@ public class QuizService {
         return result;
     }
 
+    private QuizDTO mapToQuizDTOWithEmptyQuestions(QuizEntity quiz) {
+        QuizDTO result = new QuizDTO();
+
+        result.setId(quiz.getId());
+        result.setName(quiz.getName());
+        result.setDescription(quiz.getDescription());
+        result.setCategory(quiz.getCategory());
+        result.setCreator(quiz.getCreator());
+        result.setCreatedAt(quiz.getCreatedAt());
+
+        return result;
+    }
+
     private List<QuestionDTO> mapToQuestionDTOList(List<QuestionEntity> questions) {
         List<QuestionDTO> result = new ArrayList<>();
 
@@ -179,9 +197,9 @@ public class QuizService {
             dto.setQuiz(entity.getQuiz());
             dto.setQuestion(entity.getQuestion());
             dto.setAnswer(entity.getAnswer());
-            dto.setWrongAnswerA(entity.getWrongAnswerA());
-            dto.setWrongAnswerB(entity.getWrongAnswerB());
-            dto.setWrongAnswerC(entity.getWrongAnswerC());
+            dto.setWrongAnswerA(entity.getWrong_answer_a());
+            dto.setWrongAnswerB(entity.getWrong_answer_b());
+            dto.setWrongAnswerC(entity.getWrong_answer_c());
             dto.setImage(entity.getImage());
             dto.setCreatedAt(entity.getCreated_at());
 
@@ -232,9 +250,9 @@ public class QuizService {
             entity.setQuiz(dto.getQuiz());
             entity.setQuestion(dto.getQuestion());
             entity.setAnswer(dto.getAnswer());
-            entity.setWrongAnswerA(dto.getWrongAnswerA());
-            entity.setWrongAnswerB(dto.getWrongAnswerB());
-            entity.setWrongAnswerC(dto.getWrongAnswerC());
+            entity.setWrong_answer_a(dto.getWrongAnswerA());
+            entity.setWrong_answer_b(dto.getWrongAnswerB());
+            entity.setWrong_answer_c(dto.getWrongAnswerC());
             entity.setImage(dto.getImage());
             entity.setCreated_at(dto.getCreatedAt());
 
@@ -250,7 +268,6 @@ public class QuizService {
         headers.add("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36");
         HttpEntity<String> entity = new HttpEntity<>(prompt, headers);
         ResponseEntity<QuizResponse> response = restTemplate.exchange(OPENAI_ADDRESS + "/api/quiz/generate", HttpMethod.POST, entity, QuizResponse.class);
-        System.out.println("RESPONSE: " + response);
         return response.getBody();
     }
 
@@ -306,21 +323,25 @@ public class QuizService {
 
         for (int i = 1; i< res.length; i++) {
             String viennaHistoryWikiId = res[i].substring(0, res[i].indexOf(","));
+            String imageTillEnd = res[i].substring(res[i].indexOf("\"imageUrls\":["), res[i].length()-1);
+            String images = imageTillEnd.substring("\"imageUrls\":[".length()+1, imageTillEnd.indexOf("\"]"));
+            String[] imageArr = images.split("\",\"");
+            String image = Objects.equals(imageArr[1], "https://www.geschichtewiki.wien.gv.at/images/7/7d/RDF.png") ? "" : imageArr[1];
             String contentTillEnd = res[i].substring(res[i].indexOf("contentGerman\":"), res[i].length()-1);
             String contentGerman = contentTillEnd.substring("contentGerman\":".length()+1, contentTillEnd.indexOf("\","));
-            String image = "";
             map.put(viennaHistoryWikiId, Pair.of(contentGerman, image));
         }
 
         return map;
     }
 
-    private List<QuestionDTO> mapQuestionResponsesToQuestionDTOList(List<QuizResponse> responses) {
+    private List<QuestionDTO> mapQuestionResponsesToQuestionDTOList(List<QuizResponse> responses, int quiz) {
         List<QuestionDTO> result = new ArrayList<>();
 
         for (QuizResponse response : responses) {
             QuestionDTO dto = new QuestionDTO();
 
+            dto.setQuiz(quiz);
             dto.setQuestion(response.getQuestion());
             dto.setAnswer(response.getAnswer());
             dto.setWrongAnswerA(response.getWrongAnswerA());
@@ -351,7 +372,18 @@ public class QuizService {
 
     private void enrichResponseWithImageData(List<QuizResponse> responses, List<String> images) {
         for (int i = 0; i < responses.size(); i++) {
+            System.out.println("IMAGE: " + images.get(i));
             responses.get(i).setImage(images.get(i));
+        }
+    }
+
+    private void addUsersToQuiz(List<UUID> users, int quiz) {
+        for (UUID user : users) {
+            QuizUserEntity quizUserEntity = new QuizUserEntity();
+            quizUserEntity.setQuiz(quiz);
+            quizUserEntity.setPlayer(user);
+            quizUserEntity.setCreatedAt(LocalDateTime.now());
+            quizUserRepository.save(quizUserEntity);
         }
     }
 }

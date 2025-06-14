@@ -20,6 +20,7 @@ import {GameQuizComponent} from './layout/game-quiz/game-quiz/game-quiz.componen
 import {AdminDashboardComponent} from './layout/admin-dashboard/admin-dashboard.component';
 import {HistoryAllUsersComponent} from './user-history/pages/history-all-users/history-all-users.component';
 import {AboutComponent} from './core/about/about.component';
+import {FunFactListComponent} from './saved-fun-facts/pages/fun-fact-list/fun-fact-list.component';
 
 export const routes: Routes = [
   {
@@ -52,6 +53,7 @@ export const routes: Routes = [
   { path: 'profile', component: UserProfileComponent },
   { path: 'reset-pass', component: ResetPasswordComponent },
   { path: 'my-history', component: HistoryOneUserComponent },
+  { path: 'fun-fact-list', component: FunFactListComponent },
   { path: 'history', component: HistoryAllUsersComponent },
   { path: 'quizzes', component: GameQuizComponent },
   { path: 'admin-dashboard', component: AdminDashboardComponent },

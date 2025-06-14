@@ -1,6 +1,6 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component} from '@angular/core';
-import {TuiButton, TuiDataListComponent, TuiDropdown, TuiIcon, TuiSizeL, TuiSizeS, TuiTextfield} from '@taiga-ui/core';
-import {TuiDataListDropdownManager, TuiSegmented} from '@taiga-ui/kit';
+import {TuiButton, TuiDataListComponent, TuiDropdown, TuiIcon, TuiSizeL, TuiSizeS} from '@taiga-ui/core';
+import {TuiDataListDropdownManager, TuiSegmented, TuiSwitch} from '@taiga-ui/kit';
 
 import {TuiHeaderComponent, TuiLogoComponent} from '@taiga-ui/layout';
 import {Router, RouterLink, RouterLinkActive} from '@angular/router';
@@ -9,6 +9,8 @@ import {SearchService} from '../../services/search.service'
 import {BuildingEntity} from '../../dto/db_entity/BuildingEntity';
 import { supabase } from '../../user-management/supabase.service';
 import { CommonModule } from '@angular/common';
+import {TuiPlatform} from '@taiga-ui/cdk';
+import {FormsModule} from '@angular/forms';
 
 @Component({
   selector: 'app-header',
@@ -20,12 +22,14 @@ import { CommonModule } from '@angular/common';
     TuiLogoComponent,
     TuiHeaderComponent,
     TuiIcon,
-    TuiTextfield,
     RouterLink,
     RouterLinkActive,
     TuiDropdown,
     TuiDataListDropdownManager,
-    TuiDataListComponent
+    TuiDataListComponent,
+    TuiPlatform,
+    FormsModule,
+    TuiSwitch
   ],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss',
@@ -36,6 +40,19 @@ export class HeaderComponent {
   loggedIn = false;
   protected open = false;
   protected size: TuiSizeL | TuiSizeS = 'l';
+  protected isChecked = true;
+  protected readonly platforms: ReadonlyArray<'android' | 'ios' | 'web'> = [
+    'web'
+  ];
+
+  ngOnInit() {
+    let interestFiltering = localStorage.getItem('interest_filtering');
+    if (interestFiltering === 'true') {
+      this.isChecked = true;
+    } else {
+      this.isChecked = false;
+    }
+  }
 
   constructor(private searchService: SearchService, private router: Router, private cdr: ChangeDetectorRef) {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -51,6 +68,25 @@ export class HeaderComponent {
     await supabase.auth.signOut();
     this.loggedIn = false;
     this.cdr.markForCheck();
+    localStorage.removeItem('user_uuid');
+    localStorage.removeItem('user_role');
+    localStorage.removeItem('interest_filtering');
     this.router.navigate(['/login']);
+  }
+
+  protected getSize(first: boolean): TuiSizeS {
+    return first ? 'm' : 's';
+  }
+
+  protected handleToggle() {
+    let interestFiltering = localStorage.getItem('interest_filtering');
+    if (interestFiltering === 'true') {
+      localStorage.setItem('interest_filtering', 'false');
+      this.isChecked = false;
+    } else {
+      localStorage.setItem('interest_filtering', 'true');
+      this.isChecked = true;
+    }
+    window.location.reload();
   }
 }
