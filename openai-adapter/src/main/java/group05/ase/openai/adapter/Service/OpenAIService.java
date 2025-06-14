@@ -4,6 +4,7 @@ import group05.ase.openai.adapter.Controller.EnrichmentController;
 import group05.ase.openai.adapter.dto.EnrichmentResponse;
 import group05.ase.openai.adapter.dto.OpenAIResponseDTO;
 import group05.ase.openai.adapter.dto.QuizResponse;
+import group05.ase.openai.adapter.dto.SummaryResponse;
 import lombok.RequiredArgsConstructor;
 
 import org.slf4j.Logger;
@@ -122,29 +123,42 @@ public class OpenAIService {
     """)
     );
 
-    public EnrichmentResponse generateResponse(String tone, String content) {
+    public SummaryResponse generateSummary(String content) {
         if (content == null || content.trim().isEmpty()) {
-            return new EnrichmentResponse(
-                    "<p><em>No content provided.</em></p>",
-                    "<p><em>No content available for enrichment.</em></p>",
-                    tone
-            );
+            return new SummaryResponse("<p><em>No content provided for summary.</em></p>");
+        }
+
+        String summaryPrompt = """
+                You are a historian extracting and summarizing factual information from the input content.
+                
+                Your output must consist of:
+                1. A short summary (2–3 lines), written in formal and objective tone, without opinions or speculation.
+                2. A clean HTML list of the most important key facts explicitly mentioned in the input (3–7 items).
+                Formatting:
+                - Wrap the summary in a single <p> tag.
+                - Follow it immediately with a <ul> and <li> tags for the facts.
+                - Each <li> should be 1–2 short sentences.
+                - Only include facts directly present in the input. Do not speculate, interpret, or invent.
+                
+                Do not include any titles, headings, or extra commentary.
+                Do not invent or speculate. Only restate what's provided.
+                """ ;
+
+        String summary = callOpenAI(enforceEnglish(summaryPrompt), content, "academic");
+
+        return new SummaryResponse(summary);
+    }
+
+    public EnrichmentResponse generateEnrichedContent(String tone, String content) {
+        if (content == null || content.trim().isEmpty()) {
+            return new EnrichmentResponse("<p><em>No content available for enrichment.</em></p>", tone);
         }
 
         String toneKey = tone.toLowerCase();
         String tonePrompt = TONE_PROMPTS.getOrDefault(toneKey, TONE_PROMPTS.get("academic"));
+        String enrichedContent = callOpenAI(enforceEnglish(tonePrompt), content, toneKey);
 
-        String summaryPrompt = """
-        Summarize the following using the same tone and style as below.
-        Focus on creating a short version (2–3 lines max) of the content in the specified tone.
-        Keep it factual and aligned with the input.
-        
-        """ + tonePrompt;
-
-        String summary = callOpenAI(enforceEnglish(summaryPrompt), content);
-        String enrichedContent = callOpenAI(enforceEnglish(tonePrompt), content);
-
-        return new EnrichmentResponse(summary, enrichedContent, tone);
+        return new EnrichmentResponse(enrichedContent, tone);
     }
 
     public QuizResponse generateQuiz(String quizGenerationContentPrompt) {
@@ -162,7 +176,7 @@ public class OpenAIService {
                 The final field must always be the string "empty" (without quotes).
                 Do not include any other text, explanation, or formatting — return only the semicolon-separated string exactly as specified.
                 """;
-        String generatedQuiz = callOpenAI(systemPrompt, quizGenerationContentPrompt);
+        String generatedQuiz = callOpenAI(systemPrompt, quizGenerationContentPrompt, "quiz");
 
         String[] generatedContent = generatedQuiz.split(";");
         String[] quizContent = new String[6];
@@ -177,9 +191,17 @@ public class OpenAIService {
         return prompt.endsWith(".") ? prompt + " Always respond in English." : prompt + ". Always respond in English.";
     }
 
-    protected String callOpenAI(String systemPrompt, String content) {
+    protected String callOpenAI(String systemPrompt, String content, String toneKey) {
+        double temperature = switch (toneKey) {
+            case "academic", "quiz" -> 0.2;
+            case "tour", "child-friendly" -> 0.5;
+            case "dramatic", "poetic", "funny" -> 0.7;
+            default -> 0.5;
+        };
+
         Map<String, Object> body = Map.of(
                 "model", "gpt-4.1-nano",
+                "temperature", temperature,
                 "messages", List.of(
                         Map.of("role", "system", "content", systemPrompt),
                         Map.of("role", "user", "content", content)
@@ -193,6 +215,11 @@ public class OpenAIService {
                 .retrieve()
                 .bodyToMono(OpenAIResponseDTO.class)
                 .block();
+
+        if (response == null || response.getChoices() == null || response.getChoices().isEmpty()) {
+            logger.warn("OpenAI returned no choices.");
+            return "<p><em>No response from language model.</em></p>";
+        }
 
         logger.info("SERVICE: OpenAI response: {}", response);
         return response.getChoices().get(0).getMessage().getContent();
