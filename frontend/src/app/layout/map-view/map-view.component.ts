@@ -83,6 +83,7 @@ export class MapViewComponent implements OnInit{
     streetViewControl: false,
     fullscreenControl: false,
     mapTypeControl: true,
+    gestureHandling: 'greedy', //allows one finger control on the map (mobile)
     mapTypeControlOptions: {
       style: google.maps.MapTypeControlStyle.DROPDOWN_MENU, // or .HORIZONTAL_BAR
       position: google.maps.ControlPosition.TOP_RIGHT       // e.g., BOTTOM_LEFT, TOP_CENTER, etc.
