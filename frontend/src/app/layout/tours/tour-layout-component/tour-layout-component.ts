@@ -13,6 +13,8 @@ import {TourDto} from '../../../dto/tour.dto';
 import {TourRequestEntity} from '../../../dto/tour_entity/TourRequestEntity';
 import {FormsModule} from '@angular/forms';
 import {TuiSlider} from '@taiga-ui/kit';
+import * as localForage from 'localforage';
+import {fromEvent, mapTo, merge, Observable, of} from 'rxjs';
 
 
 @Component({
@@ -24,6 +26,7 @@ import {TuiSlider} from '@taiga-ui/kit';
   styleUrl: './tour-layout-component.scss'
 })
 export class TourLayoutComponent {
+  online$: Observable<boolean>;
 
   private locationService: LocationService;
   private tourService: TourService;
@@ -32,18 +35,72 @@ export class TourLayoutComponent {
   private readonly alerts = inject(TuiAlertService);
 
   constructor(locationService: LocationService, tourService: TourService, router: Router) {
+    this.online$ = merge(
+      of(navigator.onLine),
+      fromEvent(window, 'online').pipe(mapTo(true)),
+      fromEvent(window, 'offline').pipe(mapTo(false))
+    );
+
     this.locationService = locationService;
     this.tourService = tourService;
     this.router = router;
-    this.getUserId().then(userId => {
+
+    this.getUserId().then(async userId => {
       this.userId = userId;
-      console.log('async user id ' + userId);
-      this.tourService.getToursForUserId(userId!).subscribe(tours => {
-        this.userTours = tours.map(tour => TourDto.fromTourEntity(tour))
-        console.log("User tours length: " + this.userTours.length);
-      })
-    })
+      if (!userId) return;
+
+      const cacheKey = `userTours_${userId}`;
+      const isOnline = navigator.onLine;
+
+      if (!isOnline) {
+        const cachedTours = await localForage.getItem<any[]>(cacheKey);
+        if (cachedTours && cachedTours.length > 0) {
+          console.log('Loaded tours from cache');
+
+          this.userTours = cachedTours.map(t => {
+            // Parse stops JSON string to array
+            const parsedStops = JSON.parse(t.stops || '[]');
+            // Map each stop to only lat/lng
+            const simplifiedStops = parsedStops.map((stop: any) => ({
+              latitude: stop.latitude,
+              longitude: stop.longitude
+            }));
+
+            return new TourDto(
+              t.id,
+              t.name,
+              t.description,
+              t.start_lat,
+              t.start_lng,
+              t.end_lat,
+              t.end_lng,
+              simplifiedStops,
+              t.distance,
+              t.durationEstimate,
+              t.userId
+            );
+          });
+          console.log(this.userTours)
+        } else {
+          this.alerts.open('Offline and no tour cache found.', {
+            label: 'Offline',
+            appearance: 'warning',
+            autoClose: 5000
+          }).subscribe();
+        }
+      } else {
+        this.tourService.getToursForUserId(userId).subscribe(tours => {
+          this.userTours = tours.map(tour => TourDto.fromTourEntity(tour));
+          console.log('Fetched tours from backend');
+          // Serialize before caching
+          const serializable = this.userTours.map(t => TourDto.ofTourDTo(t));
+          localForage.setItem(cacheKey, serializable);
+        });
+      }
+    });
   }
+
+
 
   async getUserId(): Promise<string | null> {
     const { data } = await supabase.auth.getSession();
@@ -392,6 +449,7 @@ export class TourLayoutComponent {
 
       var selectedTour: TourDto = tourdtos[tourdtos.length - 1];
 
+
       this.tourService.createTourInDB(selectedTour).subscribe({
         next: tour => {console.log("Tour created successfully!");
           this.tourService.getToursForUserId(this.userId!).subscribe(tours => {
@@ -407,5 +465,24 @@ export class TourLayoutComponent {
     this.router.navigateByUrl("/tours/" + tour.getId());
   }
 
+  generateGoogleMapsTourLink(tour: TourDto) {
+    console.log(tour.getStops())
+    const stops = tour.getStops();
 
+    const locations: string[] = [];
+
+    locations.push(`${tour.getStart_lat()},${tour.getStart_lng()}`);
+
+    for (const stop of stops) {
+      locations.push(`${stop.latitude},${stop.longitude}`);
+    }
+
+    locations.push(`${tour.getEnd_lat()},${tour.getEnd_lng()}`);
+
+    const baseUrl = 'https://www.google.com/maps/dir/';
+    const url = baseUrl + locations.map(encodeURIComponent).join('/');
+
+    console.log(url)
+    window.open(url, '_blank');
+  }
 }
