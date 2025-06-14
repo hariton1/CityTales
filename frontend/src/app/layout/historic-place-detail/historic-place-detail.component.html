@@ -108,6 +108,23 @@
     </tui-expand>
   </section>
 
+  <div class="content" *ngIf="selectedPlace.contentGerman">
+    <section class="place-summary">
+      <header tuiHeader class="tui-space_top-3 tui-space_bottom-3">
+        <span class="tui-text_h6">Quick Facts & Highlights</span>
+      </header>
+      <!-- Skeleton Loader -->
+      <div *ngIf="summaryStarted && summaryLoading" class="fade-in place-summary tui-space_bottom-4">
+        <div class="skeleton-line" *ngFor="let width of lineWidths2" [style.width.%]="width"></div>
+      </div>
+
+      <!-- LLM Generated Summary -->
+      <div *ngIf="summaryStarted && !summaryLoading" class="fade-in tui-space_bottom-4">
+          <div class="place-summary-text" [innerHTML]="summary"></div>
+      </div>
+    </section>
+  </div>
+
   <!-- prices -->
   <div class="prices-section" *ngIf="this.prices().length > 0">
     <h3>Prices
@@ -174,7 +191,7 @@
     </form>
   </ng-template>
 
-  <div class="tone-selector" *ngIf="selectedPlace.contentGerman">
+  <div class="tone-selector tui-space_bottom-4" *ngIf="selectedPlace.contentGerman">
     <span style="font: var(--tui-font-heading-6); display: block; width: 100%">Choose how you want the story to be told <tui-icon
       tuiHintDirection="bottom"
       tuiTooltip="Select a tone to change the storytelling style — not the facts."
@@ -213,15 +230,18 @@
     </div>
 
     <!-- LLM Generated Content -->
-    <div *ngIf="enrichmentStarted && !enrichmentLoading" class="fade-in tui-space_bottom-12">
+    <div *ngIf="enrichmentStarted && !enrichmentLoading" class="fade-in tui-space_bottom-8">
       <section class="place-summary">
-        <header tuiHeader class="tui-space_top-3 tui-space_bottom-3">
-          <span class="tui-text_h6">Quick Facts & Highlights</span>
-        </header>
-        <div class="place-summary-text" [innerHTML]="summary"></div>
-
         <header tuiHeader class="tui-space_top-5 tui-space_bottom-3">
-          <span class="tui-text_h6">Deep Dive into the {{ selectedPlace.name }}</span>
+          <ng-container [ngSwitch]="selectedTone">
+            <span *ngSwitchCase="'academic'" class="tui-text_h6">A Historical Perspective on the {{ selectedPlace.name }}</span>
+            <span *ngSwitchCase="'tour'" class="tui-text_h6">Discover the Wonders of {{ selectedPlace.name }} with Your Guide</span>
+            <span *ngSwitchCase="'poetic'" class="tui-text_h6">A Lyrical Stroll through the Soul of {{ selectedPlace.name }}</span>
+            <span *ngSwitchCase="'dramatic'" class="tui-text_h6">Unfolding the Drama of {{ selectedPlace.name }}</span>
+            <span *ngSwitchCase="'child-friendly'" class="tui-text_h6">Let’s Explore {{ selectedPlace.name }} Together!</span>
+            <span *ngSwitchCase="'funny'" class="tui-text_h6">You Won’t Believe What Happened at {{ selectedPlace.name }}</span>
+            <span *ngSwitchDefault class="tui-text_h6">Deep Dive into the {{ selectedPlace.name }}</span>
+          </ng-container>
         </header>
         <div class="place-summary-text" [innerHTML]="enrichedContent"></div>
       </section>
