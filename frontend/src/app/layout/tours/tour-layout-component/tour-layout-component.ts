@@ -13,6 +13,8 @@ import {TourDto} from '../../../dto/tour.dto';
 import {TourRequestEntity} from '../../../dto/tour_entity/TourRequestEntity';
 import {FormsModule} from '@angular/forms';
 import {TuiSlider} from '@taiga-ui/kit';
+import * as localForage from 'localforage';
+import {fromEvent, mapTo, merge, Observable, of} from 'rxjs';
 
 
 @Component({
@@ -24,6 +26,7 @@ import {TuiSlider} from '@taiga-ui/kit';
   styleUrl: './tour-layout-component.scss'
 })
 export class TourLayoutComponent {
+  online$: Observable<boolean>;
 
   private locationService: LocationService;
   private tourService: TourService;
@@ -32,18 +35,60 @@ export class TourLayoutComponent {
   private readonly alerts = inject(TuiAlertService);
 
   constructor(locationService: LocationService, tourService: TourService, router: Router) {
+    this.online$ = merge(
+      of(navigator.onLine),
+      fromEvent(window, 'online').pipe(mapTo(true)),
+      fromEvent(window, 'offline').pipe(mapTo(false))
+    );
+
     this.locationService = locationService;
     this.tourService = tourService;
     this.router = router;
-    this.getUserId().then(userId => {
+
+    this.getUserId().then(async userId => {
       this.userId = userId;
-      console.log('async user id ' + userId);
-      this.tourService.getToursForUserId(userId!).subscribe(tours => {
-        this.userTours = tours.map(tour => TourDto.fromTourEntity(tour))
-        console.log("User tours length: " + this.userTours.length);
-      })
-    })
+      if (!userId) return;
+
+      const cacheKey = `userTours_${userId}`;
+      const isOnline = navigator.onLine;
+
+      if (!isOnline) {
+        const cachedTours = await localForage.getItem<any[]>(cacheKey);
+        if (cachedTours && cachedTours.length > 0) {
+          console.log('Loaded tours from cache');
+          this.userTours = cachedTours.map(t => new TourDto(
+            t.id,
+            t.name,
+            t.description,
+            t.start_lat,
+            t.start_lng,
+            t.end_lat,
+            t.end_lng,
+            t.stops,
+            t.distance,
+            t.durationEstimate,
+            t.userId
+          ));
+        } else {
+          this.alerts.open('Offline and no tour cache found.', {
+            label: 'Offline',
+            appearance: 'warning',
+            autoClose: 5000
+          }).subscribe();
+        }
+      } else {
+        this.tourService.getToursForUserId(userId).subscribe(tours => {
+          this.userTours = tours.map(tour => TourDto.fromTourEntity(tour));
+          console.log('Fetched tours from backend');
+          // Serialize before caching
+          const serializable = this.userTours.map(t => TourDto.ofTourDTo(t));
+          localForage.setItem(cacheKey, serializable);
+        });
+      }
+    });
   }
+
+
 
   async getUserId(): Promise<string | null> {
     const { data } = await supabase.auth.getSession();
@@ -406,6 +451,4 @@ export class TourLayoutComponent {
   onGeneratedTourClick(tour: TourDto) {
     this.router.navigateByUrl("/tours/" + tour.getId());
   }
-
-
 }

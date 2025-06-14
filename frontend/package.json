@@ -54,6 +54,7 @@
     "jspdf": "^3.0.1",
     "jwt-decode": "^4.0.0",
     "libphonenumber-js": "^1.12.7",
+    "localforage": "^1.10.0",
     "maki": "^2.1.0",
     "rxjs": "~7.8.0",
     "taiga-ui": "^4.32.0",
