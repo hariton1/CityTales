@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class EnrichmentResponse {
-    private String enrichedContent;
-    private String tone;
+public class SummaryResponse {
+    private String summary;
 }
