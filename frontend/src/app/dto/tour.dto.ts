@@ -65,8 +65,6 @@ export class TourDto {
 
   }
 
-
-
   //setter and getter
 
   getId(): number {
