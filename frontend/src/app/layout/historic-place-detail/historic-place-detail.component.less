@@ -1,12 +1,17 @@
 @import '@taiga-ui/styles/taiga-ui-global';
 
+.scroll-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
 .place-detail-container {
-  padding: 16px;
-  height: 90vh;
-  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: 2rem;
+  padding: 1rem;
 }
 
 .place-detail-card {
@@ -41,10 +46,7 @@
 }
 
 .back-button {
-  position: absolute;
-  top: 1.1rem;
-  right: 1.3rem;
-  z-index: 10;
+  margin-left: 16px;
 }
 
 .image-info-flex {
@@ -203,6 +205,10 @@
 
 .place-summary-text {
   font: var(--tui-font-text-m) !important;
+}
+
+.prices-section {
+  padding: 0 0.8rem;
 }
 
 .related-persons-list {
@@ -369,49 +375,35 @@
   }
 }
 
-.scrollable-content {
-  flex: 1;
-  min-height: 0;
-  overflow: hidden;
-  position: relative;
-  height: 100%;
+@media @tui-mobile, @tui-tablet-interval, @tui-desktop-interval {
+  .image-info-flex {
+    flex-direction: column;
+  }
+
+  .image-container {
+    width: 100%;
+    height: auto;
+  }
+
+  .image-container img {
+    height: auto;
+  }
+
+  .bottom-right-button {
+    justify-content: center;
+    margin-top: 1rem;
+  }
 }
 
-
-
-
-
-
-// Responsive adjustments
-@media (max-width: 600px) {
-  .place-detail-container {
-    padding: 8px;
+@media @tui-mobile-interval {
+  .back-button{
+    margin-top: 5.5rem;
   }
+}
 
-  .place-detail-header {
-    padding: 12px 16px;
+@media @tui-tablet-interval {
+  .back-button{
+    margin-top: 5.5rem;
   }
-
-  .place-detail-content {
-    padding: 16px;
-  }
-
-  .building-details {
-    .detail-row {
-      flex-direction: column;
-
-      .label {
-        width: auto;
-        margin-bottom: 4px;
-      }
-    }
-  }
-
-  .building-image {
-    max-width: 100%;
-    height: auto;
-    border-radius: 4px;
-  }
-
 }
 

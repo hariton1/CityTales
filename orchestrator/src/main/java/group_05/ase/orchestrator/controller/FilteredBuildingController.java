@@ -6,6 +6,8 @@ import group_05.ase.orchestrator.dto.ViennaHistoryWikiBuildingObject;
 import group_05.ase.orchestrator.client.Neo4jBuildingClient;
 import group_05.ase.orchestrator.client.UserInterestClient;
 import group_05.ase.orchestrator.dto.UserInterestsDTO;
+import group_05.ase.orchestrator.dto.ViennaHistoryWikiPersonObject;
+import group_05.ase.orchestrator.dto.ViennaHistoryWikiEventObject;
 import group_05.ase.orchestrator.service.FilteredBuildingService;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +44,7 @@ public class FilteredBuildingController {
         List<UserInterestsDTO> interests = userInterestClient.getUserInterests(userId);
         List<ViennaHistoryWikiBuildingObject> buildings = buildingClient.getBuildingsByLocation(latitude, longitude, radius);
         List<ArticleWeightDTO> articleWeights = articleClient.getAllArticleWeights();
+
         return ResponseEntity.ok(filteredBuildingService.filterBuildingsByUserInterests(buildings, interests, articleWeights));
     }
 
