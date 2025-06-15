@@ -67,7 +67,6 @@ export class FunFactListComponent {
                 image_url: savedFunFact.getImageUrl(),
                 score: savedFunFact.getScore(),
                 reason: savedFunFact.getReason(),
-                saved_at: this.helperService.sanitizeDate(savedFunFact.getSavedAt())
               });
             });
 
@@ -90,7 +89,6 @@ export class FunFactListComponent {
       savedFunFact.image_url,
       savedFunFact.score,
       savedFunFact.reason,
-      savedFunFact.saved_at
     )).subscribe();
   };
 

@@ -92,3 +92,9 @@ services:
       - "8088:8088"
     environment:
       - OPENAI_API_KEY=***REMOVED***
+
+  funfact-ml-service:
+    container_name: funfact-ml-service
+    build: ./funfact-ml-service  # oder image: funfact-ml-service:latest
+    ports:
+      - "5005:5005"
