@@ -3,10 +3,7 @@ package group_05.ase.neo4j_data_access.Entity.Tour;
 import com.graphhopper.jsprit.core.problem.Location;
 import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingTransportCosts;
 import com.graphhopper.jsprit.core.problem.driver.Driver;
-import com.graphhopper.jsprit.core.problem.job.Shipment;
-import com.graphhopper.jsprit.core.problem.job.Service;
 import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
-import com.graphhopper.jsprit.core.problem.solution.route.activity.TourActivity;
 
 public class CustomMatrixCost implements VehicleRoutingTransportCosts {
 
