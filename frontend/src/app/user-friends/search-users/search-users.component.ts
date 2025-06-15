@@ -35,6 +35,7 @@ export class SearchUsersComponent implements OnInit{
 
   retrieveUserID(): void {
     const stored = localStorage.getItem("user_uuid");
+    console.log('stored:', stored)
     if (stored) {
       this.userId = stored;
     }
@@ -76,5 +77,7 @@ export class SearchUsersComponent implements OnInit{
         console.error('Failed to send friend invite:', err);
       }
     });
+
+    window.location.reload();
   }
 }
