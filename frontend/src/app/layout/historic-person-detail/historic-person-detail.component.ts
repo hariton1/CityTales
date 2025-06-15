@@ -286,11 +286,11 @@ export class HistoricPersonDetailComponent implements OnInit, OnChanges{
           this.funFact = fact;
           this.funFactSaved = false;
 
-          if (this.userId && this.funFact && this.funFact.fact) {
+          if (this.userId && this.funFact && this.funFact.sentence) {
             this.savedFunFactService.getFunFactsByUserId(this.userId as any).subscribe(savedFacts => {
               this.funFactSaved = savedFacts.some((sf: SavedFunFactDto) =>
                 ((sf.getHeadline?.() ?? sf['headline']) === (this.selectedPerson?.name ?? '')) &&
-                ((sf.getFunFact?.() ?? sf['fun_fact']) === this.funFact?.fact)
+                ((sf.getFunFact?.() ?? sf['fun_fact']) === this.funFact?.sentence)
               );
               this.cdr.markForCheck();
             });
@@ -322,7 +322,7 @@ export class HistoricPersonDetailComponent implements OnInit, OnChanges{
       this.userId as any,
       this.selectedPerson?.id ?? this.selectedPerson?.viennaHistoryWikiId,
       this.selectedPerson?.name,
-      this.funFact.fact,
+      this.funFact.sentence,
       this.selectedPerson?.imageUrls?.[0] || '',
       this.funFact.score,
       '', // reason (leer)
@@ -343,7 +343,7 @@ export class HistoricPersonDetailComponent implements OnInit, OnChanges{
   shareDialogOpen = false;
 
   get shareText(): string {
-    return `${this._selectedPerson.name}: ${this.funFact?.fact} — via CityTales\n${window.location.href}`;
+    return `${this._selectedPerson.name}: ${this.funFact?.sentence} — via CityTales\n${window.location.href}`;
   }
 
   shareWhatsApp() {

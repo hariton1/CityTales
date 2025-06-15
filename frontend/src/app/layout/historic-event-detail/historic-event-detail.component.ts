@@ -72,6 +72,7 @@ export class HistoricEventDetailComponent implements OnInit, OnChanges {
 
   protected index1 = 0; //tone slider
   lineWidths = [90, 70, 95, 60, 85, 80, 60, 75, 85, 80];
+  lineWidths2 = [90, 70, 95, 60, 85, 80];
   isMobile = false;
 
   customBreakpointLevel: CustomBreakpointLevel = null;
@@ -283,11 +284,11 @@ export class HistoricEventDetailComponent implements OnInit, OnChanges {
           this.funFact = fact;
           this.funFactSaved = false;
 
-          if (this.userId && this.funFact && this.funFact.fact) {
+          if (this.userId && this.funFact && this.funFact.sentence) {
             this.savedFunFactService.getFunFactsByUserId(this.userId as any).subscribe(savedFacts => {
               this.funFactSaved = savedFacts.some((sf: SavedFunFactDto) =>
                 ((sf.getHeadline?.() ?? sf['headline']) === (this.selectedEvent?.name ?? '')) &&
-                ((sf.getFunFact?.() ?? sf['fun_fact']) === this.funFact?.fact)
+                ((sf.getFunFact?.() ?? sf['fun_fact']) === this.funFact?.sentence)
               );
               this.cdr.markForCheck();
             });
@@ -319,7 +320,7 @@ export class HistoricEventDetailComponent implements OnInit, OnChanges {
       this.userId as any,
       this.selectedEvent?.id ?? this.selectedEvent?.viennaHistoryWikiId,
       this.selectedEvent?.name,
-      this.funFact.fact,
+      this.funFact.sentence,
       this.selectedEvent?.imageUrls?.[0] || '',
       this.funFact.score,
       '', // reason (leer)
@@ -340,7 +341,7 @@ export class HistoricEventDetailComponent implements OnInit, OnChanges {
   shareDialogOpen = false;
 
   get shareText(): string {
-    return `${this.selectedEvent.name}: ${this.funFact?.fact} — via CityTales\n${window.location.href}`;
+    return `${this.selectedEvent.name}: ${this.funFact?.sentence} — via CityTales\n${window.location.href}`;
   }
 
   shareWhatsApp() {

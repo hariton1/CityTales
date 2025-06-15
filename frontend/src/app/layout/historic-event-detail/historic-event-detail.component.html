@@ -33,7 +33,7 @@
               <h1 class="place-title tui-space_bottom-2" tuiTitle>{{selectedEvent.name}}</h1>
               <div *ngIf="funFact" class="fun-fact-card tui-space_bottom-3">
                 <tui-icon icon="@tui.star" [style.height.rem]="1.2" class="mr-2"></tui-icon>
-                <strong>Fun Fact:</strong> {{ funFact.fact }}
+                <strong>Fun Fact:</strong> {{ funFact.sentence }}
                 <span *ngIf="funFact.score">&nbsp;(Score: {{ funFact.score }})</span>
 
                 <button
