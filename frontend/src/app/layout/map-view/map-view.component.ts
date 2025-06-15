@@ -265,10 +265,27 @@ export class MapViewComponent implements OnInit{
 
   @ViewChild('relatedContentToLocation', { static: false }) relatedContentToLocationRef!: ElementRef;
 
+  private activeMarker: google.maps.Marker | null = null;
+
   detailAction(marker: google.maps.Marker, location: BuildingEntity): void {
     if (!this.nativeInfoWindow) {
       this.nativeInfoWindow = new google.maps.InfoWindow();
     }
+
+    // Reset the previous active marker (if any)
+    if (this.activeMarker && this.activeMarker !== marker) {
+      this.activeMarker.setIcon(this.getIconForBuildingType(location.buildingType)); // or a default icon
+    }
+
+    // Set the new icon for the active marker
+    marker.setIcon({
+      url: 'assets/icons/town-hall-active.svg',
+      scaledSize: new google.maps.Size(28, 28),
+      anchor: new google.maps.Point(12, 12),
+      labelOrigin: new google.maps.Point(12, 30),
+    });
+
+    this.activeMarker = marker; // store the new active marker
 
     location = this.userService.enterHistoricNode(location);
     if(this.interestFiltering === 'true') {
@@ -335,6 +352,15 @@ export class MapViewComponent implements OnInit{
     this.relatedContentToLocationRef.nativeElement.style.display = 'none';
     this.hoveredLocation = null;
     this.polylines = [];
+    if (this.activeMarker) {
+      this.activeMarker.setIcon({
+        url: 'assets/icons/town-hall-11.svg',
+        scaledSize: new google.maps.Size(28, 28),
+        anchor: new google.maps.Point(12, 12),
+        labelOrigin: new google.maps.Point(12, 30),
+      });
+      this.activeMarker = null;
+    }
   }
 
   //hide the info window when clicking outside it
@@ -362,6 +388,7 @@ export class MapViewComponent implements OnInit{
     const events = (location.relatedEvents || []).map((item: any) => ({ ...item, type: 'event' }));
 
     const combined = [...buildings, ...persons, ...events];
+    console.log(combined)
     return combined;
   }
 
@@ -400,26 +427,24 @@ export class MapViewComponent implements OnInit{
       map(([filteredBuildings, filteredPersons, filteredEvents]) => {
         // Apply semantic filtering for each category
         const buildings = (location.relatedBuildings && location.relatedBuildings.length > 0 ? location.relatedBuildings.filter((building: BuildingEntity) =>
-          filteredBuildings.some(filteredBuilding => filteredBuilding.toString() === building.viennaHistoryWikiId)
+          filteredBuildings.some(filteredBuilding => filteredBuilding === parseInt(building.viennaHistoryWikiId))
         ) : []).map((item: any) => ({ ...item, type: 'building' }));
-
-        const persons = (location.relatedPersons && location.relatedPersons.length > 0 ? location.relatedPersons.filter((person: PersonEntity) =>
-          filteredPersons.some(filteredPerson => filteredPerson.toString() === person.viennaHistoryWikiId)
-        ) : []).map((item: any) => ({ ...item, type: 'person' }));
 
         const events = (location.relatedEvents && location.relatedEvents.length > 0 ? location.relatedEvents.filter((event: EventEntity) =>
           filteredEvents.some(filteredEvent => filteredEvent === event.viennaHistoryWikiId)
         ) : []).map((item: any) => ({ ...item, type: 'event' }));
 
-        // Combine the results
+        const persons = (location.relatedPersons && location.relatedPersons.length > 0 ? location.relatedPersons.filter((person: PersonEntity) =>
+          filteredPersons.some(filteredPerson => filteredPerson === parseInt(person.viennaHistoryWikiId))
+        ) : []).map((item: any) => ({ ...item, type: 'person' }));
+
         const combined = [...buildings, ...persons, ...events];
 
-        // Return the combined results
         return combined;
       }),
       catchError(err => {
         console.error('Error fetching interests or details:', err);
-        // Emit an empty array if an error occurs
+        // Emit error
         return of([]);
       })
     );

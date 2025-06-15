@@ -1,98 +1,40 @@
-<div class="header-container">
+<div class="header-container" [class.hidden]="isMobile">
+  <div class="search-bar-container" [class.hidden]="isMobile">
+    <div #searchFieldRef class="search-wrapper">
+      <tui-textfield (pointerdown.capture.stop)="(0)" class="search-field">
+        <input
+          placeholder="Search for an entity..."
+          [formControl]="control"
+          [tuiInputSearch]="search"
+          [(tuiInputSearchOpen)]="searchOpen"
+          (tuiInputSearchOpenChange)="searchOpenChange.emit($event)"
+        />
 
-<!-- Enrich Content Button
-<tui-loader
-  class="loader"
-  [inheritColor]="true"
-  [overlay]="true"
-  [showLoader]="enrichmentLoading"
->
-  <button
-    appearance="primary"
-    tuiButton
-    type="button"
-    class="tui-space_top-3"
-    (click)="onClick('tour')"
-    [disabled]="enrichmentLoading"
-  >
-    Enrich Content
-  </button>
-
-</tui-loader>
--->
-
-  <tui-textfield (pointerdown.capture.stop)="(0)" class="search-field">
-    <input
-      placeholder="Search for an entity..."
-      [formControl]="control"
-      [tuiInputSearch]="search"
-      [(tuiInputSearchOpen)]="open"
-    />
-
-    <ng-template #search>
-      <tui-search-results [results]="results$ | async">
-        <tui-search-history [popular]="lastSearches"/>
-        <ng-template let-item>
-          <a
-            tuiCell
-            (click)="onItemClick(item)"
-          >
-              <span tuiTitle>
-                                {{ item.name }}
-                            </span>
-          </a>
+        <ng-template #search>
+          <tui-search-results [results]="results$ | async">
+            <tui-search-history [popular]="lastSearches"/>
+            <ng-template let-item>
+              <a
+                tuiCell
+                (click)="onItemClick(item)"
+              >
+                <span tuiTitle>
+                                  {{ item.name }}
+                              </span>
+              </a>
+            </ng-template>
+          </tui-search-results>
         </ng-template>
-      </tui-search-results>
-    </ng-template>
-  </tui-textfield>
+      </tui-textfield>
+    </div>
+  </div>
 
   <div class="notification-button-container" *ngIf="!isMobile">
     <app-notification-inbox (selectPlaceEvent)="setSelectedPlace($event)"></app-notification-inbox>
   </div>
 </div>
 
-<!-- Enrich Content Block
-<div tuiPlatform="web" class="content" *ngIf="enrichmentStarted && !enrichmentLoading">
-  <div
-    tuiAppearance="floating"
-    tuiCardLarge="normal"
-  >
-    <header tuiHeader>
-      <h3 tuiTitle class="tui-text_h3">
-        Franziskanerkirche
-        <span tuiSubtitle>
-          <tui-icon
-          icon="@tui.landmark"
-          [style.height.rem]="1.2"
-        /> Built: 1607</span>
-      </h3>
-    </header>
-  </div>
-  <section class="place-summary">
-    <header tuiHeader class="tui-space_top-3 tui-space_bottom-3">
-      <span class="tui-text_h6">
-        Quick Facts & Highlights
-      </span>
-    </header>
-    <span class="place-summary-text">
-      {{ summary }}
-    </span>
-
-    <header tuiHeader class="tui-space_top-5 tui-space_bottom-3">
-      <span class="tui-text_h6">
-        Deep Dive into the Franziskanerkirche
-      </span>
-    </header>
-    <span class="place-summary-text">
-      {{ enrichedContent }}
-    </span>
-  </section>
-
-</div>
--->
-
-
-
+<tui-scrollbar class="scrollable-content">
 <div class="sidebar-container" *ngIf="this.selectedPlace || this.selectedEvent || this.selectedPerson">
 
   <!-- Show Place -->
@@ -126,10 +68,12 @@
   </app-historic-person-detail>
 
 </div>
+</tui-scrollbar>
 
 
 <div class="place-preview-container" *ngIf="!this.selectedPlace && !this.selectedEvent && !this.selectedPerson">
-  <app-historic-place-preview [historicalPlaces]="historicalPlaces" (selectPlaceEvent)="setSelectedPlace($event)"></app-historic-place-preview>
+  <app-historic-place-preview [historicalPlaces]="historicalPlaces"
+                              (selectPlaceEvent)="setSelectedPlace($event)"></app-historic-place-preview>
 </div>
 
 

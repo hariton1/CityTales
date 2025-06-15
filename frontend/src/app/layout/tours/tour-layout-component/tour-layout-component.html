@@ -27,11 +27,16 @@
               <h4 tuiTitle class="tui-text_h6">{{ tour.getName() }}</h4>
               <span tuiSubtitle>Estim. Duration: {{ tour.getDurationEstimate().toFixed(2) }} h</span>
 
-            </div>
-            <p class="tui-text_body tui-space_top-1">{{ tour.getDescription() }}</p>
-            <button tuiButton size="xs" (click)="deleteTour(tour); $event.stopPropagation()" class="slide-tour-delete-button">Delete</button>
           </div>
-        </ng-container>
+          <p class="tui-text_body tui-space_top-1">{{ tour.getDescription() }}</p>
+          <button tuiButton size="xs" (click)="deleteTour(tour); $event.stopPropagation()" class="slide-tour-delete-button">Delete</button>
+          <button tuiButton size="xs"
+                  (click)="generateGoogleMapsTourLink(tour); $event.stopPropagation()"
+                  class="slide-tour-map-button">
+            Open in Maps
+          </button>
+        </div>
+      </ng-container>
       </div>
     </div>
   </section>
