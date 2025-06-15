@@ -8,7 +8,7 @@ import {
   Output,
   signal,
   ChangeDetectorRef,
-  OnInit
+  OnInit, OnChanges, SimpleChanges
 } from '@angular/core';
 import {CommonModule, NgIf} from '@angular/common';
 import {
@@ -97,7 +97,7 @@ const numberOptions = maskitoNumberOptionsGenerator({
   styleUrl: './historic-place-detail.component.less',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class HistoricPlaceDetailComponent implements OnInit{
+export class HistoricPlaceDetailComponent implements OnInit, OnChanges{
 
   private readonly pricesService = inject(PricesService);
   locationId= signal(0);
@@ -236,10 +236,6 @@ export class HistoricPlaceDetailComponent implements OnInit{
       relatedEvents: value.relatedEvents ?? this._selectedPlace?.relatedEvents,
     };
 
-    if (this._selectedPlace?.contentGerman) {
-      this.generateSummary();
-    }
-
     this.summary = '';
     this.enrichedContent = '';
     this.enrichmentStarted = false;
@@ -247,6 +243,12 @@ export class HistoricPlaceDetailComponent implements OnInit{
     this.cdr.markForCheck();
   }
   private _selectedPlace: any;
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['selectedPlace']?.currentValue?.contentGerman) {
+      this.generateSummary();
+    }
+  }
 
   @Output() onPersonDetailEvent: EventEmitter<PersonEntity> = new EventEmitter<PersonEntity>();
   @Output() onEventDetailEvent: EventEmitter<EventEntity> = new EventEmitter<EventEntity>();
