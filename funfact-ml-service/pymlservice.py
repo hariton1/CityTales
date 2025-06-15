@@ -6,6 +6,10 @@ app = Flask(__name__)
 # Load pretrained Modell
 model = SentenceTransformer('paraphrase-MiniLM-L6-v2')
 
+import spacy
+
+nlp = spacy.load("de_core_news_sm")
+
 @app.route('/funfact', methods=['POST'])
 def extract_funfact():
     data = request.json
@@ -13,8 +17,9 @@ def extract_funfact():
     if not text:
         return jsonify({'error': 'No text provided'}), 400
 
-    import re
-    sentences = re.split(r'(?<=[.!?]) +', text)
+    # Saubere Satztrennung
+    doc = nlp(text)
+    sentences = [sent.text.strip() for sent in doc.sents if len(sent.text.strip().split()) >= 5]
 
     queries = [
         "Witzige Information",
@@ -36,4 +41,5 @@ def extract_funfact():
     })
 
 if __name__ == '__main__':
-    app.run(port=5005, debug=True)
+    app.run(host="0.0.0.0", port=5005, debug=True)
+

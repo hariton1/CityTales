@@ -453,11 +453,11 @@ export class HistoricPlaceDetailComponent implements OnInit, OnChanges{
           this.funFactSaved = false;
 
           const userId = localStorage.getItem('user_uuid');
-          if (userId && this.funFact && this.funFact.fact) {
+          if (userId && this.funFact && this.funFact.sentence) {
             this.savedFunFactService.getFunFactsByUserId(userId as any).subscribe(savedFacts => {
               this.funFactSaved = savedFacts.some((sf: SavedFunFactDto) =>
                 ((sf.getHeadline?.() ?? sf['headline']) === (this.selectedPlace?.name ?? '')) &&
-                ((sf.getFunFact?.() ?? sf['fun_fact']) === this.funFact?.fact)
+                ((sf.getFunFact?.() ?? sf['fun_fact']) === this.funFact?.sentence)
               );
               this.cdr.markForCheck();
             });
@@ -494,7 +494,7 @@ export class HistoricPlaceDetailComponent implements OnInit, OnChanges{
       userId as any,
       this.selectedPlace?.id ?? this.selectedPlace?.viennaHistoryWikiId,
       this.selectedPlace?.name,
-      this.funFact.fact,
+      this.funFact.sentence,
       this.selectedPlace?.imageUrls?.[0] || '',
       this.funFact.score,
       '', // reason (leer)
@@ -515,7 +515,7 @@ export class HistoricPlaceDetailComponent implements OnInit, OnChanges{
   shareDialogOpen = false;
 
   get shareText(): string {
-    return `${this.selectedPlace.name}: ${this.funFact?.fact} — via CityTales\n${window.location.href}`;
+    return `${this.selectedPlace.name}: ${this.funFact?.sentence} — via CityTales\n${window.location.href}`;
   }
 
   shareWhatsApp() {
