@@ -36,4 +36,11 @@ public class SavedFunFactEntity {
 
     private LocalDateTime savedAt;
 
+    @PrePersist
+    public void prePersist() {
+        if (savedAt == null) {
+            savedAt = LocalDateTime.now();
+        }
+    }
+
 }

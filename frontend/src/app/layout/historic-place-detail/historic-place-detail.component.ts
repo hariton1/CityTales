@@ -10,7 +10,7 @@ import {
   ChangeDetectorRef,
   OnInit, OnChanges, SimpleChanges
 } from '@angular/core';
-import {CommonModule, NgIf} from '@angular/common';
+import {CommonModule, NgIf, NgOptimizedImage} from '@angular/common';
 import {
   TuiAppearance,
   TuiAutoColorPipe,
@@ -49,6 +49,11 @@ import {TuiCard, TuiHeader} from '@taiga-ui/layout';
 import {TuiExpand} from '@taiga-ui/experimental';
 import {EnrichmentService} from '../../services/enrichment.service';
 import {BreakpointService} from '../../services/breakpoints.service';
+import { FunFactService, FunFactCardDTO } from '../../services/fun-fact.service';
+import {SavedFunFactDto} from '../../user_db.dto/saved-fun-fact.dto';
+import {SavedFunFactService} from '../../user_db.services/saved-fun-fact.service';
+import html2canvas from 'html2canvas';
+import { ViewChild, ElementRef } from '@angular/core';
 
 const postfix = ' €';
 const numberOptions = maskitoNumberOptionsGenerator({
@@ -91,13 +96,15 @@ const numberOptions = maskitoNumberOptionsGenerator({
     TuiFallbackSrcPipe,
     TuiAutoColorPipe,
     TuiAppearance,
-    TuiPagination
+    TuiPagination,
+    NgOptimizedImage
   ],
   templateUrl: './historic-place-detail.component.html',
   styleUrl: './historic-place-detail.component.less',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class HistoricPlaceDetailComponent implements OnInit, OnChanges{
+  funFact: FunFactCardDTO | null = null;
 
   private readonly pricesService = inject(PricesService);
   locationId= signal(0);
@@ -124,7 +131,9 @@ export class HistoricPlaceDetailComponent implements OnInit, OnChanges{
   relatedItemCount = 3;
 
 
-  constructor(private userService: UserService,
+  constructor(private savedFunFactService: SavedFunFactService,
+              private funFactService: FunFactService,
+              private userService: UserService,
               private userHistoriesService: UserHistoriesService,
               private router: Router,
               readonly EnrichmentService: EnrichmentService,
@@ -240,6 +249,7 @@ export class HistoricPlaceDetailComponent implements OnInit, OnChanges{
     this.enrichedContent = '';
     this.enrichmentStarted = false;
     this.enrichmentLoading = false;
+    this.loadFunFact();
     this.cdr.markForCheck();
   }
   private _selectedPlace: any;
@@ -431,6 +441,106 @@ export class HistoricPlaceDetailComponent implements OnInit, OnChanges{
   get eventsPageCount(): number {
     return Math.ceil(this.selectedPlace?.relatedEvents?.length / this.relatedItemCount);
   }
+
+  loadFunFact() {
+    this.funFact = null;
+    this.funFactSaved = false;
+
+    if (this._selectedPlace && this._selectedPlace.viennaHistoryWikiId) {
+      this.funFactService.getBuildingFunFact(this._selectedPlace.viennaHistoryWikiId).subscribe({
+        next: fact => {
+          this.funFact = fact;
+          this.funFactSaved = false;
+
+          const userId = localStorage.getItem('user_uuid');
+          if (userId && this.funFact && this.funFact.sentence) {
+            this.savedFunFactService.getFunFactsByUserId(userId as any).subscribe(savedFacts => {
+              this.funFactSaved = savedFacts.some((sf: SavedFunFactDto) =>
+                ((sf.getHeadline?.() ?? sf['headline']) === (this.selectedPlace?.name ?? '')) &&
+                ((sf.getFunFact?.() ?? sf['fun_fact']) === this.funFact?.sentence)
+              );
+              this.cdr.markForCheck();
+            });
+          }
+        },
+        error: () => {
+          this.funFact = null;
+          this.funFactSaved = false;
+          this.cdr.markForCheck();
+        }
+      });
+    } else {
+      this.funFact = null;
+      this.funFactSaved = false;
+    }
+  }
+
+
+
+  funFactSaved = false;
+  funFactSaveError: string = '';
+
+  saveFunFact() {
+    if (!this.funFact || this.funFactSaved) return;
+
+    const userId = localStorage.getItem('user_uuid');
+    if (!userId) {
+      alert('User nicht eingeloggt! Speichern nicht möglich.');
+      return;
+    }
+
+    const savedFunFact = new SavedFunFactDto(
+      0,
+      userId as any,
+      this.selectedPlace?.id ?? this.selectedPlace?.viennaHistoryWikiId,
+      this.selectedPlace?.name,
+      this.funFact.sentence,
+      this.selectedPlace?.imageUrls?.[0] || '',
+      this.funFact.score,
+      '', // reason (leer)
+    );
+
+    this.funFactSaveError = '';
+    this.savedFunFactService.createNewSavedFunFact(savedFunFact).subscribe({
+      next: () => {
+        this.funFactSaved = true;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.funFactSaveError = 'Speichern fehlgeschlagen. Bitte versuchen Sie es erneut!';
+      }
+    });
+  }
+
+  shareDialogOpen = false;
+
+  get shareText(): string {
+    return `${this.selectedPlace.name}: ${this.funFact?.sentence} — via CityTales\n${window.location.href}`;
+  }
+
+  shareWhatsApp() {
+    const url = 'https://wa.me/?text=' + encodeURIComponent(this.shareText);
+    window.open(url, '_blank');
+  }
+
+  shareFacebook() {
+    const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}&quote=${encodeURIComponent(this.shareText)}`;
+    window.open(url, '_blank');
+  }
+
+  shareTwitter() {
+    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(this.shareText)}`;
+    window.open(url, '_blank');
+  }
+
+  shareMail() {
+    const subject = encodeURIComponent(`CityTales: ${this.selectedPlace.name}`);
+    const body = encodeURIComponent(this.shareText);
+    const url = `mailto:?subject=${subject}&body=${body}`;
+    window.open(url, '_blank');
+  }
+
+
 }
 
 
