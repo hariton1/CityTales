@@ -23,6 +23,10 @@ import {BreakpointService} from '../../services/breakpoints.service';
 import {EnrichmentService} from '../../services/enrichment.service';
 import {TuiItem} from '@taiga-ui/cdk';
 import { FunFactService, FunFactCardDTO } from '../../services/fun-fact.service';
+import {SavedFunFactDto} from '../../user_db.dto/saved-fun-fact.dto';
+import {SavedFunFactService} from '../../user_db.services/saved-fun-fact.service';
+import { supabase } from '../../user-management/supabase.service';
+
 
 
 @Component({
@@ -69,11 +73,9 @@ export class HistoricPersonDetailComponent implements OnInit{
 
   public readonly collapsed = signal(true);
 
-  funFact: FunFactCardDTO | null = null;
-  funFactSaved = false;
-
-  constructor(private funFactService: FunFactService,
-             private router: Router,
+  constructor(private savedFunFactService: SavedFunFactService,
+              private funFactService: FunFactService,
+              private router: Router,
               private userService: UserService,
               readonly EnrichmentService: EnrichmentService,
               readonly cdr: ChangeDetectorRef,
@@ -89,20 +91,35 @@ export class HistoricPersonDetailComponent implements OnInit{
     { key: 'funny', label: 'Funny', bg: 'funny-bg.jpg' },
   ];
 
+  userId: string | null = null;
   ngOnInit() {
     this.breakpointService.level$.subscribe(() => {
       this.tonesItemCount = this.breakpointService.tonesItemCount;
       this.cdr.detectChanges();
     });
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.access_token) {
+        supabase.auth.getUser().then(({ data: { user } }) => {
+          if (user) {
+            this.userId = user.id;
+            console.log('User ID:', this.userId);
+          }
+        });
+      }
+    });
   }
 
   @Input()
   get selectedPerson(): any {
-    this.loadFunFact();
     return this._selectedPerson;
   }
   set selectedPerson(value: any) {
     this._selectedPerson = value;
+    if (this.userId !== null) {
+      this.loadFunFact();
+    } else {
+      setTimeout(() => this.loadFunFact(), 100);
+    }
   }
   private _selectedPerson: any;
 
@@ -210,24 +227,72 @@ export class HistoricPersonDetailComponent implements OnInit{
     return Math.ceil(this.selectedPerson?.relatedEvents?.length / this.itemsCount);
   }
 
+  funFact: FunFactCardDTO | null = null;
+  funFactSaved = false;
+  funFactSaveError: string = '';
+
   loadFunFact() {
-    console.log('Person/Event FunFact laden für:', this._selectedPerson?.id ?? this._selectedPerson?.viennaHistoryWikiId);
-    if (this._selectedPerson && (this._selectedPerson.id || this._selectedPerson.viennaHistoryWikiId)) {
-      const id = this._selectedPerson.id ?? this._selectedPerson.viennaHistoryWikiId;
-      this.funFactService.getPersonFunFact(id).subscribe({
-        next: fact => { this.funFact = fact; },
-        error: () => { this.funFact = null; }
+    this.funFact = null;
+    this.funFactSaved = false;
+
+    if (this._selectedPerson && this._selectedPerson.viennaHistoryWikiId) {
+      this.funFactService.getBuildingFunFact(this._selectedPerson.viennaHistoryWikiId).subscribe({
+        next: fact => {
+          this.funFact = fact;
+          this.funFactSaved = false;
+
+          if (this.userId && this.funFact && this.funFact.fact) {
+            this.savedFunFactService.getFunFactsByUserId(this.userId as any).subscribe(savedFacts => {
+              this.funFactSaved = savedFacts.some((sf: SavedFunFactDto) =>
+                ((sf.getHeadline?.() ?? sf['headline']) === (this.selectedPerson?.name ?? '')) &&
+                ((sf.getFunFact?.() ?? sf['fun_fact']) === this.funFact?.fact)
+              );
+              this.cdr.markForCheck();
+            });
+          }
+        },
+        error: () => {
+          this.funFact = null;
+          this.funFactSaved = false;
+          this.cdr.markForCheck();
+        }
       });
     } else {
       this.funFact = null;
+      this.funFactSaved = false;
     }
   }
 
+
   saveFunFact() {
-    if (!this.funFact) return;
-    // TODO: Hier echten UserService-Aufruf einbauen!
-    this.funFactSaved = true;
-    setTimeout(() => this.funFactSaved = false, 2000);
+    if (!this.funFact || this.funFactSaved) return;
+
+    if (!this.userId) {
+      alert('User nicht eingeloggt! Speichern nicht möglich.');
+      return;
+    }
+
+    const savedFunFact = new SavedFunFactDto(
+      0,
+      this.userId as any,
+      this.selectedPerson?.id ?? this.selectedPerson?.viennaHistoryWikiId,
+      this.selectedPerson?.name,
+      this.funFact.fact,
+      this.selectedPerson?.imageUrls?.[0] || '',
+      this.funFact.score,
+      '', // reason (leer)
+    );
+
+    this.funFactSaveError = '';
+    this.savedFunFactService.createNewSavedFunFact(savedFunFact).subscribe({
+      next: () => {
+        this.funFactSaved = true;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.funFactSaveError = 'Speichern fehlgeschlagen. Bitte versuchen Sie es erneut!';
+      }
+    });
   }
 }
 
