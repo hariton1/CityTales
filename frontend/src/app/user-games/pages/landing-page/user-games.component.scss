@@ -1,10 +1,12 @@
 .dashboard-container {
   display: flex !important;
   flex-direction: row !important;
-  width: 100vw;
+  width: 100%;            /* 100vw causes horizontal scroll, avoid */
   gap: 20px;
   padding: 10px;
   box-sizing: border-box;
+  justify-content: center;  /* CENTER all children horizontally */
+  align-items: flex-start;  /* align top */
 }
 
 @media (max-width: 768px) {
@@ -12,9 +14,9 @@
     flex-direction: column !important;
     width: 100%;
     padding-bottom: 40px;
+    align-items: center;   /* center children in column layout */
   }
 }
-
 app-leaderboard,
 app-badges,
 app-xp-tracker {

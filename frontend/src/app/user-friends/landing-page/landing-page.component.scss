@@ -1,12 +1,31 @@
 .dashboard-container {
   display: flex !important;
   flex-direction: column !important;
-  width: 100vw;
+  width: 100%;
   gap: 20px;
   padding: 10px;
   box-sizing: border-box;
+  justify-content: center;  /* CENTER all children horizontally */
+  align-items: flex-start;  /* align top */
 }
 
+@media (max-width: 768px) {
+  .dashboard-container {
+    flex-direction: column !important;
+    width: 100%;
+    padding-bottom: 40px;
+    align-items: center;   /* center children in column layout */
+  }
+}
+
+app-friend-list,
+app-invite-users,
+app-search-users {
+  flex-grow: 1;
+  flex-shrink: 1;
+  flex-basis: 0;
+  min-width: 0;
+}
 
 .offline-banner {
   background-color: #ffcccc;
