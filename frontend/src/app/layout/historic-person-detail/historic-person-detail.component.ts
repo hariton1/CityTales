@@ -1,4 +1,14 @@
-import {ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, signal} from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnInit,
+  Output,
+  signal,
+  SimpleChanges
+} from '@angular/core';
 import {AsyncPipe, NgForOf, NgIf, NgSwitch, NgSwitchCase} from "@angular/common";
 import {
   TuiAppearance,
@@ -53,7 +63,7 @@ import {TuiItem} from '@taiga-ui/cdk';
   templateUrl: './historic-person-detail.component.html',
   styleUrl: './historic-person-detail.component.less'
 })
-export class HistoricPersonDetailComponent implements OnInit{
+export class HistoricPersonDetailComponent implements OnInit, OnChanges{
 
   protected index1 = 0; //tone slider
   lineWidths = [90, 70, 95, 60, 85, 80, 60, 75, 85, 80];
@@ -104,11 +114,14 @@ export class HistoricPersonDetailComponent implements OnInit{
   }
   set selectedPerson(value: any) {
     this._selectedPerson = value;
-    if (this._selectedPerson?.contentGerman) {
+  }
+  private _selectedPerson: any;
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['selectedPerson']?.currentValue?.contentGerman) {
       this.generateSummary();
     }
   }
-  private _selectedPerson: any;
 
   @Output() onPersonDetailEvent: EventEmitter<PersonEntity> = new EventEmitter<PersonEntity>();
   @Output() onEventDetailEvent: EventEmitter<EventEntity> = new EventEmitter<EventEntity>();
