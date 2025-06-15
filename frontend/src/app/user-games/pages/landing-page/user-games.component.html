@@ -1,4 +1,8 @@
-<div class="dashboard-container">
+<div *ngIf="!(online$ | async)" class="offline-banner">
+  ⚠️ You are currently offline. The 'Scoreboard' feature does not work under these circumstances
+</div>
+
+<div *ngIf="(online$ | async)" class="dashboard-container">
   <app-leaderboard></app-leaderboard>
   <app-xp-tracker></app-xp-tracker>
   <app-badges></app-badges>

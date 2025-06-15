@@ -1,10 +1,11 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {SidebarComponent} from '../sidebar/sidebar.component';
 import {MapViewComponent} from '../map-view/map-view.component';
 import {BuildingEntity} from '../../dto/db_entity/BuildingEntity';
 import {TuiSegmented} from '@taiga-ui/kit';
+import {BreakpointObserver, Breakpoints} from '@angular/cdk/layout';
 import {NgIf} from '@angular/common';
-import {TuiButton, TuiIcon} from '@taiga-ui/core';
+import {TuiIcon, TuiTextfieldComponent, TuiButton} from '@taiga-ui/core';
 import {NotificationInboxComponent} from '../../core/notification-inbox/notification-inbox.component';
 import {PersonEntity} from '../../dto/db_entity/PersonEntity';
 import {EventEntity} from '../../dto/db_entity/EventEntity';
@@ -19,12 +20,16 @@ import {BreakpointService} from '../../services/breakpoints.service';
     NgIf,
     TuiIcon,
     NotificationInboxComponent,
+    TuiTextfieldComponent,
+    NotificationInboxComponent,
     TuiButton
   ],
   templateUrl: './explore-layout.component.html',
   styleUrl: './explore-layout.component.less'
 })
-export class ExploreLayoutComponent {
+export class ExploreLayoutComponent  {
+
+  @ViewChild(MapViewComponent) mapViewComponent!: MapViewComponent;
 
   currentViewMobile: 'discover' | 'map' = 'discover';
 
@@ -84,5 +89,22 @@ export class ExploreLayoutComponent {
     console.log(this.selectedEvent)
     console.log(this.selectedPlace)
     console.log(this.selectedPerson);
+  }
+
+  onSelectEvent(event: any) {
+    console.log("onSelectEvent: " + event);
+    var marker = this.mapViewComponent.location_marker_dict.get(event.viennaHistoryWikiId)
+
+    if(!marker) {
+      console.log("Selected location does not have a declared marker!")
+      this.mapViewComponent.unselectMarker();
+    } else {
+      this.mapViewComponent.selectMarker(marker, event)
+    }
+  }
+
+  onCloseDetailView() {
+    console.log("Invoked close detail method in explore layout!")
+    this.mapViewComponent.unselectMarker();
   }
 }

@@ -4,22 +4,6 @@
     <h3 tuiTitle class="tui-text_h4">Recommended Tours</h3>
     <div class="tour-scroll-container">
       <ng-container *ngFor="let tour of recommendedTours")>
-        <div class="tour-card-horizontal">
-          <div class="tour-card-header">
-            <h4 tuiTitle class="tui-text_h6">{{ tour.name }}</h4>
-            <span tuiSubtitle>Estim. Duration: {{ tour.duration }}</span>
-          </div>
-          <p class="tui-text_body tui-space_top-1">{{ tour.description }}</p>
-        </div>
-      </ng-container>
-    </div>
-  </section>
-
-  <!-- User Tour Panel -->
-  <section tuiAppearance="neutral" class="recommended-section">
-    <h3 tuiTitle class="tui-text_h4">Your Tours</h3>
-    <div *ngIf="userTours.length > 0" class="tour-scroll-container">
-      <ng-container *ngFor="let tour of userTours">
         <div class="tour-card-horizontal" (click)="onTourCardClick(tour)">
           <div class="tour-card-header">
             <h4 tuiTitle class="tui-text_h6">{{ tour.getName() }}</h4>
@@ -27,15 +11,37 @@
 
           </div>
           <p class="tui-text_body tui-space_top-1">{{ tour.getDescription() }}</p>
-          <button tuiButton size="xs" (click)="deleteTour(tour); $event.stopPropagation()" class="slide-tour-delete-button">Delete</button>
         </div>
       </ng-container>
     </div>
   </section>
 
+  <!-- User Tour Panel -->
+  <section tuiAppearance="neutral" class="recommended-section">
+    <div *ngIf="userTours">
+      <h3 tuiTitle class="tui-text_h4">Your Tours</h3>
+      <div class="tour-scroll-container">
+        <ng-container *ngFor="let tour of userTours">
+          <div class="tour-card-horizontal" (click)="onTourCardClick(tour)">
+            <div class="tour-card-header">
+              <h4 tuiTitle class="tui-text_h6">{{ tour.getName() }}</h4>
+              <span tuiSubtitle>Estim. Duration: {{ tour.getDurationEstimate().toFixed(2) }} h</span>
 
-  <section tuiAppearance="neutral" class="map-section">
-    <h3 tuiTitle class="tui-text_h4">Create Your Own Tour</h3>
+          </div>
+          <p class="tui-text_body tui-space_top-1">{{ tour.getDescription() }}</p>
+          <button tuiButton size="xs" (click)="deleteTour(tour); $event.stopPropagation()" class="slide-tour-delete-button">Delete</button>
+          <button tuiButton size="xs"
+                  (click)="generateGoogleMapsTourLink(tour); $event.stopPropagation()"
+                  class="slide-tour-map-button">
+            Open in Maps
+          </button>
+        </div>
+      </ng-container>
+      </div>
+    </div>
+  </section>
+
+
   <google-map height="500px" width="100%"
               [center]="center"
               [zoom]="zoom"
@@ -45,9 +51,11 @@
   </google-map>
 
   <div class="controls">
-    <button tuiButton class="control-button" (click)="mode = 'start'">Set Start</button>
-    <button tuiButton class="control-button" (click)="mode = 'end'">Set End</button>
-    <button tuiButton class="control-button" (click)="clearRoute()">Clear</button>
+    <div class="button-group">
+      <button tuiButton class="control-button" (click)="mode = 'start'">Set Start</button>
+      <button tuiButton class="control-button" (click)="mode = 'end'">Set End</button>
+      <button tuiButton class="control-button" (click)="clearRoute()">Clear</button>
+    </div>
 
     <h4>Selected Tour</h4>
     <ol>
@@ -55,101 +63,118 @@
         <button tuiButton size="xs" (click)="deleteStopFromTour(b)" class="tour-delete-button">Delete</button>
       </li>
     </ol>
-
   </div>
 
-    <h4>Total distance of tour: {{tourDistance}}km</h4>
-    <h4>Estim. walking time of tour: {{tourDuration}}h</h4>
-
-  </section>
-
-  <!-- Create Your Own Tour Section -->
-  <section tuiAppearance="white" class="create-section tui-space_top-5">
+  <h4>Total distance of tour: {{tourDistance}}km</h4>
+  <h4>Estim. walking time of tour: {{tourDuration}}h</h4>
 
 
-    <div class="tui-space_vertical-3">
-      <tui-textfield>
+  <tui-tabs [(activeItemIndex)]="selectedTab">
+    <button
+      tuiTab
+      (click)="onTabClick(1)"
+    >
+      Create Your Own Tour
+    </button>
+    <button
+      tuiTab
+      (click)="onTabClick(2)"
+    >
+      Auto-Generate a Tour
+    </button>
+  </tui-tabs>
+
+
+
+  <div class="tui-space_vertical-3" *ngIf="selectedTab===0">
+    <tui-textfield>
+      <input
+        tuiTextfield
+        [formControl]="tourName"
+        placeholder="Enter tour name"
+        class="tui-block"
+      />
+    </tui-textfield>
+
+    <tui-textfield>
+          <textarea
+            tuiTextfield
+            [formControl]="tourDescription"
+            placeholder="Describe your tour"
+            class="tui-block"
+            rows="10"
+          ></textarea>
+    </tui-textfield>
+
+    <button
+      tuiButton
+      type="button"
+      appearance="primary"
+      size="m"
+      (click)="createTour()"
+      [disabled]="!tourName.value || !tourDescription.value || selectedBuildings.length === 0"
+    >
+      Create Tour
+    </button>
+  </div>
+
+
+
+
+
+
+
+  <div class="tui-space_vertical-3" *ngIf="selectedTab===1">
+
+    <label tuiLabel>Max Distance (km): {{ maxDistance }}</label>
+    <input tuiSlider
+           type="range"
+           min="0"
+           max="50"
+           step="0.2"
+           [(ngModel)]="maxDistance">
+
+    <label tuiLabel>Number of Sites to Visit: {{ numberOfSites }}</label>
+    <input tuiSlider
+           type="range"
+           max="20"
+           step="1"
+           [(ngModel)]="numberOfSites">
+
+    <label tuiLabel>Max budget (€): {{ maxBudget }}</label>
+    <input tuiSlider
+           type="range"
+           min="0"
+           max="100"
+           step="1"
+           [(ngModel)]="maxBudget">
+
+    <div class="input-group">
+      <tui-textfield class="input-item">
+        <label tuiLabel>Adults</label>
         <input
-          tuiTextfield
-          [formControl]="tourName"
-          placeholder="Enter tour name"
-          class="tui-block"
+          tuiInputNumber
+          [(ngModel)]="noAdults"
         />
       </tui-textfield>
 
-      <tui-textfield>
-  <textarea
-    tuiTextfield
-    [formControl]="tourDescription"
-    placeholder="Describe your tour"
-    class="tui-block"
-    rows="10"
-  ></textarea>
+      <tui-textfield class="input-item">
+        <label tuiLabel>Children</label>
+        <input
+          tuiInputNumber
+          [(ngModel)]="noChildren"
+        />
       </tui-textfield>
 
-      <button
-        tuiButton
-        type="button"
-        appearance="primary"
-        size="m"
-        (click)="createTour()"
-        [disabled]="!tourName.value || !tourDescription.value || selectedBuildings.length === 0"
-      >
-        Create Tour
-      </button>
+      <tui-textfield class="input-item">
+        <label tuiLabel>Seniors</label>
+        <input
+          tuiInputNumber
+          [(ngModel)]="noSeniors"
+        />
+      </tui-textfield>
     </div>
-  </section>
-</div>
 
-
-<section tuiAppearance="neutral" class="advanced-tour-section tui-space_top-5">
-  <h3 tuiTitle class="tui-text_h4">Advanced Tour Generator</h3>
-
-  <!-- Min and Max Distance Slider -->
-  <div class="tui-space_vertical-3">
-    <label tuiLabel>Min Distance (km): {{ minDistance }}</label>
-    <input tuiSlider
-           type="range"
-      [min]="0.0"
-      [max]="50"
-      [step]="0.2"
-      [(ngModel)]="minDistance"
-    >
-
-    <label tuiLabel>Max Distance (km): {{ maxDistance }}</label>
-    <input
-      tuiSlider
-      type="range"
-      min="0"
-      max="50"
-      step="0.2"
-      [(ngModel)]="maxDistance"
-    >
-  </div>
-
-  <!-- Min Sites to See -->
-  <div class="tui-space_vertical-3">
-    <label tuiLabel>Minimum Sites to Visit: {{ minSites }}</label>
-    <input
-      tuiSlider
-      type="range"
-      max="20"
-      step="1"
-      [(ngModel)]="minSites"
-    />
-
-    <div class="tui-space_vertical-3">
-      <label tuiLabel>Max budget (€): {{ maxBudget }}</label>
-      <input
-        tuiSlider
-        type="range"
-        min="0"
-        max="100"
-        step="1"
-        [(ngModel)]="maxBudget"
-      >
-    </div>
     <button tuiButton class="control-button" (click)="generateAdvancedTour()">Create a tour for me!</button>
   </div>
-</section>
-
+</div>
