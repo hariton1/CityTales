@@ -306,7 +306,7 @@ export class MapViewComponent implements OnInit{
     this.selectDetailEvent.emit(location);
 
     //Center map around selected marker & change icion
-    this.selectMarker(marker, location);
+    //this.selectMarker(marker, location);
 
     this.generatePolylines(location);
   }
@@ -490,7 +490,7 @@ export class MapViewComponent implements OnInit{
 
   onCircleClick(loc: any): void {
     this.selectDetailEvent.emit(loc);
-    this.selectMarker(this.getMarkerToLocation(loc), loc)
+    //this.selectMarker(this.getMarkerToLocation(loc), loc)
     this.closeInfoWindow();
   }
 

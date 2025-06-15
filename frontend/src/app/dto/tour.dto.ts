@@ -1,5 +1,6 @@
 import {BuildingEntity} from './db_entity/BuildingEntity';
 import {TourEntity} from './tour_entity/TourEntity';
+import {PriceEntity} from './tour_entity/PriceEntity';
 
 export class TourDto {
   private id: number;
@@ -14,8 +15,9 @@ export class TourDto {
   private durationEstimate: number;
   private userId: string;
   private tourPrice: number;
+  private pricePerStop: Map<number, PriceEntity[]>;
 
-  constructor(id:number, name: string, description: string, start_lat: number, start_lng: number, end_lat: number, end_lng: number, stops: BuildingEntity[], distance: number, durationEstimate: number, userId: string, tourPrice: number) {
+  constructor(id:number, name: string, description: string, start_lat: number, start_lng: number, end_lat: number, end_lng: number, stops: BuildingEntity[], distance: number, durationEstimate: number, userId: string, tourPrice: number, pricePerStop: Map<number, PriceEntity[]>) {
     this.id = id;
     this.name = name;
     this.description = description;
@@ -28,11 +30,18 @@ export class TourDto {
     this.durationEstimate = durationEstimate;
     this.userId = userId;
     this.tourPrice = tourPrice;
+    this.pricePerStop = pricePerStop;
   }
 
   public static fromTourEntity(tourEntity:TourEntity): TourDto {
 
     var stops: BuildingEntity[] = JSON.parse(tourEntity.stops);
+    if(tourEntity.pricePerStop !== undefined){
+      var pricePerStop: Map<number, PriceEntity[]> = JSON.parse(tourEntity.pricePerStop)
+    } else {
+      var pricePerStop = new Map<number, PriceEntity[]>();
+    }
+
 
     return new TourDto(
       tourEntity.id,
@@ -46,7 +55,8 @@ export class TourDto {
       tourEntity.distance,
       tourEntity.durationEstimate,
       tourEntity.userId,
-      tourEntity.tourPrice
+      tourEntity.tourPrice,
+      pricePerStop
     )
   }
 
@@ -63,7 +73,8 @@ export class TourDto {
       distance: tourDto.getDistance(),
       durationEstimate: tourDto.getDurationEstimate(),
       userId: tourDto.getUserId(),
-      tourPrice: tourDto.getTourPrice()
+      tourPrice: tourDto.getTourPrice(),
+      pricePerStop: JSON.stringify(tourDto.getPricePerStop()),
     }
     return entity;
 
@@ -165,6 +176,14 @@ export class TourDto {
 
   setTourPrice(tourPrice: number): void {
     this.tourPrice = tourPrice;
+  }
+
+  setPricePerStop(pricePerStop: Map<number, PriceEntity[]>): void {
+    this.pricePerStop = pricePerStop;
+  }
+
+  getPricePerStop() {
+    return this.pricePerStop;
   }
 
 

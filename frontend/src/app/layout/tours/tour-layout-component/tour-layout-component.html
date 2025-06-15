@@ -125,24 +125,6 @@
 
 
   <div class="tui-space_vertical-3" *ngIf="selectedTab===1">
-    <tui-textfield>
-      <input
-        tuiTextfield
-        [formControl]="tourName"
-        placeholder="Enter tour name"
-        class="tui-block"
-      />
-    </tui-textfield>
-
-    <tui-textfield>
-    <textarea
-      tuiTextfield
-      [formControl]="tourDescription"
-      placeholder="Describe your tour"
-      class="tui-block"
-      rows="10"
-    ></textarea>
-    </tui-textfield>
 
     <label tuiLabel>Max Distance (km): {{ maxDistance }}</label>
     <input tuiSlider
