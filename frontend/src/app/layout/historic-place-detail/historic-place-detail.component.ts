@@ -10,7 +10,7 @@ import {
   ChangeDetectorRef,
   OnInit
 } from '@angular/core';
-import {CommonModule, NgIf} from '@angular/common';
+import {CommonModule, NgIf, NgOptimizedImage} from '@angular/common';
 import {
   TuiAppearance,
   TuiAutoColorPipe,
@@ -94,7 +94,8 @@ const numberOptions = maskitoNumberOptionsGenerator({
     TuiFallbackSrcPipe,
     TuiAutoColorPipe,
     TuiAppearance,
-    TuiPagination
+    TuiPagination,
+    NgOptimizedImage
   ],
   templateUrl: './historic-place-detail.component.html',
   styleUrl: './historic-place-detail.component.less',
@@ -473,6 +474,51 @@ export class HistoricPlaceDetailComponent implements OnInit{
       }
     });
   }
+
+  shareDialogOpen = false;
+
+  get shareImage(): string {
+    // Always use the [0] image if available, fallback to placeholder if missing!
+    if (
+      this.selectedPlace?.imageUrls &&
+      this.selectedPlace.imageUrls.length > 0 &&
+      this.selectedPlace.imageUrls[0] !== 'https://www.geschichtewiki.wien.gv.at/images/7/7d/RDF.png'
+    ) {
+      return this.selectedPlace.imageUrls[0];
+    }
+    return 'assets/images/building-placeholder-500.jpeg';
+  }
+
+  get shareHeadline(): string {
+    return this.selectedPlace?.name || '';
+  }
+
+  get shareFact(): string {
+    return this.funFact?.fact || '';
+  }
+
+  shareOn(platform: string) {
+    const pageUrl = window.location.href; // Or create your own "shareable" page URL for this place
+    const text = `${this.shareHeadline}: ${this.shareFact} — via CityTales\n${pageUrl}`;
+
+    switch(platform) {
+      case 'whatsapp':
+        window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+        break;
+      case 'facebook':
+        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(pageUrl)}&quote=${encodeURIComponent(text)}`, '_blank');
+        break;
+      case 'twitter':
+        window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(pageUrl)}`, '_blank');
+        break;
+      case 'email':
+        window.open(`mailto:?subject=${encodeURIComponent(this.shareHeadline)}&body=${encodeURIComponent(text)}`);
+        break;
+      default:
+        break;
+    }
+  }
+
 }
 
 

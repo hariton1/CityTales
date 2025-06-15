@@ -59,6 +59,46 @@
             <div *ngIf="funFactSaved" class="success-message">
               Fun Fact wurde gespeichert!
             </div>
+            <!-- Teilen Button -->
+            <button
+              tuiButton
+              appearance="outline"
+              size="s"
+              class="share-btn tui-space_left-3"
+              (click)="shareDialogOpen = true"
+            >
+              <tui-icon icon="@tui.send" [style.height.rem]="1.1" class="mr-1"></tui-icon>
+              Teilen
+            </button>
+
+            <!-- Share Dialog Preview -->
+            <ng-template [(tuiDialog)]="shareDialogOpen">
+              <div class="share-dialog-content">
+                <img [src]="shareImage" class="share-image" alt="Share Image" style="max-width: 80px; border-radius: 8px;"/>
+                <div class="share-content">
+                  <img ngSrc="assets/logo/cityTales-logo-desktop-white.svg" class="citytales-logo" alt="CityTales Logo" style="height: 32px;"
+                       height="16" width="16"/>
+                  <h2 class="headline">{{ shareHeadline }}</h2>
+                  <p class="fact-text">{{ shareFact }}</p>
+                </div>
+                <div class="share-actions" style="display: flex; gap: 12px; margin-top: 18px;">
+                  <button tuiButton appearance="flat" (click)="shareOn('whatsapp')">
+                    <img ngSrc="assets/images/whatsapp.svg" width="24" alt="WhatsApp" height="24"/>
+                  </button>
+                  <button tuiButton appearance="flat" (click)="shareOn('facebook')">
+                    <img ngSrc="assets/images/facebook.svg" width="24" alt="Facebook" height="24"/>
+                  </button>
+                  <button tuiButton appearance="flat" (click)="shareOn('twitter')">
+                    <img ngSrc="assets/images/twitter.svg" width="24" alt="Twitter/X" height="24"/>
+                  </button>
+                  <button tuiButton appearance="flat" (click)="shareOn('email')">
+                    <tui-icon icon="@tui.mail" [style.height.rem]="1.3"></tui-icon>
+                  </button>
+                  <button tuiButton appearance="outline" (click)="shareDialogOpen = false">Schließen</button>
+                </div>
+              </div>
+            </ng-template>
+
 
             <p tuiSubtitle>
                <span class="icon-and-text">
