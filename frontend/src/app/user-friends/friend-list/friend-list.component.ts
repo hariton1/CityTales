@@ -120,5 +120,7 @@ export class FriendListComponent implements OnInit {
       next: () => console.log('Two way: Deleted successfully'),
       error: (err) => console.error('Error deleting:', err)
     });
+
+    window.location.reload();
   }
 }
