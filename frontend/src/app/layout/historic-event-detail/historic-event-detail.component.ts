@@ -16,6 +16,7 @@ import {
   TuiAppearance,
   TuiAutoColorPipe,
   TuiButton,
+  TuiDialog,
   TuiFallbackSrcPipe,
   TuiIcon,
   TuiScrollbar,
@@ -31,6 +32,10 @@ import {TuiExpand} from '@taiga-ui/experimental';
 import {TuiItem} from '@taiga-ui/cdk';
 import {BreakpointService} from '../../services/breakpoints.service';
 import {EnrichmentService} from '../../services/enrichment.service';
+import { FunFactService, FunFactCardDTO } from '../../services/fun-fact.service';
+import {supabase} from '../../user-management/supabase.service';
+import {SavedFunFactService} from '../../user_db.services/saved-fun-fact.service';
+import {SavedFunFactDto} from '../../user_db.dto/saved-fun-fact.dto';
 
 @Component({
   selector: 'app-historic-event-detail',
@@ -57,7 +62,8 @@ import {EnrichmentService} from '../../services/enrichment.service';
     TuiChevron,
     TuiItem,
     NgSwitchCase,
-    NgSwitch
+    NgSwitch,
+    TuiDialog
   ],
   templateUrl: './historic-event-detail.component.html',
   styleUrl: './historic-event-detail.component.less'
@@ -83,7 +89,9 @@ export class HistoricEventDetailComponent implements OnInit, OnChanges {
 
   public readonly collapsed = signal(true);
 
-  constructor(private router: Router,
+  constructor(private savedFunFactService: SavedFunFactService,
+              private funFactService: FunFactService,
+              private router: Router,
               private userService: UserService,
               readonly EnrichmentService: EnrichmentService,
               readonly cdr: ChangeDetectorRef,
@@ -99,11 +107,22 @@ export class HistoricEventDetailComponent implements OnInit, OnChanges {
     { key: 'funny', label: 'Funny', bg: 'funny-bg.jpg' },
   ];
 
+  userId: string | null = null;
   ngOnInit() {
     this.breakpointService.level$.subscribe(() => {
       this.tonesItemCount = this.breakpointService.tonesItemCount;
       this.generateSummary();
       this.cdr.detectChanges();
+    });
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.access_token) {
+        supabase.auth.getUser().then(({ data: { user } }) => {
+          if (user) {
+            this.userId = user.id;
+            console.log('User ID:', this.userId);
+          }
+        });
+      }
     });
   }
 
@@ -114,6 +133,11 @@ export class HistoricEventDetailComponent implements OnInit, OnChanges {
   }
   set selectedEvent(value: any) {
     this._selectedEvent = value;
+    if (this.userId !== null) {
+      this.loadFunFact();
+    } else {
+      setTimeout(() => this.loadFunFact(), 100);
+    }
   }
   private _selectedEvent: any;
 
@@ -246,7 +270,104 @@ export class HistoricEventDetailComponent implements OnInit, OnChanges {
   get eventsPageCount(): number {
     return Math.ceil(this.selectedEvent?.relatedEvents?.length / this.itemsCount);
   }
+
+  funFact: FunFactCardDTO | null = null;
+  funFactSaved = false;
+  funFactSaveError: string = '';
+  loadFunFact() {
+    this.funFact = null;
+    this.funFactSaved = false;
+
+    if (this._selectedEvent && this._selectedEvent.viennaHistoryWikiId) {
+      this.funFactService.getEventFunFact(this._selectedEvent.viennaHistoryWikiId).subscribe({
+        next: fact => {
+          this.funFact = fact;
+          this.funFactSaved = false;
+
+          if (this.userId && this.funFact && this.funFact.sentence) {
+            this.savedFunFactService.getFunFactsByUserId(this.userId as any).subscribe(savedFacts => {
+              this.funFactSaved = savedFacts.some((sf: SavedFunFactDto) =>
+                ((sf.getHeadline?.() ?? sf['headline']) === (this.selectedEvent?.name ?? '')) &&
+                ((sf.getFunFact?.() ?? sf['fun_fact']) === this.funFact?.sentence)
+              );
+              this.cdr.markForCheck();
+            });
+          }
+        },
+        error: () => {
+          this.funFact = null;
+          this.funFactSaved = false;
+          this.cdr.markForCheck();
+        }
+      });
+    } else {
+      this.funFact = null;
+      this.funFactSaved = false;
+    }
+  }
+
+
+  saveFunFact() {
+    if (!this.funFact || this.funFactSaved) return;
+
+    if (!this.userId) {
+      alert('User nicht eingeloggt! Speichern nicht möglich.');
+      return;
+    }
+
+    const savedFunFact = new SavedFunFactDto(
+      0,
+      this.userId as any,
+      this.selectedEvent?.id ?? this.selectedEvent?.viennaHistoryWikiId,
+      this.selectedEvent?.name,
+      this.funFact.sentence,
+      this.selectedEvent?.imageUrls?.[0] || '',
+      this.funFact.score,
+      '', // reason (leer)
+    );
+
+    this.funFactSaveError = '';
+    this.savedFunFactService.createNewSavedFunFact(savedFunFact).subscribe({
+      next: () => {
+        this.funFactSaved = true;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.funFactSaveError = 'Speichern fehlgeschlagen. Bitte versuchen Sie es erneut!';
+      }
+    });
+  }
+
+  shareDialogOpen = false;
+
+  get shareText(): string {
+    return `${this.selectedEvent.name}: ${this.funFact?.sentence} — via CityTales\n${window.location.href}`;
+  }
+
+  shareWhatsApp() {
+    const url = 'https://wa.me/?text=' + encodeURIComponent(this.shareText);
+    window.open(url, '_blank');
+  }
+
+  shareFacebook() {
+    const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}&quote=${encodeURIComponent(this.shareText)}`;
+    window.open(url, '_blank');
+  }
+
+  shareTwitter() {
+    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(this.shareText)}`;
+    window.open(url, '_blank');
+  }
+
+  shareMail() {
+    const subject = encodeURIComponent(`CityTales: ${this.selectedEvent.name}`);
+    const body = encodeURIComponent(this.shareText);
+    const url = `mailto:?subject=${subject}&body=${body}`;
+    window.open(url, '_blank');
+  }
 }
+
+
 
 type CustomBreakpointLevel =
   | 'mobile'          // 360–767px

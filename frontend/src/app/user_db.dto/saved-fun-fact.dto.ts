@@ -9,10 +9,9 @@ export class SavedFunFactDto {
   private image_url: string;
   private score: number;
   private reason: string;
-  private saved_at: Date;
 
   constructor(saved_fun_fact_id: number, user_id: UUID, article_id: number, headline: string, fun_fact: string,
-              image_url: string, score: number, reason: string, saved_at: Date) {
+              image_url: string, score: number, reason: string) {
     this.saved_fun_fact_id = saved_fun_fact_id;
     this.user_id = user_id;
     this.article_id = article_id;
@@ -21,7 +20,6 @@ export class SavedFunFactDto {
     this.image_url = image_url;
     this.score = score;
     this.reason = reason;
-    this.saved_at = saved_at;
   }
 
   public getSavedFunFactId():number{
@@ -86,14 +84,6 @@ export class SavedFunFactDto {
 
   public setReason(reason:string){
     this.reason = reason;
-  }
-
-  public getSavedAt():Date {
-    return this.saved_at;
-  }
-
-  public setSavedAt(saved_at:Date){
-    this.saved_at = saved_at;
   }
 
 }
