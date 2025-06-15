@@ -35,7 +35,6 @@ import { supabase } from '../../user-management/supabase.service';
     NgForOf,
     NgIf,
     TuiIcon,
-    TuiScrollbar,
     TuiButton,
     TuiCardLarge,
     TuiExpand,

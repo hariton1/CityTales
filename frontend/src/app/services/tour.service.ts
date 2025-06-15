@@ -28,12 +28,6 @@ export class TourService {
       stops
     };
 
-    console.log("Request body: " + body.start_lng);
-    console.log("Request body: " + body.start_lat);
-    console.log("Request body: " + body.end_lat);
-    console.log("Request body: " + body.end_lng);
-    console.log("Request body: " + body.stops.toString());
-
     return this.httpClient.post<any>(BACKEND_ADDRESS + 'api/tour/durationDistanceEstimate', body);
   }
 
