@@ -34,9 +34,9 @@ import java.util.stream.Collectors;
 @Service
 public class TourService implements ITourService {
 
-    private HistoricBuildingService historicBuildingService;
-    private UserDBClient userDBClient;
-    private QdrantClient qdrantClient;
+    private final HistoricBuildingService historicBuildingService;
+    private final UserDBClient userDBClient;
+    private final QdrantClient qdrantClient;
 
     public TourService(HistoricBuildingService historicBuildingService, UserDBClient userDBClient, QdrantClient qdrantClient) {
         this.historicBuildingService = historicBuildingService;
@@ -48,7 +48,6 @@ public class TourService implements ITourService {
     private final ObjectMapper mapper = new ObjectMapper();
     private final Integer MAX_ROUTES = 10;
     private final Integer MAX_NEARBY_BUILDINGS = 30;
-    private final Double MAX_RAM_PERCENT = 0.5;
 
     @Override
     public List<TourDTO> createTours(CreateTourRequestDTO dto) {
@@ -90,14 +89,10 @@ public class TourService implements ITourService {
 
         assert(startOptional.isPresent());
 
-        if(startOptional.isPresent()) {
-            //Prepend start
-            stops.add(0, startOptional.get());
-        }
-        if(endOptional.isPresent()) {
-            //Append end
-            stops.add(endOptional.get());
-        }
+        //Prepend start
+        startOptional.ifPresent(geographicPoint2d -> stops.add(0, geographicPoint2d));
+        //Append end
+        endOptional.ifPresent(stops::add);
 
 
         List<List<Float>> distanceMatrix = getMetricMatrix(stops, "distance");
@@ -175,6 +170,7 @@ public class TourService implements ITourService {
         Map<String, Double> durations = getLengthDurationOfTour(tourObject);
         tourObject.setDistance(durations.get("distance"));
         tourObject.setDurationEstimate(durations.get("duration"));
+        tourObject.setTourPrice(tourPrice);
         tourObject.setPricePerStop(pricePerStop);
 
         return tourObject;
@@ -305,7 +301,6 @@ public class TourService implements ITourService {
         List<Integer> pathBuildingIds = path.stream().map(index -> building_dict.get(stops.get(index))).toList();
         Map<Integer, List<PriceDTO>> pricePerStop = getPriceFromDB(pathBuildingIds);
         Map<Integer, List<PriceDTO>> filteredPricePerStop = new HashMap<>();
-        double currentPrice = 0;
 
         for (Integer stopId : path) {
             List<PriceDTO> pricesForLocation = pricePerStop.get(stopId);
@@ -525,8 +520,8 @@ public class TourService implements ITourService {
             System.out.println(durations);
             System.out.println(distances);
 
-            List<List<Float>> distanceArray = mapper.convertValue(distances, new TypeReference<List<List<Float>>>() {});
-            List<List<Float>> durationArray = mapper.convertValue(durations, new TypeReference<List<List<Float>>>() {});
+            List<List<Float>> distanceArray = mapper.convertValue(distances, new TypeReference<>() {});
+            List<List<Float>> durationArray = mapper.convertValue(durations, new TypeReference<>() {});
 
             switch (metric) {
                 case "distance":
@@ -622,8 +617,8 @@ public class TourService implements ITourService {
             JsonNode root = mapper.readTree(response.getBody());
             JsonNode summary = root.path("routes").get(0).path("summary");
 
-            Double distance = summary.path("distance").asDouble();
-            Double duration = summary.path("duration").asDouble();
+            double distance = summary.path("distance").asDouble();
+            double duration = summary.path("duration").asDouble();
 
             return Map.of("distance", distance/1000, "duration", duration/3600);
 
