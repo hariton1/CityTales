@@ -11,6 +11,9 @@ import { supabase } from '../../user-management/supabase.service';
 import { CommonModule } from '@angular/common';
 import {TuiPlatform, TuiThemeColorService} from '@taiga-ui/cdk';
 import {FormsModule} from '@angular/forms';
+import { Inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+
 
 @Component({
   selector: 'app-header',
@@ -45,16 +48,14 @@ export class HeaderComponent {
     'web'
   ];
 
+  isBrowser: boolean;
   ngOnInit() {
-    let interestFiltering = localStorage.getItem('interest_filtering');
-    if (interestFiltering === 'true') {
-      this.isChecked = true;
-    } else {
-      this.isChecked = false;
+    if (typeof window !== 'undefined' && localStorage) {
+      const interestFiltering = localStorage.getItem('interest_filtering');
+      this.isChecked = interestFiltering === 'true';
     }
   }
-
-  constructor(private searchService: SearchService, private router: Router, private cdr: ChangeDetectorRef) {
+  constructor(@Inject(PLATFORM_ID) private platformId: Object, private searchService: SearchService, private router: Router, private cdr: ChangeDetectorRef) {
     supabase.auth.getSession().then(({ data: { session } }) => {
       this.loggedIn = !!session;
       this.cdr.markForCheck();
@@ -63,6 +64,7 @@ export class HeaderComponent {
       this.loggedIn = !!session;
       this.cdr.markForCheck();
     });
+    this.isBrowser = isPlatformBrowser(this.platformId);
   }
   async logout() {
     await supabase.auth.signOut();

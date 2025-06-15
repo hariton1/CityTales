@@ -11,102 +11,157 @@
 </button>
 
 <div class="scroll-wrapper">
-<div class="place-detail-container">
-  <section
-    tuiCardLarge="compact"
-    [tuiCardCollapsed]="collapsed()"
-    class="tui-space_bottom-5"
-  >
+  <div class="place-detail-container">
+    <section
+      tuiCardLarge="compact"
+      [tuiCardCollapsed]="collapsed()"
+      class="tui-space_bottom-5"
+    >
 
-    <div class="image-info-flex">
-      <div class="image-container" *ngIf="selectedPlace.imageUrls.length > 0">
-        <img [src]="
-            selectedPlace.imageUrls[1] === 'https://www.geschichtewiki.wien.gv.at/images/7/7d/RDF.png'
-            ? 'assets/images/building-placeholder-500.jpeg'
-            : selectedPlace.imageUrls[1]"
-             alt="{{ selectedPlace.name }}" />
-      </div>
+      <div class="image-info-flex">
+        <div class="image-container" *ngIf="selectedPlace.imageUrls.length > 0">
+          <img [src]="
+              selectedPlace.imageUrls[1] === 'https://www.geschichtewiki.wien.gv.at/images/7/7d/RDF.png'
+              ? 'assets/images/building-placeholder-500.jpeg'
+              : selectedPlace.imageUrls[1]"
+               alt="{{ selectedPlace.name }}" />
+        </div>
 
-      <div class="info-block">
-        <header tuiHeader class="tui-space_bottom-5">
-          <hgroup>
-            <h1 class="place-title tui-space_bottom-2" tuiTitle>{{selectedPlace.name}}</h1>
-            <p tuiSubtitle>
-               <span class="icon-and-text">
-                <span class="icon">
-                  <tui-icon icon="@tui.compass" [style.height.rem]="1.3" />
+        <div class="info-block">
+          <header tuiHeader class="tui-space_bottom-5">
+            <hgroup>
+              <h1 class="place-title tui-space_bottom-2" tuiTitle>{{selectedPlace.name}}</h1>
+              <p tuiSubtitle>
+                <span class="icon-and-text">
+                  <span class="icon">
+                    <tui-icon icon="@tui.compass" [style.height.rem]="1.3" />
+                  </span>
+                  {{ selectedPlace.latitude }}°N, {{ selectedPlace.longitude }}°E
                 </span>
-                 {{ selectedPlace.latitude }}°N, {{ selectedPlace.longitude }}°E
+              </p>
+            </hgroup>
+          </header>
+
+          <div *ngIf="funFact" class="fun-fact-card tui-space_bottom-3">
+            <tui-icon icon="@tui.star" [style.height.rem]="1.2" class="mr-2"></tui-icon>
+            <strong>Fun Fact:</strong> {{ funFact.sentence }}
+            <span *ngIf="funFact.score">&nbsp;(Score: {{ funFact.score }})</span>
+
+            <button
+              tuiButton
+              appearance="outline"
+              size="s"
+              class="merken-btn tui-space_left-3"
+              (click)="saveFunFact()"
+              [disabled]="funFactSaved"
+            >
+              <ng-container *ngIf="funFactSaved; else notSaved">
+                <tui-icon icon="@tui.heart" [style.height.rem]="1.1" class="heart full"></tui-icon>
+                Gespeichert!
+              </ng-container>
+              <ng-template #notSaved>
+                <tui-icon icon="@tui.heart" [style.height.rem]="1.1" class="heart empty"></tui-icon>
+                Merken
+              </ng-template>
+            </button>
+            <button
+              tuiButton
+              appearance="outline"
+              size="s"
+              class="share-btn tui-space_left-3"
+              (click)="shareDialogOpen = true"
+            >
+              <tui-icon icon="@tui.send" [style.height.rem]="1.1" class="mr-1"></tui-icon>
+              Teilen
+            </button>
+
+            <ng-template [(tuiDialog)]="shareDialogOpen">
+              <div class="share-dialog-content">
+                <div class="share-actions" style="display: flex; gap: 12px; margin-top: 18px; flex-wrap: wrap;">
+                  <button tuiButton appearance="flat" (click)="shareWhatsApp()">
+                    <img src="assets/images/whatsapp.svg" width="20" style="vertical-align:middle;margin-right:4px"/> WhatsApp
+                  </button>
+                  <button tuiButton appearance="flat" (click)="shareFacebook()">
+                    <img src="assets/images/facebook.svg" width="20" style="vertical-align:middle;margin-right:4px"/> Facebook
+                  </button>
+                  <button tuiButton appearance="flat" (click)="shareTwitter()">
+                    <img src="assets/images/twitter.svg" width="20" style="vertical-align:middle;margin-right:4px"/> Twitter
+                  </button>
+                  <button tuiButton appearance="flat" (click)="shareMail()">
+                    <img src="assets/images/mail.svg" width="20" style="vertical-align:middle;margin-right:4px"/> Mail
+                  </button>
+                  <button tuiButton appearance="outline" (click)="shareDialogOpen = false">Schließen</button>
+                </div>
+              </div>
+            </ng-template>
+          </div>
+
+          <div *ngIf="funFactSaveError" class="error-message">
+            {{ funFactSaveError }}
+          </div>
+          <div *ngIf="funFactSaved" class="success-message">
+            Fun Fact wurde gespeichert!
+          </div>
+
+          <div class="detail-row icon-and-text tui-space_bottom-3" *ngIf="selectedPlace.dateFrom">
+            <span class="icon-and-text">
+              <span class="icon">
+                <tui-icon icon="@tui.hammer" [style.height.rem]="1.2" />
               </span>
-            </p>
-          </hgroup>
-        </header>
-
-        <div class="detail-row icon-and-text tui-space_bottom-3" *ngIf="selectedPlace.dateFrom">
-          <span class="icon-and-text">
-            <span class="icon">
-              <tui-icon icon="@tui.hammer" [style.height.rem]="1.2" />
+              <strong> Built in: </strong> {{ selectedPlace.dateFrom }}
             </span>
+          </div>
 
-            <strong> Built in: </strong> {{ selectedPlace.dateFrom }}
-          </span>
-        </div>
-
-        <div class="detail-row icon-and-text tui-space_bottom-3" *ngIf="selectedPlace.dateTo">
-          <span class="icon-and-text">
-            <span class="icon">
-              <tui-icon icon="@tui.octagon-minus" [style.height.rem]="1.2" />
+          <div class="detail-row icon-and-text tui-space_bottom-3" *ngIf="selectedPlace.dateTo">
+            <span class="icon-and-text">
+              <span class="icon">
+                <tui-icon icon="@tui.octagon-minus" [style.height.rem]="1.2" />
+              </span>
+              <strong> Demolished in: </strong> {{ selectedPlace.dateTo }}
             </span>
+          </div>
 
-            <strong> Demolished in: </strong> {{ selectedPlace.dateTo }}
-          </span>
-        </div>
-
-        <div class="detail-row icon-and-text tui-space_bottom-3" *ngIf="selectedPlace.architect">
-          <span class="icon-and-text">
-            <span class="icon">
-              <tui-icon icon="@tui.pencil" [style.height.rem]="1.2" />
+          <div class="detail-row icon-and-text tui-space_bottom-3" *ngIf="selectedPlace.architect">
+            <span class="icon-and-text">
+              <span class="icon">
+                <tui-icon icon="@tui.pencil" [style.height.rem]="1.2" />
+              </span>
+              <strong> Architect: </strong> {{ selectedPlace.architect }}
             </span>
+          </div>
 
-            <strong> Architect: </strong> {{ selectedPlace.architect }}
-          </span>
-        </div>
+          <div>
+            <button class="tui-space_top-4" appearance="outline" size="s" tuiButton type="button"
+                    (click)="navigateToFeedback()">
+              <tui-icon icon="@tui.message-circle-plus" [style.height.rem]="1"/>
+              Is something incorrect?
+            </button>
+          </div>
 
-        <div>
-          <button class="tui-space_top-4" appearance="outline" size="s" tuiButton type="button"
-                  (click)="navigateToFeedback()">
-            <tui-icon icon="@tui.message-circle-plus" [style.height.rem]="1"/>
-            Is something incorrect?
-          </button>
-        </div>
-
-
-
-        <div class="bottom-right-button">
-
-          <button
-            appearance="secondary"
-            size="s"
-            tuiButton
-            type="button"
-            [tuiChevron]="!collapsed()"
-            (click)="collapsed.set(!collapsed())"
-          >
-            Sources
-          </button>
+          <div class="bottom-right-button">
+            <button
+              appearance="secondary"
+              size="s"
+              tuiButton
+              type="button"
+              [tuiChevron]="!collapsed()"
+              (click)="collapsed.set(!collapsed())"
+            >
+              Sources
+            </button>
+          </div>
         </div>
       </div>
-    </div>
 
-    <tui-expand [expanded]="!collapsed()">
-      <div class="detail-row" *ngIf="selectedPlace.url">
-        <span class="label">Wiki URL: </span>
-        <span class="value">
-              <a [href]="selectedPlace.url" target="_blank"> {{ selectedPlace.url }} </a>
-            </span>
-      </div>
-    </tui-expand>
-  </section>
+      <tui-expand [expanded]="!collapsed()">
+        <div class="detail-row" *ngIf="selectedPlace.url">
+          <span class="label">Wiki URL: </span>
+          <span class="value">
+            <a [href]="selectedPlace.url" target="_blank"> {{ selectedPlace.url }} </a>
+          </span>
+        </div>
+      </tui-expand>
+    </section>
 
   <div class="content" *ngIf="selectedPlace.contentGerman">
     <section class="place-summary">
