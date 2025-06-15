@@ -20,45 +20,36 @@ export class FunFactService {
 
   getBuildingFunFact(buildingId: number): Observable<FunFactCardDTO> {
     if (this.useDummy) {
-      // Hier kommt immer derselbe Dummy zurück (du kannst ihn beliebig anpassen)
       return of({
         id: buildingId,
         fact: `Dies ist ein Dummy-Fun-Fact für Gebäude #${buildingId}.`,
         score: Math.floor(Math.random() * 100)
       });
     } else {
-      // Hier kommt später dein echter HTTP-Call hin!
-      // return this.http.get<FunFactCardDTO>(`${this.apiUrl}/building/${buildingId}`);
       return this.http.get<FunFactCardDTO>(`${this.apiUrl}/building/${buildingId}`);
     }
 
   }
   getPersonFunFact(personId: number): Observable<FunFactCardDTO> {
     if (this.useDummy) {
-      // Hier kommt immer derselbe Dummy zurück (du kannst ihn beliebig anpassen)
       return of({
         id: personId,
         fact: `Dies ist ein Dummy-Fun-Fact für person #${personId}.`,
         score: Math.floor(Math.random() * 100)
       });
     } else {
-      // Hier kommt später dein echter HTTP-Call hin!
-      // return this.http.get<FunFactCardDTO>(`${this.apiUrl}/building/${buildingId}`);
       return this.http.get<FunFactCardDTO>(`${this.apiUrl}/person/${personId}`);
     }
 
   }
   getEventFunFact(eventId: number): Observable<FunFactCardDTO> {
     if (this.useDummy) {
-      // Hier kommt immer derselbe Dummy zurück (du kannst ihn beliebig anpassen)
       return of({
         id: eventId,
         fact: `Dies ist ein Dummy-Fun-Fact für event #${eventId}.`,
         score: Math.floor(Math.random() * 100)
       });
     } else {
-      // Hier kommt später dein echter HTTP-Call hin!
-      // return this.http.get<FunFactCardDTO>(`${this.apiUrl}/building/${buildingId}`);
       return this.http.get<FunFactCardDTO>(`${this.apiUrl}/event/${eventId}`);
     }
 

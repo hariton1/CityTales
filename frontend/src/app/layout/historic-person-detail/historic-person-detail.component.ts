@@ -236,7 +236,7 @@ export class HistoricPersonDetailComponent implements OnInit{
     this.funFactSaved = false;
 
     if (this._selectedPerson && this._selectedPerson.viennaHistoryWikiId) {
-      this.funFactService.getBuildingFunFact(this._selectedPerson.viennaHistoryWikiId).subscribe({
+      this.funFactService.getPersonFunFact(this._selectedPerson.viennaHistoryWikiId).subscribe({
         next: fact => {
           this.funFact = fact;
           this.funFactSaved = false;
