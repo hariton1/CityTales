@@ -44,6 +44,13 @@ export class TourLayoutComponent {
   private readonly alerts = inject(TuiAlertService);
 
   constructor(locationService: LocationService, tourService: TourService, router: Router, cdr: ChangeDetectorRef, userPointsService: UserPointsService, userService: UserService) {
+    this.online$ = merge(
+      of(navigator.onLine),
+      fromEvent(window, 'online').pipe(mapTo(true)),
+      fromEvent(window, 'offline').pipe(mapTo(false))
+    );
+
+
     this.locationService = locationService;
     this.tourService = tourService;
     this.userPointsService = userPointsService;
@@ -85,7 +92,8 @@ export class TourLayoutComponent {
               simplifiedStops,
               t.distance,
               t.durationEstimate,
-              t.userId
+              t.userId,
+              t.tourPrice
             );
           });
           console.log(this.userTours)
