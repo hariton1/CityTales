@@ -39,14 +39,25 @@
                 tuiButton
                 appearance="outline"
                 size="s"
-                class="tui-space_left-3"
+                class="merken-btn tui-space_left-3"
                 (click)="saveFunFact()"
                 [disabled]="funFactSaved"
               >
-                <tui-icon icon="@tui.heart" [style.height.rem]="1.1" class="mr-1"></tui-icon>
-                <span *ngIf="!funFactSaved">Merken</span>
-                <span *ngIf="funFactSaved">Gespeichert!</span>
+                <ng-container *ngIf="funFactSaved; else notSaved">
+                  <tui-icon icon="@tui.heart" [style.height.rem]="1.1" class="heart full"></tui-icon>
+                  Gespeichert!
+                </ng-container>
+                <ng-template #notSaved>
+                  <tui-icon icon="@tui.heart" [style.height.rem]="1.1" class="heart empty"></tui-icon>
+                  Merken
+                </ng-template>
               </button>
+            </div>
+            <div *ngIf="funFactSaveError" class="error-message">
+              {{ funFactSaveError }}
+            </div>
+            <div *ngIf="funFactSaved" class="success-message">
+              Fun Fact wurde gespeichert!
             </div>
 
             <p tuiSubtitle>

@@ -22,6 +22,9 @@ import {TuiItem} from '@taiga-ui/cdk';
 import {BreakpointService} from '../../services/breakpoints.service';
 import {EnrichmentService} from '../../services/enrichment.service';
 import { FunFactService, FunFactCardDTO } from '../../services/fun-fact.service';
+import {supabase} from '../../user-management/supabase.service';
+import {SavedFunFactService} from '../../user_db.services/saved-fun-fact.service';
+import {SavedFunFactDto} from '../../user_db.dto/saved-fun-fact.dto';
 
 @Component({
   selector: 'app-historic-event-detail',
@@ -67,10 +70,8 @@ export class HistoricEventDetailComponent implements OnInit {
 
   public readonly collapsed = signal(true);
 
-  funFact: FunFactCardDTO | null = null;
-  funFactSaved = false;
-
-  constructor(private funFactService: FunFactService,
+  constructor(private savedFunFactService: SavedFunFactService,
+              private funFactService: FunFactService,
               private router: Router,
               private userService: UserService,
               readonly EnrichmentService: EnrichmentService,
@@ -87,21 +88,36 @@ export class HistoricEventDetailComponent implements OnInit {
     { key: 'funny', label: 'Funny', bg: 'funny-bg.jpg' },
   ];
 
+  userId: string | null = null;
   ngOnInit() {
     this.breakpointService.level$.subscribe(() => {
       this.tonesItemCount = this.breakpointService.tonesItemCount;
       this.cdr.detectChanges();
+    });
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.access_token) {
+        supabase.auth.getUser().then(({ data: { user } }) => {
+          if (user) {
+            this.userId = user.id;
+            console.log('User ID:', this.userId);
+          }
+        });
+      }
     });
   }
 
 
   @Input()
   get selectedEvent(): any {
-    this.loadFunFact();
     return this._selectedEvent;
   }
   set selectedEvent(value: any) {
     this._selectedEvent = value;
+    if (this.userId !== null) {
+      this.loadFunFact();
+    } else {
+      setTimeout(() => this.loadFunFact(), 100);
+    }
   }
   private _selectedEvent: any;
 
@@ -208,23 +224,72 @@ export class HistoricEventDetailComponent implements OnInit {
   get eventsPageCount(): number {
     return Math.ceil(this.selectedEvent?.relatedEvents?.length / this.itemsCount);
   }
+
+  funFact: FunFactCardDTO | null = null;
+  funFactSaved = false;
+  funFactSaveError: string = '';
   loadFunFact() {
-    if (this._selectedEvent && (this._selectedEvent.id || this._selectedEvent.viennaHistoryWikiId)) {
-      const id = this._selectedEvent.id ?? this._selectedEvent.viennaHistoryWikiId;
-      this.funFactService.getEventFunFact(id).subscribe({
-        next: fact => { this.funFact = fact; },
-        error: () => { this.funFact = null; }
+    this.funFact = null;
+    this.funFactSaved = false;
+
+    if (this._selectedEvent && this._selectedEvent.viennaHistoryWikiId) {
+      this.funFactService.getBuildingFunFact(this._selectedEvent.viennaHistoryWikiId).subscribe({
+        next: fact => {
+          this.funFact = fact;
+          this.funFactSaved = false;
+
+          if (this.userId && this.funFact && this.funFact.fact) {
+            this.savedFunFactService.getFunFactsByUserId(this.userId as any).subscribe(savedFacts => {
+              this.funFactSaved = savedFacts.some((sf: SavedFunFactDto) =>
+                ((sf.getHeadline?.() ?? sf['headline']) === (this.selectedEvent?.name ?? '')) &&
+                ((sf.getFunFact?.() ?? sf['fun_fact']) === this.funFact?.fact)
+              );
+              this.cdr.markForCheck();
+            });
+          }
+        },
+        error: () => {
+          this.funFact = null;
+          this.funFactSaved = false;
+          this.cdr.markForCheck();
+        }
       });
     } else {
       this.funFact = null;
+      this.funFactSaved = false;
     }
   }
 
+
   saveFunFact() {
-    if (!this.funFact) return;
-    // TODO: Hier echten UserService-Aufruf einbauen!
-    this.funFactSaved = true;
-    setTimeout(() => this.funFactSaved = false, 2000);
+    if (!this.funFact || this.funFactSaved) return;
+
+    if (!this.userId) {
+      alert('User nicht eingeloggt! Speichern nicht möglich.');
+      return;
+    }
+
+    const savedFunFact = new SavedFunFactDto(
+      0,
+      this.userId as any,
+      this.selectedEvent?.id ?? this.selectedEvent?.viennaHistoryWikiId,
+      this.selectedEvent?.name,
+      this.funFact.fact,
+      this.selectedEvent?.imageUrls?.[0] || '',
+      this.funFact.score,
+      '', // reason (leer)
+    );
+
+    this.funFactSaveError = '';
+    this.savedFunFactService.createNewSavedFunFact(savedFunFact).subscribe({
+      next: () => {
+        this.funFactSaved = true;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.funFactSaveError = 'Speichern fehlgeschlagen. Bitte versuchen Sie es erneut!';
+      }
+    });
   }
 }
 

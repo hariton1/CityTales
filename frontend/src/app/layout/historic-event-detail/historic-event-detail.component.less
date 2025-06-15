@@ -403,6 +403,40 @@
   }
 }
 
+.heart.empty {
+  filter: grayscale(1);
+  opacity: 0.5;
+  transition: filter 0.2s, opacity 0.2s;
+}
+.heart.full {
+  color: #e63946; /* Or your favorite red */
+  filter: none;
+  opacity: 1;
+  transition: color 0.2s, filter 0.2s, opacity 0.2s;
+}
+.merken-btn[disabled] {
+  cursor: default;
+  opacity: 0.7;
+}
+.success-message {
+  color: #3cb371;
+  margin-top: 8px;
+  font-weight: 500;
+}
+.error-message {
+  color: #e63946;
+  margin-top: 8px;
+  font-weight: 500;
+}
+.heart.full {
+  animation: pop-heart 0.25s;
+}
+@keyframes pop-heart {
+  0% { transform: scale(1); }
+  60% { transform: scale(1.4); }
+  100% { transform: scale(1); }
+}
+
 @media @tui-mobile-interval {
   .back-button{
     margin-top: 5.5rem;

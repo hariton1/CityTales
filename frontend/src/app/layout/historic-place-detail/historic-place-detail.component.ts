@@ -405,57 +405,74 @@ export class HistoricPlaceDetailComponent implements OnInit{
   }
 
   loadFunFact() {
-    console.log('FunFact wird geladen für:', this._selectedPlace?.viennaHistoryWikiId);
+    this.funFact = null;
+    this.funFactSaved = false;
+
     if (this._selectedPlace && this._selectedPlace.viennaHistoryWikiId) {
-      this.funFact = null;
       this.funFactService.getBuildingFunFact(this._selectedPlace.viennaHistoryWikiId).subscribe({
         next: fact => {
           this.funFact = fact;
-          this.cdr.markForCheck();
+          this.funFactSaved = false;
+
+          const userId = localStorage.getItem('user_uuid');
+          if (userId && this.funFact && this.funFact.fact) {
+            this.savedFunFactService.getFunFactsByUserId(userId as any).subscribe(savedFacts => {
+              this.funFactSaved = savedFacts.some((sf: SavedFunFactDto) =>
+                ((sf.getHeadline?.() ?? sf['headline']) === (this.selectedPlace?.name ?? '')) &&
+                ((sf.getFunFact?.() ?? sf['fun_fact']) === this.funFact?.fact)
+              );
+              this.cdr.markForCheck();
+            });
+          }
         },
         error: () => {
           this.funFact = null;
+          this.funFactSaved = false;
           this.cdr.markForCheck();
         }
       });
     } else {
       this.funFact = null;
+      this.funFactSaved = false;
     }
   }
 
+
+
   funFactSaved = false;
+  funFactSaveError: string = '';
 
   saveFunFact() {
-    if (!this.funFact) return;
+    if (!this.funFact || this.funFactSaved) return;
 
     const userId = localStorage.getItem('user_uuid');
-    const now = new Date();
+    if (!userId) {
+      alert('User nicht eingeloggt! Speichern nicht möglich.');
+      return;
+    }
 
     const savedFunFact = new SavedFunFactDto(
       0,
-      userId,
-      this.selectedPlace?.id ?? this.selectedPlace?.viennaHistoryWikiId, // Artikel/Gebäude-ID
+      userId as any,
+      this.selectedPlace?.id ?? this.selectedPlace?.viennaHistoryWikiId,
       this.selectedPlace?.name,
       this.funFact.fact,
       this.selectedPlace?.imageUrls?.[0] || '',
       this.funFact.score,
       '', // reason (leer)
-      now
     );
 
+    this.funFactSaveError = '';
     this.savedFunFactService.createNewSavedFunFact(savedFunFact).subscribe({
-      next: (resp) => {
-        console.log('Erfolg beim Speichern!', resp);
+      next: () => {
         this.funFactSaved = true;
-        setTimeout(() => this.funFactSaved = false, 2000);
+        this.cdr.markForCheck();
       },
-      error: (err) => {
-        // Optional: Fehlerbehandlung
+      error: () => {
+        this.funFactSaveError = 'Speichern fehlgeschlagen. Bitte versuchen Sie es erneut!';
       }
     });
   }
-
-
 }
 
 
