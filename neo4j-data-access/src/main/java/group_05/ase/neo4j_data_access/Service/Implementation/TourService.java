@@ -5,6 +5,14 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithm;
+import com.graphhopper.jsprit.core.algorithm.box.Jsprit;
+import com.graphhopper.jsprit.core.problem.Location;
+import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
+import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
+import com.graphhopper.jsprit.core.problem.solution.route.VehicleRoute;
+import com.graphhopper.jsprit.core.problem.vehicle.VehicleImpl;
+import com.graphhopper.jsprit.core.problem.vehicle.VehicleTypeImpl;
 import group_05.ase.neo4j_data_access.Client.QdrantClient;
 import group_05.ase.neo4j_data_access.Client.UserDBClient;
 import group_05.ase.neo4j_data_access.Entity.Tour.*;
@@ -39,6 +47,8 @@ public class TourService implements ITourService {
 
     private final ObjectMapper mapper = new ObjectMapper();
     private final Integer MAX_ROUTES = 10;
+    private final Integer MAX_NEARBY_BUILDINGS = 30;
+    private final Double MAX_RAM_PERCENT = 0.5;
 
     @Override
     public List<TourDTO> createTours(CreateTourRequestDTO dto) {
@@ -78,6 +88,8 @@ public class TourService implements ITourService {
             endOptional = Optional.of(new GeographicPoint2d(dto.getEnd_lat(), dto.getEnd_lng()));
         } else { endOptional = Optional.empty(); }
 
+        assert(startOptional.isPresent());
+
         if(startOptional.isPresent()) {
             //Prepend start
             stops.add(0, startOptional.get());
@@ -96,12 +108,30 @@ public class TourService implements ITourService {
 
         List<GeographicPoint2d> mandatoryStops = dto.getPredefinedStops().stream().map(stop -> new GeographicPoint2d(stop.getLatitude().get(), stop.getLongitude().get())).toList();
 
-        List<TourObject> foundTours = findRoutesBFS(startOptional, endOptional, mandatoryStops, stops  ,distanceMatrix, dto, MAX_ROUTES, building_dict);
 
-        System.out.println("Found " + foundTours.size() + " tours");
+        //First: Try with breadth first search
+        List<TourObject> foundTours = findRoutesBFS(startOptional, endOptional, mandatoryStops, stops, distanceMatrix, dto, MAX_ROUTES, building_dict);
+        if(foundTours.isEmpty()){
+            System.out.println("No tours found with BFS! Trying with Graphhopper Logic...");
+        } else {
+            System.out.println("Found " + foundTours.size() + " tours with BFS!");
+            return foundTours.stream().map(this::tourObjectToTourDTO).collect(Collectors.toList());
+        }
 
-        return foundTours.stream().map(this::tourObjectToTourDTO).toList();
-        //return null;
+        List<Integer> foundTour = findRoutesGraphhopper(distanceMatrix, dto.getNumStops(), endOptional.isPresent(), dto.getMaxDistance(), dto.getMaxBudget(), stops, building_dict, dto);
+        System.out.println("Found " + foundTour.size() + " tours with Graphhopper!");
+        if(!foundTour.isEmpty()){
+            System.out.println("Found tour with Graphhopper:" + foundTour);
+            List<GeographicPoint2d> stopsNew = new ArrayList<>();
+            foundTour.forEach(stop -> stopsNew.add(stops.get(stop)));
+            double tourPrice = getTotalPriceForTour(foundTour, stops, building_dict, dto);
+            Map<Integer, List<PriceDTO>> pricePerStop = getPricePerStop(foundTour, stops, building_dict, dto);
+            TourObject tourObject = buildTourObject(stopsNew, dto.getUserId(), building_dict, tourPrice, pricePerStop);
+            return List.of(tourObjectToTourDTO(tourObject));
+        } else{
+            System.out.println("No tours found with Graphhopper!");
+            return List.of();
+        }
     }
 
     private TourDTO tourObjectToTourDTO(TourObject tourObject) {
@@ -150,6 +180,159 @@ public class TourService implements ITourService {
         return tourObject;
     }
 
+    private List<Integer> findRoutesGraphhopper(List<List<Float>> distanceMatrix,
+                                                int numberOfStops,
+                                                boolean stopDefined,
+                                                double maxDistance,
+                                                double maxBudget,
+                                                List<GeographicPoint2d> stops,
+                                                Map<GeographicPoint2d, Integer> building_dict,
+                                                CreateTourRequestDTO dto) {
+        double[][] distanceMatrice = new double[distanceMatrix.size()][distanceMatrix.get(0).size()];
+        for(int i = 0; i < distanceMatrix.size(); i++) {
+            for(int j = 0; j < distanceMatrix.get(i).size(); j++) {
+                distanceMatrice[i][j] = distanceMatrix.get(i).get(j);
+            }
+        }
+
+
+        int desiredNumberOfServicesPerVehicle = numberOfStops;
+        int STOP_COUNT_DIMENSION_INDEX = 0;
+
+        VehicleTypeImpl.Builder vehicleTypeBuilder = VehicleTypeImpl.Builder.newInstance("vehicleType");
+        vehicleTypeBuilder.addCapacityDimension(STOP_COUNT_DIMENSION_INDEX, desiredNumberOfServicesPerVehicle);
+        VehicleTypeImpl vehicleType = vehicleTypeBuilder.build();
+
+        VehicleImpl.Builder vehicleBuilder = VehicleImpl.Builder.newInstance("vehicle");
+
+        Location start = Location.newInstance("0");
+        vehicleBuilder.setStartLocation(start);
+
+        if(stopDefined) {
+            Location end = Location.newInstance(String.valueOf(distanceMatrice.length -1));
+            vehicleBuilder.setEndLocation(end).setReturnToDepot(true);
+        }
+
+        vehicleBuilder.setType(vehicleType).setReturnToDepot(false);
+
+
+
+        VehicleRoutingProblem.Builder vrpBuilder = VehicleRoutingProblem.Builder.newInstance();
+        vrpBuilder.addVehicle(vehicleBuilder.build());
+
+        // Add all service locations (except depot)
+        for (int i = 1; i < distanceMatrix.size() - 1; i++) { // Assuming 0 is start, N-1 is end
+            vrpBuilder.addJob(com.graphhopper.jsprit.core.problem.job.Service.Builder.newInstance("stop_" + i)
+                    .setLocation(Location.newInstance(String.valueOf(i)))
+                    // Assign a demand of 1 for our STOP_COUNT_DIMENSION_INDEX
+                    .addSizeDimension(STOP_COUNT_DIMENSION_INDEX, 1)
+                    .build());
+        }
+
+        // Use your own distance matrix
+        vrpBuilder.setFleetSize(VehicleRoutingProblem.FleetSize.FINITE);
+        vrpBuilder.setRoutingCost(new CustomMatrixCost(distanceMatrice));
+        VehicleRoutingProblem problem = vrpBuilder.build();
+
+        // Solve
+        VehicleRoutingAlgorithm algorithm = Jsprit.createAlgorithm(problem);
+        Collection<VehicleRoutingProblemSolution> solutions = algorithm.searchSolutions();
+
+        // Extract best solution
+        System.out.println("Found " + solutions.size() + " solutions to routing problem! ");
+
+        List<List<Integer>> possibleRoutes = new ArrayList<>();
+
+        for (VehicleRoutingProblemSolution solution : solutions) {
+            //Filter best routes
+            System.out.println("Solution cost: " + solution.getCost());
+            List<List<Integer>> paths = new ArrayList<>();
+            for (VehicleRoute route: solution.getRoutes()){
+                List<Integer> routeDetail = new ArrayList<>();
+                routeDetail.add(Integer.valueOf(route.getStart().getLocation().getId()));
+                routeDetail.addAll(route.getActivities().stream().map(tourActivity -> Integer.parseInt(tourActivity.getLocation().getId())).toList());
+                double tourCost = getTotalPriceForTour(routeDetail, stops, building_dict, dto);
+                double tourDistance = getTourDistance(routeDetail, distanceMatrix);
+                System.out.println("Calculated tour cost for tour:" + tourCost);
+                System.out.println("Calculated tour distance for tour:" + tourDistance);
+                System.out.println("Max tour distance for tour:" + maxDistance);
+                if (tourCost > maxBudget){
+                    continue;
+                }
+                if (tourDistance > maxDistance){
+                    continue;
+                }
+                paths.add(routeDetail);
+            }
+            possibleRoutes.addAll(paths);
+        }
+        System.out.println("Found routes " + possibleRoutes.size());
+        if(possibleRoutes.isEmpty()){
+            return List.of();
+        } else{
+            return possibleRoutes.get(0);
+        }
+    }
+
+    private double getTotalPriceForTour(List<Integer> path, List<GeographicPoint2d> stops, Map<GeographicPoint2d, Integer> building_dict, CreateTourRequestDTO dto) {
+        List<Integer> pathBuildingIds = path.stream().map(index -> building_dict.get(stops.get(index))).toList();
+        Map<Integer, List<PriceDTO>> pricePerStop = getPriceFromDB(pathBuildingIds);
+        double currentPrice = 0;
+
+        for (Integer stopId : path) {
+            List<PriceDTO> pricesForLocation = pricePerStop.get(stopId);
+            if (pricesForLocation != null) {
+                Optional<PriceDTO> adultPriceDTO = pricesForLocation.stream().filter(priceDto -> "Adult".equals(priceDto.getName())).findFirst();
+                Optional<PriceDTO> childPriceDTO = pricesForLocation.stream().filter(priceDto -> "Child".equals(priceDto.getName())).findFirst();
+                Optional<PriceDTO> seniorPriceDTO = pricesForLocation.stream().filter(priceDto -> "Senior".equals(priceDto.getName())).findFirst();
+
+                if (adultPriceDTO.isPresent()) {
+                    currentPrice += dto.getPersonConfiguration()[0] * adultPriceDTO.get().getPrice();
+                }
+                if (childPriceDTO.isPresent()) {
+                    currentPrice += dto.getPersonConfiguration()[1] * childPriceDTO.get().getPrice();
+                }
+                if (seniorPriceDTO.isPresent()) {
+                    currentPrice += dto.getPersonConfiguration()[2] * seniorPriceDTO.get().getPrice();
+                }
+            }
+        }
+
+        return currentPrice;
+    }
+
+    private Map<Integer, List<PriceDTO>> getPricePerStop(List<Integer> path, List<GeographicPoint2d> stops, Map<GeographicPoint2d, Integer> building_dict, CreateTourRequestDTO dto) {
+        List<Integer> pathBuildingIds = path.stream().map(index -> building_dict.get(stops.get(index))).toList();
+        Map<Integer, List<PriceDTO>> pricePerStop = getPriceFromDB(pathBuildingIds);
+        Map<Integer, List<PriceDTO>> filteredPricePerStop = new HashMap<>();
+        double currentPrice = 0;
+
+        for (Integer stopId : path) {
+            List<PriceDTO> pricesForLocation = pricePerStop.get(stopId);
+            if (pricesForLocation != null) {
+                Optional<PriceDTO> adultPriceDTO = pricesForLocation.stream().filter(priceDto -> "Adult".equals(priceDto.getName())).findFirst();
+                Optional<PriceDTO> childPriceDTO = pricesForLocation.stream().filter(priceDto -> "Child".equals(priceDto.getName())).findFirst();
+                Optional<PriceDTO> seniorPriceDTO = pricesForLocation.stream().filter(priceDto -> "Senior".equals(priceDto.getName())).findFirst();
+
+                List<PriceDTO> prices = new ArrayList<>();
+
+                adultPriceDTO.ifPresent(prices::add);
+                childPriceDTO.ifPresent(prices::add);
+                seniorPriceDTO.ifPresent(prices::add);
+                filteredPricePerStop.put(stopId, prices);
+            }
+        }
+        return filteredPricePerStop;
+    }
+
+
+    private double getTourDistance(List<Integer> stops, List<List<Float>> distanceMatrix){
+        double totalCost = 0;
+        for (int i = 0; i < stops.size() - 1; i++) {
+            totalCost += distanceMatrix.get(stops.get(i)).get(stops.get(i + 1));
+        }
+        return totalCost;
+    }
 
 
     public List<TourObject> findRoutesBFS(
@@ -221,7 +404,8 @@ public class TourService implements ITourService {
         queue.add(new RouteState(initialPath, 0.0, visitedMandatoryStops));
 
         while (!queue.isEmpty()) {
-            System.out.println("Current RAM Usage: " + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1000000000 + "GB");
+            double ram_usage = (double) (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / Runtime.getRuntime().totalMemory();
+            System.out.println("Current VM RAM Usage: " + ram_usage + "%");
             if (validRoutes.size() >= maxRoutes) break;
 
             RouteState state = queue.poll();
@@ -253,34 +437,15 @@ public class TourService implements ITourService {
                         currentDistance >= createTourRequestDTO.getMinDistance() &&
                         currentDistance <= createTourRequestDTO.getMaxDistance()
                 ) {
-                    List<Integer> pathBuildingIds = path.stream().map(index -> building_dict.get(availableStops.get(index))).filter(Objects::nonNull).toList();
-                    Map<Integer, List<PriceDTO>> pricePerStop = getPriceFromDB(pathBuildingIds);
-                    double currentPrice = 0;
-
-                    for (Integer stopId : path) {
-                        List<PriceDTO> pricesForLocation = pricePerStop.get(stopId);
-                        if (pricesForLocation != null) {
-                            Optional<PriceDTO> adultPriceDTO = pricesForLocation.stream().filter(dto -> "Adult".equals(dto.getName())).findFirst();
-                            Optional<PriceDTO> childPriceDTO = pricesForLocation.stream().filter(dto -> "Child".equals(dto.getName())).findFirst();
-                            Optional<PriceDTO> seniorPriceDTO = pricesForLocation.stream().filter(dto -> "Senior".equals(dto.getName())).findFirst();
-
-                            if (adultPriceDTO.isPresent()) {
-                                currentPrice += createTourRequestDTO.getPersonConfiguration()[0] * adultPriceDTO.get().getPrice();
-                            }
-                            if (childPriceDTO.isPresent()) {
-                                currentPrice += createTourRequestDTO.getPersonConfiguration()[1] * childPriceDTO.get().getPrice();
-                            }
-                            if (seniorPriceDTO.isPresent()) {
-                                currentPrice += createTourRequestDTO.getPersonConfiguration()[2] * seniorPriceDTO.get().getPrice();
-                            }
-                        }
-                    }
-
+                    double currentPrice = getTotalPriceForTour(path, allStops, building_dict, createTourRequestDTO);
+                    System.out.println("Current price: " + currentPrice);
 
                     if (currentPrice <= createTourRequestDTO.getMaxBudget()) {
                         List<GeographicPoint2d> routeGeographicPoints = path.stream()
                                 .map(allStops::get)
                                 .collect(Collectors.toList());
+
+                        Map<Integer, List<PriceDTO>> pricePerStop = getPricePerStop(path, allStops, building_dict, createTourRequestDTO);
 
                         validRoutes.add(buildTourObject(routeGeographicPoints, createTourRequestDTO.getUserId(), building_dict, currentPrice, pricePerStop));
                     }
@@ -403,7 +568,7 @@ public class TourService implements ITourService {
         MatchRequest dto = new MatchRequest();
         dto.setCollectionName("WienGeschichteWikiBuildings");
         dto.setInterests(interestsIds);
-        dto.setResultSize(20);
+        dto.setResultSize(MAX_NEARBY_BUILDINGS);
         return qdrantClient.getBuildingEntityIdsFromQdrant(dto);
     }
 
