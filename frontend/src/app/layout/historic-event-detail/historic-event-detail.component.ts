@@ -5,7 +5,7 @@ import {AsyncPipe, NgForOf, NgIf} from '@angular/common';
 import {
   TuiAppearance,
   TuiAutoColorPipe,
-  TuiButton,
+  TuiButton, TuiDialog,
   TuiFallbackSrcPipe,
   TuiIcon,
   TuiScrollbar,
@@ -49,7 +49,8 @@ import {SavedFunFactDto} from '../../user_db.dto/saved-fun-fact.dto';
     TuiTooltip,
     TuiCardCollapsed,
     TuiChevron,
-    TuiItem
+    TuiItem,
+    TuiDialog
   ],
   templateUrl: './historic-event-detail.component.html',
   styleUrl: './historic-event-detail.component.less'
@@ -290,6 +291,34 @@ export class HistoricEventDetailComponent implements OnInit {
         this.funFactSaveError = 'Speichern fehlgeschlagen. Bitte versuchen Sie es erneut!';
       }
     });
+  }
+
+  shareDialogOpen = false;
+
+  get shareText(): string {
+    return `${this.selectedEvent.name}: ${this.funFact?.fact} — via CityTales\n${window.location.href}`;
+  }
+
+  shareWhatsApp() {
+    const url = 'https://wa.me/?text=' + encodeURIComponent(this.shareText);
+    window.open(url, '_blank');
+  }
+
+  shareFacebook() {
+    const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}&quote=${encodeURIComponent(this.shareText)}`;
+    window.open(url, '_blank');
+  }
+
+  shareTwitter() {
+    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(this.shareText)}`;
+    window.open(url, '_blank');
+  }
+
+  shareMail() {
+    const subject = encodeURIComponent(`CityTales: ${this.selectedEvent.name}`);
+    const body = encodeURIComponent(this.shareText);
+    const url = `mailto:?subject=${subject}&body=${body}`;
+    window.open(url, '_blank');
   }
 }
 

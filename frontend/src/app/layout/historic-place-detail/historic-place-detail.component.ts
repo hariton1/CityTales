@@ -52,6 +52,8 @@ import {BreakpointService} from '../../services/breakpoints.service';
 import { FunFactService, FunFactCardDTO } from '../../services/fun-fact.service';
 import {SavedFunFactDto} from '../../user_db.dto/saved-fun-fact.dto';
 import {SavedFunFactService} from '../../user_db.services/saved-fun-fact.service';
+import html2canvas from 'html2canvas';
+import { ViewChild, ElementRef } from '@angular/core';
 
 const postfix = ' €';
 const numberOptions = maskitoNumberOptionsGenerator({
@@ -477,47 +479,32 @@ export class HistoricPlaceDetailComponent implements OnInit{
 
   shareDialogOpen = false;
 
-  get shareImage(): string {
-    // Always use the [0] image if available, fallback to placeholder if missing!
-    if (
-      this.selectedPlace?.imageUrls &&
-      this.selectedPlace.imageUrls.length > 0 &&
-      this.selectedPlace.imageUrls[0] !== 'https://www.geschichtewiki.wien.gv.at/images/7/7d/RDF.png'
-    ) {
-      return this.selectedPlace.imageUrls[0];
-    }
-    return 'assets/images/building-placeholder-500.jpeg';
+  get shareText(): string {
+    return `${this.selectedPlace.name}: ${this.funFact?.fact} — via CityTales\n${window.location.href}`;
   }
 
-  get shareHeadline(): string {
-    return this.selectedPlace?.name || '';
+  shareWhatsApp() {
+    const url = 'https://wa.me/?text=' + encodeURIComponent(this.shareText);
+    window.open(url, '_blank');
   }
 
-  get shareFact(): string {
-    return this.funFact?.fact || '';
+  shareFacebook() {
+    const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}&quote=${encodeURIComponent(this.shareText)}`;
+    window.open(url, '_blank');
   }
 
-  shareOn(platform: string) {
-    const pageUrl = window.location.href; // Or create your own "shareable" page URL for this place
-    const text = `${this.shareHeadline}: ${this.shareFact} — via CityTales\n${pageUrl}`;
-
-    switch(platform) {
-      case 'whatsapp':
-        window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
-        break;
-      case 'facebook':
-        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(pageUrl)}&quote=${encodeURIComponent(text)}`, '_blank');
-        break;
-      case 'twitter':
-        window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(pageUrl)}`, '_blank');
-        break;
-      case 'email':
-        window.open(`mailto:?subject=${encodeURIComponent(this.shareHeadline)}&body=${encodeURIComponent(text)}`);
-        break;
-      default:
-        break;
-    }
+  shareTwitter() {
+    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(this.shareText)}`;
+    window.open(url, '_blank');
   }
+
+  shareMail() {
+    const subject = encodeURIComponent(`CityTales: ${this.selectedPlace.name}`);
+    const body = encodeURIComponent(this.shareText);
+    const url = `mailto:?subject=${subject}&body=${body}`;
+    window.open(url, '_blank');
+  }
+
 
 }
 
