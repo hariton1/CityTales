@@ -1,0 +1,15 @@
+.centered-wrapper {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 10px;
+  box-sizing: border-box;
+  overflow-x: auto; /* allows scroll on narrow screens */
+}
+
+.user-list-table {
+  width: 100%;
+  max-width: 100%;
+  border-collapse: collapse;
+  table-layout: auto;
+  min-width: 600px; /* optional to avoid squishing */
+}

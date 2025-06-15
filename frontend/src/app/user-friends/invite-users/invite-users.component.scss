@@ -1,0 +1,15 @@
+.centered-wrapper {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 10px;
+  box-sizing: border-box;
+  overflow-x: auto;  /* allows horizontal scroll if table is too wide */
+}
+
+.friend-invites-table {
+  width: 100%;        /* table fills wrapper */
+  max-width: 100%;
+  border-collapse: collapse;
+  table-layout: auto;
+  min-width: 600px;   /* optional: prevents table from getting too small */
+}
