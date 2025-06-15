@@ -23,6 +23,12 @@
   }
 }
 
+@media (max-width: 480px) {
+  .button-grid {
+    grid-template-columns: 1fr;    /* One column on small screens */
+  }
+}
+
 form footer {
   justify-content: flex-end;
 }
@@ -39,10 +45,6 @@ form footer {
   padding: 10px 0 10px 0;
 }
 
-.button-style {
-  margin-top: 10px;
-}
-
 .island {
   max-inline-size: 20rem;
   padding: 1rem;
@@ -56,4 +58,21 @@ form footer {
 
 .tui-space_top-4 {
   height: 10%;
+}
+
+.button-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;  /* Two columns of equal width */
+  grid-template-rows: auto auto;   /* Two rows with automatic height */
+  gap: 1rem;                       /* Space between buttons */
+  max-width: 600px;                /* Optional: constrains the grid width */
+  margin: 0 auto;                  /* Optional: centers the grid */
+}
+
+.button-style {
+  width: 100%;                     /* Makes buttons fill their grid cells */
+  height: 100%;                    /* Makes buttons fill their grid cells */
+  min-height: 48px;                /* Ensures minimum clickable height */
+  white-space: normal;             /* Allows text to wrap if needed */
+  text-align: center;              /* Centers button text */
 }

@@ -1,4 +1,15 @@
 <ng-container *ngIf="isMobile">
+  <div class="search-button-container" *ngIf="!searchOpen && currentViewMobile === 'discover'">
+    <button
+      tuiButton
+      size="m"
+      type="button"
+      class="mobile-search-button"
+      (click)="toggleSearch($event)">
+      <tui-icon icon="@tui.search" [style.height.rem]="1.2" />
+    </button>
+  </div>
+
     <div class="mobile-view-toggle">
       <tui-segmented [size]="'m'" [style.border-radius.rem]="10">
         <button
@@ -20,13 +31,17 @@
 
   <!-- Mobile: show only selected component -->
   <ng-container *ngIf="currentViewMobile === 'discover'">
-    <app-sidebar (onCloseDetailView)="onCloseDetailView()"
-                 [historicalPlaces]="historicalPlaces"
-                 (onSelectEvent)="onSelectEvent($event)"></app-sidebar>
+    <app-sidebar
+      [searchOpen]="searchOpen"
+      [historicalPlaces]="historicalPlaces"
+      (searchOpenChange)="searchOpen = $event">
+    </app-sidebar>
   </ng-container>
 
   <ng-container *ngIf="currentViewMobile === 'map'">
-    <app-map-view (populatePlacesEvent)="setHistoricalPlaces($event)" (selectDetailEvent)="selectDetailEvent($event)"></app-map-view>
+    <app-map-view
+      (populatePlacesEvent)="setHistoricalPlaces($event)"
+      (selectDetailEvent)="selectDetailEvent($event)"></app-map-view>
   </ng-container>
 </ng-container>
 
@@ -35,9 +50,7 @@
   <app-sidebar [historicalPlaces]="historicalPlaces"
                [selectedPlace]="selectedPlace"
                [selectedEvent]="selectedEvent"
-               [selectedPerson]="selectedPerson"
-                (onCloseDetailView)="onCloseDetailView()"
-                (onSelectEvent)="onSelectEvent($event)">
+               [selectedPerson]="selectedPerson">
   </app-sidebar>
   <app-map-view (selectDetailEvent)="selectDetailEvent($event)" (populatePlacesEvent)="setHistoricalPlaces($event)"></app-map-view>
 </ng-container>

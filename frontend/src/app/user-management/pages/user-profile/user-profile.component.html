@@ -37,15 +37,20 @@
     </fieldset>
 
     <footer>
-      <button class="button-style" tuiButton appearance="primary" type="submit" (click)="handleEditInterestsClick()" >
-        Edit interests
-      </button>
-      <button class="button-style" tuiButton appearance="primary" type="submit" (click)="handleChangePassClick()" >
-        Change password
-      </button>
-      <button class="button-style" tuiButton appearance="primary" type="submit" (click)="handleDisplayHistoryClick()" >
-        Display visits' history
-      </button>
+      <div class="button-grid">
+        <button class="button-style" tuiButton appearance="primary" type="submit" (click)="handleEditInterestsClick()" >
+          Edit interests
+        </button>
+        <button class="button-style" tuiButton appearance="primary" type="submit" (click)="handleChangePassClick()" >
+          Change password
+        </button>
+        <button class="button-style" tuiButton appearance="primary" type="submit" (click)="handleDisplayHistoryClick()" >
+          Display visits' history
+        </button>
+        <button class="button-style" tuiButton appearance="primary" type="submit" (click)="handleDisplayFunFactsClick()" >
+          Display saved fun facts
+        </button>
+      </div>
     </footer>
 </div>
 

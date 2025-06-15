@@ -13,7 +13,7 @@ import {UserService} from '../../services/user.service';
     CommonModule, TuiScrollbar
   ],
   templateUrl: './historic-place-preview.component.html',
-  styleUrl: './historic-place-preview.component.scss'
+  styleUrl: './historic-place-preview.component.less'
 })
 export class HistoricPlacePreviewComponent {
 

@@ -48,7 +48,7 @@ import {UserDto} from '../../user_db.dto/user.dto';
 import {TuiCard, TuiHeader} from '@taiga-ui/layout';
 import {TuiExpand} from '@taiga-ui/experimental';
 import {EnrichmentService} from '../../services/enrichment.service';
-import {BreakpointObserver, Breakpoints} from '@angular/cdk/layout';
+import {BreakpointService} from '../../services/breakpoints.service';
 
 const postfix = ' €';
 const numberOptions = maskitoNumberOptionsGenerator({
@@ -107,10 +107,15 @@ export class HistoricPlaceDetailComponent implements OnInit{
   lineWidths = [90, 70, 95, 60, 85, 80, 60, 75, 85, 80];
   isMobile = false;
 
+  customBreakpointLevel: CustomBreakpointLevel = null;
+
+
   summary: string = '';
   enrichedContent: string = '';
   enrichmentStarted = false;
   enrichmentLoading = false;
+  tonesItemCount = 3;
+  relatedItemCount = 3;
 
 
   constructor(private userService: UserService,
@@ -118,7 +123,7 @@ export class HistoricPlaceDetailComponent implements OnInit{
               private router: Router,
               readonly EnrichmentService: EnrichmentService,
               readonly cdr: ChangeDetectorRef,
-              readonly breakpointObserver: BreakpointObserver) {
+              private breakpointService: BreakpointService,) {
     effect(() => {
       this.pricesService.getPricesByLocation(this.locationId());
       this.cdr.markForCheck();
@@ -139,12 +144,13 @@ export class HistoricPlaceDetailComponent implements OnInit{
   ];
 
   ngOnInit() {
-    this.breakpointObserver
-      .observe([Breakpoints.Handset])
-      .subscribe(result => {
-        this.isMobile = result.matches;
-      });
+    this.breakpointService.level$.subscribe(() => {
+      this.tonesItemCount = this.breakpointService.tonesItemCount;
+      this.relatedItemCount = this.breakpointService.relatedItemCount;
+      this.cdr.detectChanges();
+    });
   }
+
 
   protected dialogLabel = '';
   protected options: Partial<TuiResponsiveDialogOptions> = {};
@@ -347,50 +353,63 @@ export class HistoricPlaceDetailComponent implements OnInit{
     })
   }
 
-  protected readonly itemsCount = 3;
+
   protected index2 = 0; //related persons slider
   protected index3 = 0; //related buildings slider
   protected index4 = 0; //related events slider
 
   protected get roundedPersons(): number {
-    return Math.floor(this.index2 / this.itemsCount);
+    return Math.floor(this.index2 / this.relatedItemCount);
   }
 
   protected onIndexPersons(index: number): void {
-    this.index2 = index * this.itemsCount;
+    this.index2 = index * this.relatedItemCount;
     this.cdr.detectChanges();
   }
 
   protected get roundedBuildings(): number {
-    return Math.floor(this.index3 / this.itemsCount);
+    return Math.floor(this.index3 / this.relatedItemCount);
   }
 
   protected onIndexBuildings(index: number): void {
-    this.index3 = index * this.itemsCount;
+    this.index3 = index * this.relatedItemCount;
     this.cdr.detectChanges();
   }
 
   protected get roundedEvents(): number {
-    return Math.floor(this.index4 / this.itemsCount);
+    return Math.floor(this.index4 / this.relatedItemCount);
   }
 
   protected onIndexEvents(index: number): void {
-    this.index4 = index * this.itemsCount;
+    this.index4 = index * this.relatedItemCount;
     this.cdr.detectChanges();
   }
 
   get personsPageCount(): number {
-    return Math.ceil(this.selectedPlace?.relatedPersons?.length / this.itemsCount);
+    return Math.ceil(this.selectedPlace?.relatedPersons?.length / this.relatedItemCount);
   }
 
   get buildingsPageCount(): number {
-    return Math.ceil(this.selectedPlace?.relatedBuildings?.length / this.itemsCount);
+    return Math.ceil(this.selectedPlace?.relatedBuildings?.length / this.relatedItemCount);
   }
 
   get eventsPageCount(): number {
-    return Math.ceil(this.selectedPlace?.relatedEvents?.length / this.itemsCount);
+    return Math.ceil(this.selectedPlace?.relatedEvents?.length / this.relatedItemCount);
   }
 }
+
+
+type CustomBreakpointLevel =
+  | 'mobile'          // 360–767px
+  | 'tablet'          // 768–1023px
+  | 'desktop'         // 1024–1279px
+  | '1280-1499'
+  | '1500-1899'
+  | '1900-2559'
+  | '2560+'
+  | 'unknown'
+  | null;
+
 
 class PriceDTO implements Price {
   priceId: number | null | undefined;

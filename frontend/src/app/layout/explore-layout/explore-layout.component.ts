@@ -5,10 +5,11 @@ import {BuildingEntity} from '../../dto/db_entity/BuildingEntity';
 import {TuiSegmented} from '@taiga-ui/kit';
 import {BreakpointObserver, Breakpoints} from '@angular/cdk/layout';
 import {NgIf} from '@angular/common';
-import {TuiIcon} from '@taiga-ui/core';
+import {TuiIcon, TuiTextfieldComponent, TuiButton} from '@taiga-ui/core';
 import {NotificationInboxComponent} from '../../core/notification-inbox/notification-inbox.component';
 import {PersonEntity} from '../../dto/db_entity/PersonEntity';
 import {EventEntity} from '../../dto/db_entity/EventEntity';
+import {BreakpointService} from '../../services/breakpoints.service';
 
 @Component({
   selector: 'app-explore-layout',
@@ -18,17 +19,19 @@ import {EventEntity} from '../../dto/db_entity/EventEntity';
     TuiSegmented,
     NgIf,
     TuiIcon,
-    NotificationInboxComponent
+    NotificationInboxComponent,
+    TuiTextfieldComponent,
+    NotificationInboxComponent,
+    TuiButton
   ],
   templateUrl: './explore-layout.component.html',
   styleUrl: './explore-layout.component.less'
 })
-export class ExploreLayoutComponent implements OnInit {
+export class ExploreLayoutComponent  {
 
   @ViewChild(MapViewComponent) mapViewComponent!: MapViewComponent;
 
   currentViewMobile: 'discover' | 'map' = 'discover';
-  isMobile = false;
 
   selectedPlace: BuildingEntity | null = null;
   selectedPerson: PersonEntity | null = null;
@@ -38,16 +41,18 @@ export class ExploreLayoutComponent implements OnInit {
   setDetailedView: boolean = false;
 
   constructor(
-    readonly breakpointObserver: BreakpointObserver
+    readonly breakpointService: BreakpointService
   ) {}
 
-  ngOnInit() {
-      this.breakpointObserver
-      .observe([Breakpoints.HandsetPortrait, Breakpoints.HandsetLandscape])
-      .subscribe(result => {
-        this.isMobile = result.matches;
-        this.currentViewMobile = 'discover';
-      });
+  get isMobile(): boolean {
+    return ['mobile', 'tablet'].includes(this.breakpointService.currentLevel ?? '');
+  }
+
+  searchOpen = false;
+
+  toggleSearch(event: MouseEvent) {
+    event.stopPropagation();
+    this.searchOpen = true;
   }
 
   setSelectedPlace(place: BuildingEntity) {

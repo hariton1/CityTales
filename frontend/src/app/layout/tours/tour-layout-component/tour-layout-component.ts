@@ -17,6 +17,8 @@ import {UserPointsService} from '../../../user_db.services/user-points.service';
 import {UserPointDto} from '../../../user_db.dto/user-point.dto';
 import {UserService} from '../../../services/user.service';
 import {UUID} from 'node:crypto';
+import * as localForage from 'localforage';
+import {fromEvent, mapTo, merge, Observable, of} from 'rxjs';
 
 
 @Component({
@@ -29,6 +31,7 @@ import {UUID} from 'node:crypto';
   changeDetection: ChangeDetectionStrategy.Default
 })
 export class TourLayoutComponent {
+  online$: Observable<boolean>;
 
   private locationService: LocationService;
   private tourService: TourService;
@@ -45,8 +48,64 @@ export class TourLayoutComponent {
     this.tourService = tourService;
     this.userPointsService = userPointsService;
     this.router = router;
+    this.cdr = cdr;
+    this.userService = userService;
     this.userService = userService;
     this.cdr = cdr;
+
+    this.getUserId().then(async userId => {
+      this.userId = userId;
+      if (!userId) return;
+
+      const cacheKey = `userTours_${userId}`;
+      const isOnline = navigator.onLine;
+
+      if (!isOnline) {
+        const cachedTours = await localForage.getItem<any[]>(cacheKey);
+        if (cachedTours && cachedTours.length > 0) {
+          console.log('Loaded tours from cache');
+
+          this.userTours = cachedTours.map(t => {
+            // Parse stops JSON string to array
+            const parsedStops = JSON.parse(t.stops || '[]');
+            // Map each stop to only lat/lng
+            const simplifiedStops = parsedStops.map((stop: any) => ({
+              latitude: stop.latitude,
+              longitude: stop.longitude
+            }));
+
+            return new TourDto(
+              t.id,
+              t.name,
+              t.description,
+              t.start_lat,
+              t.start_lng,
+              t.end_lat,
+              t.end_lng,
+              simplifiedStops,
+              t.distance,
+              t.durationEstimate,
+              t.userId
+            );
+          });
+          console.log(this.userTours)
+        } else {
+          this.alerts.open('Offline and no tour cache found.', {
+            label: 'Offline',
+            appearance: 'warning',
+            autoClose: 5000
+          }).subscribe();
+        }
+      } else {
+        this.tourService.getToursForUserId(userId).subscribe(tours => {
+          this.userTours = tours.map(tour => TourDto.fromTourEntity(tour));
+          console.log('Fetched tours from backend');
+          // Serialize before caching
+          const serializable = this.userTours.map(t => TourDto.ofTourDTo(t));
+          localForage.setItem(cacheKey, serializable);
+        });
+      }
+    });
   }
 
   ngOnChanges(): void {
@@ -77,7 +136,12 @@ export class TourLayoutComponent {
       console.error("User ID is null or undefined");
       // Handle the error accordingly (e.g., show an alert, redirect to login)
     }
+  }
 
+  async getUserId(): Promise<string | null> {
+    const { data } = await supabase.auth.getSession();
+    const userId = data.session?.user?.id ?? null;
+    return userId;
   }
 
 
@@ -231,7 +295,6 @@ export class TourLayoutComponent {
     }
 
     //TODO: replace with user location
-    console.log()
     this.locationService.getLocationsInRadius(48.19994406631644, 16.371089994357767, 3000, this.interestFiltering === 'true').subscribe(locations => {
       this.buildingData = locations;
       console.log(this.buildingData.length);
@@ -449,6 +512,7 @@ export class TourLayoutComponent {
       var pointDTO = new UserPointDto(-1, stored, 4, new Date(),Date.now() / 1000)
       this.userPointsService.createNewPoints(pointDTO).subscribe(data => {console.log("Tour points created")});
 
+
       this.tourService.createTourInDB(selectedTour).subscribe({
         next: tour => {console.log("Tour created successfully!");
           this.tourService.getToursForUserId(this.userId!).subscribe(tours => {
@@ -464,5 +528,24 @@ export class TourLayoutComponent {
     this.router.navigateByUrl("/tours/" + tour.getId());
   }
 
+  generateGoogleMapsTourLink(tour: TourDto) {
+    console.log(tour.getStops())
+    const stops = tour.getStops();
 
+    const locations: string[] = [];
+
+    locations.push(`${tour.getStart_lat()},${tour.getStart_lng()}`);
+
+    for (const stop of stops) {
+      locations.push(`${stop.latitude},${stop.longitude}`);
+    }
+
+    locations.push(`${tour.getEnd_lat()},${tour.getEnd_lng()}`);
+
+    const baseUrl = 'https://www.google.com/maps/dir/';
+    const url = baseUrl + locations.map(encodeURIComponent).join('/');
+
+    console.log(url)
+    window.open(url, '_blank');
+  }
 }

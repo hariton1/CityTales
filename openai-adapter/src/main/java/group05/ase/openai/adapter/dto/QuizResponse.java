@@ -8,5 +8,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class QuizResponse {
+
+    private String question;
     private String answer;
+    private String wrongAnswerA;
+    private String wrongAnswerB;
+    private String wrongAnswerC;
+    private String image;
 }

@@ -4,6 +4,7 @@ import {TuiHeader} from "@taiga-ui/layout";
 
 @Component({
   selector: 'app-about',
+  standalone: true,
     imports: [
         TuiHeader,
         TuiTitle

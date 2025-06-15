@@ -1,19 +1,17 @@
-<tui-scrollbar class="scrollable-content" [style]="'overflow-y: auto'">
-  <!-- TODO: make it responsive -->
+<button
+  tuiButton
+  type="button"
+  appearance="flat"
+  size="s"
+  class="back-button"
+  (click)="closeDetail()"
+>
+  <tui-icon icon="@tui.chevron-left" class="mr-1" [style.height.rem]="1.2" />
+  Back to All Sites
+</button>
 
+<div class="scroll-wrapper">
 <div class="place-detail-container">
-  <button
-    tuiButton
-    type="button"
-    appearance="flat"
-    size="s"
-    class="back-button"
-    (click)="closeDetail()"
-  >
-    <tui-icon icon="@tui.chevron-left" class="mr-1" [style.height.rem]="1.2" />
-    Back to All Sites
-  </button>
-
   <section
     tuiCardLarge="compact"
     [tuiCardCollapsed]="collapsed()"
@@ -111,7 +109,7 @@
   </section>
 
   <!-- prices -->
-  <div class="content-section" *ngIf="this.prices().length > 0">
+  <div class="prices-section" *ngIf="this.prices().length > 0">
     <h3>Prices
       <button *ngIf="userHasPermission" tuiButton appearance="flat" size="xs" type="button" class="add-btn" tuiHint="Add a new price!"
               tuiHintDirection="top" (click)="showDialog(-1)">
@@ -184,7 +182,7 @@
 
     <tui-carousel
       [draggable]="true"
-      [itemsCount]="isMobile ? 2 : 4"
+      [itemsCount]="tonesItemCount"
       [(index)]="index1"
     >
       <ng-container *ngFor="let tone of tones">
@@ -215,7 +213,7 @@
     </div>
 
     <!-- LLM Generated Content -->
-    <div *ngIf="enrichmentStarted && !enrichmentLoading" class="fade-in tui-space_bottom-8">
+    <div *ngIf="enrichmentStarted && !enrichmentLoading" class="fade-in tui-space_bottom-12">
       <section class="place-summary">
         <header tuiHeader class="tui-space_top-3 tui-space_bottom-3">
           <span class="tui-text_h6">Quick Facts & Highlights</span>
@@ -235,7 +233,7 @@
 
       <tui-carousel
         [draggable]="true"
-        [itemsCount]="3"
+        [itemsCount]="relatedItemCount"
         [(index)]="index2"
         [style.--tui-carousel-padding] = "isMobile ? '0' : '0 15px 0 0'"
       >
@@ -274,7 +272,7 @@
         </ng-container>
       </tui-carousel>
       <tui-pagination
-        *ngIf="selectedPlace.relatedPersons?.length > 3"
+        *ngIf="selectedPlace.relatedPersons?.length > relatedItemCount"
         size="s"
         class="tui-space_top-4"
         [index]="roundedPersons"
@@ -288,7 +286,7 @@
 
       <tui-carousel
         [draggable]="true"
-        [itemsCount]="3"
+        [itemsCount]="relatedItemCount"
         [(index)]="index3"
         [style.--tui-carousel-padding] = "isMobile ? '0' : '0 15px 0 0'"
       >
@@ -325,7 +323,7 @@
         </ng-container>
       </tui-carousel>
       <tui-pagination
-        *ngIf="selectedPlace.relatedBuildings?.length > 3"
+        *ngIf="selectedPlace.relatedBuildings?.length > relatedItemCount"
         size="s"
         class="tui-space_top-4"
         [index]="roundedBuildings"
@@ -340,7 +338,7 @@
 
       <tui-carousel
         [draggable]="true"
-        [itemsCount]="3"
+        [itemsCount]="relatedItemCount"
         [(index)]="index4"
         [style.--tui-carousel-padding] = "isMobile ? '0' : '0 15px 0 0'"
       >
@@ -376,7 +374,7 @@
         </ng-container>
       </tui-carousel>
       <tui-pagination
-        *ngIf="selectedPlace.relatedEvents?.length > 3"
+        *ngIf="selectedPlace.relatedEvents?.length > relatedItemCount"
         size="s"
         class="tui-space_top-4"
         [index]="roundedEvents"
@@ -388,4 +386,4 @@
     </div>
   </div>
 
-</tui-scrollbar>
+</div>
