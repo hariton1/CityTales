@@ -18,6 +18,8 @@ import group_05.ase.neo4j_data_access.Client.UserDBClient;
 import group_05.ase.neo4j_data_access.Entity.Tour.*;
 import group_05.ase.neo4j_data_access.Entity.ViennaHistoryWikiBuildingObject;
 import group_05.ase.neo4j_data_access.Service.Interface.ITourService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.neo4j.types.GeographicPoint2d;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -33,6 +35,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class TourService implements ITourService {
+
+    Logger logger = LoggerFactory.getLogger(TourService.class);
 
     private final HistoricBuildingService historicBuildingService;
     private final UserDBClient userDBClient;
@@ -54,9 +58,8 @@ public class TourService implements ITourService {
 
         List<Integer> interests = getInterestsFromDB(dto.getUserId());
         //List<Integer> interests = List.of(2,3,4,5,6,7,10,12);
-        System.out.println(interests);
         List<Integer> buildingIds = getBuildingEntititesFromQdrant(interests.stream().map(Object::toString).toList());
-        System.out.println("Building list size: " + buildingIds.size());
+        logger.info("Qdrant Building list size: {}", buildingIds.size());
 
         List<GeographicPoint2d> stops = new ArrayList<>();
         Map<GeographicPoint2d, Integer> building_dict = new HashMap<>();
@@ -68,10 +71,9 @@ public class TourService implements ITourService {
             }
             GeographicPoint2d stop = new GeographicPoint2d(viennaHistoryWikiBuildingObject.getLatitude().get(), viennaHistoryWikiBuildingObject.getLongitude().get());
             building_dict.put(stop, viennaHistoryWikiBuildingObject.getViennaHistoryWikiId());
-            System.out.println(stop);
             stops.add(stop);
         }
-        System.out.println("Stops array size: "+ stops.size());
+        logger.info("Stops array size: {}", stops.size());
 
 
         //assert that all predefined stops are in the stops list, should be anyway since qdrant returns all buildings
@@ -97,7 +99,7 @@ public class TourService implements ITourService {
 
         List<List<Float>> distanceMatrix = getMetricMatrix(stops, "distance");
         if(distanceMatrix == null) {
-            System.out.println("Distance matrix is null");
+            logger.error("Distance matrix is null! Return null");
             return null;
         }
 
@@ -107,16 +109,16 @@ public class TourService implements ITourService {
         //First: Try with breadth first search
         List<TourObject> foundTours = findRoutesBFS(startOptional, endOptional, mandatoryStops, stops, distanceMatrix, dto, MAX_ROUTES, building_dict);
         if(foundTours.isEmpty()){
-            System.out.println("No tours found with BFS! Trying with Graphhopper Logic...");
+            logger.error("No tours found with BFS! Trying with Graphhopper Logic...");
         } else {
-            System.out.println("Found " + foundTours.size() + " tours with BFS!");
+            logger.info("Found {} tours with BFS!", foundTours.size());
             return foundTours.stream().map(this::tourObjectToTourDTO).collect(Collectors.toList());
         }
 
         List<Integer> foundTour = findRoutesGraphhopper(distanceMatrix, dto.getNumStops(), endOptional.isPresent(), dto.getMaxDistance(), dto.getMaxBudget(), stops, building_dict, dto);
-        System.out.println("Found " + foundTour.size() + " tours with Graphhopper!");
+        logger.info("Found {} tours with Graphhopper!", foundTour.size());
         if(!foundTour.isEmpty()){
-            System.out.println("Found tour with Graphhopper:" + foundTour);
+            logger.info("Found tour with Graphhopper:{}", foundTour);
             List<GeographicPoint2d> stopsNew = new ArrayList<>();
             foundTour.forEach(stop -> stopsNew.add(stops.get(stop)));
             double tourPrice = getTotalPriceForTour(foundTour, stops, building_dict, dto);
@@ -124,7 +126,7 @@ public class TourService implements ITourService {
             TourObject tourObject = buildTourObject(stopsNew, dto.getUserId(), building_dict, tourPrice, pricePerStop);
             return List.of(tourObjectToTourDTO(tourObject));
         } else{
-            System.out.println("No tours found with Graphhopper!");
+            logger.error("No tours found with Graphhopper!");
             return List.of();
         }
     }
@@ -144,7 +146,7 @@ public class TourService implements ITourService {
         try{
             dto.setStops(mapper.writeValueAsString(tourObject.getStops()));
         } catch (JsonProcessingException e) {
-            System.out.println("Could not convert stops array to JSON string: " + e.getMessage());
+            logger.error("Could not convert stops array to JSON string: {}", e.getMessage());
         }
         return dto;
     }
@@ -234,14 +236,10 @@ public class TourService implements ITourService {
         VehicleRoutingAlgorithm algorithm = Jsprit.createAlgorithm(problem);
         Collection<VehicleRoutingProblemSolution> solutions = algorithm.searchSolutions();
 
-        // Extract best solution
-        System.out.println("Found " + solutions.size() + " solutions to routing problem! ");
-
         List<List<Integer>> possibleRoutes = new ArrayList<>();
 
         for (VehicleRoutingProblemSolution solution : solutions) {
             //Filter best routes
-            System.out.println("Solution cost: " + solution.getCost());
             List<List<Integer>> paths = new ArrayList<>();
             for (VehicleRoute route: solution.getRoutes()){
                 List<Integer> routeDetail = new ArrayList<>();
@@ -249,9 +247,9 @@ public class TourService implements ITourService {
                 routeDetail.addAll(route.getActivities().stream().map(tourActivity -> Integer.parseInt(tourActivity.getLocation().getId())).toList());
                 double tourCost = getTotalPriceForTour(routeDetail, stops, building_dict, dto);
                 double tourDistance = getTourDistance(routeDetail, distanceMatrix);
-                System.out.println("Calculated tour cost for tour:" + tourCost);
-                System.out.println("Calculated tour distance for tour:" + tourDistance);
-                System.out.println("Max tour distance for tour:" + maxDistance);
+                logger.info("Calculated tour cost for tour:{}", tourCost);
+                logger.info("Calculated tour distance for tour:{}", tourDistance);
+                logger.info("Max tour distance for tour:{}", maxDistance);
                 if (tourCost > maxBudget){
                     continue;
                 }
@@ -262,7 +260,7 @@ public class TourService implements ITourService {
             }
             possibleRoutes.addAll(paths);
         }
-        System.out.println("Found routes " + possibleRoutes.size());
+        logger.info("Found routes with Graphhopper: {}", possibleRoutes.size());
         if(possibleRoutes.isEmpty()){
             return List.of();
         } else{
@@ -399,8 +397,6 @@ public class TourService implements ITourService {
         queue.add(new RouteState(initialPath, 0.0, visitedMandatoryStops));
 
         while (!queue.isEmpty()) {
-            double ram_usage = (double) (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / Runtime.getRuntime().totalMemory();
-            System.out.println("Current VM RAM Usage: " + ram_usage + "%");
             if (validRoutes.size() >= maxRoutes) break;
 
             RouteState state = queue.poll();
@@ -433,7 +429,6 @@ public class TourService implements ITourService {
                         currentDistance <= createTourRequestDTO.getMaxDistance()
                 ) {
                     double currentPrice = getTotalPriceForTour(path, allStops, building_dict, createTourRequestDTO);
-                    System.out.println("Current price: " + currentPrice);
 
                     if (currentPrice <= createTourRequestDTO.getMaxBudget()) {
                         List<GeographicPoint2d> routeGeographicPoints = path.stream()
@@ -508,7 +503,7 @@ public class TourService implements ITourService {
         try{
             response = restTemplate.postForEntity(url, request, String.class);
         } catch (RestClientException e) {
-            System.out.println(e.getMessage());
+            logger.info("Error fetching metric matrix from OpenRouteService: {}", e.getMessage());
             return null;
         }
 
@@ -516,9 +511,6 @@ public class TourService implements ITourService {
             JsonNode root = mapper.readTree(response.getBody());
             JsonNode durations = root.path("durations");
             JsonNode distances = root.path("distances");
-
-            System.out.println(durations);
-            System.out.println(distances);
 
             List<List<Float>> distanceArray = mapper.convertValue(distances, new TypeReference<>() {});
             List<List<Float>> durationArray = mapper.convertValue(durations, new TypeReference<>() {});
@@ -529,11 +521,11 @@ public class TourService implements ITourService {
                 case "duration":
                     return durationArray;
                 default:
-                    System.out.println("Invalid metric: " + metric);
+                    logger.error("Invalid metric: {}", metric);
             }
 
         } catch (JsonProcessingException e) {
-            System.out.println("Could not parse directions response.");
+            logger.error("Could not parse directions response.");
             return null;
         }
 
@@ -545,10 +537,9 @@ public class TourService implements ITourService {
     }
 
     private Map<Integer, List<PriceDTO>> getPriceFromDB(List<Integer> location_ids) {
-        System.out.println("Prices for location ids: " + location_ids);
         List<PriceDTO> prices = this.userDBClient.getPricesFromDB(location_ids);
         if(prices.isEmpty()) {
-         System.out.println("Error: Could not retrieve prices from User DB! Either there are no prices available, or there was an issue with the DB connection.");
+         logger.error("Could not retrieve prices from User DB! Either there are no prices available, or there was an issue with the DB connection.");
         }
         Map<Integer, List<PriceDTO>> priceMap = new HashMap<>();
         for(Integer location_id : prices.stream().map(PriceDTO::getLocationId).distinct().toList()) {
@@ -609,7 +600,7 @@ public class TourService implements ITourService {
         ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
 
         if (!response.getStatusCode().is2xxSuccessful()) {
-            System.out.println("Error: " + response.getBody());
+            logger.error("Error accessing OpenRoutingService for distance calculations: {}", response.getBody());
             return null;
         }
 
@@ -623,7 +614,7 @@ public class TourService implements ITourService {
             return Map.of("distance", distance/1000, "duration", duration/3600);
 
         } catch (JsonProcessingException e) {
-            System.out.println("Could not parse directions response.");
+            logger.error("Could not parse ORS directions response.");
             return null;
         }
 
