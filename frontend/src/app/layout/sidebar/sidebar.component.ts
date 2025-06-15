@@ -1,4 +1,14 @@
-import {Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, ViewChild} from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  EventEmitter,
+  HostListener,
+  Input,
+  OnChanges,
+  OnInit,
+  Output,
+  ViewChild
+} from '@angular/core';
 import {HistoricPlaceDetailComponent} from '../historic-place-detail/historic-place-detail.component';
 import {HistoricPlacePreviewComponent} from '../historic-place-preview/historic-place-preview.component';
 import {NgIf, CommonModule} from '@angular/common';
@@ -41,7 +51,7 @@ import {BreakpointService} from '../../services/breakpoints.service';
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.less'
 })
-export class SidebarComponent {
+export class SidebarComponent implements OnChanges{
 
   @Input() selectedPlace: BuildingEntity | null = null;
   @Input() selectedPerson: PersonEntity | null = null;
@@ -64,38 +74,35 @@ export class SidebarComponent {
     return ['mobile', 'tablet'].includes(this.breakpointService.currentLevel ?? '');
   }
 
-  setSelectedPlace(place: any) {
-    this.selectedPlace = place;
-    console.log(this.selectedPlace);
-    console.log(this.selectedEvent);
-    console.log(this.selectedPerson);
+  selectedItem: { type: 'place' | 'event' | 'person'; data: any } | null = null;
+
+  ngOnChanges(): void {
+    if (this.selectedPlace) {
+      this.selectedItem = { type: 'place', data: this.selectedPlace };
+    } else if (this.selectedEvent) {
+      this.selectedItem = { type: 'person', data: this.selectedPerson };
+    } else if (this.selectedPerson) {
+      this.selectedItem = { type: 'event', data: this.selectedEvent };
+    } else {
+      this.selectedItem = null;
+    }
   }
 
   setPlaceDetail(place: BuildingEntity) {
-    this.selectedPlace = place;
-    this.selectedEvent = null;
-    this.selectedPerson = null;
+    this.selectedItem = { type: 'place', data: place };
   }
 
   setPersonDetail(person: PersonEntity) {
-    console.log('Received person:', person);
-    this.selectedPlace = null;
-    this.selectedEvent = null;
-    this.selectedPerson = person;
+    this.selectedItem = { type: 'person', data: person };
   }
 
   setEventDetail(event: EventEntity) {
-    this.selectedEvent = event;
-    this.selectedPlace = null;
-    this.selectedPerson = null;
+    this.selectedItem = { type: 'event', data: event };
   }
 
-  closeDetailView(): void {
-    this.selectedPlace = null;
-    this.selectedEvent = null;
-    this.selectedPerson = null;
+  closeDetailView() {
+    this.selectedItem = null;
   }
-
 
   //Search field
 
