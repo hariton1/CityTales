@@ -34,7 +34,7 @@ class FunFactExtractorServiceTest {
         double expectedScore = 0.5;
 
         // Mock the Python service response
-        mockServer.expect(requestTo("http://localhost:5005/funfact"))
+        mockServer.expect(requestTo("http://funfact-ml-service:5005/funfact"))
                 .andExpect(method(org.springframework.http.HttpMethod.POST))
                 .andRespond(withSuccess(
                         "{ \"funfact\": \"" + expectedFunFact + "\", \"score\": " + expectedScore + " }",
