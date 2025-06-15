@@ -28,8 +28,7 @@ export class SavedFunFactService {
             item.fun_fact,
             item.image_url,
             item.score,
-            item.reason,
-            item.saved_at);
+            item.reason);
         }))
       );
 
@@ -45,7 +44,6 @@ export class SavedFunFactService {
       image_url: savedFunFact.getImageUrl(),
       score: savedFunFact.getScore(),
       reason: savedFunFact.getReason(),
-      cre_dat: this.utilitiesService.formatDate(savedFunFact.getSavedAt())
     };
 
     return this.httpClient.post<SavedFunFactDto>(
@@ -70,7 +68,6 @@ export class SavedFunFactService {
       image_url: deletedFunFact.getImageUrl(),
       score: deletedFunFact.getScore(),
       reason: deletedFunFact.getReason(),
-      cre_dat: this.utilitiesService.formatDate(deletedFunFact.getSavedAt())
     };
 
     const options = {
