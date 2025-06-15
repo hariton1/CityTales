@@ -9,6 +9,7 @@ import group_05.ase.neo4j_data_access.Service.Interface.IHistoricEventService;
 import group_05.ase.neo4j_data_access.Service.Interface.IHistoricPersonService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -18,6 +19,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(FunFactController.class)
+@AutoConfigureMockMvc(addFilters = false)
 public class FunFactControllerTest {
 
     @MockBean
@@ -45,8 +47,8 @@ public class FunFactControllerTest {
 
         mockMvc.perform(get("/api/funfact/building/9356"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.headline").exists())
-                .andExpect(jsonPath("$.funFact").exists())
-                .andExpect(jsonPath("$.score").exists());
+                .andExpect(jsonPath("$.sentence").exists())
+                .andExpect(jsonPath("$.score").exists())
+                .andExpect(jsonPath("$.reason").exists());
     }
 }
