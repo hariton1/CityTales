@@ -16,7 +16,6 @@ public class WebClientConfig {
     private ExchangeFilterFunction jwtFilter() {
         return ExchangeFilterFunction.ofRequestProcessor(clientRequest -> {
             String token = resolveJwtToken();
-            System.out.println("Token: " + token);
             if (token != null) {
                 var newRequest = org.springframework.web.reactive.function.client.ClientRequest.from(clientRequest)
                         .header("Authorization", "Bearer " + token)
