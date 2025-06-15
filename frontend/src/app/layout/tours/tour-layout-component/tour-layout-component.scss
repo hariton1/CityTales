@@ -1,3 +1,58 @@
+.button-group {
+  display: flex;
+  gap: 1rem; /* Space between buttons */
+  justify-content: flex-start; /* Align buttons to the left */
+}
+
+.control-button {
+  padding: 0.4rem 1rem; /* Add padding for better appearance */
+  font-size: 0.875rem; /* Make buttons smaller */
+  height: auto; /* Remove fixed height */
+}
+
+.input-group {
+  display: flex;
+  gap: 1rem; /* Adds space between the inputs */
+  justify-content: flex-start;
+}
+
+.input-item {
+  flex: 1; /* Makes each item take equal space */
+}
+
+.tui-textfield {
+  width: 100%; /* Ensures the textfield takes full width within each column */
+}
+
+
+.map-section {
+  padding: 1rem;
+  background-color: #f5f5f5;
+  height: 400px;
+}
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.tour-delete-button {
+  margin-left: 0.5rem;
+  color: red;
+}
+
+.create-section, .advanced-tour-section {
+  padding: 1rem;
+  background-color: #ffffff;
+  border-top: 1px solid #ddd;
+}
+
+.tabs-wrapper {
+  margin-bottom: 1rem;
+}
+
 .layout-container {
   padding: 2rem;
 }
@@ -87,4 +142,8 @@
   overflow-x: auto;
   gap: 1rem;
   padding: 1rem;
+}
+
+.tui-space_vertical-3{
+  padding-bottom: 4rem;
 }

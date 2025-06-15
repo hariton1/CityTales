@@ -20,14 +20,11 @@ public class TourController {
 
     public TourController(ITourService tourService) {
         this.tourService = tourService;
-        System.out.println("TourController created");
     }
 
     @PostMapping(value = "/durationDistanceEstimate", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity<Map<String, Double>> getDurationDistanceEstimate(@RequestBody DurationDistanceEstimateDTO request) {
-
-        System.out.println("Received request: " + request.toString());
 
         Map<String, Double> result = tourService.getDurationDistanceEstimate(
                 request.getStart_lat(),
@@ -43,7 +40,6 @@ public class TourController {
 
     @PostMapping("/createBasedOnInterests")
     public ResponseEntity<List<TourDTO>> createTourBasedOnInterests(@RequestBody CreateTourRequestDTO request) {
-        System.out.println("Received request: " + request.toString());
         List<TourDTO> tours = tourService.createTours(request);
         return ResponseEntity.ok(tours);
     }

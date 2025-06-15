@@ -1,4 +1,4 @@
-import {Component, inject, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject, ViewChild, ChangeDetectorRef} from '@angular/core';
 import {Router} from '@angular/router';
 import {FormControl, ReactiveFormsModule} from '@angular/forms';
 import {TuiAlertService, TuiButton, TuiTextfield} from '@taiga-ui/core';
@@ -12,7 +12,11 @@ import {BuildingEntity} from '../../../dto/db_entity/BuildingEntity';
 import {TourDto} from '../../../dto/tour.dto';
 import {TourRequestEntity} from '../../../dto/tour_entity/TourRequestEntity';
 import {FormsModule} from '@angular/forms';
-import {TuiSlider} from '@taiga-ui/kit';
+import {TuiInputNumber, TuiSlider, TuiTabs} from '@taiga-ui/kit';
+import {UserPointsService} from '../../../user_db.services/user-points.service';
+import {UserPointDto} from '../../../user_db.dto/user-point.dto';
+import {UserService} from '../../../services/user.service';
+import {UUID} from 'node:crypto';
 import * as localForage from 'localforage';
 import {fromEvent, mapTo, merge, Observable, of} from 'rxjs';
 
@@ -20,30 +24,41 @@ import {fromEvent, mapTo, merge, Observable, of} from 'rxjs';
 @Component({
   selector: 'app-tour-layout-component',
   imports: [TuiButton,
-    TuiInputModule, ReactiveFormsModule, CommonModule, GoogleMap, TuiTextfield, MapPolyline, FormsModule, TuiSlider],
+    TuiInputModule, ReactiveFormsModule, CommonModule, GoogleMap, TuiTextfield, MapPolyline, FormsModule, TuiSlider, TuiTabs, TuiInputNumber],
   templateUrl: './tour-layout-component.html',
   standalone: true,
-  styleUrl: './tour-layout-component.scss'
+  styleUrl: './tour-layout-component.scss',
+  changeDetection: ChangeDetectionStrategy.Default
 })
 export class TourLayoutComponent {
   online$: Observable<boolean>;
 
   private locationService: LocationService;
   private tourService: TourService;
+  private userPointsService: UserPointsService;
+  private userService: UserService;
   private router: Router;
   private userId: string | null = null;
+  private cdr: ChangeDetectorRef;
+  private interestFiltering: string | null = null;
   private readonly alerts = inject(TuiAlertService);
 
-  constructor(locationService: LocationService, tourService: TourService, router: Router) {
+  constructor(locationService: LocationService, tourService: TourService, router: Router, cdr: ChangeDetectorRef, userPointsService: UserPointsService, userService: UserService) {
     this.online$ = merge(
       of(navigator.onLine),
       fromEvent(window, 'online').pipe(mapTo(true)),
       fromEvent(window, 'offline').pipe(mapTo(false))
     );
 
+
     this.locationService = locationService;
     this.tourService = tourService;
+    this.userPointsService = userPointsService;
     this.router = router;
+    this.cdr = cdr;
+    this.userService = userService;
+    this.userService = userService;
+    this.cdr = cdr;
 
     this.getUserId().then(async userId => {
       this.userId = userId;
@@ -77,7 +92,9 @@ export class TourLayoutComponent {
               simplifiedStops,
               t.distance,
               t.durationEstimate,
-              t.userId
+              t.userId,
+              t.tourPrice,
+              t.pricePerStop
             );
           });
           console.log(this.userTours)
@@ -100,7 +117,35 @@ export class TourLayoutComponent {
     });
   }
 
+  ngOnChanges(): void {
+    this.cdr.detectChanges();
+  }
 
+  async ngOnInit() {
+    console.log('ngOnViewInit');
+    this.interestFiltering = localStorage.getItem("interest_filtering");
+    const { data } = await supabase.auth.getSession();
+    const userId = data.session?.user?.id;
+    console.log('async user id ' + userId);
+    if (userId) {
+      this.userId = userId;
+      for(var id of this.recommendedToursIds){
+        this.tourService.getTourForTourId(id).subscribe(tour => {
+          this.recommendedTours.push(TourDto.fromTourEntity(tour));
+          console.log("Fetched recommended tour: " + tour);
+        })
+      }
+
+      this.tourService.getToursForUserId(userId!).subscribe(tours => {
+        this.userTours = [...tours.map(tour => TourDto.fromTourEntity(tour))];
+        console.log("User tours length: " + this.userTours.length);
+        this.cdr.detectChanges();
+      }) // Proceed to load tours for a valid user
+    } else {
+      console.error("User ID is null or undefined");
+      // Handle the error accordingly (e.g., show an alert, redirect to login)
+    }
+  }
 
   async getUserId(): Promise<string | null> {
     const { data } = await supabase.auth.getSession();
@@ -109,20 +154,25 @@ export class TourLayoutComponent {
   }
 
 
+  userTours: TourDto[] | null = null;
 
-  userTours: TourDto[] = [];
 
-
-  recommendedTours = [
-    { name: 'Vienna Highlights', duration: '2 hours', description: 'Visit iconic landmarks in central Vienna.' },
-    { name: 'Hidden Gems Walk', duration: '3 hours', description: 'Explore less-known but charming spots.' },
-    { name: 'Imperial Architecture', duration: '1.5 hours', description: 'Admire the grandeur of Vienna’s palaces.' },
-  ];
+  recommendedToursIds: number[] = [153, 154, 155]
+  recommendedTours: TourDto[] = []
 
   tourName = new FormControl('');
   tourDescription = new FormControl('');
   tourDuration: string = "0";
   tourDistance: string = "0";
+  protected noAdults: number | null = 0;
+  noChildren = 0;
+  noSeniors = 0;
+
+  selectedTab = 0;
+
+  onTabClick(tab: number) {
+    this.selectedTab = tab;
+  }
 
 
   createTour(){
@@ -144,7 +194,9 @@ export class TourLayoutComponent {
       this.selectedBuildings,
       +this.tourDistance,
       +this.tourDuration,
-      this.userId ?? 'NONE');
+      this.userId ?? 'NONE',
+      0,
+      new Map());
 
 
       this.tourDistance = (tour.getDistance() / 1000).toFixed(2);
@@ -162,7 +214,7 @@ export class TourLayoutComponent {
             appearance: 'warning',
             autoClose: 3000
           }).subscribe()}});
-        this.userTours.push(tour);
+        this.userTours!.push(tour);
         this.resetInterface();
       } else {
         this.alerts.open('No user logged in! Cannot create tour.', {
@@ -253,7 +305,7 @@ export class TourLayoutComponent {
     }
 
     //TODO: replace with user location
-    this.locationService.getLocationsInRadius(48.19994406631644, 16.371089994357767, 1000, true).subscribe(locations => {
+    this.locationService.getLocationsInRadius(48.19994406631644, 16.371089994357767, 3000, this.interestFiltering === 'true').subscribe(locations => {
       this.buildingData = locations;
       console.log(this.buildingData.length);
 
@@ -304,7 +356,7 @@ export class TourLayoutComponent {
 
     this.updateEstimate()
     this.updatePolylinePath();
-
+    this.cdr.detectChanges();
   }
 
   addBuildingToRoute(building: any) {
@@ -335,7 +387,7 @@ export class TourLayoutComponent {
   deleteTour(tour: TourDto): void{
     console.log(tour.getId())
     this.tourService.deleteTourById(tour.getId());
-    this.userTours = this.userTours.filter(t => t.getId() !== tour.getId());
+    this.userTours = this.userTours!.filter(t => t.getId() !== tour.getId());
     this.alerts.open('Your tour is deleted!', {label: 'Success!', appearance: 'success', autoClose: 3000}).subscribe();
   }
 
@@ -404,20 +456,20 @@ export class TourLayoutComponent {
     this.updatePolylinePath()
   }
 
-  minDistance = 1.0; // km
+  minDistance = 0; // km
   maxDistance = 10.0; // km
-  minSites = 2;
+  numberOfSites = 2;
   maxBudget = 10;
 
   generatedTours: TourDto[] = [];
 
   generateAdvancedTour() {
 
-    if(!this.startMarker || !this.endMarker){
-      this.alerts.open('Please select a start and end point!', {label: 'Failure!', appearance: 'warning', autoClose: 3000}).subscribe();
-      return;
-    }
-
+    //if(!this.startMarker || !this.endMarker){
+    //  this.alerts.open('Please select a start and end point!', {label: 'Failure!', appearance: 'warning', autoClose: 3000}).subscribe();
+    //  return;
+    //}
+    console.log("Nearby stops length: " + this.buildingData.length)
     console.log("Generating tour for user " + this.userId)
     var user = this.userId!;
     var entity: TourRequestEntity = {
@@ -426,16 +478,21 @@ export class TourLayoutComponent {
       start_lng: this.startMarker?.getPosition()?.lng()!,
       end_lat: this.endMarker?.getPosition()?.lat()!,
       end_lng: this.endMarker?.getPosition()?.lng()!,
-      predefined_stops: [],
+      predefinedStops: [],
       maxDistance: this.maxDistance * 1000,
       minDistance: this.minDistance * 1000,
       maxDuration: 0,
       minDuration: 0,
       maxBudget: this.maxBudget,
-      minIntermediateStops: this.minSites
+      numStops: this.numberOfSites,
+      personConfiguration: [this.noAdults!, this.noChildren, this.noSeniors] //multiset for adults, children, seniors
     }
     this.alerts.open('Your tour is being generated...', {label: 'Success!', appearance: 'success', autoClose: 6000}).subscribe();
     this.tourService.createTour(entity).subscribe(data => {
+      if(!data){
+        this.alerts.open('Could not connect to backend tour creation service!', {label: 'Failure!', appearance: 'warning', autoClose: 6000}).subscribe();
+        return;
+      }
       if(data.length === 0) {
         this.alerts.open('No tour found for your parameters! Please choose other parameters.', {label: 'Failure!', appearance: 'warning', autoClose: 6000}).subscribe();
         return;
@@ -446,9 +503,27 @@ export class TourLayoutComponent {
       data.forEach(tour => {
         tourdtos.push(TourDto.fromTourEntity(tour))});
 
+      tourdtos.sort((dto1, dto2) => {
+        if(dto1.getDistance() < dto2.getDistance()){
+          return -1;
+        }
+        if(dto1.getDistance() > dto2.getDistance()){
+          return 1;
+        }
+        return 0;
+      });
 
-      var selectedTour: TourDto = tourdtos[tourdtos.length - 1];
+      tourdtos.forEach(tour => {console.log(tour.getId(), tour.getDistance())})
 
+      var selectedTour: TourDto = tourdtos[0];
+
+      //Create points for tour with article id tour id
+      const stored = localStorage.getItem("user_uuid") as UUID;
+      var pointDTO = new UserPointDto(-1, stored, 4, new Date(),Date.now() / 1000)
+      this.userPointsService.createNewPoints(pointDTO).subscribe(data => {console.log("Tour points created")});
+
+      console.log("A" + selectedTour.getTourPrice())
+      console.log("B" + selectedTour.getPricePerStop())
 
       this.tourService.createTourInDB(selectedTour).subscribe({
         next: tour => {console.log("Tour created successfully!");
