@@ -32,7 +32,9 @@ public class TourService {
                     entity.getStops(),
                     entity.getDistance(),
                     entity.getDurationEstimate(),
-                    entity.getUserId()));
+                    entity.getUserId(),
+                    entity.getTourPrice(),
+                    entity.getPricePerStop()));
         }
         return tours;
     }
@@ -53,7 +55,9 @@ public class TourService {
                     entity.getStops(),
                     entity.getDistance(),
                     entity.getDurationEstimate(),
-                    entity.getUserId()));
+                    entity.getUserId(),
+                    entity.getTourPrice(),
+                    entity.getPricePerStop()));
         }
         return tours;
     }
@@ -72,7 +76,9 @@ public class TourService {
                     entity.getStops(),
                     entity.getDistance(),
                     entity.getDurationEstimate(),
-                    entity.getUserId());
+                    entity.getUserId(),
+                entity.getTourPrice(),
+                entity.getPricePerStop());
     }
 
     public TourDTO findTourByName(String name) {
@@ -88,7 +94,9 @@ public class TourService {
                     entity.getStops(),
                     entity.getDistance(),
                     entity.getDurationEstimate(),
-                    entity.getUserId());
+                    entity.getUserId(),
+                entity.getTourPrice(),
+                entity.getPricePerStop());
     }
 
     public void deleteTourById(Integer id){
@@ -110,6 +118,8 @@ public class TourService {
         tourEntity.setDistance(tourDTO.getDistance());
         tourEntity.setDurationEstimate(tourDTO.getDurationEstimate());
         tourEntity.setUserId(tourDTO.getUserId());
+        tourEntity.setTourPrice(tourDTO.getTourPrice());
+        tourEntity.setPricePerStop(tourDTO.getPricePerStop());
 
         this.tourRepository.save(tourEntity);
     }
@@ -160,9 +170,17 @@ public class TourService {
             existingTour.setUserId(updatedValues.getUserId());
         }
 
+        if (updatedValues.getTourPrice() != null) {
+            existingTour.setTourPrice(updatedValues.getTourPrice());
+        }
+
+        if (updatedValues.getPricePerStop() != null) {
+            existingTour.setPricePerStop(updatedValues.getPricePerStop());
+        }
+
         TourEntity updatedTour = this.tourRepository.save(existingTour);
 
-        return new TourDTO(id, updatedTour.getName(), updatedTour.getDescription(), updatedTour.getStart_lat(), updatedTour.getStart_lng(), updatedTour.getEnd_lat(), updatedTour.getEnd_lng(), updatedTour.getStops(), updatedTour.getDistance(), updatedTour.getDurationEstimate(), updatedTour.getUserId());
+        return new TourDTO(id, updatedTour.getName(), updatedTour.getDescription(), updatedTour.getStart_lat(), updatedTour.getStart_lng(), updatedTour.getEnd_lat(), updatedTour.getEnd_lng(), updatedTour.getStops(), updatedTour.getDistance(), updatedTour.getDurationEstimate(), updatedTour.getUserId(), updatedTour.getTourPrice(), updatedTour.getPricePerStop());
 
 
     }

@@ -25,80 +25,84 @@
 
     <button tuiButton size="m" (click)="saveChanges()">Save Changes</button>
     <button tuiButton size="m" (click)="deleteTour()">Delete Tour</button>
+    <button tuiButton size="m" (click)="exportSiteToPdf()">PDF</button>
+    <button tuiButton size="m" (click)="generateGoogleMapsTourLink()">Maps</button>
   </div>
 
   <!-- Tour Summary -->
+  <div id="pdf-content">
   <div class="tour-summary tui-space_top-3">
     <p><strong>Total Distance:</strong> {{ tour.getDistance().toFixed(2) }} km</p>
     <p><strong>Estimated Walking Duration:</strong> {{ tour.getDurationEstimate().toFixed(2) }} hours</p>
+    <p><strong>Tour cost:</strong> {{ tour.getTourPrice() || 0}}€</p>
   </div>
 
-  <!-- Tour Stops Section -->
-  <div class="tour-stops-cards tui-space_vertical-5">
-    <h4 tuiTitle class="tui-text_h5">Tour Stops</h4>
+    <!-- Tour Stops Section -->
+    <div class="tour-stops-cards tui-space_vertical-5">
+      <h4 tuiTitle class="tui-text_h5">Tour Stops</h4>
 
-    <!-- Start Point -->
-    <div tuiCardMedium class="stop-card">
-      <div tuiTitle class="tui-text_h6">Start: {{this.tour.getStart_lat()}}°N {{this.tour.getStart_lng()}}°E </div>
-    </div>
-
-    <div *ngIf="tour.getStops().length > 0" class="start-timeline-connector">
-      <div class="connector-line"></div>
-      <div class="connector-info">
-        Distance: {{ distanceBetweenStops[0] | number:'1.2-2' }} km,
-        Duration: {{ durationBetweenStops[0] | number:'1.2-2' }} min
+      <!-- Start Point -->
+      <div tuiCardMedium class="stop-card">
+        <div tuiTitle class="tui-text_h6">Start: {{this.tour.getStart_lat()}}°N {{this.tour.getStart_lng()}}°E </div>
       </div>
-    </div>
 
-
-    <!-- Intermediate Stops -->
-    <ng-container *ngFor="let stop of tour.getStops(); let i = index">
-      <!-- Line + info between stops -->
-      <div *ngIf="i > 0" class="stop-timeline-connector">
+      <div *ngIf="tour.getStops().length > 0" class="start-timeline-connector">
         <div class="connector-line"></div>
         <div class="connector-info">
-          Distance: {{ distanceBetweenStops[i] | number:'1.2-2' }} km,
-          Duration: {{ durationBetweenStops[i] | number:'1.2-2' }} min
+          Distance: {{ distanceBetweenStops[0] | number:'1.2-2' }} km,
+          Duration: {{ durationBetweenStops[0] | number:'1.2-2' }} min
         </div>
       </div>
 
-      <!-- Stop card -->
-      <div class="stop-timeline-item">
-        <div tuiCardMedium class="stop-card tui-space_top-3">
-          <div tuiTitle class="tui-text_h6">{{ stop.name }}</div>
 
-          <p class="tui-text_body tui-space_top-2">
-            {{ stop.contentGerman || 'No description available.' }}
-          </p>
+      <!-- Intermediate Stops -->
+      <ng-container *ngFor="let stop of tour.getStops(); let i = index">
+        <!-- Line + info between stops -->
+        <div *ngIf="i > 0" class="stop-timeline-connector">
+          <div class="connector-line"></div>
+          <div class="connector-info">
+            Distance: {{ distanceBetweenStops[i] | number:'1.2-2' }} km,
+            Duration: {{ durationBetweenStops[i] | number:'1.2-2' }} min
+          </div>
+        </div>
 
-          <div *ngIf="stop.imageUrls && stop.imageUrls.length > 0" class="stop-images tui-space_top-2">
-            <div class="stop-image" *ngFor="let imageUrl of stop.imageUrls">
-              <img [src]="imageUrl" alt="Stop Image" />
+        <!-- Stop card -->
+        <div class="stop-timeline-item">
+          <div tuiCardMedium class="stop-card tui-space_top-3">
+            <div tuiTitle class="tui-text_h6">{{ stop.name }}</div>
+
+            <p class="tui-text_body tui-space_top-2">
+              {{ stop.contentGerman || 'No description available.' }}
+            </p>
+
+            <div *ngIf="stop.imageUrls && stop.imageUrls.length > 0" class="stop-images tui-space_top-2">
+              <div class="stop-image" *ngFor="let imageUrl of stop.imageUrls">
+                <img [src]="imageUrl" alt="Stop Image" />
+              </div>
+            </div>
+
+            <div class="tui-space_top-3">
+              <button tuiButton size="xs" appearance="error" (click)="deleteStop(stop)">
+                Delete Stop
+              </button>
             </div>
           </div>
+        </div>
+      </ng-container>
 
-          <div class="tui-space_top-3">
-            <button tuiButton size="xs" appearance="error" (click)="deleteStop(stop)">
-              Delete Stop
-            </button>
-          </div>
+      <!-- Connector to End -->
+      <div *ngIf="tour.getStops().length > 0" class="stop-timeline-connector">
+        <div class="connector-line"></div>
+        <div class="connector-info">
+          Distance: {{ distanceBetweenStops[distanceBetweenStops.length -1] | number:'1.2-2' }} km,
+          Duration: {{ durationBetweenStops[durationBetweenStops.length -1] | number:'1.2-2' }} min
         </div>
       </div>
-    </ng-container>
 
-    <!-- Connector to End -->
-    <div *ngIf="tour.getStops().length > 0" class="stop-timeline-connector">
-      <div class="connector-line"></div>
-      <div class="connector-info">
-        Distance: {{ distanceBetweenStops[distanceBetweenStops.length -1] | number:'1.2-2' }} km,
-        Duration: {{ durationBetweenStops[durationBetweenStops.length -1] | number:'1.2-2' }} min
+      <!-- End Point -->
+      <div tuiCardMedium class="stop-card tui-space_top-3">
+        <div tuiTitle class="tui-text_h6">Stop: {{this.tour.getEnd_lat()}}°N {{this.tour.getEnd_lng()}}°E </div>
       </div>
-    </div>
-
-    <!-- End Point -->
-    <div tuiCardMedium class="stop-card tui-space_top-3">
-      <div tuiTitle class="tui-text_h6">Stop: {{this.tour.getEnd_lat()}}°N {{this.tour.getEnd_lng()}}°E </div>
-    </div>
-
+  </div>
   </div>
 </div>

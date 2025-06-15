@@ -39,7 +39,6 @@ import {TuiItem} from '@taiga-ui/cdk';
     NgForOf,
     NgIf,
     TuiIcon,
-    TuiScrollbar,
     TuiButton,
     TuiCardLarge,
     TuiExpand,

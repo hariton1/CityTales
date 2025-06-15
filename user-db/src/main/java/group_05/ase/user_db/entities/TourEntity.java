@@ -25,4 +25,6 @@ public class TourEntity {
     Double distance;
     Double durationEstimate;
     String userId;
+    Double tourPrice;
+    String pricePerStop;
 }

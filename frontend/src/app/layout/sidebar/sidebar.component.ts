@@ -57,6 +57,9 @@ export class SidebarComponent implements OnChanges{
   @Input() selectedPerson: PersonEntity | null = null;
   @Input() selectedEvent: EventEntity | null = null;
 
+  @Output() onCloseDetailView = new EventEmitter();
+  @Output() onSelectEvent:EventEmitter<any> = new EventEmitter<any>();
+
 
   @Input() historicalPlaces: BuildingEntity[] = [];
 
