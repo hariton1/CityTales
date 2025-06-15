@@ -77,31 +77,52 @@ export class SidebarComponent implements OnChanges{
   selectedItem: { type: 'place' | 'event' | 'person'; data: any } | null = null;
 
   ngOnChanges(): void {
+    let shouldScroll = false;
+
     if (this.selectedPlace) {
       this.selectedItem = { type: 'place', data: this.selectedPlace };
-    } else if (this.selectedEvent) {
-      this.selectedItem = { type: 'person', data: this.selectedPerson };
+      shouldScroll = true;
     } else if (this.selectedPerson) {
+      this.selectedItem = { type: 'person', data: this.selectedPerson };
+      shouldScroll = true;
+    } else if (this.selectedEvent) {
       this.selectedItem = { type: 'event', data: this.selectedEvent };
+      shouldScroll = true;
     } else {
       this.selectedItem = null;
+    }
+
+    if (shouldScroll) {
+      this.scrollToTop();
     }
   }
 
   setPlaceDetail(place: BuildingEntity) {
     this.selectedItem = { type: 'place', data: place };
+    this.scrollToTop();
   }
 
   setPersonDetail(person: PersonEntity) {
     this.selectedItem = { type: 'person', data: person };
+    this.scrollToTop();
   }
 
   setEventDetail(event: EventEntity) {
     this.selectedItem = { type: 'event', data: event };
+    this.scrollToTop();
   }
 
   closeDetailView() {
     this.selectedItem = null;
+  }
+
+  @ViewChild('scrollbarRef') scrollbarRef!: ElementRef<HTMLElement>;
+  private scrollToTop(): void {
+    setTimeout(() => {
+      if (this.scrollbarRef?.nativeElement) {
+        this.scrollbarRef.nativeElement.scrollTop = 0;
+      }
+    });
   }
 
   //Search field
