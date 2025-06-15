@@ -77,5 +77,7 @@ export class SearchUsersComponent implements OnInit{
         console.error('Failed to send friend invite:', err);
       }
     });
+
+    window.location.reload();
   }
 }
