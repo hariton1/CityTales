@@ -30,51 +30,51 @@
   </div>
 
   <div class="notification-button-container" *ngIf="!isMobile">
-    <app-notification-inbox (selectPlaceEvent)="setSelectedPlace($event)"></app-notification-inbox>
+    <app-notification-inbox (selectPlaceEvent)="setPlaceDetail($event)"></app-notification-inbox>
   </div>
 </div>
 
 <tui-scrollbar class="scrollable-content">
-<div class="sidebar-container" *ngIf="this.selectedPlace || this.selectedEvent || this.selectedPerson">
+  <div class="sidebar-container" *ngIf="selectedItem">
+    <ng-container [ngSwitch]="selectedItem.type">
 
-  <!-- Show Place -->
-  <app-historic-place-detail
-    *ngIf="this.selectedPlace"
-    [selectedPlace]="selectedPlace"
-    (onCloseEvent)="closeDetailView()"
-    (onPersonDetailEvent)="setPersonDetail($event)"
-    (onEventDetailEvent)="setEventDetail($event)"
-    (onBuildingDetailEvent)="setPlaceDetail($event)">
-  </app-historic-place-detail>
+      <app-historic-place-detail
+        *ngSwitchCase="'place'"
+        [selectedPlace]="selectedItem.data"
+        (onCloseEvent)="closeDetailView()"
+        (onPersonDetailEvent)="setPersonDetail($event)"
+        (onEventDetailEvent)="setEventDetail($event)"
+        (onBuildingDetailEvent)="setPlaceDetail($event)">
+      </app-historic-place-detail>
 
-  <!-- Show Event -->
-  <app-historic-event-detail
-    *ngIf="this.selectedEvent"
-    [selectedEvent]="selectedEvent"
-    (onCloseEvent)="closeDetailView()"
-    (onPersonDetailEvent)="setPersonDetail($event)"
-    (onEventDetailEvent)="setEventDetail($event)"
-    (onBuildingDetailEvent)="setPlaceDetail($event)">
-  </app-historic-event-detail>
+      <app-historic-event-detail
+        *ngSwitchCase="'event'"
+        [selectedEvent]="selectedItem.data"
+        (onCloseEvent)="closeDetailView()"
+        (onPersonDetailEvent)="setPersonDetail($event)"
+        (onEventDetailEvent)="setEventDetail($event)"
+        (onBuildingDetailEvent)="setPlaceDetail($event)">
+      </app-historic-event-detail>
 
-  <!-- Show Person -->
-  <app-historic-person-detail
-    *ngIf="this.selectedPerson"
-    [selectedPerson]="selectedPerson"
-    (onCloseEvent)="closeDetailView()"
-    (onCloseEvent)="closeDetailView()"
-    (onPersonDetailEvent)="setPersonDetail($event)"
-    (onEventDetailEvent)="setEventDetail($event)"
-    (onBuildingDetailEvent)="setPlaceDetail($event)">
-  </app-historic-person-detail>
+      <app-historic-person-detail
+        *ngSwitchCase="'person'"
+        [selectedPerson]="selectedItem.data"
+        (onCloseEvent)="closeDetailView()"
+        (onPersonDetailEvent)="setPersonDetail($event)"
+        (onEventDetailEvent)="setEventDetail($event)"
+        (onBuildingDetailEvent)="setPlaceDetail($event)">
+      </app-historic-person-detail>
 
-</div>
+    </ng-container>
+  </div>
 </tui-scrollbar>
 
 
-<div class="place-preview-container" *ngIf="!this.selectedPlace && !this.selectedEvent && !this.selectedPerson">
-  <app-historic-place-preview [historicalPlaces]="historicalPlaces"
-                              (selectPlaceEvent)="setSelectedPlace($event)"></app-historic-place-preview>
+<div class="place-preview-container" *ngIf="!selectedItem">
+  <app-historic-place-preview
+    [historicalPlaces]="historicalPlaces"
+    (selectPlaceEvent)="setPlaceDetail($event)">
+  </app-historic-place-preview>
 </div>
 
 
