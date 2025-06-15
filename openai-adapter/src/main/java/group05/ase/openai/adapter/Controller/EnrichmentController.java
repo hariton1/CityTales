@@ -1,7 +1,10 @@
 package group05.ase.openai.adapter.Controller;
 
 import group05.ase.openai.adapter.Service.OpenAIService;
+import group05.ase.openai.adapter.dto.EnrichmentRequest;
 import group05.ase.openai.adapter.dto.EnrichmentResponse;
+import group05.ase.openai.adapter.dto.SummaryRequest;
+import group05.ase.openai.adapter.dto.SummaryResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -24,13 +27,33 @@ public class EnrichmentController {
         this.openAIService = openAIService;
     }
 
-    @PostMapping
-    public EnrichmentResponse enrichText(@RequestBody Map<String, String> body) {
-        String tone = body.get("tone");
-        String content = body.get("content");
+    @PostMapping("/summary")
+    public ResponseEntity<SummaryResponse> generateSummary(@RequestBody SummaryRequest summaryRequest) {
+        String content = summaryRequest.getContent();
 
-        logger.info("POST /api/enrich");
-        logger.info("Tone: {}", tone);
-        return this.openAIService.generateResponse(tone, content);
+        if (content == null || content.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body( new SummaryResponse("<p>Missing input for summary.</p>"));
+        }
+
+        logger.info("POST /api/enrich/summary");
+        SummaryResponse summary = openAIService.generateSummary(content);
+        return ResponseEntity.ok(summary);
+    }
+
+    @PostMapping("/full")
+    public ResponseEntity<EnrichmentResponse> enrichText(@RequestBody EnrichmentRequest enrichmentRequest) {
+        String tone = enrichmentRequest.getTone();
+        String content = enrichmentRequest.getContent();
+
+        if (tone == null || content == null || content.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body(
+                    new EnrichmentResponse("<p><em>Missing content or tone.</em></p>", tone != null ? tone : "tone unknown")
+            );
+        }
+
+        logger.info("POST /api/enrich/full | Tone: {}", tone);
+
+        EnrichmentResponse response = openAIService.generateEnrichedContent(tone, content);
+        return ResponseEntity.ok(response);
     }
 }

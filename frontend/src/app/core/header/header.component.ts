@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, inject} from '@angular/core';
 import {TuiButton, TuiDataListComponent, TuiDropdown, TuiIcon, TuiSizeL, TuiSizeS} from '@taiga-ui/core';
 import {TuiDataListDropdownManager, TuiSegmented, TuiSwitch} from '@taiga-ui/kit';
 
@@ -9,7 +9,7 @@ import {SearchService} from '../../services/search.service'
 import {BuildingEntity} from '../../dto/db_entity/BuildingEntity';
 import { supabase } from '../../user-management/supabase.service';
 import { CommonModule } from '@angular/common';
-import {TuiPlatform} from '@taiga-ui/cdk';
+import {TuiPlatform, TuiThemeColorService} from '@taiga-ui/cdk';
 import {FormsModule} from '@angular/forms';
 import { Inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';

@@ -1,5 +1,15 @@
-import {ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, signal} from '@angular/core';
-import {AsyncPipe, NgForOf, NgIf} from "@angular/common";
+import {
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnInit,
+  Output,
+  signal,
+  SimpleChanges
+} from '@angular/core';
+import {AsyncPipe, NgForOf, NgIf, NgSwitch, NgSwitchCase} from "@angular/common";
 import {
   TuiAppearance,
   TuiAutoColorPipe,
@@ -52,21 +62,28 @@ import { supabase } from '../../user-management/supabase.service';
     TuiSurface,
     TuiTooltip,
     TuiItem,
+    NgSwitchCase,
+    NgSwitch,
     TuiDialog
   ],
   templateUrl: './historic-person-detail.component.html',
   styleUrl: './historic-person-detail.component.less'
 })
-export class HistoricPersonDetailComponent implements OnInit{
+export class HistoricPersonDetailComponent implements OnInit, OnChanges{
 
   protected index1 = 0; //tone slider
   lineWidths = [90, 70, 95, 60, 85, 80, 60, 75, 85, 80];
+  lineWidths2 = [90, 70, 95, 60, 85, 80];
   isMobile = false;
 
   customBreakpointLevel: CustomBreakpointLevel = null;
 
   summary: string = '';
+  summaryStarted = false;
+  summaryLoading = false;
+
   enrichedContent: string = '';
+  selectedTone: string = '';
   enrichmentStarted = false;
   enrichmentLoading = false;
   tonesItemCount = 3;
@@ -95,6 +112,7 @@ export class HistoricPersonDetailComponent implements OnInit{
   ngOnInit() {
     this.breakpointService.level$.subscribe(() => {
       this.tonesItemCount = this.breakpointService.tonesItemCount;
+      this.generateSummary();
       this.cdr.detectChanges();
     });
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -122,6 +140,12 @@ export class HistoricPersonDetailComponent implements OnInit{
     }
   }
   private _selectedPerson: any;
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['selectedPerson']?.currentValue?.contentGerman) {
+      this.generateSummary();
+    }
+  }
 
   @Output() onPersonDetailEvent: EventEmitter<PersonEntity> = new EventEmitter<PersonEntity>();
   @Output() onEventDetailEvent: EventEmitter<EventEntity> = new EventEmitter<EventEntity>();
@@ -157,6 +181,28 @@ export class HistoricPersonDetailComponent implements OnInit{
     });
   }
 
+  generateSummary(): void {
+    this.summaryStarted = true;
+    this.summaryLoading = true;
+
+    let content = this.selectedPerson.contentGerman;
+
+    this.EnrichmentService.generateSummary(content).subscribe({
+      next: (response) => {
+        console.log('summary: ' + response.summary);
+        this.summary = response.summary;
+      },
+      error: (error: any) => {
+        console.error(error);
+      },
+      complete: () => {
+        console.log('Completed');
+        this.summaryLoading = false;
+        this.cdr.detectChanges();
+      }
+    })
+  }
+
   startEnrichment(tone: string): void {
     this.enrichmentStarted = true;
     this.enrichmentLoading = true;
@@ -166,11 +212,10 @@ export class HistoricPersonDetailComponent implements OnInit{
     this.EnrichmentService.enrichContentWithTone(tone, content).subscribe({
       next: (response) => {
         console.log('tone: ' + response.tone);
-        console.log('summary: ' + response.summary);
         console.log('enrichedContent: ' + response.enrichedContent);
 
-        this.summary = response.summary;
         this.enrichedContent = response.enrichedContent;
+        this.selectedTone = response.tone;
       },
       error: (error: any) => {
         console.error(error);

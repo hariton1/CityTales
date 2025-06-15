@@ -17,7 +17,8 @@ header[tuiNavigationHeader][tuiNavigationHeader] {
 }
 
 .main-nav-desktop a {
-  border: none !important;
+  //border: none !important;
+  gap: 4px !important;
 }
 
 tui-segmented {
