@@ -16,11 +16,12 @@ public class CreateTourRequestDTO {
     private double start_lng;
     private double end_lat;
     private double end_lng;
-    private List<ViennaHistoryWikiBuildingObject> predefined_stops;
+    private List<ViennaHistoryWikiBuildingObject> predefinedStops;
     private double maxDistance;
     private double minDistance;
     private double maxDuration;
     private double minDuration;
     private double maxBudget;
-    private Integer minIntermediateStops;
+    private Integer numStops;
+    private int[] personConfiguration;
 }

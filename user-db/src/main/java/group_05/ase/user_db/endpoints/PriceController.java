@@ -33,7 +33,7 @@ public class PriceController {
         }
     }
 
-    @GetMapping("/find/multiple")
+    @PostMapping("/find/multiple")
     @ResponseStatus(HttpStatus.OK)
     public List<List<PriceDTO>> getPricesByLocations(@RequestBody int[] location_ids) {
         try {

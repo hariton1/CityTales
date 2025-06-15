@@ -11,7 +11,6 @@ export const JwtInterceptor: HttpInterceptorFn = (
 ): Observable<HttpEvent<unknown>> => {
 
   const skipJwtFor = [
-    'http://localhost:8083/',
     'http://localhost:7474/db/data'
   ];
 
