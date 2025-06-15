@@ -93,7 +93,8 @@ export class TourLayoutComponent {
               t.distance,
               t.durationEstimate,
               t.userId,
-              t.tourPrice
+              t.tourPrice,
+              t.pricePerStop
             );
           });
           console.log(this.userTours)
@@ -194,7 +195,8 @@ export class TourLayoutComponent {
       +this.tourDistance,
       +this.tourDuration,
       this.userId ?? 'NONE',
-      0); //TODO: Add price estimation for user defined tours
+      0,
+      new Map());
 
 
       this.tourDistance = (tour.getDistance() / 1000).toFixed(2);
@@ -520,6 +522,8 @@ export class TourLayoutComponent {
       var pointDTO = new UserPointDto(-1, stored, 4, new Date(),Date.now() / 1000)
       this.userPointsService.createNewPoints(pointDTO).subscribe(data => {console.log("Tour points created")});
 
+      console.log("A" + selectedTour.getTourPrice())
+      console.log("B" + selectedTour.getPricePerStop())
 
       this.tourService.createTourInDB(selectedTour).subscribe({
         next: tour => {console.log("Tour created successfully!");

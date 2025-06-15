@@ -145,8 +145,9 @@ public class TourService implements ITourService {
         dto.setTourPrice(tourObject.getTourPrice());
         try{
             dto.setStops(mapper.writeValueAsString(tourObject.getStops()));
+            dto.setPricePerStop(mapper.writeValueAsString(tourObject.getPricePerStop()));
         } catch (JsonProcessingException e) {
-            logger.error("Could not convert stops array to JSON string: {}", e.getMessage());
+            logger.error("Could not convert stops array/price per stop to JSON string: {}", e.getMessage());
         }
         return dto;
     }

@@ -10,6 +10,7 @@ import {TuiCard} from '@taiga-ui/layout';
 import {firstValueFrom} from 'rxjs';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import {PriceEntity} from '../../../dto/tour_entity/PriceEntity';
 
 @Component({
   selector: 'app-tour-detail',
@@ -27,11 +28,11 @@ import jsPDF from 'jspdf';
 export class TourDetailComponent {
 
   tourId: number = 0;
-  tour: TourDto = new TourDto(0, '', '', 0, 0, 0, 0, [], 0, 0, 'NONE', 0);
+  tour: TourDto = new TourDto(0, '', '', 0, 0, 0, 0, [], 0, 0, 'NONE', 0, new Map());
   private tourService: TourService;
   private router: Router;
   private readonly alerts = inject(TuiAlertService);
-
+  pricePerStop: Map<number, PriceEntity[]> = new Map();
   private filter_urls: string[] = ["https://www.geschichtewiki.wien.gv.at/KnowledgeWiki.png",
     "https://www.geschichtewiki.wien.gv.at/extensions/SemanticMediaWiki/res/smw/logo_footer.png",
     "https://www.geschichtewiki.wien.gv.at/KnowledgeWiki.png",
@@ -53,6 +54,7 @@ export class TourDetailComponent {
 
   this.tourService.getTourForTourId(this.tourId).subscribe(async tour => {
     this.tour = TourDto.fromTourEntity(tour);
+    this.pricePerStop = this.tour.getPricePerStop();
     this.nameControl.setValue(this.tour.getName());
     this.descriptionControl.setValue(this.tour.getDescription());
     await this.recalculateStopDistances();
@@ -120,7 +122,8 @@ export class TourDetailComponent {
           estimate.distance,
           estimate.duration,
           this.tour.getUserId(),
-          this.tour.getTourPrice()
+          this.tour.getTourPrice(),
+          this.tour.getPricePerStop()
         );
         console.log(this.tour.getDistance());
         console.log(this.tour.getDurationEstimate());

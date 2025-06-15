@@ -20,4 +20,5 @@ public class TourDTO {
     Double durationEstimate;
     String userId;
     Double tourPrice;
+    String pricePerStop;
 }
