@@ -1,5 +1,7 @@
 package group05.ase.openai.adapter.Service;
 
+import group05.ase.openai.adapter.dto.EnrichmentResponse;
+import group05.ase.openai.adapter.dto.SummaryResponse;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -17,20 +19,36 @@ class OpenAIServiceTest {
     }
 
     @Test
-    void generateResponse_shouldReturnEnrichmentDTO() {
+    void generateSummary_shouldReturnExpectedSummary() {
+        // Arrange
         OpenAIService spyService = Mockito.spy(new OpenAIService());
 
-        Mockito.doReturn("summary text")
-                .doReturn("enriched tour guide text")
+        Mockito.doReturn("<p>Mocked summary</p><ul><li>Fact 1</li></ul>")
                 .when(spyService)
-                .callOpenAI(Mockito.anyString(), Mockito.anyString());
+                .callOpenAI(Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
 
-        var result = spyService.generateResponse("tour", "The monument was built in 1607.");
+        String content = "The monument was built in 1607.";
+        SummaryResponse result = spyService.generateSummary(content);
 
-        assertEquals("summary text", result.getSummary());
-        assertEquals("enriched tour guide text", result.getEnrichedContent());
+        assertEquals("<p>Mocked summary</p><ul><li>Fact 1</li></ul>", result.getSummary());
+
+        Mockito.verify(spyService, Mockito.times(1))
+                .callOpenAI(Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
+    }
+
+    @Test
+    void generateEnrichedContent_shouldReturnEnrichmentDTO() {
+        OpenAIService spyService = Mockito.spy(new OpenAIService());
+
+        Mockito.doReturn("enriched tour guide text")
+                .when(spyService)
+                .callOpenAI(Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
+
+        EnrichmentResponse result = spyService.generateEnrichedContent("tour", "The monument was built in 1607.");
+
         assertEquals("tour", result.getTone());
-        Mockito.verify(spyService, Mockito.times(2))
-                .callOpenAI(Mockito.anyString(), Mockito.anyString());
+        assertEquals("enriched tour guide text", result.getEnrichedContent());
+        Mockito.verify(spyService, Mockito.times(1))
+                .callOpenAI(Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
     }
 }

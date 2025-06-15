@@ -8,7 +8,7 @@ import {
   Output,
   signal,
   ChangeDetectorRef,
-  OnInit
+  OnInit, OnChanges, SimpleChanges
 } from '@angular/core';
 import {CommonModule, NgIf, NgOptimizedImage} from '@angular/common';
 import {
@@ -103,7 +103,7 @@ const numberOptions = maskitoNumberOptionsGenerator({
   styleUrl: './historic-place-detail.component.less',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class HistoricPlaceDetailComponent implements OnInit{
+export class HistoricPlaceDetailComponent implements OnInit, OnChanges{
   funFact: FunFactCardDTO | null = null;
 
   private readonly pricesService = inject(PricesService);
@@ -112,20 +112,26 @@ export class HistoricPlaceDetailComponent implements OnInit{
   public readonly collapsed = signal(true); //for collapsed card
   protected index1 = 0; //tone slider
   lineWidths = [90, 70, 95, 60, 85, 80, 60, 75, 85, 80];
+  lineWidths2 = [90, 70, 95, 60, 85, 80];
   isMobile = false;
 
   customBreakpointLevel: CustomBreakpointLevel = null;
 
 
   summary: string = '';
+  summaryStarted = false;
+  summaryLoading = false;
+
   enrichedContent: string = '';
+  selectedTone: string = '';
   enrichmentStarted = false;
   enrichmentLoading = false;
+
   tonesItemCount = 3;
   relatedItemCount = 3;
 
 
-  constructor (private savedFunFactService: SavedFunFactService,
+  constructor(private savedFunFactService: SavedFunFactService,
               private funFactService: FunFactService,
               private userService: UserService,
               private userHistoriesService: UserHistoriesService,
@@ -153,13 +159,15 @@ export class HistoricPlaceDetailComponent implements OnInit{
   ];
 
   ngOnInit() {
+    if (this.selectedPlace.contentGerman){
+      this.generateSummary();
+    }
     this.breakpointService.level$.subscribe(() => {
       this.tonesItemCount = this.breakpointService.tonesItemCount;
       this.relatedItemCount = this.breakpointService.relatedItemCount;
       this.cdr.detectChanges();
     });
   }
-
 
   protected dialogLabel = '';
   protected options: Partial<TuiResponsiveDialogOptions> = {};
@@ -245,6 +253,12 @@ export class HistoricPlaceDetailComponent implements OnInit{
     this.cdr.markForCheck();
   }
   private _selectedPlace: any;
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['selectedPlace']?.currentValue?.contentGerman) {
+      this.generateSummary();
+    }
+  }
 
   @Output() onPersonDetailEvent: EventEmitter<PersonEntity> = new EventEmitter<PersonEntity>();
   @Output() onEventDetailEvent: EventEmitter<EventEntity> = new EventEmitter<EventEntity>();
@@ -337,6 +351,28 @@ export class HistoricPlaceDetailComponent implements OnInit{
     this.userHasPermission = contributor && emailMatchesLocation;
   }
 
+  generateSummary(): void {
+    this.summaryStarted = true;
+    this.summaryLoading = true;
+
+    let content = this.selectedPlace.contentGerman;
+
+    this.EnrichmentService.generateSummary(content).subscribe({
+      next: (response) => {
+        console.log('summary: ' + response.summary);
+        this.summary = response.summary;
+      },
+      error: (error: any) => {
+        console.error(error);
+      },
+      complete: () => {
+        console.log('Completed');
+        this.summaryLoading = false;
+        this.cdr.detectChanges();
+      }
+    })
+  }
+
   startEnrichment(tone: string): void {
     this.enrichmentStarted = true;
     this.enrichmentLoading = true;
@@ -346,11 +382,10 @@ export class HistoricPlaceDetailComponent implements OnInit{
     this.EnrichmentService.enrichContentWithTone(tone, content).subscribe({
       next: (response) => {
         console.log('tone: ' + response.tone);
-        console.log('summary: ' + response.summary);
         console.log('enrichedContent: ' + response.enrichedContent);
 
-        this.summary = response.summary;
         this.enrichedContent = response.enrichedContent;
+        this.selectedTone = response.tone;
       },
       error: (error: any) => {
         console.error(error);

@@ -163,73 +163,24 @@
       </tui-expand>
     </section>
 
-  <!-- prices -->
-  <div class="prices-section" *ngIf="this.prices().length > 0">
-    <h3>Prices
-      <button *ngIf="userHasPermission" tuiButton appearance="flat" size="xs" type="button" class="add-btn" tuiHint="Add a new price!"
-              tuiHintDirection="top" (click)="showDialog(-1)">
-        <tui-icon icon="@tui.circle-plus" class="prices"></tui-icon>
-      </button>
-    </h3>
+  <div class="content" *ngIf="selectedPlace.contentGerman">
+    <section class="place-summary">
+      <header tuiHeader class="tui-space_top-3 tui-space_bottom-3">
+        <span class="tui-text_h6">Quick Facts & Highlights</span>
+      </header>
+      <!-- Skeleton Loader -->
+      <div *ngIf="summaryStarted && summaryLoading" class="fade-in tui-space_bottom-4">
+        <div class="skeleton-line" *ngFor="let width of lineWidths2" [style.width.%]="width"></div>
+      </div>
 
-    <div *ngFor="let price of prices(); index as i" class="price-row">
-
-      <div class="price-bold" tuiHint="{{price.name}}">{{ price.name }}</div>
-      <div class="price-description" tuiHint="{{price.description}}">{{ price.description }}</div>
-      <div class="price-bold">{{ price.price }} €</div>
-
-      <button *ngIf="userHasPermission" tuiButton appearance="flat" size="xs" type="button" class="edit-btn" tuiHint="Edit or delete an existing price!"
-              tuiHintDirection="top" (click)="showDialog(i.valueOf())">
-        <tui-icon icon="@tui.square-pen" class="prices"></tui-icon>
-      </button>
-    </div>
-
+      <!-- LLM Generated Summary -->
+      <div *ngIf="summaryStarted && !summaryLoading" class="fade-in tui-space_bottom-4">
+          <div class="place-summary-text" [innerHTML]="summary"></div>
+      </div>
+    </section>
   </div>
 
-  <ng-template let-observer [tuiDialogOptions]="options" [(tuiDialog)]="open">
-    <form [formGroup]="priceForm" class="textAreaContainerCtrl" (ngSubmit)="observer.complete()">
-      <div class="stack">
-        <tui-textfield #price tuiTextfieldSize="m" tuiAutoFocus [maskito]="maskitoOptions">
-          <label tuiLabel>Price value</label>
-          <input tuiTextfield required [placeholder]="price.focused() ? 'e.g. 15,00€' : 'Price value'"
-                 formControlName="priceFormValue"/>
-          <tui-icon tuiTooltip="The monetary value of the price."/>
-        </tui-textfield>
-      </div>
-
-      <div class="stack">
-        <tui-textfield #name tuiTextfieldSize="m">
-          <label tuiLabel>Name</label>
-          <input tuiTextfield required [placeholder]="name.focused() ? 'e.g. Adult' : 'Name'"
-                 formControlName="nameFormValue"/>
-          <tui-icon tuiTooltip="A short-hand name for the price."/>
-        </tui-textfield>
-      </div>
-
-      <div class="stack">
-        <tui-textfield #desc tuiTextfieldSize="m">
-          <label tuiLabel>Description</label>
-          <input tuiTextfield [placeholder]="desc.focused() ? 'e.g. Tour Ticket' : 'Description'"
-                 formControlName="descriptionFormValue"/>
-          <tui-icon tuiTooltip="Additional information for the price."/>
-        </tui-textfield>
-      </div>
-
-      <div class="price-dialog-buttons">
-        <button size="s" tuiButton type="submit" (click)="onSubmit()" class="save-button">
-          <tui-icon icon="@tui.save" [style.height.rem]="1.2"/>
-          Save
-        </button>
-
-        <button appearance="action-destructive" size="s" tuiButton type="submit" (click)="onDelete()" *ngIf="dialogLabel.startsWith('Edit')">
-          Delete
-        </button>
-      </div>
-
-    </form>
-  </ng-template>
-
-  <div class="tone-selector" *ngIf="selectedPlace.contentGerman">
+  <div class="tone-selector tui-space_bottom-4" *ngIf="selectedPlace.contentGerman">
     <span style="font: var(--tui-font-heading-6); display: block; width: 100%">Choose how you want the story to be told <tui-icon
       tuiHintDirection="bottom"
       tuiTooltip="Select a tone to change the storytelling style — not the facts."
@@ -268,19 +219,88 @@
     </div>
 
     <!-- LLM Generated Content -->
-    <div *ngIf="enrichmentStarted && !enrichmentLoading" class="fade-in tui-space_bottom-12">
+    <div *ngIf="enrichmentStarted && !enrichmentLoading" class="fade-in tui-space_bottom-8">
       <section class="place-summary">
-        <header tuiHeader class="tui-space_top-3 tui-space_bottom-3">
-          <span class="tui-text_h6">Quick Facts & Highlights</span>
-        </header>
-        <div class="place-summary-text" [innerHTML]="summary"></div>
-
         <header tuiHeader class="tui-space_top-5 tui-space_bottom-3">
-          <span class="tui-text_h6">Deep Dive into the {{ selectedPlace.name }}</span>
+          <ng-container [ngSwitch]="selectedTone">
+            <span *ngSwitchCase="'academic'" class="tui-text_h6">A Historical Perspective on the {{ selectedPlace.name }}</span>
+            <span *ngSwitchCase="'tour'" class="tui-text_h6">Discover the Wonders of {{ selectedPlace.name }} with Your Guide</span>
+            <span *ngSwitchCase="'poetic'" class="tui-text_h6">A Lyrical Stroll through the Soul of {{ selectedPlace.name }}</span>
+            <span *ngSwitchCase="'dramatic'" class="tui-text_h6">Unfolding the Drama of {{ selectedPlace.name }}</span>
+            <span *ngSwitchCase="'child-friendly'" class="tui-text_h6">Let’s Explore {{ selectedPlace.name }} Together!</span>
+            <span *ngSwitchCase="'funny'" class="tui-text_h6">You Won’t Believe What Happened at {{ selectedPlace.name }}</span>
+            <span *ngSwitchDefault class="tui-text_h6">Deep Dive into the {{ selectedPlace.name }}</span>
+          </ng-container>
         </header>
         <div class="place-summary-text" [innerHTML]="enrichedContent"></div>
       </section>
     </div>
+
+    <!-- prices -->
+    <div class="prices-section tui-space_bottom-8" *ngIf="this.prices().length > 0">
+      <h3>Prices
+        <button *ngIf="userHasPermission" tuiButton appearance="flat" size="xs" type="button" class="add-btn" tuiHint="Add a new price!"
+                tuiHintDirection="top" (click)="showDialog(-1)">
+          <tui-icon icon="@tui.circle-plus" class="prices"></tui-icon>
+        </button>
+      </h3>
+
+      <div *ngFor="let price of prices(); index as i" class="price-row">
+
+        <div class="price-bold" tuiHint="{{price.name}}">{{ price.name }}</div>
+        <div class="price-description" tuiHint="{{price.description}}">{{ price.description }}</div>
+        <div class="price-bold">{{ price.price }} €</div>
+
+        <button *ngIf="userHasPermission" tuiButton appearance="flat" size="xs" type="button" class="edit-btn" tuiHint="Edit or delete an existing price!"
+                tuiHintDirection="top" (click)="showDialog(i.valueOf())">
+          <tui-icon icon="@tui.square-pen" class="prices"></tui-icon>
+        </button>
+      </div>
+
+    </div>
+
+    <ng-template let-observer [tuiDialogOptions]="options" [(tuiDialog)]="open">
+      <form [formGroup]="priceForm" class="textAreaContainerCtrl" (ngSubmit)="observer.complete()">
+        <div class="stack">
+          <tui-textfield #price tuiTextfieldSize="m" tuiAutoFocus [maskito]="maskitoOptions">
+            <label tuiLabel>Price value</label>
+            <input tuiTextfield required [placeholder]="price.focused() ? 'e.g. 15,00€' : 'Price value'"
+                   formControlName="priceFormValue"/>
+            <tui-icon tuiTooltip="The monetary value of the price."/>
+          </tui-textfield>
+        </div>
+
+        <div class="stack">
+          <tui-textfield #name tuiTextfieldSize="m">
+            <label tuiLabel>Name</label>
+            <input tuiTextfield required [placeholder]="name.focused() ? 'e.g. Adult' : 'Name'"
+                   formControlName="nameFormValue"/>
+            <tui-icon tuiTooltip="A short-hand name for the price."/>
+          </tui-textfield>
+        </div>
+
+        <div class="stack">
+          <tui-textfield #desc tuiTextfieldSize="m">
+            <label tuiLabel>Description</label>
+            <input tuiTextfield [placeholder]="desc.focused() ? 'e.g. Tour Ticket' : 'Description'"
+                   formControlName="descriptionFormValue"/>
+            <tui-icon tuiTooltip="Additional information for the price."/>
+          </tui-textfield>
+        </div>
+
+        <div class="price-dialog-buttons">
+          <button size="s" tuiButton type="submit" (click)="onSubmit()" class="save-button">
+            <tui-icon icon="@tui.save" [style.height.rem]="1.2"/>
+            Save
+          </button>
+
+          <button appearance="action-destructive" size="s" tuiButton type="submit" (click)="onDelete()" *ngIf="dialogLabel.startsWith('Edit')">
+            Delete
+          </button>
+        </div>
+
+      </form>
+    </ng-template>
 
 
     <div class="related-persons tui-space_bottom-6" *ngIf="selectedPlace.relatedPersons?.length">

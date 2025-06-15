@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import group05.ase.openai.adapter.Controller.EnrichmentController;
 import group05.ase.openai.adapter.Service.OpenAIService;
 import group05.ase.openai.adapter.dto.EnrichmentResponse;
+import group05.ase.openai.adapter.dto.SummaryRequest;
+import group05.ase.openai.adapter.dto.SummaryResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -43,26 +45,43 @@ class EnrichmentControllerTest {
     }
 
     @Test
+    void generateSummary_shouldReturnSummaryResponse() throws Exception {
+        String inputContent = "This monument was built in 1607.";
+        String summaryHtml = "<p>Summary text</p><ul><li>Fact 1</li></ul>";
+
+        SummaryRequest request = new SummaryRequest();
+        request.setContent(inputContent);
+
+        when(openAIService.generateSummary(inputContent))
+                .thenReturn(new SummaryResponse(summaryHtml));
+
+        mockMvc.perform(post("/api/enrich/summary")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.summary").value(summaryHtml));
+    }
+
+    @Test
     void enrichText_shouldReturnEnrichmentResponse() throws Exception {
         String tone = "tour";
         String content = "The monument was built in 1607.";
 
         var mockResponse = new EnrichmentResponse(
-                "Mocked summary", "Mocked enrichment", tone
+                "Mocked enrichment", tone
         );
 
-        when(openAIService.generateResponse(tone, content)).thenReturn(mockResponse);
+        when(openAIService.generateEnrichedContent(tone, content)).thenReturn(mockResponse);
 
         Map<String, String> requestBody = Map.of(
                 "tone", tone,
                 "content", content
         );
 
-        mockMvc.perform(post("/api/enrich")
+        mockMvc.perform(post("/api/enrich/full")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestBody)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.summary").value("Mocked summary"))
                 .andExpect(jsonPath("$.enrichedContent").value("Mocked enrichment"))
                 .andExpect(jsonPath("$.tone").value("tour"));
     }
