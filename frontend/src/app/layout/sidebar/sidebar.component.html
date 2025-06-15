@@ -34,7 +34,7 @@
   </div>
 </div>
 
-<tui-scrollbar class="scrollable-content">
+<tui-scrollbar class="scrollable-content" #scrollbarRef>
   <div class="sidebar-container" *ngIf="selectedItem">
     <ng-container [ngSwitch]="selectedItem.type">
 
