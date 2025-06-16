@@ -19,6 +19,7 @@ import {QuizResult} from '../../../dto/quiz.result.dto';
 import {QuestionResults} from '../../../dto/question-results.dto';
 import {UserPointsService} from '../../../user_db.services/user-points.service';
 import {UserPointDto} from '../../../user_db.dto/user-point.dto';
+import {tuiRound} from '@taiga-ui/cdk';
 
 @Component({
   selector: 'app-game-quiz',
@@ -86,6 +87,8 @@ export class GameQuizComponent implements OnInit {
   ngOnInit(): void {
     this.retrieveUserID();
     this.quizService.getQuizzesByUserId(this.creatorId);
+    this.quizService.getQuizResultsByUserId(this.creatorId);
+    console.log(this.quizzesResults());
   }
 
   generateQuiz(category: string) {
@@ -115,7 +118,8 @@ export class GameQuizComponent implements OnInit {
     this.currentQuestionIndex = 0;
     this.currentQuizIndex = index;
     this.playingQuiz = this.quizzes()[index];
-    this.numberOfQuestions = this.quizzes()[this.currentQuizIndex].questions.length;
+    console.log('Playing quiz ', this.playingQuiz);
+    this.numberOfQuestions = this.playingQuiz.questions.length;
     this.options = {
       label: this.playingQuiz.name,
       size: 'l',
@@ -128,9 +132,7 @@ export class GameQuizComponent implements OnInit {
 
   loadNextQuestion(): void {
     this.toggleScoreEditable = true;
-    if (this.currentQuestionIndex < this.numberOfQuestions) {
-      this.currentQuestionIndex++;
-    } else {
+    if (this.currentQuestionIndex >= this.numberOfQuestions) {
       this.openQuizPlay = false;
       this.alerts.open(`Good job!`, {
         label: `Final score: ${this.score}`,
@@ -138,8 +140,15 @@ export class GameQuizComponent implements OnInit {
         autoClose: 5000
       }).subscribe()
       let quiz = this.quizzes()[this.currentQuizIndex];
-      let pointDTO = new UserPointDto(-1, this.creatorId, this.score*5, new Date(), Number(quiz))
-      this.userPointsService.createNewPoints(pointDTO);
+      let oldScore = this.calcOldScore(this.playingQuiz!.id);
+      if (oldScore) {
+        let subtractedPointDTO = new UserPointDto(-1, this.creatorId, -oldScore * 5, new Date(), Number(quiz))
+        this.userPointsService.createNewPoints(subtractedPointDTO).subscribe();
+      }
+      let pointDTO = new UserPointDto(-1, this.creatorId, this.score * 5, new Date(), Number(quiz))
+      this.userPointsService.createNewPoints(pointDTO).subscribe(data => {
+        console.log("Quiz points created")
+      });
       this.saveQuizResult({quiz: this.playingQuiz?.id, questionResults: this.questionResults, friendResults: []});
     }
 
@@ -155,6 +164,7 @@ export class GameQuizComponent implements OnInit {
     this.currentImageSignal.set(question.image);
 
     this.openQuizPlay = true;
+    this.currentQuestionIndex++;
   }
 
   check(answer: string) {
@@ -185,10 +195,36 @@ export class GameQuizComponent implements OnInit {
   getNewQuestionResult(correct: boolean): QuestionResults {
     return {
       id: 0,
-      question: this.quizzes()[this.currentQuizIndex].questions[this.currentQuestionIndex].id,
+      question: this.quizzes()[this.currentQuizIndex].questions[this.currentQuestionIndex - 1].id,
       player: this.creatorId,
       correct: correct,
       createdAt: new Date()
     }
+  }
+
+  printScore(index: number) {
+    let quizId = this.quizzes()[index].id;
+    let numOfQuestions = this.quizzes()[index].questions.length;
+    let oldScore = this.calcOldScore(quizId)
+    if (oldScore !== null) {
+      let percentage = tuiRound(oldScore / numOfQuestions * 100, 0);
+      return 'Score: ' + percentage + '%';
+    }
+
+    return 'Not played yet!';
+  }
+
+  calcOldScore(quizId : number) {
+    let score = 0;
+    let quizResult = this.quizzesResults().find(result => result.quiz === quizId);
+    if (quizResult) {
+      quizResult?.questionResults.forEach((result) => {
+        if (result.correct) {
+          score++;
+        }
+      })
+      return score;
+    }
+    return null;
   }
 }
