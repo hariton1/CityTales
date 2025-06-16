@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import {TuiHeader} from '@taiga-ui/layout';
 import {TuiButton} from '@taiga-ui/core';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-home',
@@ -13,7 +14,7 @@ import {TuiButton} from '@taiga-ui/core';
 })
 export class HomeComponent {
 
-  constructor(private router: any) {
+  constructor(private router: Router) {
   }
 
   handleClick () {
