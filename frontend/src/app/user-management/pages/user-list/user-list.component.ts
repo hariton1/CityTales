@@ -73,7 +73,6 @@ export class UserListComponent implements OnInit {
     const id = user.id;
     const email = user.email;
     this.confirmDelete(id,email);
-    window.location.reload();
   }
 
   protected confirmDelete(userId: string,email: string): void {
@@ -99,7 +98,17 @@ export class UserListComponent implements OnInit {
           }
           return this.alerts.open('User deletion cancelled!', {label: 'Cancelled!', appearance: 'warning', autoClose: 3000});
         }))
-      .subscribe();
+      .subscribe({
+        next: () => {
+          window.location.reload();
+        },
+        error: (error) => {
+          console.error('Error deleting users:', error);
+        },
+        complete: () => {
+          window.location.reload();
+        }
+      });
   }
 
   deleteUser(id: string) : void {
