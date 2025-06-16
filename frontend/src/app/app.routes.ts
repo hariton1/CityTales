@@ -58,6 +58,8 @@ export const routes: Routes = [
   { path: 'quizzes', component: GameQuizComponent },
   { path: 'admin-dashboard', component: AdminDashboardComponent },
   { path: 'about-us',
-  loadComponent: () => import("./core/about/about.component").then(about => about.AboutComponent)},
-  { path: '', redirectTo: '/explore', pathMatch: 'full' } //default page, to be changed
+    loadComponent: () => import("./core/about/about.component").then(about => about.AboutComponent)},
+  { path: 'home',
+    loadComponent: () => import("./core/home/home.component").then(home => home.HomeComponent)},
+  { path: '', redirectTo: '/home', pathMatch: 'full' } //default page
 ];

@@ -40,6 +40,15 @@
       Friends
     </button>
     <button
+      *ngIf="loggedIn"
+      tuiTabBarItem
+      type="button"
+      [icon]="'@tui.brain'"
+      routerLink="/quizzes"
+    >
+      Quizzes
+    </button>
+    <button
       *ngIf="!loggedIn"
       tuiTabBarItem
       type="button"
