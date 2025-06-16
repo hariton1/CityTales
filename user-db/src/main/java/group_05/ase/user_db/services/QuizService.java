@@ -74,60 +74,20 @@ public class QuizService {
         List<QuizUserEntity> userQuizzes = quizUserRepository.findByPlayer(user);
 
         for (QuizUserEntity quiz : userQuizzes) {
-            QuizResultDTO result = new QuizResultDTO();
-            int quizId = quiz.getQuiz();
-            result.setQuiz(quizId);
-            List<QuestionEntity> questions = questionRepository.findByQuiz(quizId);
-            List<QuizFriendResultDTO> friendResultDTOs = new ArrayList<>();
-
-            for (QuestionEntity question : questions) {
-                int questionId = question.getId();
-                List<QuestionResultsEntity> questionResults = questionResultsRepository.findByQuestion(questionId);
-
-                List<QuestionResultsDTO> questionResultsDTOs = new ArrayList<>();
-                for (QuestionResultsEntity questionResultsEntity : questionResults) {
-                    UUID player = questionResultsEntity.getPlayer();
-                    if (user.equals(player)) {
-                        questionResultsDTOs.add(mapToQuestionResultsDTO(questionResultsEntity));
-                    } else {
-
-                        QuizFriendResultDTO friendResult = null;
-                        for (QuizFriendResultDTO friend : friendResultDTOs) {
-                            if (player.equals(friend.getFriend())) {
-                                friendResult = friend;
-                                break;
-                            }
-                        }
-
-                        if (friendResult == null) {
-                            QuizFriendResultDTO newFriend = new QuizFriendResultDTO();
-                            newFriend.setQuiz(quizId);
-                            newFriend.setFriend(player);
-                            newFriend.setCorrectnessPercentage(questionResultsEntity.getCorrect() ? 1f : 0f);
-                            newFriend.setQuestionsAnswered(1);
-                            friendResultDTOs.add(newFriend);
-                        } else {
-                            float percentage = friendResult.getCorrectnessPercentage();
-                            int questionsAnsweredSoFar = friendResult.getQuestionsAnswered();
-                            int numberOfCorrectlyAnsweredQuestionsSoFar = (int) (percentage * questionsAnsweredSoFar);
-                            int newQuestionAnsweredCorrectly = questionResultsEntity.getCorrect() ? 1 : 0;
-                            int newNumberOfQuestionsAnswered = friendResult.getQuestionsAnswered() + 1;
-                            float newPercentage = ((float) (numberOfCorrectlyAnsweredQuestionsSoFar + newQuestionAnsweredCorrectly)) / ((float) newNumberOfQuestionsAnswered);
-
-                            friendResult.setCorrectnessPercentage(newPercentage);
-                            friendResult.setQuestionsAnswered(newNumberOfQuestionsAnswered);
-                        }
-                    }
-                }
-
-                result.setQuestionResults(questionResultsDTOs);
-            }
-
-            result.setFriendResults(friendResultDTOs);
+            QuizResultDTO result = getResultsForUserForQuiz(user, quiz.getQuiz());
             results.add(result);
         }
 
         return results;
+    }
+
+    public QuizResultDTO saveQuestionResults(QuizResultDTO dto) {
+
+        List<QuestionResultsEntity> entities = mapToQuestionResultsEntity(dto);
+        for (QuestionResultsEntity entity : entities) {
+            questionResultsRepository.save(entity);
+        }
+        return getResultsForUserForQuiz(dto.getQuestionResults().getFirst().getPlayer(), dto.getQuiz());
     }
 
     public QuizDTO saveQuiz(String category, List<UUID> users) {
@@ -523,5 +483,82 @@ public class QuizService {
             quizUserEntity.setCreatedAt(LocalDateTime.now());
             quizUserRepository.save(quizUserEntity);
         }
+    }
+
+    private List<QuestionResultsEntity> mapToQuestionResultsEntity (QuizResultDTO dto) {
+        List<QuestionResultsDTO> questionResultsList = dto.getQuestionResults();
+        List<QuestionResultsEntity> list = new ArrayList<>();
+
+        if (questionResultsList == null || questionResultsList.isEmpty()) {
+            return list;
+        }
+
+        for (QuestionResultsDTO questionResults : questionResultsList) {
+            QuestionResultsEntity entity = new QuestionResultsEntity();
+
+            entity.setQuestion(questionResults.getQuestion());
+            entity.setPlayer(questionResults.getPlayer());
+            entity.setCorrect(questionResults.getCorrect());
+            entity.setCreatedAt(LocalDateTime.now());
+
+            list.add(entity);
+        }
+
+        return list;
+    }
+
+    private QuizResultDTO getResultsForUserForQuiz(UUID user, int quiz) {
+        QuizResultDTO result = new QuizResultDTO();
+        result.setQuiz(quiz);
+        result.setQuestionResults(new ArrayList<>());
+        result.setFriendResults(new ArrayList<>());
+        List<QuestionEntity> questions = questionRepository.findByQuiz(quiz);
+        List<QuizFriendResultDTO> friendResultDTOs = new ArrayList<>();
+
+        for (QuestionEntity question : questions) {
+            int questionId = question.getId();
+            List<QuestionResultsEntity> questionResults = questionResultsRepository.findByQuestion(questionId);
+
+            QuestionResultsDTO questionResultsDTO = new QuestionResultsDTO();
+            for (QuestionResultsEntity questionResultsEntity : questionResults) {
+                UUID player = questionResultsEntity.getPlayer();
+                if (user.equals(player)) {
+                    questionResultsDTO = mapToQuestionResultsDTO(questionResultsEntity);
+                } else {
+
+                    QuizFriendResultDTO friendResult = null;
+                    for (QuizFriendResultDTO friend : friendResultDTOs) {
+                        if (player.equals(friend.getFriend())) {
+                            friendResult = friend;
+                            break;
+                        }
+                    }
+
+                    if (friendResult == null) {
+                        QuizFriendResultDTO newFriend = new QuizFriendResultDTO();
+                        newFriend.setQuiz(quiz);
+                        newFriend.setFriend(player);
+                        newFriend.setCorrectnessPercentage(questionResultsEntity.getCorrect() ? 1f : 0f);
+                        newFriend.setQuestionsAnswered(1);
+                        friendResultDTOs.add(newFriend);
+                    } else {
+                        float percentage = friendResult.getCorrectnessPercentage();
+                        int questionsAnsweredSoFar = friendResult.getQuestionsAnswered();
+                        int numberOfCorrectlyAnsweredQuestionsSoFar = (int) (percentage * questionsAnsweredSoFar);
+                        int newQuestionAnsweredCorrectly = questionResultsEntity.getCorrect() ? 1 : 0;
+                        int newNumberOfQuestionsAnswered = friendResult.getQuestionsAnswered() + 1;
+                        float newPercentage = ((float) (numberOfCorrectlyAnsweredQuestionsSoFar + newQuestionAnsweredCorrectly)) / ((float) newNumberOfQuestionsAnswered);
+
+                        friendResult.setCorrectnessPercentage(newPercentage);
+                        friendResult.setQuestionsAnswered(newNumberOfQuestionsAnswered);
+                    }
+                }
+            }
+
+            result.getQuestionResults().add(questionResultsDTO);
+        }
+
+        result.setFriendResults(friendResultDTOs);
+        return result;
     }
 }
