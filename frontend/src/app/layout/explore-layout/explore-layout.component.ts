@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, NgZone, OnInit, ViewChild} from '@angular/core';
+import {ChangeDetectorRef, Component, ElementRef, NgZone, OnInit, ViewChild} from '@angular/core';
 import {SidebarComponent} from '../sidebar/sidebar.component';
 import {MapViewComponent} from '../map-view/map-view.component';
 import {BuildingEntity} from '../../dto/db_entity/BuildingEntity';
@@ -32,7 +32,7 @@ export class ExploreLayoutComponent  {
   @ViewChild(MapViewComponent) mapViewComponent!: MapViewComponent;
 
   currentViewMobile: 'discover' | 'map' = 'map';
-  changeVal: 0 | 1 = 1;
+  changeVal: 0 | 1 = 0;
 
   selectedPlace: BuildingEntity | null = null;
   selectedPerson: PersonEntity | null = null;
@@ -73,8 +73,8 @@ export class ExploreLayoutComponent  {
 
     if(this.isMobile) {
         this.currentViewMobile = 'discover';
-        this.onIndex(0);
-        console.log('got event', event);
+        this.changeVal = 1;
+        this.onIndex(this.changeVal);
     }
 
     if(event.buildingType == 'Gebäude') {
@@ -120,7 +120,6 @@ export class ExploreLayoutComponent  {
   onIndex(x: number) {
     console.log('got :', x)
     if(x == 1 || x == 0)this.changeVal = x;
-    this.cdr.markForCheck(); // tells Angular to re-render the UI
-
+    //this.cdr.markForCheck(); // tells Angular to re-render the UI
   }
 }
