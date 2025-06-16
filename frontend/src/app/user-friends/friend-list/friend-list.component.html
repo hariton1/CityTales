@@ -1,40 +1,32 @@
-<div class="centered-wrapper">
-  <h2 class="header-with-icon">👥 Friend List</h2>
+<div class="friendlist-container">
+  <div>
+    <h2 class="header-with-icon">👥 Friend List</h2>
+  </div>
 
   <ng-container *ngIf="friendInfoList.length > 0; else noFriends">
-    <table
-      tuiTable
-      [size]="'m'"
-      class="friend-table"
-    >
+    <table class="friendlist-table">
       <thead>
       <tr>
-        <th tuiTh>Email</th>
-        <th tuiTh>Became Friends On</th>
-        <th tuiTh>Actions</th>
+        <th>Email</th>
+        <th>Became Friends On</th>
+        <th>Actions</th>
       </tr>
       </thead>
-
-      <tbody tuiTbody>
+      <tbody>
       <tr *ngFor="let friend of friendInfoList">
-        <!-- Email with avatar -->
-        <td tuiTd>
-          <div [tuiCell]="'m'">
+        <td>
+          <div class="email-cell">
             <tui-avatar
               [src]="friend.email | tuiInitials"
               [style.background]="friend.email | tuiAutoColor"
             ></tui-avatar>
-            <span tuiTitle>{{ friend.email }}</span>
+            <span>{{ friend.email }}</span>
           </div>
         </td>
-
-        <!-- Date -->
-        <td tuiTd>
-            <span tuiTitle>
-              {{ friend.becameFriendsOn | date: 'dd.MM.yyyy' }}
-            </span>
+        <td>
+          {{ friend.becameFriendsOn | date: 'dd.MM.yyyy' }}
         </td>
-        <td tuiTd>
+        <td>
           <button
             tuiIconButton
             iconStart="@tui.trash"
@@ -42,7 +34,7 @@
             size="s"
             (click)="removeFriend(friend)"
           >
-            Remove Friend
+            Remove
           </button>
         </td>
       </tr>

@@ -1,15 +1,64 @@
-.centered-wrapper {
+.invites-container {
+  background: var(--tui-base-02);
+  border-radius: 1rem;
   max-width: 900px;
-  margin: 0 auto;
-  padding: 0 10px;
-  box-sizing: border-box;
-  overflow-x: auto;  /* allows horizontal scroll if table is too wide */
+  margin: auto;
+  padding: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  overflow-x: auto;
 }
 
-.friend-invites-table {
-  width: 100%;        /* table fills wrapper */
-  max-width: 100%;
+.invites-table {
+  width: 100%;
   border-collapse: collapse;
-  table-layout: auto;
-  min-width: 600px;   /* optional: prevents table from getting too small */
+  font-size: 1rem;
+  min-width: 600px;
+}
+
+.invites-table th,
+.invites-table td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid var(--tui-base-03);
+}
+
+.invites-table th {
+  color: var(--tui-text-03);
+  font-weight: 600;
+}
+
+.invites-table tbody tr:hover {
+  background-color: var(--tui-base-01);
+}
+
+.invite-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.header-with-icon {
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+/* Responsive tweaks */
+@media (max-width: 700px) {
+  .invites-container {
+    padding: 1rem 0.5rem;
+  }
+
+  .invites-table {
+    font-size: 0.9rem;
+    min-width: 100%; /* triggers scroll if needed */
+  }
+
+  .invite-actions {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
 }

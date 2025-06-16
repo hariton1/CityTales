@@ -492,6 +492,7 @@ export class MapViewComponent implements OnInit{
   onCircleClick(loc: any): void {
     this.selectDetailEvent.emit(loc);
     //this.selectMarker(this.getMarkerToLocation(loc), loc)
+    console.log('emitting event: ',loc);
     this.closeInfoWindow();
   }
 

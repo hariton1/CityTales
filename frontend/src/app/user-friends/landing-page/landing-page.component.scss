@@ -5,8 +5,8 @@
   gap: 20px;
   padding: 10px;
   box-sizing: border-box;
-  justify-content: center;  /* CENTER all children horizontally */
-  align-items: flex-start;  /* align top */
+  justify-content: center;
+  align-items: center;
 }
 
 @media (max-width: 768px) {

@@ -11,7 +11,7 @@
   </div>
 
     <div class="mobile-view-toggle">
-      <tui-segmented [size]="'m'" [style.border-radius.rem]="10">
+      <tui-segmented [size]="'m'" [style.border-radius.rem]="10" [activeItemIndex]="changeVal" (activeItemIndexChange)="onIndex($event)">
         <button
           (click)="currentViewMobile = 'map'"
         >
@@ -32,6 +32,9 @@
   <!-- Mobile: show only selected component -->
   <ng-container *ngIf="currentViewMobile === 'discover'">
     <app-sidebar
+      [selectedEvent]="selectedEvent"
+      [selectedPerson]="selectedPerson"
+      [selectedPlace]="selectedPlace"
       [searchOpen]="searchOpen"
       [historicalPlaces]="historicalPlaces"
       (searchOpenChange)="searchOpen = $event">
