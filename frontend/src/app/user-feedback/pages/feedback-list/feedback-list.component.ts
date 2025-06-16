@@ -1,13 +1,14 @@
 import {Component, inject} from '@angular/core';
 import {NgForOf} from "@angular/common";
-import {TuiAlertService, TuiAutoColorPipe, TuiButton, TuiInitialsPipe, TuiTitle} from "@taiga-ui/core";
+import {TuiAlertService, TuiAutoColorPipe, TuiButton, TuiIcon, TuiInitialsPipe, TuiTitle} from "@taiga-ui/core";
 import {TuiAvatar, TuiStatus} from "@taiga-ui/kit";
 import {TuiTableDirective, TuiTableTbody, TuiTableTd, TuiTableTh} from "@taiga-ui/addon-table";
 import {UserService} from '../../../user_db.services/user.service';
 import {FeedbackService} from '../../../user_db.services/feedback.service';
 import {LocationService} from '../../../services/location.service';
-import {TuiCell} from '@taiga-ui/layout';
+import {TuiCell, TuiHeader} from '@taiga-ui/layout';
 import {catchError, forkJoin, of} from 'rxjs';
+import {RouterLink} from '@angular/router';
 
 @Component({
   selector: 'app-feedback-list',
@@ -23,7 +24,10 @@ import {catchError, forkJoin, of} from 'rxjs';
     TuiTableTd,
     TuiTableTh,
     TuiTitle,
-    TuiCell
+    TuiCell,
+    RouterLink,
+    TuiHeader,
+    TuiIcon
   ],
   templateUrl: './feedback-list.component.html',
   styleUrl: './feedback-list.component.scss'

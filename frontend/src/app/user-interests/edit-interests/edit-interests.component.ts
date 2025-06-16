@@ -7,11 +7,9 @@ import {InterestDto} from '../../user_db.dto/interest.dto';
 import {TuiAlertService, TuiButton, TuiIcon, TuiTitle} from '@taiga-ui/core';
 import {UserInterestsService} from '../../user_db.services/user-interests.service';
 import {InterestsService} from '../../user_db.services/interests.service';
-import {TuiAppBarBack, TuiAppBarComponent, TuiHeader} from '@taiga-ui/layout';
-import {TuiPlatform} from '@taiga-ui/cdk';
-import {NgIf} from '@angular/common';
+import {TuiHeader} from '@taiga-ui/layout';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import {Router, RouterLink} from '@angular/router';
+import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {UUID} from 'node:crypto';
 
 @Component({
@@ -23,10 +21,6 @@ import {UUID} from 'node:crypto';
         TuiIcon,
         TuiHeader,
         TuiTitle,
-        TuiPlatform,
-        TuiAppBarComponent,
-        TuiAppBarBack,
-        NgIf,
         RouterLink,
     ],
   templateUrl: './edit-interests.component.html',
@@ -42,6 +36,7 @@ export class EditInterestsComponent implements OnInit{
   protected loading = true;
   protected error: any = null;
   private userId: UUID;
+  private sourcePage: string | null = null;
 
   isMobile = false;
 
@@ -51,11 +46,13 @@ export class EditInterestsComponent implements OnInit{
     private interestsService: InterestsService,
     private userInterestService: UserInterestsService,
     private breakpointObserver: BreakpointObserver,
-    private router: Router) {
+    private router: Router,
+    private route: ActivatedRoute) {
     this.userId = localStorage.getItem("user_uuid") as UUID;
   }
 
   ngOnInit(): void {
+    this.sourcePage = this.route.snapshot.queryParamMap.get('sourcePage');
     this.breakpointObserver
       .observe([Breakpoints.HandsetPortrait, Breakpoints.HandsetLandscape])
       .subscribe(result => {
@@ -193,7 +190,11 @@ export class EditInterestsComponent implements OnInit{
     console.log('Form submitted with values:', this.form.value);
     this.deleteInterest();
     this.createInterests();
-    this.router.navigate(['/profile']);
+    if(this.sourcePage === 'signup') {
+      this.router.navigate(['/onboarding']);
+    } else {
+      this.router.navigate(['/profile']);
+    }
   }
 
   protected form = new FormGroup({
