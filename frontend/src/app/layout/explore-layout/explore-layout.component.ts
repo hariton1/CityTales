@@ -31,7 +31,7 @@ export class ExploreLayoutComponent  {
 
   @ViewChild(MapViewComponent) mapViewComponent!: MapViewComponent;
 
-  currentViewMobile: 'discover' | 'map' = 'discover';
+  currentViewMobile: 'discover' | 'map' = 'map';
 
   selectedPlace: BuildingEntity | null = null;
   selectedPerson: PersonEntity | null = null;
