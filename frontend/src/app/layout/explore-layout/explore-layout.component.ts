@@ -51,6 +51,7 @@ export class ExploreLayoutComponent  {
   }
 
   searchOpen = false;
+  interestEnabled = false;
 
   toggleSearch(event: MouseEvent) {
     event.stopPropagation();
@@ -121,5 +122,18 @@ export class ExploreLayoutComponent  {
     console.log('got :', x)
     if(x == 1 || x == 0)this.changeVal = x;
     //this.cdr.markForCheck(); // tells Angular to re-render the UI
+  }
+
+  isInterestEnabled = true;
+
+  onToggleInterest(newValue: boolean): void {
+    this.isInterestEnabled = newValue;
+    // You can add more logic here
+  }
+
+  onInterestToggle(): void {
+    console.log('was:', this.interestEnabled)
+    this.interestEnabled = !this.interestEnabled;
+    localStorage.setItem('interest_filtering', this.interestEnabled.toString());
   }
 }

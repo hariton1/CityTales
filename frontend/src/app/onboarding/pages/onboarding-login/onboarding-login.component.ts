@@ -134,5 +134,4 @@ export class OnboardingLoginComponent implements OnInit{
   protected readonly form = new FormGroup({
     filters: new FormControl([]),
   });
-
 }
