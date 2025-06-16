@@ -50,41 +50,49 @@ export class SignUpComponent {
 
   async onSubmit(): Promise<void> {
     if (this.signupForm.invalid) {
-    this.signupForm.markAllAsTouched();
-    return;
-  }
-  const { email, passwordValue, firstName, lastName, birthday } = this.signupForm.value;
-  console.log('About to call Supabase:', email, passwordValue, firstName, lastName, birthday);
-
-  const { data, error } = await supabase.auth.signUp({
-    email: email!,
-    password: passwordValue!,
-    options: {
-      data: {
-        first_name: firstName,
-        last_name: lastName,
-        birthday: birthday?.toString() // or birthday?.toLocalNativeDate().toISOString() for better format
-      }
+      this.signupForm.markAllAsTouched();
+      return;
     }
-  });
+    const { email, passwordValue, firstName, lastName, birthday } = this.signupForm.value;
+    console.log('About to call Supabase:', email, passwordValue, firstName, lastName, birthday);
 
-  console.log('Supabase result:', { data, error });
+    const { data, error } = await supabase.auth.signUp({
+      email: email!,
+      password: passwordValue!,
+      options: {
+        data: {
+          first_name: firstName,
+          last_name: lastName,
+          birthday: birthday?.toString() // or birthday?.toLocalNativeDate().toISOString() for better format
+        }
+      }
+    });
 
-  if (error) {
-    alert(error.message);
-    return;
-  }
-  alert('Signup successful! Please check your email to confirm your account.');
-  this.userDataService.saveUserData(new UserDataDto(
-    -1,
-    data.user?.id as UUID,
-    'User',
-    'Active',
-    new Date()
-  )).subscribe(data => {
-    console.log(data);
-  })
-  this.router.navigate(['/login']);
+    console.log('Supabase result:', { data, error });
+
+    if (error) {
+      alert(error.message);
+      return;
+    }
+    alert('Signup successful! Please check your email to confirm your account.');
+    this.userDataService.saveUserData(new UserDataDto(
+      -1,
+      data.user?.id as UUID,
+      'User',
+      'Active',
+      new Date()
+    )).subscribe(data => {
+      console.log(data);
+    })
+    //this.router.navigate(['/login']);
+    localStorage.setItem('user_uuid', data.user?.id || "");
+    localStorage.setItem('user_role', 'User');
+    localStorage.setItem('interest_filtering', 'true')
+    this.router.navigate(['/edit-interests'], {
+      queryParams: {
+        sourcePage: "signup"
+      }
+    });
   }
 }
 
