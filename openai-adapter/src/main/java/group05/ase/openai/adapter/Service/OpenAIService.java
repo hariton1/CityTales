@@ -1,10 +1,7 @@
 package group05.ase.openai.adapter.Service;
 
 import group05.ase.openai.adapter.Controller.EnrichmentController;
-import group05.ase.openai.adapter.dto.EnrichmentResponse;
-import group05.ase.openai.adapter.dto.OpenAIResponseDTO;
-import group05.ase.openai.adapter.dto.QuizResponse;
-import group05.ase.openai.adapter.dto.SummaryResponse;
+import group05.ase.openai.adapter.dto.*;
 import lombok.RequiredArgsConstructor;
 
 import org.slf4j.Logger;
@@ -161,7 +158,7 @@ public class OpenAIService {
         return new EnrichmentResponse(enrichedContent, tone);
     }
 
-    public QuizResponse generateQuiz(String quizGenerationContentPrompt) {
+    public QuizQuestionResponse generateQuiz(String quizGenerationContentPrompt) {
         String systemPrompt = """
                 You are a quiz question generator. Based on the provided input information, generate exactly one concise multiple-choice question.
                 Each output must always be in german and returned as a single line string in the following format:
@@ -184,7 +181,35 @@ public class OpenAIService {
             quizContent[i] = generatedQuiz.length() - 1 >= i ? generatedContent[i] : "";
         }
 
-        return new QuizResponse(quizContent[0], quizContent[1], quizContent[2], quizContent[3], quizContent[4], quizContent[5]);
+        return new QuizQuestionResponse(quizContent[0], quizContent[1], quizContent[2], quizContent[3], quizContent[4], quizContent[5]);
+    }
+
+    public QuizAdditionalResponse generateAdditionalQuizData(String quizAdditionalQuizDataPrompt) {
+        String systemPrompt = """
+                Your are a fun and charismatic game show host that announces a new quiz.
+                You are given a series of questions and your job is to generate a name and
+                a description for this quiz.
+                Name and description should both somehow reference the content of the questions
+                while also being fun and engaging.
+                The name must be exactly between 1 and 3 words long.
+                The description must fit within 15 words.
+                Each output must always be in german and returned as a single line string in the following format:
+                "name;description"
+                Important requirements:
+                Separate each field strictly with a semicolon (;) — no extra spaces.
+                The first field is the quiz name.
+                The second field is the description of the quiz.
+                Do not include any other text, explanation, or formatting — return only the semicolon-separated string exactly as specified.
+                """;
+        String generatedQuiz = callOpenAI(systemPrompt, quizAdditionalQuizDataPrompt, "funny");
+
+        String[] generatedContent = generatedQuiz.split(";");
+        String[] quizAdditionalContent = new String[2];
+        for (int i = 0; i < quizAdditionalContent.length; i++) {
+            quizAdditionalContent[i] = generatedQuiz.length() - 1 >= i ? generatedContent[i] : "";
+        }
+
+        return new QuizAdditionalResponse(quizAdditionalContent[0], quizAdditionalContent[1]);
     }
 
     protected String enforceEnglish(String prompt) {

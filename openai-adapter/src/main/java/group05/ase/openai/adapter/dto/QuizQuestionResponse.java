@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class QuizResponse {
+public class QuizQuestionResponse {
 
     private String question;
     private String answer;
