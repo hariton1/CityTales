@@ -11,23 +11,24 @@ import {TuiAppBarBack, TuiAppBarComponent, TuiHeader} from '@taiga-ui/layout';
 import {TuiPlatform} from '@taiga-ui/cdk';
 import {NgIf} from '@angular/common';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import {Router} from '@angular/router';
+import {Router, RouterLink} from '@angular/router';
 import {UUID} from 'node:crypto';
 
 @Component({
   selector: 'app-edit-interests',
-  imports: [
-    ReactiveFormsModule,
-    TuiFilter,
-    TuiButton,
-    TuiIcon,
-    TuiHeader,
-    TuiTitle,
-    TuiPlatform,
-    TuiAppBarComponent,
-    TuiAppBarBack,
-    NgIf,
-  ],
+    imports: [
+        ReactiveFormsModule,
+        TuiFilter,
+        TuiButton,
+        TuiIcon,
+        TuiHeader,
+        TuiTitle,
+        TuiPlatform,
+        TuiAppBarComponent,
+        TuiAppBarBack,
+        NgIf,
+        RouterLink,
+    ],
   templateUrl: './edit-interests.component.html',
   styleUrl: './edit-interests.component.less'
 })

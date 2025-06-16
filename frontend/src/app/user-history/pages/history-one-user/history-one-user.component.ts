@@ -1,13 +1,14 @@
 import { Component } from '@angular/core';
 import {DatePipe, NgForOf} from "@angular/common";
-import {TuiTitle} from "@taiga-ui/core";
+import {TuiButton, TuiIcon, TuiTitle} from "@taiga-ui/core";
 import {TuiTableDirective, TuiTableTbody, TuiTableTd, TuiTableTh} from "@taiga-ui/addon-table";
-import {TuiCell} from '@taiga-ui/layout';
+import {TuiCell, TuiHeader} from '@taiga-ui/layout';
 import {LocationService} from '../../../services/location.service';
 import {UserHistoriesService} from '../../../user_db.services/user-histories.service';
 import {catchError, forkJoin, of} from 'rxjs';
 import {UUID} from 'node:crypto';
 import {HelperService} from '../../../user_db.services/helper.service';
+import {RouterLink} from '@angular/router';
 
 @Component({
   selector: 'app-history-one-user',
@@ -19,7 +20,11 @@ import {HelperService} from '../../../user_db.services/helper.service';
     TuiTableTh,
     TuiTitle,
     DatePipe,
-    TuiCell
+    TuiCell,
+    RouterLink,
+    TuiButton,
+    TuiIcon,
+    TuiHeader
   ],
   templateUrl: './history-one-user.component.html',
   styleUrl: './history-one-user.component.scss'

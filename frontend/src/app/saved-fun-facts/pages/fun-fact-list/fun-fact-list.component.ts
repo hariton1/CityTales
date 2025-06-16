@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import {DatePipe, NgForOf} from "@angular/common";
 import {TuiTableDirective, TuiTableTbody, TuiTableTd, TuiTableTh} from "@taiga-ui/addon-table";
-import {TuiButton, TuiTitle} from "@taiga-ui/core";
+import {TuiButton, TuiIcon, TuiTitle} from "@taiga-ui/core";
 import {TuiStatus} from '@taiga-ui/kit';
 import {SavedFunFactService} from '../../../user_db.services/saved-fun-fact.service';
 import {SavedFunFactDto} from '../../../user_db.dto/saved-fun-fact.dto';
@@ -9,7 +9,8 @@ import {LocationService} from '../../../services/location.service';
 import {HelperService} from '../../../user_db.services/helper.service';
 import {UUID} from 'node:crypto';
 import {catchError, forkJoin, of} from 'rxjs';
-import {TuiCell} from '@taiga-ui/layout';
+import {TuiCell, TuiHeader} from '@taiga-ui/layout';
+import {RouterLink} from "@angular/router";
 
 @Component({
   selector: 'app-fun-fact-list',
@@ -23,7 +24,10 @@ import {TuiCell} from '@taiga-ui/layout';
     TuiTitle,
     TuiButton,
     TuiStatus,
-    TuiCell
+    TuiCell,
+    RouterLink,
+    TuiHeader,
+    TuiIcon
   ],
   templateUrl: './fun-fact-list.component.html',
   styleUrl: './fun-fact-list.component.scss'
@@ -89,7 +93,11 @@ export class FunFactListComponent {
       savedFunFact.image_url,
       savedFunFact.score,
       savedFunFact.reason,
-    )).subscribe();
+    )).subscribe({
+      complete: () => {
+        window.location.reload();
+      }
+    });
   };
 
 }
