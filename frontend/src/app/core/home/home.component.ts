@@ -17,6 +17,6 @@ export class HomeComponent {
   }
 
   handleClick () {
-    this.router.navigate(['/register']);
+    this.router.navigate(['/first-steps']);
   }
 }

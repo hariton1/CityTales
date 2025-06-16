@@ -2,11 +2,11 @@ import {NgIf} from '@angular/common';
 import {Component, inject, OnInit} from '@angular/core';
 import {FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {TuiFilter} from '@taiga-ui/kit';
-import {InterestDto} from '../../user_db.dto/interest.dto';
-import {InterestsService} from '../../user_db.services/interests.service';
+import {InterestDto} from '../../../user_db.dto/interest.dto';
+import {InterestsService} from '../../../user_db.services/interests.service';
 import {forkJoin, Observable} from 'rxjs';
-import {UserInterestDto} from '../../user_db.dto/user-interest.dto';
-import {UserInterestsService} from '../../user_db.services/user-interests.service';
+import {UserInterestDto} from '../../../user_db.dto/user-interest.dto';
+import {UserInterestsService} from '../../../user_db.services/user-interests.service';
 import {TuiAppBarBack, TuiAppBarComponent, TuiHeader} from '@taiga-ui/layout';
 import {TuiAlertService, TuiButton, TuiIcon, TuiTitle} from '@taiga-ui/core';
 import {TuiPlatform} from '@taiga-ui/cdk';
@@ -28,11 +28,11 @@ import {BreakpointObserver, Breakpoints} from '@angular/cdk/layout';
     TuiIcon,
     NgIf
   ],
-  templateUrl: './onboarding.component.html',
-  styleUrl: './onboarding.component.less',
+  templateUrl: './onboarding-login.component.html',
+  styleUrl: './onboarding-login.component.less',
 })
 
-export class OnboardingComponent implements OnInit{
+export class OnboardingLoginComponent implements OnInit{
 
   protected allInterestsList: InterestDto[] = [];
   protected interestNames: string[] = [];
