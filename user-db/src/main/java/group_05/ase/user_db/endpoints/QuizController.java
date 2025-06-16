@@ -3,12 +3,17 @@ package group_05.ase.user_db.endpoints;
 import group_05.ase.user_db.restData.QuizDTO;
 import group_05.ase.user_db.restData.QuizResultDTO;
 import group_05.ase.user_db.services.QuizService;
+import org.apache.coyote.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpStatusCodeException;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @RestController
@@ -47,9 +52,12 @@ public class QuizController {
 
     @PostMapping("/quiz/create/{category}")
     @ResponseStatus(HttpStatus.OK)
-    public QuizDTO saveQuizForUsers(@PathVariable("category") String category, @RequestBody List<UUID> users) {
+    public ResponseEntity<QuizDTO> saveQuizForUsers(@PathVariable("category") String category, @RequestBody List<UUID> users) {
         try {
-            return service.saveQuiz(category, users);
+            QuizDTO response = service.saveQuiz(category, users);
+            return ResponseEntity.ok(response);
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.notFound().build();
         } catch (Exception e) {
             logger.error("Error creating quiz for {}: {}", users, e.getMessage());
             throw new RuntimeException("Error saving quiz", e);
