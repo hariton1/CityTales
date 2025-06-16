@@ -51,4 +51,10 @@ export class QuizService {
       console.log('QUIZZES RESULTS: ', data);
     });
   }
+
+  getQuizResultsByUserId(userId: UUID) {
+    this.httpClient.get<QuizResult[]>(this.PATH + `result/user=${userId}`).subscribe((data) => {
+      this.quizzesResultsSignal.set(data);
+    });
+  }
 }

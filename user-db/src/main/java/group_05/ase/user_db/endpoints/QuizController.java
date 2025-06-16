@@ -39,13 +39,13 @@ public class QuizController {
         }
     }
 
-    @GetMapping("/result/user")
+    @GetMapping("/result/user={userId}")
     @ResponseStatus(HttpStatus.OK)
-    public List<QuizResultDTO> getResultsForUser(@RequestBody UUID user) {
+    public List<QuizResultDTO> getResultsForUser(@PathVariable UUID userId) {
         try {
-            return service.getResultsForUser(user);
+            return service.getResultsForUser(userId);
         } catch (Exception e) {
-            logger.error("Error fetching quiz results for user {}: {}", user, e.getMessage());
+            logger.error("Error fetching quiz results for user {}: {}", userId, e.getMessage());
             throw new RuntimeException("Error fetching quiz results", e);
         }
     }
