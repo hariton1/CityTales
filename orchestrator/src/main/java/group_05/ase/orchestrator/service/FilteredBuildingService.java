@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 public class FilteredBuildingService {
 
     private final RestTemplate restTemplate = new RestTemplate();
-    private final String QDRANT_URL = "http://localhost:8081/";
+    private final String QDRANT_URL = "http://qdrant-adapter:8081/";
 
     public List<ViennaHistoryWikiBuildingObject> filterBuildingsByUserInterests(
             List<ViennaHistoryWikiBuildingObject> buildings,
