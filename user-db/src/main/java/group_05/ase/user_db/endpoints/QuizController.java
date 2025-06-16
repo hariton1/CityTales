@@ -63,4 +63,18 @@ public class QuizController {
             throw new RuntimeException("Error saving quiz", e);
         }
     }
+
+    @PostMapping("/result/save")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<QuizResultDTO> saveQuestionResults(@RequestBody QuizResultDTO dto) {
+        try {
+            QuizResultDTO response = service.saveQuestionResults(dto);
+            return ResponseEntity.ok(response);
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            logger.error("Error creating quiz result for {}: {}", dto, e.getMessage());
+            throw new RuntimeException("Error saving quiz result", e);
+        }
+    }
 }
