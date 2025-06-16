@@ -1,18 +1,19 @@
-<div class="centered-wrapper">
+<div class="invites-container">
   <h2 class="header-with-icon">📩 Invites</h2>
 
-  <table tuiTable [size]="'m'" class="friend-invites-table">
+  <table class="invites-table">
     <thead>
     <tr>
-      <th tuiTh>Actions</th>
-      <th tuiTh>Email</th>
-      <th tuiTh>Status</th>
+      <th>Actions</th>
+      <th>Email</th>
+      <th>Status</th>
     </tr>
     </thead>
-    <tbody tuiTbody>
+    <tbody>
+    <!-- Received Invites -->
     <tr *ngFor="let f of receivedInvites">
-      <td tuiTd>
-        <div style="display: flex; gap: 8px;">
+      <td>
+        <div class="invite-actions">
           <button
             tuiIconButton
             iconStart="@tui.check"
@@ -33,16 +34,13 @@
           </button>
         </div>
       </td>
-      <td tuiTd>
-        <div [tuiCell]="'m'">
-          <span tuiTitle>{{ f.user.email }}</span>
-        </div>
-      </td>
-      <td tuiTd>Received Invite</td>
+      <td>{{ f.user.email }}</td>
+      <td>Received Invite</td>
     </tr>
 
+    <!-- Sent Invites -->
     <tr *ngFor="let f of sentInvites">
-      <td tuiTd>
+      <td>
         <button
           tuiIconButton
           iconStart="@tui.trash"
@@ -53,12 +51,8 @@
           Take Back
         </button>
       </td>
-      <td tuiTd>
-        <div [tuiCell]="'m'">
-          <span tuiTitle>{{ f.user.email }}</span>
-        </div>
-      </td>
-      <td tuiTd>Sent Invite</td>
+      <td>{{ f.user.email }}</td>
+      <td>Sent Invite</td>
     </tr>
     </tbody>
   </table>

@@ -10,7 +10,6 @@ import {
   SimpleChanges
 } from '@angular/core';
 import {Router} from '@angular/router';
-import {UserHistoriesService} from '../../user_db.services/user-histories.service';
 import {AsyncPipe, NgForOf, NgIf, NgSwitch, NgSwitchCase} from '@angular/common';
 import {
   TuiAppearance,
@@ -125,7 +124,6 @@ export class HistoricEventDetailComponent implements OnInit, OnChanges {
       }
     });
   }
-
 
   @Input()
   get selectedEvent(): any {
