@@ -1,4 +1,15 @@
 <div class="centered-wrapper">
+  <header tuiHeader>
+    <h3 tuiTitle>
+      User management
+      <span tuiSubtitle>Change types and states of user accounts on CityTales</span>
+    </h3>
+    <button tuiButton appearance="outline" type="button" routerLink="/admin-dashboard" >
+      <tui-icon icon="@tui.arrow-left" [style.height.rem]="1"/>
+      Return to admin dashboard
+    </button>
+  </header>
+
   <table
     tuiTable
     [size]="'m'"

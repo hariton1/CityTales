@@ -1,26 +1,31 @@
 import { Component } from '@angular/core';
 import {DatePipe, NgForOf} from "@angular/common";
 import {TuiTableDirective, TuiTableTbody, TuiTableTd, TuiTableTh} from "@taiga-ui/addon-table";
-import {TuiTitle} from "@taiga-ui/core";
+import {TuiButton, TuiIcon, TuiTitle} from "@taiga-ui/core";
 import {UserHistoriesService} from '../../../user_db.services/user-histories.service';
 import {LocationService} from '../../../services/location.service';
 import {HelperService} from '../../../user_db.services/helper.service';
 import {catchError, forkJoin, of} from 'rxjs';
-import {TuiCell} from '@taiga-ui/layout';
+import {TuiCell, TuiHeader} from '@taiga-ui/layout';
 import { UserService } from '../../../user_db.services/user.service';
+import {RouterLink} from "@angular/router";
 
 @Component({
   selector: 'app-history-all-users',
-  imports: [
-    DatePipe,
-    NgForOf,
-    TuiTableDirective,
-    TuiTableTbody,
-    TuiTableTd,
-    TuiTableTh,
-    TuiTitle,
-    TuiCell
-  ],
+    imports: [
+        DatePipe,
+        NgForOf,
+        TuiTableDirective,
+        TuiTableTbody,
+        TuiTableTd,
+        TuiTableTh,
+        TuiTitle,
+        TuiCell,
+        RouterLink,
+        TuiButton,
+        TuiHeader,
+        TuiIcon
+    ],
   templateUrl: './history-all-users.component.html',
   styleUrl: './history-all-users.component.scss'
 })

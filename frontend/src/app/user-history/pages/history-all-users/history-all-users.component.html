@@ -1,4 +1,14 @@
 <div class="centered-wrapper">
+  <header tuiHeader>
+    <h3 tuiTitle>
+      User activity
+      <span tuiSubtitle>History of all opened details that the users did on CityTales</span>
+    </h3>
+    <button tuiButton appearance="outline" type="button" routerLink="/admin-dashboard" >
+      <tui-icon icon="@tui.arrow-left" [style.height.rem]="1"/>
+      Return to admin dashboard
+    </button>
+  </header>
   <table tuiTable [size]="'m'" [style.width.rem]="70" class="userHistories" >
     <thead>
     <tr>

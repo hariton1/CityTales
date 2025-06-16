@@ -126,7 +126,11 @@ export class UserProfileComponent {
   }
 
   handleEditInterestsClick () {
-    this.router.navigate(['/edit-interests']);
+    this.router.navigate(['/edit-interests'], {
+      queryParams: {
+        sourcePage: "profile"
+      }
+    });
   }
 
   handleChangePassClick () {

@@ -1,10 +1,10 @@
 import {Component, inject, OnInit} from '@angular/core';
 import {
-  TuiAlertService,
-  TuiAutoColorPipe,
-  TuiButton,
-  TuiInitialsPipe,
-  TuiTitle
+    TuiAlertService,
+    TuiAutoColorPipe,
+    TuiButton, TuiIcon,
+    TuiInitialsPipe,
+    TuiTitle
 } from '@taiga-ui/core';
 import {
   TUI_CONFIRM,
@@ -12,7 +12,7 @@ import {
   TuiConfirmData,
   TuiStatus
 } from '@taiga-ui/kit';
-import {TuiCell} from '@taiga-ui/layout';
+import {TuiCell, TuiHeader} from '@taiga-ui/layout';
 import {DatePipe, NgForOf} from '@angular/common';
 import {TuiTable} from '@taiga-ui/addon-table';
 import {RouterLink} from '@angular/router';
@@ -24,19 +24,21 @@ import {TuiThemeColorService} from '@taiga-ui/cdk';
 
 @Component({
   selector: 'app-user-list',
-  imports: [
-    TuiInitialsPipe,
-    TuiAutoColorPipe,
-    TuiAvatar,
-    TuiCell,
-    TuiStatus,
-    NgForOf,
-    TuiTable,
-    TuiButton,
-    TuiTitle,
-    RouterLink,
-    DatePipe
-  ],
+    imports: [
+        TuiInitialsPipe,
+        TuiAutoColorPipe,
+        TuiAvatar,
+        TuiCell,
+        TuiStatus,
+        NgForOf,
+        TuiTable,
+        TuiButton,
+        TuiTitle,
+        RouterLink,
+        DatePipe,
+        TuiHeader,
+        TuiIcon
+    ],
   templateUrl: './user-list.component.html',
   styleUrl: './user-list.component.scss'
 })
