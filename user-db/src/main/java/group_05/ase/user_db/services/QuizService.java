@@ -1,6 +1,5 @@
 package group_05.ase.user_db.services;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import group_05.ase.user_db.entities.QuestionEntity;
 import group_05.ase.user_db.entities.QuestionResultsEntity;
 import group_05.ase.user_db.entities.QuizEntity;
@@ -10,8 +9,6 @@ import group_05.ase.user_db.repositories.QuestionResultsRepository;
 import group_05.ase.user_db.repositories.QuizRepository;
 import group_05.ase.user_db.repositories.QuizUserRepository;
 import group_05.ase.user_db.restData.*;
-import lombok.Getter;
-import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.util.Pair;
@@ -96,7 +93,7 @@ public class QuizService {
 
         List<Pair<String, String>> contentData = fetchGenerationDataByCategoryForUser(creator, category);
 
-        List<QuizResponse> responses = new ArrayList<>();
+        List<QuizQuestionResponse> responses = new ArrayList<>();
         List<String> questionData = getColumn(contentData, true);
         for (String questionPrompt : questionData) {
             responses.add(generateQuizByLLM(questionPrompt));
@@ -105,9 +102,11 @@ public class QuizService {
         List<String> imageData = getColumn(contentData, false);
         enrichResponseWithImageData(responses, imageData);
 
+        QuizAdditionalResponse quizAdditionalResponse = generateQuizAdditionalByLLM(responses);
+
         QuizDTO result = new QuizDTO();
-        result.setName("persisted Quiz");
-        result.setDescription("generated");
+        result.setName(quizAdditionalResponse.getName());
+        result.setDescription(quizAdditionalResponse.getDescription());
         result.setCategory(category);
         result.setCreator(creator);
         result.setCreatedAt(LocalDateTime.now());
@@ -226,12 +225,27 @@ public class QuizService {
         return result;
     }
 
-    private QuizResponse generateQuizByLLM(String prompt) {
+    private QuizQuestionResponse generateQuizByLLM(String prompt) {
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
         headers.add("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36");
         HttpEntity<String> entity = new HttpEntity<>(prompt, headers);
-        ResponseEntity<QuizResponse> response = restTemplate.exchange(OPENAI_ADDRESS + "/api/quiz/generate", HttpMethod.POST, entity, QuizResponse.class);
+        ResponseEntity<QuizQuestionResponse> response = restTemplate.exchange(OPENAI_ADDRESS + "/api/quiz/generate", HttpMethod.POST, entity, QuizQuestionResponse.class);
+        return response.getBody();
+    }
+
+    private QuizAdditionalResponse generateQuizAdditionalByLLM(List<QuizQuestionResponse> responses) {
+        StringBuilder prompt = new StringBuilder();
+        for (QuizQuestionResponse questionResponse : responses) {
+            prompt.append(questionResponse.getQuestion());
+            prompt.append("\n");
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+        headers.add("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36");
+        HttpEntity<String> entity = new HttpEntity<>(prompt.toString(), headers);
+        ResponseEntity<QuizAdditionalResponse> response = restTemplate.exchange(OPENAI_ADDRESS + "/api/quiz/generate_additional", HttpMethod.POST, entity, QuizAdditionalResponse.class);
         return response.getBody();
     }
 
@@ -433,10 +447,10 @@ public class QuizService {
         }
     }
 
-    private List<QuestionDTO> mapQuestionResponsesToQuestionDTOList(List<QuizResponse> responses, int quiz) {
+    private List<QuestionDTO> mapQuestionResponsesToQuestionDTOList(List<QuizQuestionResponse> responses, int quiz) {
         List<QuestionDTO> result = new ArrayList<>();
 
-        for (QuizResponse response : responses) {
+        for (QuizQuestionResponse response : responses) {
             QuestionDTO dto = new QuestionDTO();
 
             dto.setQuiz(quiz);
@@ -468,7 +482,7 @@ public class QuizService {
         return list;
     }
 
-    private void enrichResponseWithImageData(List<QuizResponse> responses, List<String> images) {
+    private void enrichResponseWithImageData(List<QuizQuestionResponse> responses, List<String> images) {
         for (int i = 0; i < responses.size(); i++) {
             logger.info("IMAGE: {}", images.get(i));
             responses.get(i).setImage(images.get(i));

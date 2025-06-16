@@ -227,4 +227,8 @@ export class GameQuizComponent implements OnInit {
     }
     return null;
   }
+
+  inviteFriend(index: number) {
+    console.log('Invite Friend!')
+  }
 }
