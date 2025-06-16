@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {ChangeDetectorRef, Component, ElementRef, NgZone, OnInit, ViewChild} from '@angular/core';
 import {SidebarComponent} from '../sidebar/sidebar.component';
 import {MapViewComponent} from '../map-view/map-view.component';
 import {BuildingEntity} from '../../dto/db_entity/BuildingEntity';
@@ -31,7 +31,8 @@ export class ExploreLayoutComponent  {
 
   @ViewChild(MapViewComponent) mapViewComponent!: MapViewComponent;
 
-  currentViewMobile: 'discover' | 'map' = 'discover';
+  currentViewMobile: 'discover' | 'map' = 'map';
+  changeVal: 0 | 1 = 0;
 
   selectedPlace: BuildingEntity | null = null;
   selectedPerson: PersonEntity | null = null;
@@ -41,7 +42,8 @@ export class ExploreLayoutComponent  {
   setDetailedView: boolean = false;
 
   constructor(
-    readonly breakpointService: BreakpointService
+    readonly breakpointService: BreakpointService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   get isMobile(): boolean {
@@ -68,6 +70,13 @@ export class ExploreLayoutComponent  {
   }
 
   selectDetailEvent(event: any) {
+
+    if(this.isMobile) {
+        this.currentViewMobile = 'discover';
+        this.changeVal = 1;
+        this.onIndex(this.changeVal);
+    }
+
     if(event.buildingType == 'Gebäude') {
       this.selectedPlace = event;
       this.selectedPerson = null;
@@ -106,5 +115,11 @@ export class ExploreLayoutComponent  {
   onCloseDetailView() {
     console.log("Invoked close detail method in explore layout!")
     this.mapViewComponent.unselectMarker();
+  }
+
+  onIndex(x: number) {
+    console.log('got :', x)
+    if(x == 1 || x == 0)this.changeVal = x;
+    //this.cdr.markForCheck(); // tells Angular to re-render the UI
   }
 }

@@ -17,29 +17,15 @@ DevOps coordinator - Simon Ripphausen, 12444081, e12444081@student.tuwien.ac.at`
 
 ---
 
-### Basic Project Setup
+### About
 
-All Maven/Spring projects can be initialized using the [Spring Initializr](https://start.spring.io/).
+Just run the global docker-compose and enjoy.
+This web-app lets you create tours, consume information and interact with friends in and around vienna.
 
-- **Spring Boot**: 3.4.4 (latest stable release)
-- **Java**: 17
-- **Group**: `group-05.ase`
+### Disclaimer about the Data
 
-To integrate the new module, add a reference to it in the top-level `pom.xml`. This allows you to run `mvn ...` from the top-level directory.
-
-Each sub-project has its own `Dockerfile`, which is then referenced in the `docker-compose.yml`.
-
-### What should your local .env file include?
-NEO4J_PASSWORD=***
-
-### URLs for different components
-- Frontend: localhost:4200
-- DataScraper: localhost:8080
-- Neo4J Web-UI: localhost:7474
-- UserDB: localhost:7575
-
-
-
+The Data which the application builds on was retrieved from: https://www.geschichtewiki.wien.gv.at/Wien_Geschichte_Wiki 
+and processed on our end.
 
 ### Basic Project Setup
 
@@ -53,14 +39,17 @@ To integrate the new module, add a reference to it in the top-level `pom.xml`. T
 
 Each sub-project has its own `Dockerfile`, which is then referenced in the `docker-compose.yml`.
 
-### What should your local .env file include?
-NEO4J_PASSWORD=***
+### What you need to adapt:
+- NEO4J_PASSWORD=*** (in your env file and the application.props where it is used)
+- OPEN_AI_API_KEY=*** where it is used
+
 
 ### URLs for different components
 - Frontend: localhost:4200
 - DataScraper: localhost:8080
 - Neo4J Web-UI: localhost:7474
 - UserDB: localhost:8090
+- Qdrant: localhost:6333 (http interface)
 
 
 
