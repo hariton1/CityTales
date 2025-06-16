@@ -12,6 +12,8 @@ import group_05.ase.user_db.repositories.QuizUserRepository;
 import group_05.ase.user_db.restData.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.util.Pair;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -32,6 +34,8 @@ public class QuizService {
     private final RestTemplate restTemplate = new RestTemplate();
     private final String OPENAI_ADDRESS = "http://openai-adapter:8088/";
     private final String ORCHESTRATOR_ADDRESS = "http://orchestrator:9098/";
+
+    private static final Logger logger = LoggerFactory.getLogger(QuizService.class);
 
     private enum Category {
         LATEST_TOUR,
@@ -317,22 +321,156 @@ public class QuizService {
     }
 
     private Map<String, Pair<String, String>> extractStringsFromTour(TourDTO tour) {
-        String stops = tour.getStops();
-        String[] res = stops.split("\"viennaHistoryWikiId\":");
+        String[] res = getStrings(tour);
         Map<String, Pair<String, String>> map = new HashMap<>();
 
-        for (int i = 1; i< res.length; i++) {
-            String viennaHistoryWikiId = res[i].substring(0, res[i].indexOf(","));
-            String imageTillEnd = res[i].substring(res[i].indexOf("\"imageUrls\":["), res[i].length()-1);
-            String images = imageTillEnd.substring("\"imageUrls\":[".length()+1, imageTillEnd.indexOf("\"]"));
-            String[] imageArr = images.split("\",\"");
-            String image = Objects.equals(imageArr[1], "https://www.geschichtewiki.wien.gv.at/images/7/7d/RDF.png") ? "" : imageArr[1];
-            String contentTillEnd = res[i].substring(res[i].indexOf("contentGerman\":"), res[i].length()-1);
-            String contentGerman = contentTillEnd.substring("contentGerman\":".length()+1, contentTillEnd.indexOf("\","));
-            map.put(viennaHistoryWikiId, Pair.of(contentGerman, image));
+        for (int i = 1; i < res.length; i++) {
+            try {
+                String currentStop = res[i];
+                if (currentStop == null || currentStop.trim().isEmpty()) {
+                    continue;
+                }
+
+                String viennaHistoryWikiId = extractViennaHistoryWikiId(currentStop);
+                if (viennaHistoryWikiId == null || viennaHistoryWikiId.trim().isEmpty()) {
+                    continue;
+                }
+
+                String image = extractImageUrl(currentStop);
+
+                String contentGerman = extractContentGerman(currentStop);
+                if (contentGerman == null || contentGerman.trim().isEmpty()) {
+                    continue;
+                }
+
+                map.put(viennaHistoryWikiId, Pair.of(contentGerman, image != null ? image : ""));
+
+            } catch (Exception e) {
+                logger.error("Error processing stop {}: {}", i, e.getMessage());
+            }
+        }
+
+        if (map.isEmpty()) {
+            throw new NoSuchElementException("No valid stops found on tour for quiz!");
         }
 
         return map;
+    }
+
+    private static String[] getStrings(TourDTO tour) {
+        if (tour == null) {
+            throw new RuntimeException("No tour available for quiz!");
+        }
+
+        String stops = tour.getStops();
+        if (stops == null || stops.trim().isEmpty()) {
+            throw new RuntimeException("No stops data available for quiz!");
+        }
+
+        if (!stops.contains("\"viennaHistoryWikiId\":")) {
+            throw new RuntimeException("No Vienna history stops available for quiz!");
+        }
+
+        return stops.split("\"viennaHistoryWikiId\":");
+    }
+
+    private String extractViennaHistoryWikiId(String stopData) {
+        if (stopData == null || !stopData.contains(",")) {
+            return null;
+        }
+
+        try {
+            int commaIndex = stopData.indexOf(",");
+            if (commaIndex <= 0) {
+                return null;
+            }
+            return stopData.substring(0, commaIndex).trim().replaceAll("^\"|\"$", "");
+        } catch (StringIndexOutOfBoundsException e) {
+            return null;
+        }
+    }
+
+    private String extractImageUrl(String stopData) {
+        if (stopData == null) {
+            return "";
+        }
+
+        try {
+            String imageMarker = "\"imageUrls\":[";
+            int imageStart = stopData.indexOf(imageMarker);
+            if (imageStart == -1) {
+                return "";
+            }
+
+            int imageDataStart = imageStart + imageMarker.length();
+            if (imageDataStart >= stopData.length()) {
+                return "";
+            }
+
+            String imageTillEnd = stopData.substring(imageDataStart);
+            int imageEnd = imageTillEnd.indexOf("\"]");
+            if (imageEnd == -1) {
+                return "";
+            }
+
+            String images = imageTillEnd.substring(0, imageEnd);
+            if (images.trim().isEmpty()) {
+                return "";
+            }
+
+            if (images.startsWith("\"")) {
+                images = images.substring(1);
+            }
+
+            String[] imageArr = images.split("\",\"");
+            if (imageArr.length < 2) {
+                return imageArr.length == 1 ? imageArr[0] : "";
+            }
+
+            String secondImage = imageArr[1];
+            return "https://www.geschichtewiki.wien.gv.at/images/7/7d/RDF.png".equals(secondImage) ? "" : secondImage;
+
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    private String extractContentGerman(String stopData) {
+        if (stopData == null) {
+            return null;
+        }
+
+        try {
+            String contentMarker = "contentGerman\":";
+            int contentStart = stopData.indexOf(contentMarker);
+            if (contentStart == -1) {
+                return null;
+            }
+
+            int contentDataStart = contentStart + contentMarker.length();
+            if (contentDataStart >= stopData.length()) {
+                return null;
+            }
+
+            String contentTillEnd = stopData.substring(contentDataStart);
+
+            if (contentTillEnd.startsWith("\"")) {
+                contentTillEnd = contentTillEnd.substring(1);
+            }
+
+            int contentEnd = contentTillEnd.indexOf("\",");
+            if (contentEnd == -1) {
+                contentEnd = contentTillEnd.indexOf("\"");
+                if (contentEnd == -1) {
+                    return contentTillEnd.trim();
+                }
+            }
+
+            return contentTillEnd.substring(0, contentEnd).trim();
+
+        } catch (StringIndexOutOfBoundsException e) {
+            return null;
+        }
     }
 
     private List<QuestionDTO> mapQuestionResponsesToQuestionDTOList(List<QuizResponse> responses, int quiz) {
@@ -372,7 +510,7 @@ public class QuizService {
 
     private void enrichResponseWithImageData(List<QuizResponse> responses, List<String> images) {
         for (int i = 0; i < responses.size(); i++) {
-            System.out.println("IMAGE: " + images.get(i));
+            logger.info("IMAGE: {}", images.get(i));
             responses.get(i).setImage(images.get(i));
         }
     }
