@@ -14,7 +14,7 @@ import {TuiFieldErrorPipe, TuiPassword, TuiTooltip} from "@taiga-ui/kit";
 import {TuiForm, TuiHeader} from "@taiga-ui/layout";
 import {TuiInputCopyModule, TuiInputDateModule} from "@taiga-ui/legacy";
 import {TuiDay} from '@taiga-ui/cdk';
-import { Router } from '@angular/router';
+import {Router, RouterLink} from '@angular/router';
 import {supabase} from '../../supabase.service';
 import {UserDataDto} from '../../../user_db.dto/user-data.dto';
 import {UUID} from 'node:crypto';
@@ -36,7 +36,8 @@ import {UUID} from 'node:crypto';
         TuiPassword,
         TuiTextfieldComponent,
         TuiTextfieldDirective,
-        TuiTitle
+        TuiTitle,
+        RouterLink
     ],
   templateUrl: './reset-password.component.html',
   styleUrl: './reset-password.component.scss'
