@@ -7,33 +7,25 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 
+@Setter
+@Getter
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class QuestionResultsDTO {
 
-    @Getter
-    @Setter
     @JsonProperty(required = true, value = "id")
     private int id;
 
-    @Getter
-    @Setter
     @JsonProperty(required = true, value = "question")
     private int question;
 
-    @Getter
-    @Setter
     @JsonProperty(required = true, value = "player")
     private UUID player;
 
-    @Getter
-    @Setter
     @JsonProperty(required = true, value = "correct")
     private Boolean correct;
 
-    @Getter
-    @Setter
     @JsonProperty(required = true, value = "created_at")
     private LocalDateTime createdAt;
 

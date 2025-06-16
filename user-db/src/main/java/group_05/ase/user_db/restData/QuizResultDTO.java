@@ -5,23 +5,19 @@ import lombok.*;
 
 import java.util.List;
 
+@Setter
+@Getter
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class QuizResultDTO {
 
-    @Getter
-    @Setter
     @JsonProperty(required = true, value = "quiz")
     private int quiz;
 
-    @Getter
-    @Setter
-    @JsonProperty(required = true, value = "question_results")
+    @JsonProperty(required = true, value = "questionResults")
     private List<QuestionResultsDTO> questionResults;
 
-    @Getter
-    @Setter
-    @JsonProperty(required = true, value = "friend_results")
+    @JsonProperty(required = true, value = "friendResults")
     private List<QuizFriendResultDTO> friendResults;
 }
