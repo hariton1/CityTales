@@ -4,7 +4,7 @@ import {ExploreLayoutComponent} from './layout/explore-layout/explore-layout.com
 import {LoginComponent} from './user-management/pages/login/login.component';
 import {SignUpComponent} from './user-management/pages/sign-up/sign-up.component';
 import {EditUserComponent} from './user-management/pages/edit-user/edit-user.component';
-import {OnboardingComponent} from './user-interests/onboarding/onboarding.component';
+import {OnboardingLoginComponent} from './onboarding/pages/onboarding-login/onboarding-login.component';
 import {EditInterestsComponent} from './user-interests/edit-interests/edit-interests.component';
 import {FeedbackComponent} from './user-feedback/pages/feedback/feedback.component';
 import {TourLayoutComponent} from './layout/tours/tour-layout-component/tour-layout-component';
@@ -21,6 +21,7 @@ import {AdminDashboardComponent} from './layout/admin-dashboard/admin-dashboard.
 import {HistoryAllUsersComponent} from './user-history/pages/history-all-users/history-all-users.component';
 import {AboutComponent} from './core/about/about.component';
 import {FunFactListComponent} from './saved-fun-facts/pages/fun-fact-list/fun-fact-list.component';
+import {OnboardingSignUpComponent} from './onboarding/pages/onboarding-sign-up/onboarding-sign-up.component';
 
 export const routes: Routes = [
   {
@@ -43,7 +44,8 @@ export const routes: Routes = [
   { path: 'tours/:id', component: TourDetailComponent},
   { path: 'login', component: LoginComponent },
   { path: 'register', component: SignUpComponent },
-  { path: 'onboarding', component: OnboardingComponent },
+  { path: 'onboarding', component: OnboardingLoginComponent },
+  { path: 'first-steps', component: OnboardingSignUpComponent },
   { path: 'feedback', component: FeedbackComponent },
   { path: 'feedback-list', component: FeedbackListComponent },
   { path: 'edit-interests', component: EditInterestsComponent },
