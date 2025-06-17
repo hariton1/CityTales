@@ -3,7 +3,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {TourDto} from '../../../dto/tour.dto';
 import {TourService} from '../../../services/tour.service';
 import {FormControl, ReactiveFormsModule} from '@angular/forms';
-import {TuiAlertService, TuiButton, TuiTextfield, TuiTitle} from '@taiga-ui/core';
+import {TuiAlertService, TuiButton, TuiLoader, TuiTextfield, TuiTitle} from '@taiga-ui/core';
 import {CommonModule} from '@angular/common';
 import {BuildingEntity} from '../../../dto/db_entity/BuildingEntity';
 import {TuiCard} from '@taiga-ui/layout';
@@ -20,7 +20,8 @@ import {PriceEntity} from '../../../dto/tour_entity/PriceEntity';
     CommonModule,
     TuiTitle,
     TuiButton,
-    TuiCard
+    TuiCard,
+    TuiLoader
   ],
   templateUrl: './tour-detail.component.html',
   styleUrl: './tour-detail.component.scss'
@@ -42,6 +43,8 @@ export class TourDetailComponent {
   nameControl = new FormControl('');
   descriptionControl = new FormControl('');
 
+  isLoading = true;
+
   constructor(
     private route: ActivatedRoute,
     tourService: TourService,
@@ -53,16 +56,22 @@ export class TourDetailComponent {
     this.router = router;
 
   this.tourService.getTourForTourId(this.tourId).subscribe(async tour => {
-    this.tour = TourDto.fromTourEntity(tour);
-    this.pricePerStop = this.tour.getPricePerStop();
-    this.nameControl.setValue(this.tour.getName());
-    this.descriptionControl.setValue(this.tour.getDescription());
-    await this.recalculateStopDistances();
-    console.log(this.tour)
+    try{
+      this.tour = TourDto.fromTourEntity(tour);
+      this.pricePerStop = this.tour.getPricePerStop();
+      this.nameControl.setValue(this.tour.getName());
+      this.descriptionControl.setValue(this.tour.getDescription());
+      await this.recalculateStopDistances();
+      console.log(this.tour)
 
-    this.tour.getStops().forEach(stop => {
-      stop.imageUrls = stop.imageUrls.filter(url => !this.filter_urls.includes(url));
-    })
+      this.tour.getStops().forEach(stop => {
+        stop.imageUrls = stop.imageUrls.filter(url => !this.filter_urls.includes(url));
+      })
+    } catch (error) {
+      console.log(error);
+    } finally {
+      this.isLoading = false;
+    }
   })};
 
   saveChanges() {
