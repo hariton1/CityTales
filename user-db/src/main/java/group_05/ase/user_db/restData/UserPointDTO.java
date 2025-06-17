@@ -41,4 +41,15 @@ public class UserPointDTO {
     @JsonProperty(value = "article_id")
     private int articleId;
 
+    @Override
+    public String toString() {
+        return "UserPointDTO{" +
+                "userPointId=" + userPointId +
+                ", userId=" + userId.toString() +
+                ", points=" + points +
+                ", earnedAt=" + earnedAt +
+                ", articleId=" + articleId +
+                '}';
+    }
+
 }

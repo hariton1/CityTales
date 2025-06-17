@@ -41,4 +41,15 @@ public class UserDataDTO {
     @JsonDeserialize(using = CustomTimestampDeserializer.class)
     private LocalDateTime creDat;
 
+    @Override
+    public String toString() {
+        return "UserDataDTO{" +
+                "userDataId=" + userDataId +
+                ", userId=" + userId.toString() +
+                ", roleName='" + roleName + '\'' +
+                ", status='" + status + '\'' +
+                ", creDat=" + creDat +
+                '}';
+    }
+
 }
