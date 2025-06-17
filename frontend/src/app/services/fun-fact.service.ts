@@ -1,7 +1,7 @@
 // src/app/services/fun-fact.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import {Observable, of} from 'rxjs';
+import {catchError, Observable, of} from 'rxjs';
 import { BACKEND_ADDRESS } from '../globals'; // Pfad ggf. anpassen
 
 export interface FunFactCardDTO {
@@ -31,7 +31,16 @@ export class FunFactService {
         reason: `Darum`
       });
     } else {
-      return this.http.get<FunFactCardDTO>(`${this.apiUrl}/building/${buildingId}`);
+      return this.http.get<FunFactCardDTO>(`${this.apiUrl}/building/${buildingId}`)
+        .pipe(
+          catchError(err => {
+            return of({
+              sentence: 'Kein Fun Fact verfügbar.',
+              score: 0,
+              reason: 'Keine ausreichenden Informationen gefunden.'
+            });
+          })
+        );
     }
 
   }
@@ -43,7 +52,16 @@ export class FunFactService {
         reason: `Darum`
       });
     } else {
-      return this.http.get<FunFactCardDTO>(`${this.apiUrl}/person/${personId}`);
+      return this.http.get<FunFactCardDTO>(`${this.apiUrl}/person/${personId}`)
+        .pipe(
+          catchError(err => {
+            return of({
+              sentence: 'Kein Fun Fact verfügbar.',
+              score: 0,
+              reason: 'Keine ausreichenden Informationen gefunden.'
+            });
+          })
+        );
     }
 
   }
@@ -55,7 +73,16 @@ export class FunFactService {
         reason: `Darum`
       });
     } else {
-      return this.http.get<FunFactCardDTO>(`${this.apiUrl}/event/${eventId}`);
+      return this.http.get<FunFactCardDTO>(`${this.apiUrl}/event/${eventId}`)
+        .pipe(
+          catchError(err => {
+            return of({
+              sentence: 'Kein Fun Fact verfügbar.',
+              score: 0,
+              reason: 'Keine ausreichenden Informationen gefunden.'
+            });
+          })
+        );
     }
 
   }

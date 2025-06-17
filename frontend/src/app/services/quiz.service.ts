@@ -7,6 +7,7 @@ import {TuiAlertService} from '@taiga-ui/core';
 import {QuizResult} from '../dto/quiz.result.dto';
 import {QuizUserDto} from '../dto/quiz-user.dto';
 import {UserService} from './user.service';
+import {tuiRound} from '@taiga-ui/cdk';
 
 @Injectable({providedIn: 'root'})
 export class QuizService {
@@ -16,9 +17,11 @@ export class QuizService {
   private quizzesSignal = signal<Quiz[]>([]);
   private quizzesResultsSignal = signal<QuizResult[]>([]);
   private quizCreatorNamesSignal = signal<string[]>([]);
+  private friendScoresSignal = signal<string[]>([]);
   quizzes = computed(() => this.quizzesSignal());
   quizzesResults = computed(() => this.quizzesResultsSignal());
   quizCreatorNames = computed(() => this.quizCreatorNamesSignal());
+  friendScores = computed(() => this.friendScoresSignal());
   private readonly alerts = inject(TuiAlertService);
   inviteSuccessfullySent = false;
 
@@ -60,21 +63,38 @@ export class QuizService {
         currentResults.splice(currentResults.indexOf(entryToUpdate), 1);
       }
       this.quizzesResultsSignal.set([... currentResults, data]);
-      console.log('QUIZZES RESULTS: ', data);
     });
   }
 
   getQuizResultsByUserId(userId: UUID) {
     this.httpClient.get<QuizResult[]>(this.PATH + `result/user=${userId}`).subscribe((data) => {
       this.quizzesResultsSignal.set(data);
+      this.fillFriendScoresData(data);
     });
   }
 
   inviteFriendsToQuiz(friends: QuizUserDto[]) {
-    console.log(friends);
     this.httpClient.post(this.PATH + `quiz/invite`, friends).subscribe({
       next: (response) => {this.inviteSuccessfullySent = true;},
       error: (err) => {console.log(err)}
+    });
+  }
+
+  fillFriendScoresData(quizzes: QuizResult[]) {
+    quizzes.forEach((quiz) => {
+      const currentFriendScores = this.friendScores();
+      let friendsScore = '';
+      quiz.friendResults.forEach((friend) => {
+        this.userService.getUserWithRoleById(friend.friend).subscribe((user) => {
+          let name = user.email.substring(0, user.email.indexOf('@'));
+
+          let percentage = friend.correctness_percentage * 100;
+          let score = tuiRound(percentage,0);
+          let friendString = name + ': ' + score + '%\n';
+          friendsScore += friendString;
+          this.friendScoresSignal.set([... currentFriendScores, friendsScore]);
+        });
+      })
     });
   }
 }
