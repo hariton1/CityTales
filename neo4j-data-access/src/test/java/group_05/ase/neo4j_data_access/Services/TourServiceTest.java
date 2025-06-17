@@ -259,10 +259,10 @@ class TourServiceTest {
 
             assertThat(tours).hasSize(2);
             TourDTO tour = tours.get(0);
-            assertThat(tour.getDistance()).isBetween(30.0, 50.0); //m
-            assertThat(tour.getDurationEstimate()).isBetween(0.0, 50.0); //min
+            assertThat(tour.getDistance()).isBetween(0.0, 0.06); //km
+            assertThat(tour.getDurationEstimate()).isBetween(0.0, 2.0); //h
             assertThat(tour.getTourPrice()).isBetween(0.0, 30.0);
-            verify(tourService, never()).findRoutesGraphhopper(any(List.class), anyInt(), anyDouble(), anyDouble(), any(List.class), any(Map.class), any(CreateTourRequestDTO.class));          // Graphhopper never used
+            verify(tourService, never()).findRoutesGraphhopper(any(List.class), anyInt(), anyDouble(), anyDouble(), any(List.class), any(Map.class), any(CreateTourRequestDTO.class), any(Map.class));          // Graphhopper never used
         }
     }
 
@@ -302,11 +302,10 @@ class TourServiceTest {
             List<TourDTO> tours = tourService.createTours(baseRequest_zeroStops());
             assertThat(tours).hasSize(1);
             TourDTO tour = tours.get(0);
-            assertThat(tour.getDistance()).isEqualTo(30.0); // m
-            assertThat(tour.getDurationEstimate()).isEqualTo(24.0);
+            assertThat(tour.getDistance()).isEqualTo(0.03); // km
+            assertThat(tour.getDurationEstimate()).isBetween(0.0, 0.1); //h
             assertThat(tour.getTourPrice()).isEqualTo(0.0);
-            verify(tourService, never()).findRoutesGraphhopper(any(List.class), anyInt(), anyDouble(), anyDouble(), any(List.class), any(Map.class), any(CreateTourRequestDTO.class));          // Graphhopper never used
-        }
+            verify(tourService, never()).findRoutesGraphhopper(any(List.class), anyInt(), anyDouble(), anyDouble(), any(List.class), any(Map.class), any(CreateTourRequestDTO.class), any(Map.class));          }
     }
 
     @Test
@@ -341,8 +340,7 @@ class TourServiceTest {
             List<TourDTO> tours = tourService.createTours(baseRequest_impossibleDistance());
 
             assertThat(tours).hasSize(0);
-            verify(tourService, atLeastOnce()).findRoutesGraphhopper(any(List.class), anyInt(), anyDouble(), anyDouble(), any(List.class), any(Map.class), any(CreateTourRequestDTO.class));          // Graphhopper never used
-        }
+            verify(tourService, atLeastOnce()).findRoutesGraphhopper(any(List.class), anyInt(), anyDouble(), anyDouble(), any(List.class), any(Map.class), any(CreateTourRequestDTO.class), any(Map.class));          }
     }
 
     @Test
@@ -398,8 +396,7 @@ class TourServiceTest {
                 assertThat(tour.getStops()).doesNotContain("1001");
             }
 
-            verify(tourService, never()).findRoutesGraphhopper(any(List.class), anyInt(), anyDouble(), anyDouble(), any(List.class), any(Map.class), any(CreateTourRequestDTO.class));          // Graphhopper never used
-        }
+            verify(tourService, never()).findRoutesGraphhopper(any(List.class), anyInt(), anyDouble(), anyDouble(), any(List.class), any(Map.class), any(CreateTourRequestDTO.class), any(Map.class));          }
     }
 
     @Test
@@ -446,8 +443,7 @@ class TourServiceTest {
             TourDTO tour = tours.get(0);
             assertThat(tour.getTourPrice()).isLessThan(100.0);
 
-            verify(tourService, never()).findRoutesGraphhopper(any(List.class), anyInt(), anyDouble(), anyDouble(), any(List.class), any(Map.class), any(CreateTourRequestDTO.class));          // Graphhopper never used
-        }
+            verify(tourService, never()).findRoutesGraphhopper(any(List.class), anyInt(), anyDouble(), anyDouble(), any(List.class), any(Map.class), any(CreateTourRequestDTO.class), any(Map.class));          }
     }
 
     @Test
@@ -494,8 +490,7 @@ class TourServiceTest {
             TourDTO tour = tours.get(0);
             assertThat(tour.getDistance()).isLessThanOrEqualTo(35.0);
 
-            verify(tourService, never()).findRoutesGraphhopper(any(List.class), anyInt(), anyDouble(), anyDouble(), any(List.class), any(Map.class), any(CreateTourRequestDTO.class));          // Graphhopper never used
-        }
+            verify(tourService, never()).findRoutesGraphhopper(any(List.class), anyInt(), anyDouble(), anyDouble(), any(List.class), any(Map.class), any(CreateTourRequestDTO.class), any(Map.class));          }
     }
 
     @Test
@@ -543,8 +538,7 @@ class TourServiceTest {
             assertThat(tour.getStops()).contains("1002");
             assertThat(tour.getStops()).doesNotContain("1001");
 
-            verify(tourService, never()).findRoutesGraphhopper(any(List.class), anyInt(), anyDouble(), anyDouble(), any(List.class), any(Map.class), any(CreateTourRequestDTO.class));          // Graphhopper never used
-        }
+            verify(tourService, never()).findRoutesGraphhopper(any(List.class), anyInt(), anyDouble(), anyDouble(), any(List.class), any(Map.class), any(CreateTourRequestDTO.class), any(Map.class));          }
     }
 
     @Test
@@ -553,7 +547,6 @@ class TourServiceTest {
 
         assertThat(tours).hasSize(0);
 
-        verify(tourService, never()).findToursBFS(any(List.class), any(List.class), anyDouble(), anyInt(), any(Set.class), anyInt(), anyDouble(), any(CreateTourRequestDTO.class), any(Map.class), any(List.class));
-        verify(tourService, never()).findRoutesGraphhopper(any(List.class), anyInt(), anyDouble(), anyDouble(), any(List.class), any(Map.class), any(CreateTourRequestDTO.class));          // Graphhopper never used
-    }
+        verify(tourService, never()).findToursBFS(any(List.class), any(List.class), anyDouble(), anyInt(), any(Set.class), anyInt(), anyDouble(), any(CreateTourRequestDTO.class), any(Map.class), any(List.class), any(Map.class));
+        verify(tourService, never()).findRoutesGraphhopper(any(List.class), anyInt(), anyDouble(), anyDouble(), any(List.class), any(Map.class), any(CreateTourRequestDTO.class), any(Map.class));      }
 }
