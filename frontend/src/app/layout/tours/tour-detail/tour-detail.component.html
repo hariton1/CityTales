@@ -1,4 +1,8 @@
-<div class="tour-detail-container tui-space_vertical-5">
+<div *ngIf="isLoading" class="sidebar-loader">
+  <tui-loader [overlay]="false" [showLoader]="true" [inheritColor]="true"></tui-loader>
+</div>
+
+<div *ngIf="!isLoading" class="tour-detail-container tui-space_vertical-5">
 
   <!-- Tour Edit Header -->
   <div class="tour-header tui-space_vertical-3">

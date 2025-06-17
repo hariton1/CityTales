@@ -36,8 +36,6 @@ public class InterestRepositoryTest {
         assertThat(tmp.getInterestNameDe()).isEqualTo(interestEntity.getInterestNameDe());
         assertThat(tmp.getDescription()).isEqualTo(interestEntity.getDescription());*/
 
-        System.out.println("Test testFindByInterestId passed!");
-
     }
 
     @Test
@@ -50,8 +48,6 @@ public class InterestRepositoryTest {
         assertThat(tmp.getInterestNameEn()).isEqualTo(interestEntity.getInterestNameEn());
         assertThat(tmp.getInterestNameDe()).isEqualTo(interestEntity.getInterestNameDe());
         assertThat(tmp.getDescription()).isEqualTo(interestEntity.getDescription());*/
-
-        System.out.println("Test testFindByInterestNameEn passed!");
 
     }
 
@@ -66,8 +62,6 @@ public class InterestRepositoryTest {
         assertThat(tmp.getInterestNameDe()).isEqualTo(interestEntity.getInterestNameDe());
         assertThat(tmp.getDescription()).isEqualTo(interestEntity.getDescription());*/
 
-        System.out.println("Test testFindByInterestNameDe passed!");
-
     }
 
     @Test
@@ -80,8 +74,6 @@ public class InterestRepositoryTest {
         assertThat(tmp.getFirst().getInterestNameEn()).isEqualTo(interestEntity.getInterestNameEn());
         assertThat(tmp.getFirst().getInterestNameDe()).isEqualTo(interestEntity.getInterestNameDe());
         assertThat(tmp.getFirst().getDescription()).isEqualTo(interestEntity.getDescription());*/
-
-        System.out.println("Test testFindByDescriptionContaining passed!");
 
     }
 

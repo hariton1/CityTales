@@ -3,3 +3,6 @@
 neo4j_db
 qdrant_data
 *.iml
+/logs/orchestrator.log
+/logs/qdrantAdapter.log
+logs/

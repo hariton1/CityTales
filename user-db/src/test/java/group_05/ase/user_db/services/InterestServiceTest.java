@@ -46,8 +46,6 @@ public class InterestServiceTest {
         assertThat(interestDTOs.getFirst().getInterestNameDe()).isEqualTo(interestEntity.getInterestNameDe());
         assertThat(interestDTOs.getFirst().getDescription()).isEqualTo(interestEntity.getDescription());
 
-        System.out.println("Test testGetAllInterests passed!");
-
     }
 
     @Test
@@ -61,8 +59,6 @@ public class InterestServiceTest {
         assertThat(interestDTO.getInterestNameEn()).isEqualTo(interestEntity.getInterestNameEn());
         assertThat(interestDTO.getInterestNameDe()).isEqualTo(interestEntity.getInterestNameDe());
         assertThat(interestDTO.getDescription()).isEqualTo(interestEntity.getDescription());
-
-        System.out.println("Test testGetInterestById passed!");
 
     }
 
@@ -78,8 +74,6 @@ public class InterestServiceTest {
         assertThat(interestDTO.getInterestNameDe()).isEqualTo(interestEntity.getInterestNameDe());
         assertThat(interestDTO.getDescription()).isEqualTo(interestEntity.getDescription());
 
-        System.out.println("Test testGetInterestByNameEn passed!");
-
     }
 
     @Test
@@ -94,8 +88,6 @@ public class InterestServiceTest {
         assertThat(interestDTO.getInterestNameDe()).isEqualTo(interestEntity.getInterestNameDe());
         assertThat(interestDTO.getDescription()).isEqualTo(interestEntity.getDescription());
 
-        System.out.println("Test testGetInterestByNameDe passed!");
-
     }
 
     @Test
@@ -109,15 +101,6 @@ public class InterestServiceTest {
         assertThat(interestDTOs.getFirst().getInterestNameEn()).isEqualTo(interestEntity.getInterestNameEn());
         assertThat(interestDTOs.getFirst().getInterestNameDe()).isEqualTo(interestEntity.getInterestNameDe());
         assertThat(interestDTOs.getFirst().getDescription()).isEqualTo(interestEntity.getDescription());
-
-        System.out.println("Test testGetInterestsByDescriptionLike passed!");
-
-    }
-
-    @Test
-    public void testSaveNewInterest() {
-
-        System.out.println("Test testSaveNewInterest not provided.");
 
     }
 

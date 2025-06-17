@@ -39,8 +39,6 @@ public class UserHistoryRepositoryTest {
         assertThat(tmp.getArticleId()).isEqualTo(userHistoryEntity.getArticleId());
         assertThat(tmp.getInterestId()).isEqualTo(userHistoryEntity.getInterestId());*/
 
-        System.out.println("Test testFindByUserHistoryId passed!");
-
     }
 
     @Test
@@ -54,8 +52,6 @@ public class UserHistoryRepositoryTest {
         assertThat(tmp.getFirst().getArticleId()).isEqualTo(userHistoryEntity.getArticleId());
         assertThat(tmp.getFirst().getInterestId()).isEqualTo(userHistoryEntity.getInterestId());*/
 
-        System.out.println("Test testFindAllByUserId passed!");
-
     }
 
     @Test
@@ -68,8 +64,6 @@ public class UserHistoryRepositoryTest {
         assertThat(tmp.getFirst().getUserId()).isEqualTo(userHistoryEntity.getUserId());
         assertThat(tmp.getFirst().getArticleId()).isEqualTo(userHistoryEntity.getArticleId());
         assertThat(tmp.getFirst().getInterestId()).isEqualTo(userHistoryEntity.getInterestId());*/
-
-        System.out.println("Test testFindAllByArticleId passed!");
 
     }
 

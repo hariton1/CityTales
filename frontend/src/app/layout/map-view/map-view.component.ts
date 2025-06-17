@@ -7,7 +7,7 @@ import {
   EventEmitter,
   NgZone,
   ElementRef,
-  HostListener, Input
+  HostListener, Input, ChangeDetectorRef
 } from '@angular/core';
 import {GoogleMap, GoogleMapsModule, MapInfoWindow} from '@angular/google-maps';
 import {CommonModule} from '@angular/common';
@@ -44,7 +44,8 @@ export class MapViewComponent implements OnInit{
               private userInterestService: UserInterestsService,
               private interestsService: InterestsService,
               private zone: NgZone,
-              private qdrantService: QdrantService
+              private qdrantService: QdrantService,
+              private cdr: ChangeDetectorRef,
               ) {
   }
 
@@ -56,7 +57,7 @@ export class MapViewComponent implements OnInit{
     this.interestFiltering = value ? 'true' : 'false';
 
     this.markers.forEach( m => m.setMap(null));
-    this.clusterer.setMap(null);
+    if (this.clusterer) this.clusterer.setMap(null);
     this.initLoading();
   }
 
@@ -267,6 +268,7 @@ export class MapViewComponent implements OnInit{
       this.nativeInfoWindow = new google.maps.InfoWindow();
     }
 
+    this.unselectMarker();
     // Reset the previous active marker (if any)
     if (this.activeMarker && this.activeMarker !== marker) {
       this.activeMarker.setIcon(this.getIconForBuildingType(location.buildingType)); // or a default icon
@@ -312,7 +314,23 @@ export class MapViewComponent implements OnInit{
       this.unselectMarker()
       return
     }
-    this.center = {lat: marker.getPosition()?.lat()!, lng: marker.getPosition()?.lng()!}
+
+    if (!marker) {
+      console.log("Could not select marker since the desired object has no coordinates.");
+      this.unselectMarker();
+      return;
+    }
+
+    this.closeInfoWindow();
+
+    this.center = {
+      lat: marker.getPosition()?.lat()!,
+      lng: marker.getPosition()?.lng()!
+    }
+
+    this.map.googleMap?.setZoom(17);
+    this.map.googleMap?.panTo(marker.getPosition()!);
+
     //Reset old marker
     if (this.selectedMarker && this.selectedMarker !== marker) {
       this.selectedMarker.setIcon({
@@ -324,9 +342,15 @@ export class MapViewComponent implements OnInit{
     }
 
     //Set new marker and flags
-    marker.setOptions(this.selectedMarkerOptions);
     this.selectedMarker = marker;
     this.selectedBuildingType = location.buildingType;
+
+    marker.setIcon({
+      url: 'assets/icons/town-hall-active2.svg',  // <-- your active icon
+      scaledSize: new google.maps.Size(40, 40),   // larger or different
+      anchor: new google.maps.Point(17, 34),
+      labelOrigin: new google.maps.Point(20, 48),
+    });
   }
 
   unselectMarker() {

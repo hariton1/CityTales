@@ -36,8 +36,6 @@ public class UserInterestRepositoryTest {
         assertThat(tmp.getFirst().getInterestId()).isEqualTo(userInterestEntity.getInterestId());
         assertThat(tmp.getFirst().getInterestWeight()).isEqualTo(userInterestEntity.getInterestWeight());*/
 
-        System.out.println("Test testFindByUserId passed!");
-
     }
 
     @Test
@@ -50,8 +48,6 @@ public class UserInterestRepositoryTest {
         assertThat(tmp.getFirst().getInterestId()).isEqualTo(userInterestEntity.getInterestId());
         assertThat(tmp.getFirst().getInterestWeight()).isEqualTo(userInterestEntity.getInterestWeight());*/
 
-        System.out.println("Test testFindByInterestId passed!");
-
     }
 
     @Test
@@ -63,8 +59,6 @@ public class UserInterestRepositoryTest {
         assertThat(tmp.getUserId()).isEqualTo(userInterestEntity.getUserId());
         assertThat(tmp.getInterestId()).isEqualTo(userInterestEntity.getInterestId());
         assertThat(tmp.getInterestWeight()).isEqualTo(userInterestEntity.getInterestWeight());*/
-
-        System.out.println("Test testFindByUserIdAndInterestId passed!");
 
     }
 

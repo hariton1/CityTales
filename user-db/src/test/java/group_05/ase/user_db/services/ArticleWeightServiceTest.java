@@ -50,8 +50,6 @@ public class ArticleWeightServiceTest {
         assertThat(articleWeightDTOs.getFirst().getArticleId()).isEqualTo(articleWeightEntity.getArticleId());
         assertThat(articleWeightDTOs.getFirst().getWeight()).isEqualTo(articleWeightEntity.getWeight());
 
-        System.out.println("Test testGetAllArticleWeights passed!");
-
     }
 
     @Test
@@ -65,8 +63,6 @@ public class ArticleWeightServiceTest {
         assertThat(articleWeightDTO.getArticleId()).isEqualTo(articleWeightEntity.getArticleId());
         assertThat(articleWeightDTO.getWeight()).isEqualTo(articleWeightEntity.getWeight());
 
-        System.out.println("Test testGetArticleWeightByArticleId passed!");
-
     }
 
     @Test
@@ -79,8 +75,6 @@ public class ArticleWeightServiceTest {
         assertThat(articleWeightDTO.getArticleWeightId()).isEqualTo(articleWeightDTO.getArticleWeightId());
         assertThat(articleWeightDTO.getArticleId()).isEqualTo(articleWeightDTO.getArticleId());
         assertThat(articleWeightDTO.getWeight()).isEqualTo(articleWeightDTO.getWeight());
-
-        System.out.println("Test testSaveNewArticleWeight passed.");
 
     }
 

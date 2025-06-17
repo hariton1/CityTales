@@ -5,7 +5,6 @@ import {
   HostListener,
   Input,
   OnChanges,
-  OnInit,
   Output,
   ViewChild
 } from '@angular/core';
@@ -16,7 +15,7 @@ import {TuiSearchResults} from '@taiga-ui/experimental';
 import {ReactiveFormsModule, FormControl} from '@angular/forms';
 import {BuildingEntity} from '../../dto/db_entity/BuildingEntity';
 import {EnrichmentService} from '../../services/enrichment.service';
-import {TuiAppearance, TuiTitle, TuiTextfield, TuiIcon, TuiScrollbar} from '@taiga-ui/core';
+import {TuiTitle, TuiTextfield, TuiScrollbar, TuiLoader} from '@taiga-ui/core';
 import {TuiCell, TuiInputSearch} from '@taiga-ui/layout';
 import {debounceTime, filter, Observable, switchMap} from 'rxjs';
 import {SearchService} from '../../services/search.service';
@@ -34,7 +33,6 @@ import {BreakpointService} from '../../services/breakpoints.service';
     NgIf,
     HistoricPlaceDetailComponent,
     HistoricPlacePreviewComponent,
-    TuiAppearance,
     TuiTitle,
     ReactiveFormsModule,
     TuiCell,
@@ -45,8 +43,8 @@ import {BreakpointService} from '../../services/breakpoints.service';
     NotificationInboxComponent,
     HistoricEventDetailComponent,
     HistoricPersonDetailComponent,
-    TuiIcon,
-    TuiScrollbar
+    TuiScrollbar,
+    TuiLoader
   ],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.less'
@@ -62,6 +60,7 @@ export class SidebarComponent implements OnChanges{
 
 
   @Input() historicalPlaces: BuildingEntity[] = [];
+  public isLoading = true;
 
   summary: string = '';
   enrichedContent: string = '';
@@ -70,7 +69,7 @@ export class SidebarComponent implements OnChanges{
 
   constructor(readonly EnrichmentService: EnrichmentService, readonly searchService: SearchService,
               private userService: UserService,
-              readonly breakpointService: BreakpointService,) {
+              readonly breakpointService: BreakpointService) {
   }
 
   get isMobile(): boolean {
@@ -98,10 +97,15 @@ export class SidebarComponent implements OnChanges{
     if (shouldScroll) {
       this.scrollToTop();
     }
+
+    if (this.historicalPlaces && this.historicalPlaces.length > 0) {
+      this.isLoading = false;
+    }
   }
 
   setPlaceDetail(place: BuildingEntity) {
     this.selectedItem = { type: 'place', data: place };
+    this.onSelectEvent.emit(place);
     this.scrollToTop();
   }
 
@@ -117,6 +121,7 @@ export class SidebarComponent implements OnChanges{
 
   closeDetailView() {
     this.selectedItem = null;
+    this.onCloseDetailView.emit();
   }
 
   @ViewChild('scrollbarRef') scrollbarRef!: ElementRef<HTMLElement>;

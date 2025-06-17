@@ -38,8 +38,6 @@ public class UserPointRepositoryTest {
         assertThat(tmp.getPoints()).isEqualTo(userPointEntity.getPoints());
         assertThat(tmp.getArticleId()).isEqualTo(userPointEntity.getArticleId());*/
 
-        System.out.println("Test testFindByUserPointId passed!");
-
     }
 
     @Test
@@ -52,8 +50,6 @@ public class UserPointRepositoryTest {
         assertThat(tmp.getFirst().getUserId()).isEqualTo(userPointEntity.getUserId());
         assertThat(tmp.getFirst().getPoints()).isEqualTo(userPointEntity.getPoints());
         assertThat(tmp.getFirst().getArticleId()).isEqualTo(userPointEntity.getArticleId());*/
-
-        System.out.println("Test testFindByUserId passed!");
 
     }
 

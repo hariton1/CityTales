@@ -6,7 +6,6 @@ import group_05.ase.neo4j_data_access.Entity.ViennaHistoryWikiEventObject;
 import group_05.ase.neo4j_data_access.Entity.ViennaHistoryWikiPersonObject;
 import group_05.ase.neo4j_data_access.Service.Interface.IHistoricPersonService;
 import group_05.ase.neo4j_data_access.Service.Interface.IMappingService;
-import group_05.ase.neo4j_data_access.Service.Interface.IWikipediaExtractorService;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import org.neo4j.driver.*;
@@ -40,14 +39,12 @@ public class HistoricPersonService implements IHistoricPersonService {
                 NEO4J_URL,
                 AuthTokens.basic(NEO4J_USER, NEO4J_PASSWORD)
         );
-        System.out.println("Neo4j driver initialized.");
     }
 
     @PreDestroy
     public void close() {
         if (driver != null) {
             driver.close();
-            System.out.println("Neo4j driver closed.");
         }
     }
 
