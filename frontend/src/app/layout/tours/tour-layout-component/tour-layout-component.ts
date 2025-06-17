@@ -1,7 +1,7 @@
 import {ChangeDetectionStrategy, Component, inject, ViewChild, ChangeDetectorRef} from '@angular/core';
 import {Router} from '@angular/router';
 import {FormControl, ReactiveFormsModule} from '@angular/forms';
-import {TuiAlertService, TuiButton, TuiTextfield} from '@taiga-ui/core';
+import {TuiAlertService, TuiButton, TuiLoader, TuiTextfield} from '@taiga-ui/core';
 import {TuiInputModule} from '@taiga-ui/legacy';
 import {CommonModule} from '@angular/common';
 import {LocationService} from '../../../services/location.service';
@@ -127,20 +127,30 @@ export class TourLayoutComponent {
     const { data } = await supabase.auth.getSession();
     const userId = data.session?.user?.id;
     console.log('async user id ' + userId);
-    if (userId) {
-      this.userId = userId;
+
+    try {
       for(var id of this.recommendedToursIds){
         this.tourService.getTourForTourId(id).subscribe(tour => {
           this.recommendedTours.push(TourDto.fromTourEntity(tour));
           console.log("Fetched recommended tour: " + tour);
         })
       }
+    } catch (error) {
+      console.log(error);
+    }
 
-      this.tourService.getToursForUserId(userId!).subscribe(tours => {
-        this.userTours = [...tours.map(tour => TourDto.fromTourEntity(tour))];
-        console.log("User tours length: " + this.userTours.length);
-        this.cdr.detectChanges();
-      }) // Proceed to load tours for a valid user
+    if (userId) {
+      this.userId = userId;
+      try{
+        this.tourService.getToursForUserId(userId!).subscribe(tours => {
+          this.userTours = [...tours.map(tour => TourDto.fromTourEntity(tour))];
+          console.log("User tours length: " + this.userTours.length);
+          this.cdr.detectChanges();
+        }) // Proceed to load tours for a valid user
+      } catch (error) {
+        console.log(error);
+      }
+
     } else {
       console.error("User ID is null or undefined");
       // Handle the error accordingly (e.g., show an alert, redirect to login)
@@ -154,11 +164,10 @@ export class TourLayoutComponent {
   }
 
 
-  userTours: TourDto[] | null = null;
-
+  userTours: TourDto[] = [];
 
   recommendedToursIds: number[] = [153, 154, 155]
-  recommendedTours: TourDto[] = []
+  recommendedTours: TourDto[] = [];
 
   tourName = new FormControl('');
   tourDescription = new FormControl('');
@@ -465,10 +474,10 @@ export class TourLayoutComponent {
 
   generateAdvancedTour() {
 
-    //if(!this.startMarker || !this.endMarker){
-    //  this.alerts.open('Please select a start and end point!', {label: 'Failure!', appearance: 'warning', autoClose: 3000}).subscribe();
-    //  return;
-    //}
+    if(!this.startMarker || !this.endMarker){
+      this.alerts.open('Please select a start and end point!', {label: 'Failure!', appearance: 'warning', autoClose: 3000}).subscribe();
+      return;
+    }
     console.log("Nearby stops length: " + this.buildingData.length)
     console.log("Generating tour for user " + this.userId)
     var user = this.userId!;
@@ -514,6 +523,7 @@ export class TourLayoutComponent {
       });
 
       tourdtos.forEach(tour => {console.log(tour.getId(), tour.getDistance())})
+      console.log(tourdtos.length)
 
       var selectedTour: TourDto = tourdtos[0];
 
@@ -521,9 +531,6 @@ export class TourLayoutComponent {
       const stored = localStorage.getItem("user_uuid") as UUID;
       var pointDTO = new UserPointDto(-1, stored, 4, new Date(),Date.now() / 1000)
       this.userPointsService.createNewPoints(pointDTO).subscribe(data => {console.log("Tour points created")});
-
-      console.log("A" + selectedTour.getTourPrice())
-      console.log("B" + selectedTour.getPricePerStop())
 
       this.tourService.createTourInDB(selectedTour).subscribe({
         next: tour => {console.log("Tour created successfully!");

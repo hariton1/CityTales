@@ -1,3 +1,4 @@
+
 <div class="header-container" [class.hidden]="isMobile">
   <div class="search-bar-container" [class.hidden]="isMobile">
     <div #searchFieldRef class="search-wrapper">
@@ -32,6 +33,10 @@
   <div class="notification-button-container" *ngIf="!isMobile">
     <app-notification-inbox (selectPlaceEvent)="setPlaceDetail($event)"></app-notification-inbox>
   </div>
+</div>
+
+<div *ngIf="isLoading" class="sidebar-loader">
+  <tui-loader [overlay]="false" [showLoader]="true" [inheritColor]="true"></tui-loader>
 </div>
 
 <tui-scrollbar class="scrollable-content" #scrollbarRef>
@@ -76,5 +81,4 @@
     (selectPlaceEvent)="setPlaceDetail($event)">
   </app-historic-place-preview>
 </div>
-
 
