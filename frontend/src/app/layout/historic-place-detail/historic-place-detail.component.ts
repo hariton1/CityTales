@@ -284,7 +284,7 @@ export class HistoricPlaceDetailComponent implements OnInit, OnChanges{
     console.log(this.selectedPlace)
     let userId = localStorage.getItem("user_uuid");
     if(userId !== null) {
-      this._selectedPlace.userHistoryEntry.setCloseDt(new Date());
+      this._selectedPlace.userHistoryEntry.closeD = new Date();
 
       this.userHistoriesService.updateUserHistory(this._selectedPlace.userHistoryEntry).subscribe({
         next: (results) => {

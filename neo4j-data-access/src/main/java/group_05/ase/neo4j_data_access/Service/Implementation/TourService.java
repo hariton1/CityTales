@@ -554,6 +554,21 @@ public class TourService implements ITourService {
         return accessOpenRoutingService(points, "foot-walking");
     }
 
+    public Map<String, List<List<Float>>> getDurationDistanceMatrix(double start_lat, double start_lng, double end_lat, double end_lng, List<ViennaHistoryWikiBuildingObject> stops) {
+        List<GeographicPoint2d> points = new ArrayList<>();
+        if(start_lat != 0.0 && start_lng != 0.0) {
+            points.add(new GeographicPoint2d(start_lat, start_lng) );
+        }
+        stops.forEach(stop -> points.add(new GeographicPoint2d(stop.getLatitude().get(), stop.getLongitude().get())));
+        if(end_lat != 0.0 && end_lng != 0.0) {
+            points.add(new GeographicPoint2d(end_lat, end_lng) );
+        }
+
+        List<List<Float>> distanceMatrix = getMetricMatrix(points, "distance");
+        List<List<Float>> durationMatrix = getMetricMatrix(points, "duration");
+        return Map.of("distance", distanceMatrix, "duration", durationMatrix);
+    }
+
     private Map<String, Double> getLengthDurationOfTour(TourObject tour){
         List<GeographicPoint2d> stops = new ArrayList<>();
         stops.add(new GeographicPoint2d(tour.getStartLat(), tour.getStartLng()) );
