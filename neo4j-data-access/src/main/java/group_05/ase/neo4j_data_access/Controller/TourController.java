@@ -28,7 +28,6 @@ public class TourController {
     @PostMapping(value = "/durationDistanceEstimate", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity<Map<String, Double>> getDurationDistanceEstimate(@RequestBody DurationDistanceEstimateDTO request) {
-        logger.info("Fetching duration and distance estimate for request: {}", request.toString());
         Map<String, Double> result = tourService.getDurationDistanceEstimate(
                 request.getStart_lat(),
                 request.getStart_lng(),
@@ -43,6 +42,25 @@ public class TourController {
         }
         return ResponseEntity.ok(result);
     }
+
+    @PostMapping(value = "/durationDistanceMatrix", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<Map<String, List<List<Float>>>> getDurationDistanceMatrix(@RequestBody DurationDistanceEstimateDTO request) {
+        Map<String, List<List<Float>>> result = tourService.getDurationDistanceMatrix(
+                request.getStart_lat(),
+                request.getStart_lng(),
+                request.getEnd_lat(),
+                request.getEnd_lng(),
+                request.getStops()
+        );
+
+        if (result == null) {
+            logger.info("Fetching duration and distance estimate for request {} return nothing", request.toString());
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(result);
+    }
+
 
     @PostMapping("/createBasedOnInterests")
     public ResponseEntity<List<TourDTO>> createTourBasedOnInterests(@RequestBody CreateTourRequestDTO request) {
