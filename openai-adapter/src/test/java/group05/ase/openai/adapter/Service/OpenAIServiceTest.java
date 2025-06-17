@@ -19,6 +19,18 @@ class OpenAIServiceTest {
     }
 
     @Test
+    void generateSummary_shouldReturnFallback_whenContentIsNull() {
+        SummaryResponse result = service.generateSummary(null);
+        assertEquals("<p><em>No content provided for summary.</em></p>", result.getSummary());
+    }
+
+    @Test
+    void generateSummary_shouldReturnFallback_whenContentIsBlank() {
+        SummaryResponse result = service.generateSummary("   ");
+        assertEquals("<p><em>No content provided for summary.</em></p>", result.getSummary());
+    }
+
+    @Test
     void generateSummary_shouldReturnExpectedSummary() {
         // Arrange
         OpenAIService spyService = Mockito.spy(new OpenAIService());
@@ -34,6 +46,33 @@ class OpenAIServiceTest {
 
         Mockito.verify(spyService, Mockito.times(1))
                 .callOpenAI(Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
+    }
+
+    @Test
+    void generateEnrichedContent_shouldReturnFallback_whenContentIsNull() {
+        EnrichmentResponse result = service.generateEnrichedContent("tour", null);
+        assertEquals("<p><em>No content available for enrichment.</em></p>", result.getEnrichedContent());
+        assertEquals("tour", result.getTone());
+    }
+
+    @Test
+    void generateEnrichedContent_shouldReturnFallback_whenContentIsBlank() {
+        EnrichmentResponse result = service.generateEnrichedContent("tour", "   ");
+        assertEquals("<p><em>No content available for enrichment.</em></p>", result.getEnrichedContent());
+        assertEquals("tour", result.getTone());
+    }
+
+    @Test
+    void generateEnrichedContent_shouldFallbackToAcademic_whenToneUnknown() {
+        OpenAIService spyService = Mockito.spy(new OpenAIService());
+        Mockito.doReturn("fallback academic content")
+                .when(spyService)
+                .callOpenAI(Mockito.anyString(), Mockito.anyString(), Mockito.eq("unknown"));
+
+        EnrichmentResponse result = spyService.generateEnrichedContent("unknown", "some content");
+
+        assertEquals("unknown", result.getTone());
+        assertEquals("fallback academic content", result.getEnrichedContent());
     }
 
     @Test
