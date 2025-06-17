@@ -31,6 +31,22 @@ export class TourService {
     return this.httpClient.post<any>(BACKEND_ADDRESS + 'api/tour/durationDistanceEstimate', body);
   }
 
+  public getDurationDistanceMatrix(start_lat: number,
+                                     start_lng: number,
+                                     end_lat: number,
+                                     end_lng: number,
+                                     stops: BuildingEntity[]) {
+    const body = {
+      start_lat,
+      start_lng,
+      end_lat,
+      end_lng,
+      stops
+    };
+
+    return this.httpClient.post<any>(BACKEND_ADDRESS + 'api/tour/durationDistanceMatrix', body);
+  }
+
   public createTourInDB(tour: TourDto)
   {
     return this.httpClient.post(SERVER_ADDRESS + 'tours/createTour', TourDto.ofTourDTo(tour));

@@ -44,6 +44,8 @@ export class TourDetailComponent {
   descriptionControl = new FormControl('');
 
   isLoading = true;
+  distanceMatrix: number[][] = [];
+  durationMatrix: number[][] = [];
 
   constructor(
     private route: ActivatedRoute,
@@ -61,8 +63,14 @@ export class TourDetailComponent {
       this.pricePerStop = this.tour.getPricePerStop();
       this.nameControl.setValue(this.tour.getName());
       this.descriptionControl.setValue(this.tour.getDescription());
-      await this.recalculateStopDistances();
-      console.log(this.tour)
+      this.tourService.getDurationDistanceMatrix(this.tour.getStart_lat(), this.tour.getStart_lng(), this.tour.getEnd_lat(), this.tour.getEnd_lng(), this.tour.getStops()).subscribe(
+        response => {
+          console.log("Response: " + response);
+          this.distanceMatrix = response["distance"];
+          this.durationMatrix = response["duration"];
+          this.recalculateStopDistances();
+        }
+      )
 
       this.tour.getStops().forEach(stop => {
         stop.imageUrls = stop.imageUrls.filter(url => !this.filter_urls.includes(url));
@@ -150,17 +158,17 @@ export class TourDetailComponent {
 
     // Start to first stop
     if (stops.length > 0) {
-      const distance = await this.getDistanceBetweenStops(-1, 0);
-      const duration = await this.getDurationBetweenStops(-1, 0);
+      const distance = this.distanceMatrix[0][1]
+      const duration = this.durationMatrix[0][1]
 
       this.distanceBetweenStops.push(distance);
       this.durationBetweenStops.push(duration);
     }
 
     // Between intermediate stops
-    for (let i = 0; i < stops.length - 1; i++) {
-      const distance = await this.getDistanceBetweenStops(i, i + 1);
-      const duration = await this.getDurationBetweenStops(i, i + 1);
+    for (let i = 1; i < stops.length - 2; i++) {
+      const distance = this.distanceMatrix[i][i+1]
+      const duration = this.durationMatrix[i][i+1]
 
       this.distanceBetweenStops.push(distance);
       this.durationBetweenStops.push(duration);
@@ -168,76 +176,18 @@ export class TourDetailComponent {
 
     // Last stop to end
     if (stops.length > 0) {
-      const distance = await this.getDistanceBetweenStops(stops.length - 1, stops.length);
-      const duration = await this.getDurationBetweenStops(stops.length - 1, stops.length);
+      const distance = this.distanceMatrix[stops.length-2][stops.length-1]
+      const duration = this.durationMatrix[stops.length-2][stops.length-1]
 
       this.distanceBetweenStops.push(distance);
       this.durationBetweenStops.push(duration);
     }
 
+    this.distanceBetweenStops = this.distanceBetweenStops.map(i => i/1000)
+    this.durationBetweenStops = this.durationBetweenStops.map(i => i/3600)
+
     console.log('Distances:', this.distanceBetweenStops);
     console.log('Durations:', this.durationBetweenStops);
-  }
-
-  async getDistanceBetweenStops(index1: number, index2: number): Promise<number> {
-    console.log("Invoked distance computation between stops");
-
-    let lat1: number, lng1: number, lat2: number, lng2: number;
-
-    // Start to first stop
-    if (index1 === -1) {
-      lat1 = this.tour.getStart_lat();
-      lng1 = this.tour.getStart_lng();
-      lat2 = this.tour.getStops()[index2].latitude;
-      lng2 = this.tour.getStops()[index2].longitude;
-    }
-    // Last stop to end
-    else if (index2 === this.tour.getStops().length) {
-      lat1 = this.tour.getStops()[index1].latitude;
-      lng1 = this.tour.getStops()[index1].longitude;
-      lat2 = this.tour.getEnd_lat();
-      lng2 = this.tour.getEnd_lng();
-    }
-    // Between two stops
-    else {
-      lat1 = this.tour.getStops()[index1].latitude;
-      lng1 = this.tour.getStops()[index1].longitude;
-      lat2 = this.tour.getStops()[index2].latitude;
-      lng2 = this.tour.getStops()[index2].longitude;
-    }
-
-    const result = await firstValueFrom(
-      this.tourService.getDurationDistanceEstimate(lat1, lng1, lat2, lng2, [])
-    );
-
-    return result.distance; // in km
-  }
-
-  async getDurationBetweenStops(index1: number, index2: number): Promise<number> {
-    let lat1: number, lng1: number, lat2: number, lng2: number;
-
-    if (index1 === -1) {
-      lat1 = this.tour.getStart_lat();
-      lng1 = this.tour.getStart_lng();
-      lat2 = this.tour.getStops()[index2].latitude;
-      lng2 = this.tour.getStops()[index2].longitude;
-    } else if (index2 === this.tour.getStops().length) {
-      lat1 = this.tour.getStops()[index1].latitude;
-      lng1 = this.tour.getStops()[index1].longitude;
-      lat2 = this.tour.getEnd_lat();
-      lng2 = this.tour.getEnd_lng();
-    } else {
-      lat1 = this.tour.getStops()[index1].latitude;
-      lng1 = this.tour.getStops()[index1].longitude;
-      lat2 = this.tour.getStops()[index2].latitude;
-      lng2 = this.tour.getStops()[index2].longitude;
-    }
-
-    const result = await firstValueFrom(
-      this.tourService.getDurationDistanceEstimate(lat1, lng1, lat2, lng2, [])
-    );
-
-    return result.duration*60; // in minutes
   }
 
   exportSiteToPdf() {

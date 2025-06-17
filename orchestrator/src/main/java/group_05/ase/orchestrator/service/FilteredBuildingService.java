@@ -67,7 +67,7 @@ public class FilteredBuildingService {
         MatchRequest dto = new MatchRequest();
         dto.setCollectionName(collectionName);
         dto.setInterests(interestsNames);
-        dto.setResultSize(100);
+        dto.setResultSize(500);
 
         HttpEntity<MatchRequest> entity = new HttpEntity<>(dto, headers);
         ResponseEntity<List> response = restTemplate.exchange(QDRANT_URL + "categorize/match", HttpMethod.POST, entity, List.class);
