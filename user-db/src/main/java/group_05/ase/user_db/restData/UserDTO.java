@@ -34,4 +34,16 @@ public class UserDTO {
     @Setter
     @JsonProperty(required = true, value = "status")
     private String status;
+
+    @Override
+    public String toString() {
+        return "UserDTO{" +
+                "id=" + id.toString() +
+                ", email='" + email + '\'' +
+                ", createdAt=" + createdAt +
+                ", role='" + role + '\'' +
+                ", status='" + status + '\'' +
+                '}';
+    }
+
 }

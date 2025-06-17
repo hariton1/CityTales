@@ -7,7 +7,6 @@ import com.cohere.api.types.EmbedByTypeResponseEmbeddings;
 import com.cohere.api.types.EmbedInputType;
 import com.cohere.api.types.EmbeddingType;
 import group_05.ase.qdrant_adapter.Service.Interface.IEmbeddingsService;
-import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -34,7 +33,6 @@ public class CohereService implements IEmbeddingsService {
         EmbedByTypeResponse response =
                 cohere.v2().embed(V2EmbedRequest.builder().model("embed-v4.0").inputType(EmbedInputType.CLASSIFICATION).embeddingTypes(embeddingTypes).texts(input).build());
 
-        System.out.println(response.getEmbeddings().getFloat().get().size());
         return mapEmbedByTypeResponseEmbeddingsToFloatList(response.getEmbeddings());
     }
 

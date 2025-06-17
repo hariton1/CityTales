@@ -1,10 +1,10 @@
 package group_05.ase.qdrant_adapter.Controller;
 
 import group_05.ase.qdrant_adapter.Entity.MatchRequest;
-import group_05.ase.qdrant_adapter.Entity.UpsertEntryRequest;
 import group_05.ase.qdrant_adapter.Service.Implementation.OpenAiService;
-import group_05.ase.qdrant_adapter.Service.Interface.IEmbeddingsService;
 import group_05.ase.qdrant_adapter.Service.Interface.IVectorDBService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -18,6 +18,8 @@ public class CategorizationController {
 
     private final IVectorDBService vectorDBService;
     private final OpenAiService openAiService;
+
+    private static final Logger logger = LoggerFactory.getLogger(CategorizationController.class);
 
     @Autowired
     public CategorizationController(IVectorDBService vectorDBService, OpenAiService openAiService ) {
@@ -61,7 +63,7 @@ public class CategorizationController {
         String combinedInterests = String.join(", ", dto.getInterests());
 
         float[] embedding = openAiService.getEmbedding(combinedInterests);
-        System.out.println("interestVector:" + embedding.length);
+        logger.info("Fetching interestVector: {}", embedding.length);
         return ResponseEntity.ok(vectorDBService.doMatching(embedding, dto.getCollectionName(), dto.getResultSize()));
     }
 }

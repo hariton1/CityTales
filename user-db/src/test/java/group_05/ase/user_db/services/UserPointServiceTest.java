@@ -48,8 +48,6 @@ public class UserPointServiceTest {
         assertThat(userPointDTOs.getFirst().getPoints()).isEqualTo(userPointEntity.getPoints());
         assertThat(userPointDTOs.getFirst().getArticleId()).isEqualTo(userPointEntity.getArticleId());
 
-        System.out.println("Test testGetAllUserPoints passed!");
-
     }
 
     @Test
@@ -64,8 +62,6 @@ public class UserPointServiceTest {
         assertThat(userPointDTO.getPoints()).isEqualTo(userPointEntity.getPoints());
         assertThat(userPointDTO.getArticleId()).isEqualTo(userPointEntity.getArticleId());
 
-        System.out.println("Test testGetUserPointById passed!");
-
     }
 
     @Test
@@ -79,15 +75,6 @@ public class UserPointServiceTest {
         assertThat(userPointDTOs.getFirst().getUserId()).isEqualTo(userPointEntity.getUserId());
         assertThat(userPointDTOs.getFirst().getPoints()).isEqualTo(userPointEntity.getPoints());
         assertThat(userPointDTOs.getFirst().getArticleId()).isEqualTo(userPointEntity.getArticleId());
-
-        System.out.println("Test testGetUserPointsByUserId passed!");
-
-    }
-
-    @Test
-    public void testSaveNewPoints() {
-
-        System.out.println("Test testSaveNewPoints not provided.");
 
     }
 

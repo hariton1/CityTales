@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -26,6 +25,7 @@ public class ArticleWeightController {
     @ResponseStatus(HttpStatus.OK)
     public List<ArticleWeightDTO> getAllArticleWeights() {
         try {
+            logger.info("Fetching all article weights");
             return this.articleWeightService.getAllArticleWeights();
         } catch (Exception e) {
             logger.error("Error fetching article weights: {}", e.getMessage());
@@ -37,6 +37,7 @@ public class ArticleWeightController {
     @ResponseStatus(HttpStatus.OK)
     public ArticleWeightDTO getArticleWeightByArticleId(@PathVariable("articleId") int articleId) {
         try {
+            logger.info("Fetching article weight by id: {}", articleId);
             return this.articleWeightService.getArticleWeightByArticleId(articleId);
         } catch (Exception e) {
             logger.error("Error fetching article weight by id {}: {}", articleId, e.getMessage());
@@ -48,6 +49,7 @@ public class ArticleWeightController {
     @ResponseStatus(HttpStatus.CREATED)
     public ArticleWeightDTO createNewArticleWeight(@RequestBody ArticleWeightDTO articleWeightDTO) {
         try {
+            logger.info("Creating article weight: {}", articleWeightDTO.toString());
             return this.articleWeightService.saveNewArticleWeight(articleWeightDTO);
         } catch (Exception e) {
             logger.error("Error when creating article weight {}: {}", articleWeightDTO.toString(), e.getMessage());

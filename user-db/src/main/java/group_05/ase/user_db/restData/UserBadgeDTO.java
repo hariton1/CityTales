@@ -36,4 +36,14 @@ public class UserBadgeDTO {
     @JsonDeserialize(using = CustomTimestampDeserializer.class)
     private LocalDateTime earnedAt;
 
+    @Override
+    public String toString() {
+        return "UserBadgeDTO{" +
+                "userBadgeId=" + userBadgeId +
+                ", userId=" + userId.toString() +
+                ", articleId=" + articleId +
+                ", earnedAt=" + earnedAt +
+                '}';
+    }
+
 }
