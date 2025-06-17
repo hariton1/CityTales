@@ -5,7 +5,7 @@ export class UserHistoryDto {
   private user_id: UUID;
   private article_id: number;
   private openDt: Date;
-  private closeDt: Date;
+  public closeDt: Date;
   private interest_id: number;
 
   constructor(user_history_id: number, user_id: UUID, article_id: number, openDt: Date, closeDt: Date, interest_id: number) {

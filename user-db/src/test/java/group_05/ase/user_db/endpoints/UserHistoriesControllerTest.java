@@ -4,13 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import group_05.ase.user_db.restData.UserHistoryDTO;
 import group_05.ase.user_db.services.UserHistoryService;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
@@ -61,8 +59,6 @@ public class UserHistoriesControllerTest {
                 .andExpect(jsonPath("$[0].user_id").value(userHistoryDTO.getUserId().toString()))
                 .andExpect(jsonPath("$[0].article_id").value(userHistoryDTO.getArticleId()))
                 .andExpect(jsonPath("$[0].interest_id").value(userHistoryDTO.getInterestId()));
-
-        System.out.println("Test testGetAllUserHistories passed!");
     }
 
     @Test
@@ -78,8 +74,6 @@ public class UserHistoriesControllerTest {
                 .andExpect(jsonPath("$.user_id").value(userHistoryDTO.getUserId().toString()))
                 .andExpect(jsonPath("$.article_id").value(userHistoryDTO.getArticleId()))
                 .andExpect(jsonPath("$.interest_id").value(userHistoryDTO.getInterestId()));
-
-        System.out.println("Test testGetUserHistoriesById passed!");
     }
 
     @Test
@@ -95,8 +89,6 @@ public class UserHistoriesControllerTest {
                 .andExpect(jsonPath("$[0].user_id").value(userHistoryDTO.getUserId().toString()))
                 .andExpect(jsonPath("$[0].article_id").value(userHistoryDTO.getArticleId()))
                 .andExpect(jsonPath("$[0].interest_id").value(userHistoryDTO.getInterestId()));
-
-        System.out.println("Test testGetUserHistoriesByUserId passed!");
     }
 
     @Test
@@ -112,8 +104,6 @@ public class UserHistoriesControllerTest {
                 .andExpect(jsonPath("$[0].user_id").value(userHistoryDTO.getUserId().toString()))
                 .andExpect(jsonPath("$[0].article_id").value(userHistoryDTO.getArticleId()))
                 .andExpect(jsonPath("$[0].interest_id").value(userHistoryDTO.getInterestId()));
-
-        System.out.println("Test testGetUserHistoriesByArticleId passed!");
     }
 
     @Test
@@ -129,12 +119,6 @@ public class UserHistoriesControllerTest {
                 .andExpect(jsonPath("$.user_id").value(userHistoryDTO.getUserId().toString()))
                 .andExpect(jsonPath("$.article_id").value(userHistoryDTO.getArticleId()))
                 .andExpect(jsonPath("$.interest_id").value(userHistoryDTO.getInterestId()));
-
-        System.out.println("Test testCreateNewUserHistory passed!");
     }
 
-    @Test
-    public void testUpdateUserHistory() {
-        System.out.println("Test testUpdateUserHistory not provided!");
-    }
 }

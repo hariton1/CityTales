@@ -62,8 +62,6 @@ public class FeedbacksControllerTest {
 				.andExpect(jsonPath("$[0].rating").value(feedbackDTO.getRating()))
 				.andExpect(jsonPath("$[0].fb_content").value(feedbackDTO.getFbContent()));
 
-		System.out.println("Test testGetAllFeedbacks passed!");
-
 	}
 
 	@Test
@@ -76,8 +74,6 @@ public class FeedbacksControllerTest {
 						.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.feedback_id").value(feedbackDTO.getFeedbackId()));
-
-		System.out.println("Test testGetFeedbackById passed!");
 
 	}
 
@@ -96,8 +92,6 @@ public class FeedbacksControllerTest {
 				.andExpect(jsonPath("$[0].rating").value(feedbackDTO.getRating()))
 				.andExpect(jsonPath("$[0].fb_content").value(feedbackDTO.getFbContent()));
 
-		System.out.println("Test testGetFeedbacksByUserId passed!");
-
 	}
 
 	@Test
@@ -115,8 +109,6 @@ public class FeedbacksControllerTest {
 				.andExpect(jsonPath("$[0].rating").value(feedbackDTO.getRating()))
 				.andExpect(jsonPath("$[0].fb_content").value(feedbackDTO.getFbContent()));
 
-		System.out.println("Test testGetFeedbacksByArticleId passed!");
-
 	}
 
 	@Test
@@ -133,15 +125,6 @@ public class FeedbacksControllerTest {
 				.andExpect(jsonPath("$[0].article_id").value(feedbackDTO.getArticleId()))
 				.andExpect(jsonPath("$[0].rating").value(feedbackDTO.getRating()))
 				.andExpect(jsonPath("$[0].fb_content").value(feedbackDTO.getFbContent()));
-
-		System.out.println("Test testGetFeedbacksByFbContentLike passed!");
-
-	}
-
-	@Test
-	public void testCreateNewFeedback() throws Exception {
-
-		System.out.println("Test testCreateNewFeedback not provided!");
 
 	}
 

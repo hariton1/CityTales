@@ -12,4 +12,5 @@ public interface ITourService {
 
     List<TourDTO> createTours(CreateTourRequestDTO dto);
     Map<String, Double> getDurationDistanceEstimate(double start_lat, double start_lng, double end_lat, double end_lng, List<ViennaHistoryWikiBuildingObject> stops);
+    Map<String, List<List<Float>>> getDurationDistanceMatrix(double start_lat, double start_lng, double end_lat, double end_lng, List<ViennaHistoryWikiBuildingObject> stops);
 }

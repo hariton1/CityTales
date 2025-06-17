@@ -57,8 +57,6 @@ public class UserDataControllerTest {
                 .andExpect(jsonPath("$[0].user_id").value(userDataDto.getUserId().toString()))
                 .andExpect(jsonPath("$[0].role_name").value(userDataDto.getRoleName()))
                 .andExpect(jsonPath("$[0].status").value(userDataDto.getStatus()));
-
-        System.out.println("Test testGetAllUserData passed!");
     }
 
     @Test
@@ -72,8 +70,6 @@ public class UserDataControllerTest {
                 .andExpect(jsonPath("$.user_id").value(userDataDto.getUserId().toString()))
                 .andExpect(jsonPath("$.role_name").value(userDataDto.getRoleName()))
                 .andExpect(jsonPath("$.status").value(userDataDto.getStatus()));
-
-        System.out.println("Test testGetUserDataById passed!");
     }
 
     @Test
@@ -87,8 +83,6 @@ public class UserDataControllerTest {
                 .andExpect(jsonPath("$.user_id").value(userDataDto.getUserId().toString()))
                 .andExpect(jsonPath("$.role_name").value(userDataDto.getRoleName()))
                 .andExpect(jsonPath("$.status").value(userDataDto.getStatus()));
-
-        System.out.println("Test testGetUserDataByUserId passed!");
     }
 
     @Test
@@ -103,8 +97,6 @@ public class UserDataControllerTest {
                 .andExpect(jsonPath("$.user_id").value(userDataDto.getUserId().toString()))
                 .andExpect(jsonPath("$.role_name").value(userDataDto.getRoleName()))
                 .andExpect(jsonPath("$.status").value(userDataDto.getStatus()));
-
-        System.out.println("Test testSaveUserData passed!");
     }
 
 }

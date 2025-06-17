@@ -57,8 +57,6 @@ public class UserPointControllerTest {
                 .andExpect(jsonPath("$[0].user_id").value(userPointDTO.getUserId().toString()))
                 .andExpect(jsonPath("$[0].points").value(userPointDTO.getPoints()))
                 .andExpect(jsonPath("$[0].article_id").value(userPointDTO.getArticleId()));
-
-        System.out.println("Test testGetAllUserPoints passed!");
     }
 
     @Test
@@ -74,8 +72,6 @@ public class UserPointControllerTest {
                 .andExpect(jsonPath("$.user_id").value(userPointDTO.getUserId().toString()))
                 .andExpect(jsonPath("$.points").value(userPointDTO.getPoints()))
                 .andExpect(jsonPath("$.article_id").value(userPointDTO.getArticleId()));
-
-        System.out.println("Test testGetUserPointById passed!");
     }
 
     @Test
@@ -91,13 +87,5 @@ public class UserPointControllerTest {
                 .andExpect(jsonPath("$[0].user_id").value(userPointDTO.getUserId().toString()))
                 .andExpect(jsonPath("$[0].points").value(userPointDTO.getPoints()))
                 .andExpect(jsonPath("$[0].article_id").value(userPointDTO.getArticleId()));
-
-        System.out.println("Test testGetUserPointsByUserId passed!");
-    }
-
-    @Test
-    @WithMockUser(username = "testuser")
-    public void testCreateNewPoints() throws Exception {
-        System.out.println("Test testCreateNewPoints not provided!");
     }
 }

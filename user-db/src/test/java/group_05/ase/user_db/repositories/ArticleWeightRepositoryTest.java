@@ -34,8 +34,6 @@ public class ArticleWeightRepositoryTest {
         assertThat(tmp.getArticleId()).isEqualTo(this.articleWeightEntity.getArticleId());
         assertThat(tmp.getWeight()).isEqualTo(this.articleWeightEntity.getWeight());*/
 
-        System.out.println("Test testFindByArticleId not provided!");
-
     }
 
     @Test
@@ -47,8 +45,6 @@ public class ArticleWeightRepositoryTest {
         assertThat(tmp.getFirst().getArticleWeightId()).isEqualTo(articleWeightEntity.getArticleWeightId());
         assertThat(tmp.getFirst().getArticleId()).isEqualTo(articleWeightEntity.getArticleId());
         assertThat(tmp.getFirst().getWeight()).isEqualTo(articleWeightEntity.getWeight());*/
-
-        System.out.println("Test testFindAllByOrderByWeightDesc not provided!");
 
     }
 

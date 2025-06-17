@@ -54,9 +54,6 @@ public class UserDataServiceTest {
         assertThat(userDataDTOs.getFirst().getUserId()).isEqualTo(userDataEntity.getUserId());
         assertThat(userDataDTOs.getFirst().getRoleName()).isEqualTo(userDataEntity.getRoleName());
         assertThat(userDataDTOs.getFirst().getStatus()).isEqualTo(userDataEntity.getStatus());
-
-        System.out.println("Test testGetAllUserData passed!");
-
     }
 
     @Test
@@ -70,8 +67,6 @@ public class UserDataServiceTest {
         assertThat(userDataDTO.getRoleName()).isEqualTo(userDataEntity.getRoleName());
         assertThat(userDataDTO.getStatus()).isEqualTo(userDataEntity.getStatus());
 
-        System.out.println("Test testGetUserDataById passed!");
-
     }
 
     @Test
@@ -84,9 +79,6 @@ public class UserDataServiceTest {
         assertThat(userDataDTO.getUserId()).isEqualTo(userDataEntity.getUserId());
         assertThat(userDataDTO.getRoleName()).isEqualTo(userDataEntity.getRoleName());
         assertThat(userDataDTO.getStatus()).isEqualTo(userDataEntity.getStatus());
-
-        System.out.println("Test testGetUserDataByUserId passed!");
-
     }
 
     @Test
@@ -99,8 +91,6 @@ public class UserDataServiceTest {
         assertThat(userDataDTO.getUserId()).isEqualTo(this.userDataDto.getUserId());
         assertThat(userDataDTO.getRoleName()).isEqualTo(this.userDataDto.getRoleName());
         assertThat(userDataDTO.getStatus()).isEqualTo(this.userDataDto.getStatus());
-
-        System.out.println("Test testSaveUserData passed.");
 
     }
 

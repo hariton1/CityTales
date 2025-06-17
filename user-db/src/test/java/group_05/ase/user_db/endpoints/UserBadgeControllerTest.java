@@ -58,8 +58,6 @@ public class UserBadgeControllerTest {
                 .andExpect(jsonPath("$[0].user_id").value(userBadgeDTO.getUserId().toString()))
                 .andExpect(jsonPath("$[0].article_id").value(userBadgeDTO.getArticleId()));
 
-        System.out.println("Test testGetAllUserBadges passed!");
-
     }
 
     @Test
@@ -74,8 +72,6 @@ public class UserBadgeControllerTest {
                 .andExpect(jsonPath("$[0].user_badge_id").value(userBadgeDTO.getUserBadgeId()))
                 .andExpect(jsonPath("$[0].user_id").value(userBadgeDTO.getUserId().toString()))
                 .andExpect(jsonPath("$[0].article_id").value(userBadgeDTO.getArticleId()));
-
-        System.out.println("Test testGetUserBadgesByUserId passed!");
 
     }
 
@@ -92,8 +88,6 @@ public class UserBadgeControllerTest {
                 .andExpect(jsonPath("$[0].user_id").value(userBadgeDTO.getUserId().toString()))
                 .andExpect(jsonPath("$[0].article_id").value(userBadgeDTO.getArticleId()));
 
-        System.out.println("Test testGetUserBadgesByArticleId passed!");
-
     }
 
     @Test
@@ -108,8 +102,6 @@ public class UserBadgeControllerTest {
                 .andExpect(jsonPath("$.user_badge_id").value(userBadgeDTO.getUserBadgeId()))
                 .andExpect(jsonPath("$.user_id").value(userBadgeDTO.getUserId().toString()))
                 .andExpect(jsonPath("$.article_id").value(userBadgeDTO.getArticleId()));
-
-        System.out.println("Test testCreateNewBadge passed!");
 
     }
 }

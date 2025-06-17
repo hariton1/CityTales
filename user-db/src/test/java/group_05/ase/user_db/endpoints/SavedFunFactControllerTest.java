@@ -65,8 +65,6 @@ public class SavedFunFactControllerTest {
                 .andExpect(jsonPath("$[0].image_url").value(savedFunFactDTO.getImageUrl()))
                 .andExpect(jsonPath("$[0].score").value(savedFunFactDTO.getScore()))
                 .andExpect(jsonPath("$[0].reason").value(savedFunFactDTO.getReason()));
-
-        System.out.println("Test testGetAllByUserId passed!");
     }
 
     @Test
@@ -85,8 +83,6 @@ public class SavedFunFactControllerTest {
                 .andExpect(jsonPath("$.image_url").value(savedFunFactDTO.getImageUrl()))
                 .andExpect(jsonPath("$.score").value(savedFunFactDTO.getScore()))
                 .andExpect(jsonPath("$.reason").value(savedFunFactDTO.getReason()));
-
-        System.out.println("Test testCreateNewSavedFunFact passed!");
     }
 
 }
