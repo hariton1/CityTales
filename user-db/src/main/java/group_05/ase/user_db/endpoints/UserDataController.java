@@ -26,6 +26,7 @@ public class UserDataController {
     @ResponseStatus(HttpStatus.OK)
     public List<UserDataDTO> getAllUserData() {
         try {
+            logger.info("Fetching all user data");
             return this.userDataService.getAllUserData();
         } catch (Exception e) {
             logger.error("Error fetching user data: {}", e.getMessage());
@@ -37,6 +38,7 @@ public class UserDataController {
     @ResponseStatus(HttpStatus.OK)
     public UserDataDTO getUserDataById(@PathVariable("userDataId") int userDataId) {
         try {
+            logger.info("Fetching user data by id: {}", userDataId);
             return this.userDataService.getUserDataById(userDataId);
         } catch (Exception e) {
             logger.error("Error fetching user data by id {}: {}", userDataId, e.getMessage());
@@ -48,6 +50,7 @@ public class UserDataController {
     @ResponseStatus(HttpStatus.OK)
     public UserDataDTO getUserDataByUserId(@PathVariable("userId") UUID userId) {
         try {
+            logger.info("Fetching user data by user_id: {}", userId.toString());
             return this.userDataService.getUserDataByUserId(userId);
         } catch (Exception e) {
             logger.error("Error fetching user data by user_id {}: {}", userId.toString(), e.getMessage());
@@ -59,6 +62,7 @@ public class UserDataController {
     @ResponseStatus(HttpStatus.CREATED)
     public UserDataDTO saveUserData(@RequestBody UserDataDTO userDataDTO) {
         try {
+            logger.info("Saving user data: {}", userDataDTO.toString());
             return this.userDataService.saveUserData(userDataDTO);
         } catch (Exception e) {
             logger.error("Error saving user data {}: {}", userDataDTO.toString(), e.getMessage());

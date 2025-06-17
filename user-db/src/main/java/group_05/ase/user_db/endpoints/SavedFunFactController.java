@@ -26,6 +26,7 @@ public class SavedFunFactController {
     @ResponseStatus(HttpStatus.OK)
     public List<SavedFunFactDTO> getAllByUserId(@PathVariable("userId") UUID userId) {
         try {
+            logger.info("Fetching saved fun facts for user with id: {}", userId.toString());
             return this.savedFunFactService.getAllByUserId(userId);
         } catch (Exception e) {
             logger.error("Error fetching saved fun facts for user with id {}: {}", userId.toString(), e.getMessage());
@@ -37,6 +38,7 @@ public class SavedFunFactController {
     @ResponseStatus(HttpStatus.CREATED)
     public SavedFunFactDTO createNewSavedFunFact(@RequestBody SavedFunFactDTO savedFunFactDTO) {
         try {
+            logger.info("Creating saved fun fact: {}", savedFunFactDTO.toString());
             return this.savedFunFactService.saveNewSavedFunFact(savedFunFactDTO);
         } catch (Exception e) {
             logger.error("Error when creating saved fun fact {}: {}", savedFunFactDTO.toString(), e.getMessage());
@@ -48,6 +50,7 @@ public class SavedFunFactController {
     @ResponseStatus(HttpStatus.OK)
     public void deleteSavedFunFact(@RequestBody SavedFunFactDTO savedFunFactDTO) {
         try {
+            logger.info("Deleting saved fun fact: {}", savedFunFactDTO.toString());
             this.savedFunFactService.deleteSavedFunFact(savedFunFactDTO);
         } catch (Exception e) {
             logger.error("Error deleting saved fun fact {}: {}", savedFunFactDTO.toString(), e.getMessage());

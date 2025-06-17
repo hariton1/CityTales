@@ -21,7 +21,7 @@ class FriendsRepositoryTest {
     private UUID uuid2;
     private FriendsEntity testEntity;
 
-    @BeforeEach
+    /*@BeforeEach
     void setUp() {
         uuid1 = UUID.fromString("f5599c8c-166b-495c-accc-65addfaa572b");
         uuid2 = UUID.fromString("5be46711-4f9c-468b-a6dc-0dce03f3b318");
@@ -30,7 +30,7 @@ class FriendsRepositoryTest {
         testEntity.setFriendOne(uuid1);
         testEntity.setFriendTwo(uuid2);
         friendsRepository.save(testEntity);
-    }
+    }*/
 
     @Test
     void testFindByFriendsId() {

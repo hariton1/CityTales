@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,6 +26,7 @@ public class FriendsController {
     @ResponseStatus(HttpStatus.OK)
     public List<FriendsDTO> getAllFriends() {
         try {
+            logger.info("Fetching all friends");
             return this.friendsService.getAllFriends();
         } catch (Exception e) {
             logger.error("Error fetching friends: {}", e.getMessage());
@@ -38,6 +38,7 @@ public class FriendsController {
     @ResponseStatus(HttpStatus.OK)
     public FriendsDTO getFriendsById(@PathVariable("friendsId") int friendsId) {
         try {
+            logger.info("Fetching friends by id: {}", friendsId);
             return this.friendsService.getFriendsById(friendsId);
         } catch (Exception e) {
             logger.error("Error fetching friends by id {}: {}", friendsId, e.getMessage());
@@ -49,6 +50,7 @@ public class FriendsController {
     @ResponseStatus(HttpStatus.OK)
     public List<FriendsDTO> getFriendsByFriendOne(@PathVariable("friendOne") UUID friendOne) {
         try {
+            logger.info("Fetching friends by fiend_one_id: {}", friendOne.toString());
             return this.friendsService.getFriendsByFriendOne(friendOne);
         } catch (Exception e) {
             logger.error("Error fetching friends by fiend_one_id {}: {}", friendOne.toString(), e.getMessage());
@@ -60,6 +62,7 @@ public class FriendsController {
     @ResponseStatus(HttpStatus.OK)
     public List<FriendsDTO> getFriendsByFriendTwo(@PathVariable("friendTwo") UUID friendTwo) {
         try {
+            logger.info("Fetching friends by fiend_two_id: {}", friendTwo.toString());
             return this.friendsService.getFriendsByFriendTwo(friendTwo);
         } catch (Exception e) {
             logger.error("Error fetching friends by fiend_two_id {}: {}", friendTwo.toString(), e.getMessage());
@@ -71,6 +74,7 @@ public class FriendsController {
     @ResponseStatus(HttpStatus.CREATED)
     public void createNewFriendsPair(@RequestBody FriendsDTO friendsDTO) {
         try {
+            logger.info("Creating friends: {}", friendsDTO.toString());
             this.friendsService.saveNewFriendsPair(friendsDTO);
         } catch (Exception e) {
             logger.error("Error creating friends {}: {}", friendsDTO.toString(), e.getMessage());
@@ -82,6 +86,7 @@ public class FriendsController {
     @ResponseStatus(HttpStatus.OK)
     public void deleteFriendsPair(@RequestBody FriendsDTO friendsDTO) {
         try {
+            logger.info("Deleting friends: {}", friendsDTO.toString());
             this.friendsService.deleteFriendsPair(friendsDTO);
         } catch (Exception e) {
             logger.error("Error deleting friends {}: {}", friendsDTO.toString(), e.getMessage());

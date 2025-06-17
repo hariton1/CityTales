@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -17,7 +16,7 @@ public class UserController {
 
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
-    private UserService userService;
+    private final UserService userService;
 
     public UserController(UserService userService) {
         this.userService = userService;
@@ -27,6 +26,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public List<UserDTO> getAllUsers() {
         try {
+            logger.info("Fetching all users");
             return this.userService.getAllUsers();
         } catch (Exception e) {
             logger.error("Error fetching users: {}", e.getMessage());
@@ -38,9 +38,10 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public UserDTO getUserById(@PathVariable("userId") UUID userId) {
         try {
+            logger.info("Fetching user with ID: {}", userId.toString());
             return this.userService.getUserById(userId);
         } catch (Exception e) {
-            logger.error("Error fetching user with ID {}: {}", userId, e.getMessage());
+            logger.error("Error fetching user with ID {}: {}", userId.toString(), e.getMessage());
             throw new RuntimeException("Error fetching user", e);
 
         }
@@ -51,9 +52,10 @@ public class UserController {
     public String getUserEmailById(@PathVariable("userId") UUID userId) {
         try {
             UserDTO userDTO = this.userService.getUserById(userId);
+            logger.info("Fetching username with ID: {}", userId.toString());
             return userDTO.getEmail();
         } catch (Exception e) {
-            logger.error("Error fetching username with ID {}: {}", userId, e.getMessage());
+            logger.error("Error fetching username with ID {}: {}", userId.toString(), e.getMessage());
             throw new RuntimeException("Error fetching username", e);
         }
     }
@@ -62,9 +64,10 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public void deleteUserById(@PathVariable("userId") UUID userId) {
         try {
+            logger.info("Deleting user with ID: {}", userId.toString());
             this.userService.deleteUserById(userId);
         } catch (Exception e) {
-            logger.error("Error deleting user with ID {}: {}", userId, e.getMessage());
+            logger.error("Error deleting user with ID {}: {}", userId.toString(), e.getMessage());
             throw new RuntimeException("Error deleting user", e);
         }
     }
@@ -73,10 +76,10 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public UserDTO updateUserById(@PathVariable("userId") UUID userId, @RequestBody UserDTO updatedValues) {
         try {
-            logger.info("Updating user with ID {}: {}", userId, updatedValues);
+            logger.info("Updating user with ID {}: {}", userId.toString(), updatedValues.toString());
             return this.userService.updateUserById(userId, updatedValues);
         } catch (Exception e) {
-            logger.error("Error updating user with ID {}: {}", userId, e.getMessage());
+            logger.error("Error updating user with ID {}: {}", userId.toString(), e.getMessage());
             throw new RuntimeException("Error updating user", e);
         }
     }

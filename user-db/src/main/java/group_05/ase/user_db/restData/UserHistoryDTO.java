@@ -48,4 +48,16 @@ public class UserHistoryDTO {
     @JsonProperty(value = "interest_id")
     private int interestId;
 
+    @Override
+    public String toString() {
+        return "UserHistoryDTO{" +
+                "userHistoryId=" + userHistoryId +
+                ", userId=" + userId.toString() +
+                ", articleId=" + articleId +
+                ", openDt=" + openDt +
+                ", closeDt=" + closeDt +
+                ", interestId=" + interestId +
+                '}';
+    }
+
 }

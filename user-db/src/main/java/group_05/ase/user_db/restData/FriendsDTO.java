@@ -36,4 +36,14 @@ public class FriendsDTO {
     @JsonDeserialize(using = CustomTimestampDeserializer.class)
     private LocalDateTime creDat;
 
+    @Override
+    public String toString() {
+        return "FriendsDTO{" +
+                "friendsId=" + friendsId +
+                ", friendOne=" + friendOne.toString() +
+                ", friendTwo=" + friendTwo.toString() +
+                ", creDat=" + creDat +
+                '}';
+    }
+
 }
