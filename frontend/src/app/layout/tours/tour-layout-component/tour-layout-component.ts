@@ -474,10 +474,10 @@ export class TourLayoutComponent {
 
   generateAdvancedTour() {
 
-    //if(!this.startMarker || !this.endMarker){
-    //  this.alerts.open('Please select a start and end point!', {label: 'Failure!', appearance: 'warning', autoClose: 3000}).subscribe();
-    //  return;
-    //}
+    if(!this.startMarker || !this.endMarker){
+      this.alerts.open('Please select a start and end point!', {label: 'Failure!', appearance: 'warning', autoClose: 3000}).subscribe();
+      return;
+    }
     console.log("Nearby stops length: " + this.buildingData.length)
     console.log("Generating tour for user " + this.userId)
     var user = this.userId!;
@@ -523,6 +523,7 @@ export class TourLayoutComponent {
       });
 
       tourdtos.forEach(tour => {console.log(tour.getId(), tour.getDistance())})
+      console.log(tourdtos.length)
 
       var selectedTour: TourDto = tourdtos[0];
 
@@ -530,9 +531,6 @@ export class TourLayoutComponent {
       const stored = localStorage.getItem("user_uuid") as UUID;
       var pointDTO = new UserPointDto(-1, stored, 4, new Date(),Date.now() / 1000)
       this.userPointsService.createNewPoints(pointDTO).subscribe(data => {console.log("Tour points created")});
-
-      console.log("A" + selectedTour.getTourPrice())
-      console.log("B" + selectedTour.getPricePerStop())
 
       this.tourService.createTourInDB(selectedTour).subscribe({
         next: tour => {console.log("Tour created successfully!");

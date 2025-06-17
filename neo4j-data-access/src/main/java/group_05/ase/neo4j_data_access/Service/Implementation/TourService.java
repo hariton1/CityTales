@@ -54,7 +54,7 @@ public class TourService implements ITourService {
 
     private final ObjectMapper mapper = new ObjectMapper();
 
-    private final Integer MAX_ROUTES = 10;
+    private final Integer MAX_ROUTES = 100;
     private final Integer MAX_NEARBY_BUILDINGS = 30;
 
     @Override
@@ -72,6 +72,9 @@ public class TourService implements ITourService {
 
         Deque<GeographicPoint2d> stops = new ArrayDeque<>();
         Map<GeographicPoint2d, Integer> building_dict = new HashMap<>();
+
+        logger.info("Fetching price information from db...");
+        Map<Integer, List<PriceDTO>> pricePerBuilding = getPriceFromDB(buildingIds);
 
         for(Integer stopId: buildingIds) {
             ViennaHistoryWikiBuildingObject viennaHistoryWikiBuildingObject = historicBuildingService.getBuildingById(stopId);
@@ -98,6 +101,12 @@ public class TourService implements ITourService {
             return null;
         }
 
+        List<List<Float>> durationMatrix = getMetricMatrix(stops.stream().toList(), "duration");
+        if(durationMatrix == null) {
+            logger.error("Duration matrix is null! Return null");
+            return null;
+        }
+
         List<GeographicPoint2d> mandatoryStops = dto.getPredefinedStops().stream().map(stop -> new GeographicPoint2d(stop.getLatitude().get(), stop.getLongitude().get())).toList();
 
         List<Integer> stopsIndexes = IntStream.range(0, stops.size()).boxed().toList();
@@ -106,8 +115,8 @@ public class TourService implements ITourService {
             mandatoryIndexes.add(stops.stream().toList().indexOf(mandatoryStop));
         }
 
-        List<List<Integer>> newRoutes = findToursBFS(stopsIndexes, distanceMatrix, dto.getMaxDistance(), dto.getNumStops(), mandatoryIndexes, MAX_ROUTES, dto.getMaxBudget(), dto, building_dict, stops.stream().toList());
-        List<TourObject> foundTours = indiceListToObjectList(newRoutes, stops.stream().toList(), building_dict, distanceMatrix, dto);
+        List<List<Integer>> newRoutes = findToursBFS(stopsIndexes, distanceMatrix, dto.getMaxDistance(), dto.getNumStops(), mandatoryIndexes, MAX_ROUTES, dto.getMaxBudget(), dto, building_dict, stops.stream().toList(), pricePerBuilding);
+        List<TourObject> foundTours = indiceListToObjectList(newRoutes, stops.stream().toList(), building_dict, distanceMatrix, dto, pricePerBuilding, durationMatrix);
 
         if(foundTours.isEmpty()){
                 logger.error("No tours found with BFS! Trying with Graphhopper Logic...");
@@ -116,13 +125,13 @@ public class TourService implements ITourService {
             return foundTours.stream().map(this::tourObjectToTourDTO).collect(Collectors.toList());
         }
 
-        List<Integer> foundTour = findRoutesGraphhopper(distanceMatrix, dto.getNumStops(), dto.getMaxDistance(), dto.getMaxBudget(), stops.stream().toList(), building_dict, dto);
+        List<Integer> foundTour = findRoutesGraphhopper(distanceMatrix, dto.getNumStops(), dto.getMaxDistance(), dto.getMaxBudget(), stops.stream().toList(), building_dict, dto, pricePerBuilding);
         logger.info("Found {} tours with Graphhopper!", foundTour.size());
         if(!foundTour.isEmpty()){
             List<GeographicPoint2d> stopsNew = new ArrayList<>();
             foundTour.forEach(stop -> stopsNew.add(stops.stream().toList().get(stop)));
-            double tourPrice = getTotalPriceForTour(foundTour, stops.stream().toList(), building_dict, dto);
-            Map<Integer, List<PriceDTO>> pricePerStop = getPricePerStop(foundTour, stops.stream().toList(), building_dict, dto);
+            double tourPrice = getTotalPriceForTour(foundTour, stops.stream().toList(), building_dict, dto, pricePerBuilding);
+            Map<Integer, List<PriceDTO>> pricePerStop = getPricePerStop(foundTour, stops.stream().toList(), building_dict, dto, pricePerBuilding);
             TourObject tourObject = buildTourObject(stopsNew, dto.getUserId(), building_dict, tourPrice, pricePerStop);
             return List.of(tourObjectToTourDTO(tourObject));
         } else{
@@ -140,7 +149,8 @@ public class TourService implements ITourService {
                                             Double maxTourPrice,
                                             CreateTourRequestDTO dto,
                                             Map<GeographicPoint2d, Integer> buildingDict,
-                                            List<GeographicPoint2d> stopLocations) {
+                                            List<GeographicPoint2d> stopLocations,
+                                            Map<Integer, List<PriceDTO>> pricePerStop) {
         Integer startIndex = stops.get(0);
         Integer endIndex = stops.get(stops.size() - 1);
 
@@ -181,7 +191,6 @@ public class TourService implements ITourService {
 
                 double newDistance = getTourDistance(newPath, distanceMatrix);
                 Set<Integer> newVisitedMandatoryStops = new HashSet<>(state.visitedMandatoryStops);
-                double totalTourPrice = getTotalPriceForTour(state.path, stopLocations, buildingDict, dto);
 
                 if (mandatoryStops.contains(i)) {
                     newVisitedMandatoryStops.add(i);
@@ -190,9 +199,13 @@ public class TourService implements ITourService {
                 if (i == endIndex) {
                     if (newPath.size() - 2 == noStops &&
                             newDistance <= maxDistance &&
-                            newVisitedMandatoryStops.equals(mandatoryStops) &&
-                            totalTourPrice <= maxTourPrice) {
-                        validRoutes.add(newPath);
+                            newVisitedMandatoryStops.equals(mandatoryStops)
+                            && validRoutes.size() < maxRoutes ) {
+                        double totalTourPrice = getTotalPriceForTour(state.path, stopLocations, buildingDict, dto, pricePerStop);
+                        if(totalTourPrice <= maxTourPrice){
+                            validRoutes.add(newPath);
+                            logger.info("Valid routes: {}", validRoutes.toString());
+                        }
                     }
                 } else {
                     queue.add(new RouteState(newPath, newDistance, newVisitedMandatoryStops));
@@ -208,7 +221,8 @@ public class TourService implements ITourService {
                                                double maxBudget,
                                                List<GeographicPoint2d> stops,
                                                Map<GeographicPoint2d, Integer> building_dict,
-                                               CreateTourRequestDTO dto) {
+                                               CreateTourRequestDTO dto,
+                                               Map<Integer, List<PriceDTO>> pricePerStop) {
         double[][] distanceMatrice = new double[distanceMatrix.size()][distanceMatrix.get(0).size()];
         for(int i = 0; i < distanceMatrix.size(); i++) {
             for(int j = 0; j < distanceMatrix.get(i).size(); j++) {
@@ -264,7 +278,7 @@ public class TourService implements ITourService {
                 List<Integer> routeDetail = new ArrayList<>();
                 routeDetail.add(Integer.valueOf(route.getStart().getLocation().getId()));
                 routeDetail.addAll(route.getActivities().stream().map(tourActivity -> Integer.parseInt(tourActivity.getLocation().getId())).toList());
-                double tourCost = getTotalPriceForTour(routeDetail, stops, building_dict, dto);
+                double tourCost = getTotalPriceForTour(routeDetail, stops, building_dict, dto, pricePerStop);
                 double tourDistance = getTourDistance(routeDetail, distanceMatrix);
                 logger.info("Calculated tour cost for tour:{}", tourCost);
                 logger.info("Calculated tour distance for tour:{}", tourDistance);
@@ -287,22 +301,16 @@ public class TourService implements ITourService {
         }
     }
 
-    private List<TourObject> indiceListToObjectList(List<List<Integer>> tours, List<GeographicPoint2d> stops, Map<GeographicPoint2d, Integer> building_dict, List<List<Float>> distanceMatrix, CreateTourRequestDTO dto) {
+    private List<TourObject> indiceListToObjectList(List<List<Integer>> tours, List<GeographicPoint2d> stops, Map<GeographicPoint2d, Integer> building_dict, List<List<Float>> distanceMatrix, CreateTourRequestDTO dto, Map<Integer, List<PriceDTO>> pricePerStop, List<List<Float>> durationMatrix) {
         List<TourObject> tourObjects = new ArrayList<>();
         for(List<Integer> tour: tours){
             TourObject tourObject = new TourObject();
-            List<List<Float>> durationMatrix = getMetricMatrix(stops.stream().toList(), "duration");
-            if(distanceMatrix == null) {
-                logger.error("Duration matrix is null! Return 0 as duration.");
-                tourObject.setDurationEstimate(0);
-            }
-
             tourObject.setStartLat(stops.get(0).getLatitude());
             tourObject.setStartLng(stops.get(0).getLongitude());
             tourObject.setEndLat(stops.get(tour.size()-1).getLatitude());
             tourObject.setEndLng(stops.get(tour.size()-1).getLongitude());
-            tourObject.setDistance(getTourDistance(tour, distanceMatrix));
-            tourObject.setDurationEstimate(getTourDuration(tour, durationMatrix));
+            tourObject.setDistance(getTourDistance(tour, distanceMatrix) / 1000);
+            tourObject.setDurationEstimate(getTourDuration(tour, durationMatrix) / 3600);
             tourObject.setName("Tour from " + Date.from(Instant.now()));
             tourObject.setDescription("Tour created at " + Date.from(Instant.now()));
             List<ViennaHistoryWikiBuildingObject> stops_list = new ArrayList<>();
@@ -312,8 +320,8 @@ public class TourService implements ITourService {
                 stops_list.add(building);
             }
             tourObject.setStops(stops_list);
-            tourObject.setTourPrice(getTotalPriceForTour(tour, stops, building_dict, dto));
-            tourObject.setPricePerStop(getPricePerStop(tour, stops, building_dict, dto));
+            tourObject.setTourPrice(getTotalPriceForTour(tour, stops, building_dict, dto, pricePerStop));
+            tourObject.setPricePerStop(getPricePerStop(tour, stops, building_dict, dto, pricePerStop));
             tourObject.setUserId(dto.getUserId());
 
             tourObjects.add(tourObject);
@@ -373,9 +381,13 @@ public class TourService implements ITourService {
 
 
 
-    private double getTotalPriceForTour(List<Integer> path, List<GeographicPoint2d> stops, Map<GeographicPoint2d, Integer> building_dict, CreateTourRequestDTO dto) {
+    private double getTotalPriceForTour(List<Integer> path,
+                                        List<GeographicPoint2d> stops,
+                                        Map<GeographicPoint2d, Integer> building_dict,
+                                        CreateTourRequestDTO dto,
+                                        Map<Integer, List<PriceDTO>> pricePerStop) {
+        logger.info("Total price for tour path: {}", path.toString());
         List<Integer> pathBuildingIds = path.stream().map(index -> building_dict.get(stops.get(index))).toList();
-        Map<Integer, List<PriceDTO>> pricePerStop = getPriceFromDB(pathBuildingIds);
         double currentPrice = 0;
 
         for (Integer stopId : pathBuildingIds) {
@@ -400,9 +412,8 @@ public class TourService implements ITourService {
         return currentPrice;
     }
 
-    private Map<Integer, List<PriceDTO>> getPricePerStop(List<Integer> path, List<GeographicPoint2d> stops, Map<GeographicPoint2d, Integer> building_dict, CreateTourRequestDTO dto) {
+    private Map<Integer, List<PriceDTO>> getPricePerStop(List<Integer> path, List<GeographicPoint2d> stops, Map<GeographicPoint2d, Integer> building_dict, CreateTourRequestDTO dto, Map<Integer, List<PriceDTO>> pricePerStop) {
         List<Integer> pathBuildingIds = path.stream().map(index -> building_dict.get(stops.get(index))).toList();
-        Map<Integer, List<PriceDTO>> pricePerStop = getPriceFromDB(pathBuildingIds);
         Map<Integer, List<PriceDTO>> filteredPricePerStop = new HashMap<>();
 
         for (Integer stopId : pathBuildingIds) {
