@@ -1,7 +1,7 @@
 import {ChangeDetectionStrategy, Component, inject, ViewChild, ChangeDetectorRef} from '@angular/core';
 import {Router} from '@angular/router';
 import {FormControl, ReactiveFormsModule} from '@angular/forms';
-import {TuiAlertService, TuiButton, TuiTextfield} from '@taiga-ui/core';
+import {TuiAlertService, TuiButton, TuiLoader, TuiTextfield} from '@taiga-ui/core';
 import {TuiInputModule} from '@taiga-ui/legacy';
 import {CommonModule} from '@angular/common';
 import {LocationService} from '../../../services/location.service';
@@ -127,20 +127,30 @@ export class TourLayoutComponent {
     const { data } = await supabase.auth.getSession();
     const userId = data.session?.user?.id;
     console.log('async user id ' + userId);
-    if (userId) {
-      this.userId = userId;
+
+    try {
       for(var id of this.recommendedToursIds){
         this.tourService.getTourForTourId(id).subscribe(tour => {
           this.recommendedTours.push(TourDto.fromTourEntity(tour));
           console.log("Fetched recommended tour: " + tour);
         })
       }
+    } catch (error) {
+      console.log(error);
+    }
 
-      this.tourService.getToursForUserId(userId!).subscribe(tours => {
-        this.userTours = [...tours.map(tour => TourDto.fromTourEntity(tour))];
-        console.log("User tours length: " + this.userTours.length);
-        this.cdr.detectChanges();
-      }) // Proceed to load tours for a valid user
+    if (userId) {
+      this.userId = userId;
+      try{
+        this.tourService.getToursForUserId(userId!).subscribe(tours => {
+          this.userTours = [...tours.map(tour => TourDto.fromTourEntity(tour))];
+          console.log("User tours length: " + this.userTours.length);
+          this.cdr.detectChanges();
+        }) // Proceed to load tours for a valid user
+      } catch (error) {
+        console.log(error);
+      }
+
     } else {
       console.error("User ID is null or undefined");
       // Handle the error accordingly (e.g., show an alert, redirect to login)
@@ -154,11 +164,10 @@ export class TourLayoutComponent {
   }
 
 
-  userTours: TourDto[] | null = null;
-
+  userTours: TourDto[] = [];
 
   recommendedToursIds: number[] = [153, 154, 155]
-  recommendedTours: TourDto[] = []
+  recommendedTours: TourDto[] = [];
 
   tourName = new FormControl('');
   tourDescription = new FormControl('');
