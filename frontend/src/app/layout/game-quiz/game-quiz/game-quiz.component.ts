@@ -14,12 +14,14 @@ import {QuizService} from '../../../services/quiz.service';
 import {UUID} from 'node:crypto';
 import {TuiResponsiveDialogOptions} from '@taiga-ui/addon-mobile';
 import {Quiz} from '../../../dto/quiz.dto';
-import {UserService} from '../../../services/user.service';
 import {QuizResult} from '../../../dto/quiz.result.dto';
 import {QuestionResults} from '../../../dto/question-results.dto';
 import {UserPointsService} from '../../../user_db.services/user-points.service';
 import {UserPointDto} from '../../../user_db.dto/user-point.dto';
 import {tuiRound} from '@taiga-ui/cdk';
+import {FriendsService} from '../../../user_db.services/friends.service';
+import {FriendsDto} from '../../../user_db.dto/friends.dto';
+import {QuizUserDto} from '../../../dto/quiz-user.dto';
 
 @Component({
   selector: 'app-game-quiz',
@@ -46,8 +48,8 @@ import {tuiRound} from '@taiga-ui/cdk';
 export class GameQuizComponent implements OnInit {
 
   private readonly quizService = inject(QuizService);
-  private readonly userService = inject(UserService);
   private readonly userPointsService = inject(UserPointsService);
+  private readonly friendsService = inject(FriendsService);
   private readonly alerts = inject(TuiAlertService);
   protected options: Partial<TuiResponsiveDialogOptions> = {};
   protected openQuizPlay = false;
@@ -55,12 +57,13 @@ export class GameQuizComponent implements OnInit {
   protected size: TuiSizeL | TuiSizeS = 's';
   protected openGenerateMenu = false;
   creatorId: UUID = '' as UUID;
+  friends: FriendsDto[] = [];
   users: UUID[] = [];
   quizzes = this.quizService.quizzes;
   quizzesResults = this.quizService.quizzesResults;
+  quizCreatorNames = this.quizService.quizCreatorNames;
   questionResults: QuestionResults[] = [];
   chosenCategory = '';
-  userName = '';
   playingQuiz: Quiz | undefined;
   numberOfQuestions = 0;
   currentQuizIndex = 0;
@@ -68,6 +71,7 @@ export class GameQuizComponent implements OnInit {
   correctAnswer = '';
   score = 0;
   toggleScoreEditable = false;
+  inviteSent = this.quizService.inviteSuccessfullySent;
 
   currentQuestionSignal = signal<string>('');
   currentAnswer1Signal = signal<string>('');
@@ -88,7 +92,6 @@ export class GameQuizComponent implements OnInit {
     this.retrieveUserID();
     this.quizService.getQuizzesByUserId(this.creatorId);
     this.quizService.getQuizResultsByUserId(this.creatorId);
-    console.log(this.quizzesResults());
   }
 
   generateQuiz(category: string) {
@@ -104,9 +107,6 @@ export class GameQuizComponent implements OnInit {
     if (stored) {
       this.creatorId = stored;
     }
-    this.userService.getUserWithRoleById(this.creatorId).subscribe((user) => {
-      this.userName = user.email.substring(0, user.email.indexOf('@'));
-    });
   }
 
   saveQuizResult(result: QuizResult) {
@@ -118,7 +118,6 @@ export class GameQuizComponent implements OnInit {
     this.currentQuestionIndex = 0;
     this.currentQuizIndex = index;
     this.playingQuiz = this.quizzes()[index];
-    console.log('Playing quiz ', this.playingQuiz);
     this.numberOfQuestions = this.playingQuiz.questions.length;
     this.options = {
       label: this.playingQuiz.name,
@@ -214,7 +213,7 @@ export class GameQuizComponent implements OnInit {
     return 'Not played yet!';
   }
 
-  calcOldScore(quizId : number) {
+  calcOldScore(quizId: number) {
     let score = 0;
     let quizResult = this.quizzesResults().find(result => result.quiz === quizId);
     if (quizResult) {
@@ -228,7 +227,34 @@ export class GameQuizComponent implements OnInit {
     return null;
   }
 
-  inviteFriend(index: number) {
-    console.log('Invite Friend!')
+  retrieveFriends() {
+    this.friendsService.getFriendsByFriendOne(this.creatorId).subscribe({
+        next: result => {
+          result.forEach(result => {
+            this.friends.push(result);
+          });
+        }
+      }
+    );
+
+    if (!this.inviteSent) {
+      let quizUsers: QuizUserDto[] = [];
+      this.friends.forEach((friend) => {
+        quizUsers.push({ id: 0, quiz: this.playingQuiz!.id, player: friend.friend_two, createdAt: new Date });
+      });
+      this.quizService.inviteFriendsToQuiz(quizUsers);
+      this.alerts.open(`Your friends can now play this quiz too!`, {
+        label: `Invite Sent!`,
+        appearance: 'success',
+        autoClose: 5000
+      }).subscribe()
+    } else {
+      this.alerts.open(`Your friends have already received this quiz!`, {
+        label: `Invite already sent!`,
+        appearance: 'neutral',
+        autoClose: 3000
+      }).subscribe()
+    }
+
   }
 }

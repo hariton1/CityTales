@@ -2,6 +2,7 @@ package group_05.ase.user_db.endpoints;
 
 import group_05.ase.user_db.restData.QuizDTO;
 import group_05.ase.user_db.restData.QuizResultDTO;
+import group_05.ase.user_db.restData.QuizUserDTO;
 import group_05.ase.user_db.services.QuizService;
 import org.apache.coyote.Response;
 import org.slf4j.Logger;
@@ -75,6 +76,18 @@ public class QuizController {
         } catch (Exception e) {
             logger.error("Error creating quiz result for {}: {}", dto, e.getMessage());
             throw new RuntimeException("Error saving quiz result", e);
+        }
+    }
+
+    @PostMapping("/quiz/invite")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<List<QuizUserDTO>> saveQuizForUsers(@RequestBody List<QuizUserDTO> dtoList) {
+        try {
+            List<QuizUserDTO> persistedQuizUserDtoList = service.saveQuizForUsers(dtoList);
+            return ResponseEntity.ok(persistedQuizUserDtoList);
+        } catch (Exception e) {
+            logger.error("Error saving quiz for users {}: {}", dtoList, e.getMessage());
+            throw new RuntimeException("Error fetching quiz", e);
         }
     }
 }
