@@ -105,6 +105,7 @@ export class SidebarComponent implements OnChanges{
 
   setPlaceDetail(place: BuildingEntity) {
     this.selectedItem = { type: 'place', data: place };
+    this.onSelectEvent.emit(place);
     this.scrollToTop();
   }
 
@@ -120,6 +121,7 @@ export class SidebarComponent implements OnChanges{
 
   closeDetailView() {
     this.selectedItem = null;
+    this.onCloseDetailView.emit();
   }
 
   @ViewChild('scrollbarRef') scrollbarRef!: ElementRef<HTMLElement>;

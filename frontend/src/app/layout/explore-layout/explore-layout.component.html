@@ -66,6 +66,8 @@
   <app-sidebar [historicalPlaces]="historicalPlaces"
                [selectedPlace]="selectedPlace"
                [selectedEvent]="selectedEvent"
+               (onSelectEvent)="onSelectEvent($event)"
+               (onCloseDetailView)="onCloseDetailView()"
                [selectedPerson]="selectedPerson">
   </app-sidebar>
   <app-map-view (selectDetailEvent)="selectDetailEvent($event)" (populatePlacesEvent)="setHistoricalPlaces($event)"></app-map-view>
