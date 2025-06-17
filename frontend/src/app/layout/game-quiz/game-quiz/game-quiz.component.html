@@ -8,12 +8,9 @@
   </button>
   <ng-template #content class="category-list">
     <tui-data-list tuiDataListDropdownManager [size]="size">
-      <button tuiOption type="button" (click)="generateQuiz('LATEST_TOUR')"> your latest tour</button>
-      <!--button tuiOption type="button" (click)="generateQuiz('SPECIFIC_TOUR')"> a specific tour</button>
-      <button tuiOption type="button" (click)="generateQuiz('INTERESTS')"> your interests</button>
-      <button tuiOption type="button" (click)="generateQuiz('FUN_FACTS')"> your favorite fun facts</button>
-      <button tuiOption type="button" (click)="generateQuiz('POPULAR')"> general popularity</button>
-      <button tuiOption type="button" (click)="generateQuiz('PARTY')"> randomized based on players</button-->
+      <div *ngFor="let tour of userTours; index as i">
+        <button tuiOption type="button" (click)="generateQuiz(tour.getId())"> {{ tour.getName() }} </button>
+      </div>
     </tui-data-list>
   </ng-template>
 
@@ -23,23 +20,8 @@
         <div class="quiz-card">
           <div class="quiz-top-row">
             <div class="quiz-category">
-              <div *ngIf="quiz.category === 'LATEST_TOUR'" tuiHint="based on your latest tour">
-                <tui-avatar appearance="info" src="@tui.timer"/>
-              </div>
-              <div *ngIf="quiz.category === 'SPECIFIC_TOUR'" tuiHint="based on a specific tour">
+              <div tuiHint="based on a tour">
                 <tui-avatar appearance="info" src="@tui.landmark"/>
-              </div>
-              <div *ngIf="quiz.category === 'INTERESTS'" tuiHint="based on your interests">
-                <tui-avatar appearance="positive" src="@tui.book-open-text"/>
-              </div>
-              <div *ngIf="quiz.category === 'FUN_FACTS'" tuiHint="based on your favorite fun facts">
-                <tui-avatar appearance="warning" src="@tui.heart"/>
-              </div>
-              <div *ngIf="quiz.category === 'POPULAR'" tuiHint="based on general popularity">
-                <tui-avatar appearance="neutral" src="@tui.users-round"/>
-              </div>
-              <div *ngIf="quiz.category === 'PARTY'" tuiHint="based on all participating players">
-                <tui-avatar appearance="negative" src="@tui.party-popper"/>
               </div>
             </div>
             <h3 tuiTitle>

@@ -30,18 +30,9 @@ public class QuizService {
 
     private final RestTemplate restTemplate = new RestTemplate();
     private final String OPENAI_ADDRESS = "http://openai-adapter:8088/";
-    private final String ORCHESTRATOR_ADDRESS = "http://orchestrator:9098/";
+    private final HttpHeaders headers = new HttpHeaders();
 
     private static final Logger logger = LoggerFactory.getLogger(QuizService.class);
-
-    private enum Category {
-        LATEST_TOUR,
-        SPECIFIC_TOUR,
-        INTERESTS,
-        FUN_FACTS,
-        POPULAR,
-        PARTY
-    }
 
     public QuizService(QuestionRepository questionRepository, QuestionResultsRepository questionResultsRepository, QuizRepository quizRepository, QuizUserRepository quizUserRepository, TourService tourService) {
         this.questionRepository = questionRepository;
@@ -49,6 +40,9 @@ public class QuizService {
         this.quizRepository = quizRepository;
         this.quizUserRepository = quizUserRepository;
         this.tourService = tourService;
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+        headers.add("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36");
+
     }
 
     public List<QuizDTO> getQuizzesForUser(UUID user) {
@@ -88,10 +82,9 @@ public class QuizService {
     }
 
     public QuizDTO saveQuiz(String category, List<UUID> users) {
-        //todo call build creation criteria based on users and category (tours, interests, fun facts ect.)
         UUID creator = users.getFirst();
 
-        List<Pair<String, String>> contentData = fetchGenerationDataByCategoryForUser(creator, category);
+        List<Pair<String, String>> contentData = fetchGenerationDataByCategoryForUser(category);
 
         List<QuizQuestionResponse> responses = new ArrayList<>();
         List<String> questionData = getColumn(contentData, true);
@@ -262,9 +255,6 @@ public class QuizService {
     }
 
     private QuizQuestionResponse generateQuizByLLM(String prompt) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-        headers.add("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36");
         HttpEntity<String> entity = new HttpEntity<>(prompt, headers);
         ResponseEntity<QuizQuestionResponse> response = restTemplate.exchange(OPENAI_ADDRESS + "/api/quiz/generate", HttpMethod.POST, entity, QuizQuestionResponse.class);
         return response.getBody();
@@ -277,57 +267,28 @@ public class QuizService {
             prompt.append("\n");
         }
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-        headers.add("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36");
         HttpEntity<String> entity = new HttpEntity<>(prompt.toString(), headers);
         ResponseEntity<QuizAdditionalResponse> response = restTemplate.exchange(OPENAI_ADDRESS + "/api/quiz/generate_additional", HttpMethod.POST, entity, QuizAdditionalResponse.class);
         return response.getBody();
     }
 
-    private List<Pair<String, String>> fetchGenerationDataByCategoryForUser(UUID user, String category) {
-        List<Pair<String, String>> results = new ArrayList<>(); //first: content, second: image
-        TourDTO tour = null;
-        int tourId = -1;
+    private List<Pair<String, String>> fetchGenerationDataByCategoryForUser(String category) {
+        int tourId = Integer.parseInt(category.substring(category.indexOf("=")+1));
 
-        if (category.startsWith("SPECIFIC_TOUR")) {
-            tourId = Integer.parseInt(category.substring(category.indexOf("=")+1, category.length()-1));
-            category = "SPECIFIC_TOUR";
+        TourDTO tour = this.tourService.findTourByTourId(tourId);
+
+        List<Pair<String, String>> result = extractStringsFromTour(tour).values().stream().toList(); //first: content, second: image
+        result = result.stream().filter((item) -> item.getFirst().length() > 100).toList();
+
+        if (result.size() > 10) {
+            Random random = new Random();
+            int randomCount = 5 + random.nextInt(6);
+            List<Pair<String, String>> mutableResult = new ArrayList<>(result);
+            Collections.shuffle(mutableResult, random);
+            result = mutableResult.subList(0, randomCount);
         }
 
-        switch (Category.valueOf(category)) {
-            case LATEST_TOUR -> {
-                tour = this.tourService.findToursByUserId(String.valueOf(user)).getLast();
-
-                List<Pair<String, String>> result = extractStringsFromTour(tour).values().stream().toList();
-                results = result.stream().filter((item) -> item.getFirst().length() > 100).toList();
-            }
-            case SPECIFIC_TOUR -> {
-                tour = this.tourService.findTourByTourId(tourId);
-
-                List<Pair<String, String>> result = extractStringsFromTour(tour).values().stream().toList();
-                results = result.stream().filter((item) -> item.getFirst().length() > 100).toList();
-            }  /*
-            case INTERESTS -> {
-            http://localhost:9098/buildings/filtered/byUser/57cbf83e-919d-4b20-baa7-113cdf116db0?latitude=48.19994406631644&longitude=16.371089994357767&radius=1000
-                // todo gather articles by interest -> need to extract long, lat and radius for that
-                System.out.println("INTERESTS: not implemented yet");
-            }
-            case FUN_FACTS -> {
-                // todo gather fun facts
-                System.out.println("FUN_FACTS: not implemented yet");
-            }
-            case POPULAR -> {
-                // todo gather articles by article weights
-                System.out.println("POPULAR: not implemented yet");
-            }
-            case PARTY -> {
-                // todo gather random entries from above from random users from the list
-                System.out.println("PARTY: not implemented yet");
-            } */
-        }
-
-        return results;
+        return result;
     }
 
     private Map<String, Pair<String, String>> extractStringsFromTour(TourDTO tour) {

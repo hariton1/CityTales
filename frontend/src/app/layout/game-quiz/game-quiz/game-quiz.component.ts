@@ -22,6 +22,8 @@ import {tuiRound} from '@taiga-ui/cdk';
 import {FriendsService} from '../../../user_db.services/friends.service';
 import {FriendsDto} from '../../../user_db.dto/friends.dto';
 import {QuizUserDto} from '../../../dto/quiz-user.dto';
+import {TourService} from '../../../services/tour.service';
+import {TourDto} from '../../../dto/tour.dto';
 
 @Component({
   selector: 'app-game-quiz',
@@ -50,12 +52,14 @@ export class GameQuizComponent implements OnInit {
   private readonly quizService = inject(QuizService);
   private readonly userPointsService = inject(UserPointsService);
   private readonly friendsService = inject(FriendsService);
+  private readonly tourService = inject(TourService);
   private readonly alerts = inject(TuiAlertService);
   protected options: Partial<TuiResponsiveDialogOptions> = {};
   protected openQuizPlay = false;
   protected value = '';
   protected size: TuiSizeL | TuiSizeS = 's';
   protected openGenerateMenu = false;
+  userTours: TourDto[] | null = null;
   creatorId: UUID = '' as UUID;
   friends: FriendsDto[] = [];
   users: UUID[] = [];
@@ -93,11 +97,12 @@ export class GameQuizComponent implements OnInit {
     this.retrieveUserID();
     this.quizService.getQuizzesByUserId(this.creatorId);
     this.quizService.getQuizResultsByUserId(this.creatorId);
+    this.getUserTours(this.creatorId);
   }
 
-  generateQuiz(category: string) {
+  generateQuiz(tourId: number) {
     this.openGenerateMenu = false;
-    this.chosenCategory = category;
+    this.chosenCategory = 'SPECIFIC_TOUR=' + tourId;
     this.retrieveUserID();
     this.users.push(this.creatorId);
     this.quizService.generateNewQuiz(this.chosenCategory, this.users);
@@ -234,20 +239,39 @@ export class GameQuizComponent implements OnInit {
           result.forEach(result => {
             this.friends.push(result);
           });
+          this.friendsService.getFriendsByFriendTwo(this.creatorId).subscribe({
+              next: result => {
+                result.forEach(result => {
+                  this.friends.push(result);
+                });
+              }
+            }
+          );
         }
       }
     );
     if (!this.inviteSent) {
       let quizUsers: QuizUserDto[] = [];
       this.friends.forEach((friend) => {
-        quizUsers.push({ id: 0, quiz: this.playingQuiz!.id, player: friend.friend_two, createdAt: new Date });
+        quizUsers.push({id: 0, quiz: this.playingQuiz!.id, player: friend.friend_one, createdAt: new Date});
+        quizUsers.push({id: 0, quiz: this.playingQuiz!.id, player: friend.friend_two, createdAt: new Date});
       });
+      console.log('friends!: ', quizUsers);
       this.quizService.inviteFriendsToQuiz(quizUsers);
-      this.alerts.open(`Your friends can now play this quiz too!`, {
-        label: `Invite Sent!`,
-        appearance: 'success',
-        autoClose: 5000
-      }).subscribe()
+      if (quizUsers.length > 0) {
+        this.alerts.open(`Your friends can now play this quiz too!`, {
+          label: `Invite Sent!`,
+          appearance: 'success',
+          autoClose: 5000
+        }).subscribe()
+      } else {
+        this.alerts.open(`Try again to find out!`, {
+          label: `All alone?`,
+          appearance: 'neutral',
+          autoClose: 3000
+        }).subscribe()
+      }
+
     } else {
       this.alerts.open(`Your friends have already received this quiz!`, {
         label: `Invite already sent!`,
@@ -255,6 +279,12 @@ export class GameQuizComponent implements OnInit {
         autoClose: 3000
       }).subscribe()
     }
-
   }
+
+  getUserTours(userId: UUID) {
+    this.tourService.getToursForUserId(userId).subscribe(tours => {
+      this.userTours = tours.map(tour => TourDto.fromTourEntity(tour));
+    });
+  }
+
 }
