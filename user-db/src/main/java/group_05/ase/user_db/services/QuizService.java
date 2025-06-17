@@ -123,6 +123,42 @@ public class QuizService {
         return mapToQuizDTO(quizEntity, questionEntities);
     }
 
+    public List<QuizUserDTO> saveQuizForUsers(List<QuizUserDTO> dtoList) {
+        List<QuizUserDTO> list = new ArrayList<>();
+
+        for (QuizUserDTO dto : dtoList) {
+            QuizUserEntity entity = new QuizUserEntity();
+
+            entity.setQuiz(dto.getQuiz());
+            entity.setPlayer(dto.getPlayer());
+            entity.setCreatedAt(dto.getCreatedAt());
+
+            List<QuizUserEntity> persistedEntities = quizUserRepository.findByPlayer(dto.getPlayer());
+            boolean found = false;
+            for (QuizUserEntity persistedEntity : persistedEntities) {
+                if (dto.getQuiz() == (persistedEntity.getQuiz())) {
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                QuizUserEntity result = quizUserRepository.save(entity);
+
+                QuizUserDTO persistedDTO = new QuizUserDTO();
+
+                persistedDTO.setId(result.getId());
+                persistedDTO.setQuiz(result.getQuiz());
+                persistedDTO.setPlayer(result.getPlayer());
+                persistedDTO.setCreatedAt(result.getCreatedAt());
+
+                list.add(persistedDTO);
+            }
+        }
+
+        return list;
+    }
+
     private QuizDTO mapToQuizDTO(QuizEntity quiz, List<QuestionEntity> questions) {
         QuizDTO result = new QuizDTO();
 

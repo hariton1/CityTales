@@ -5,16 +5,22 @@ import {UUID} from 'node:crypto';
 import {Quiz} from '../dto/quiz.dto';
 import {TuiAlertService} from '@taiga-ui/core';
 import {QuizResult} from '../dto/quiz.result.dto';
+import {QuizUserDto} from '../dto/quiz-user.dto';
+import {UserService} from './user.service';
 
 @Injectable({providedIn: 'root'})
 export class QuizService {
   private httpClient = inject(HttpClient);
+  private readonly userService = inject(UserService);
   private PATH = SERVER_ADDRESS + 'quizzes/';
   private quizzesSignal = signal<Quiz[]>([]);
   private quizzesResultsSignal = signal<QuizResult[]>([]);
+  private quizCreatorNamesSignal = signal<string[]>([]);
   quizzes = computed(() => this.quizzesSignal());
   quizzesResults = computed(() => this.quizzesResultsSignal());
+  quizCreatorNames = computed(() => this.quizCreatorNamesSignal());
   private readonly alerts = inject(TuiAlertService);
+  inviteSuccessfullySent = false;
 
   generateNewQuiz(category: string, userIds: UUID[]) {
     this.httpClient.post<Quiz>(this.PATH + 'quiz/create/' + category, userIds).subscribe({
@@ -37,6 +43,12 @@ export class QuizService {
   getQuizzesByUserId(userId: UUID) {
     this.httpClient.get<Quiz[]>(this.PATH + `quiz/user=${userId}`).subscribe((data) => {
       this.quizzesSignal.set(data);
+      this.quizzes().forEach((quiz) => {
+        this.userService.getUserWithRoleById(quiz.creator).subscribe((user) => {
+          const namesSoFar = this.quizCreatorNames();
+          this.quizCreatorNamesSignal.set([... namesSoFar, (user.email.substring(0, user.email.indexOf('@')))]);
+        });
+      })
     });
   }
 
@@ -55,6 +67,14 @@ export class QuizService {
   getQuizResultsByUserId(userId: UUID) {
     this.httpClient.get<QuizResult[]>(this.PATH + `result/user=${userId}`).subscribe((data) => {
       this.quizzesResultsSignal.set(data);
+    });
+  }
+
+  inviteFriendsToQuiz(friends: QuizUserDto[]) {
+    console.log(friends);
+    this.httpClient.post(this.PATH + `quiz/invite`, friends).subscribe({
+      next: (response) => {this.inviteSuccessfullySent = true;},
+      error: (err) => {console.log(err)}
     });
   }
 }
