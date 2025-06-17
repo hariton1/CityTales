@@ -44,7 +44,7 @@ export class MapViewComponent implements OnInit{
               private userInterestService: UserInterestsService,
               private interestsService: InterestsService,
               private zone: NgZone,
-              private qdrantService: QdrantService
+              private qdrantService: QdrantService,
               ) {
   }
 
@@ -53,7 +53,6 @@ export class MapViewComponent implements OnInit{
 
   private selectedMarker: google.maps.Marker | null = null;
   private selectedBuildingType: string | null = null;
-
 
   @ViewChild(MapInfoWindow) infoWindow: any;
   private nativeInfoWindow = new google.maps.InfoWindow();
@@ -187,12 +186,17 @@ export class MapViewComponent implements OnInit{
   // TODO: remove later on
   // For testing in case navigator.geolocation breaks - happened to me for some reason...
   ngOnInit(): void {
+    try{
       this.interestFiltering = localStorage.getItem("interest_filtering");
       this.locationService.getLocationsInRadius(this.center.lat, this.center.lng, 10000, this.interestFiltering === 'true').subscribe(locations => {
         this.locationsNearby = locations;
         this.addMarkersToMap(locations);
         this.populatePlacesEvent.emit(locations);
       });
+    } catch (error) {
+      console.log(error);
+    }
+
   }
 
   private clusterer!: MarkerClusterer;
