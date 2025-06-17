@@ -62,6 +62,7 @@ export class GameQuizComponent implements OnInit {
   quizzes = this.quizService.quizzes;
   quizzesResults = this.quizService.quizzesResults;
   quizCreatorNames = this.quizService.quizCreatorNames;
+  friendScores = this.quizService.friendScores;
   questionResults: QuestionResults[] = [];
   chosenCategory = '';
   playingQuiz: Quiz | undefined;
@@ -236,7 +237,6 @@ export class GameQuizComponent implements OnInit {
         }
       }
     );
-
     if (!this.inviteSent) {
       let quizUsers: QuizUserDto[] = [];
       this.friends.forEach((friend) => {
