@@ -6,11 +6,9 @@ import group_05.ase.orchestrator.dto.ViennaHistoryWikiBuildingObject;
 import group_05.ase.orchestrator.client.Neo4jBuildingClient;
 import group_05.ase.orchestrator.client.UserInterestClient;
 import group_05.ase.orchestrator.dto.UserInterestsDTO;
-import group_05.ase.orchestrator.dto.ViennaHistoryWikiPersonObject;
-import group_05.ase.orchestrator.dto.ViennaHistoryWikiEventObject;
 import group_05.ase.orchestrator.service.FilteredBuildingService;
-import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,6 +23,8 @@ public class FilteredBuildingController {
     private final UserInterestClient userInterestClient;
     private final Neo4jBuildingClient buildingClient;
     private final ArticleClient articleClient;
+
+    private static final Logger logger = LoggerFactory.getLogger(FilteredBuildingController.class);
 
     public FilteredBuildingController(FilteredBuildingService filteredBuildingService, UserInterestClient userInterestClient, Neo4jBuildingClient buildingClient, ArticleClient articleClient) {
         this.filteredBuildingService = filteredBuildingService;
@@ -45,6 +45,7 @@ public class FilteredBuildingController {
         List<ViennaHistoryWikiBuildingObject> buildings = buildingClient.getBuildingsByLocation(latitude, longitude, radius);
         List<ArticleWeightDTO> articleWeights = articleClient.getAllArticleWeights();
 
+        logger.info("Fetching filtered buildings for user with ID {}, latitude {}, longitude {} and radius {}", userId.toString(), latitude, longitude, radius);
         return ResponseEntity.ok(filteredBuildingService.filterBuildingsByUserInterests(buildings, interests, articleWeights));
     }
 

@@ -24,13 +24,13 @@ public class QuizController {
 
     @PostMapping("/generate")
     public QuizQuestionResponse generateQuiz(@RequestBody String prompt) {
-        logger.info("Generate quiz");
+        logger.info("Generate quiz, prompt: {}", prompt);
         return this.openAIService.generateQuiz(prompt);
     }
 
     @PostMapping("/generate_additional")
     public QuizAdditionalResponse generateAdditionalQuizData(@RequestBody String prompt) {
-        logger.info("Generate quiz additional data");
+        logger.info("Generate quiz additional data, prompt: {}", prompt);
         return this.openAIService.generateAdditionalQuizData(prompt);
     }
 }

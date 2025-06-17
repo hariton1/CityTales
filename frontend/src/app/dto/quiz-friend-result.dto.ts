@@ -3,6 +3,6 @@ import {UUID} from 'node:crypto';
 export interface QuizFriendResult {
   quiz: number;
   friend: UUID;
-  correctnessPercentage: number;
+  correctness_percentage: number;
   questionsAnswered: number;
 }
