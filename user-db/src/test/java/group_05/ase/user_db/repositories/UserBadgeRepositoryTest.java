@@ -36,8 +36,6 @@ public class UserBadgeRepositoryTest {
         assertThat(tmp.getFirst().getUserId()).isEqualTo(userBadgeEntity.getUserId());
         assertThat(tmp.getFirst().getArticleId()).isEqualTo(userBadgeEntity.getArticleId());*/
 
-        System.out.println("Test testFindAllByUserIdOrderByUserBadgeIdAsc passed!");
-
     }
 
     @Test
@@ -47,8 +45,6 @@ public class UserBadgeRepositoryTest {
 
         assertThat(tmp).isNotNull();
         assertThat(tmp).isEqualTo(new ArrayList<>());*/
-
-        System.out.println("Test testFindByNonExistUserId passed!");
 
     }
 
@@ -61,8 +57,6 @@ public class UserBadgeRepositoryTest {
         assertThat(tmp.getFirst().getUserBadgeId()).isEqualTo(userBadgeEntity.getUserBadgeId());
         assertThat(tmp.getFirst().getUserId()).isEqualTo(userBadgeEntity.getUserId());
         assertThat(tmp.getFirst().getArticleId()).isEqualTo(userBadgeEntity.getArticleId());*/
-
-        System.out.println("Test testFindAllByArticleIdOrderByUserBadgeIdAsc passed!");
 
     }
 

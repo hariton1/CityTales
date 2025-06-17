@@ -42,8 +42,6 @@ public class FeedbackRepositoryTest {
         assertThat(tmp.getRating()).isEqualTo(feedbackEntity.getRating());
         assertThat(tmp.getFbContent()).isEqualTo(feedbackEntity.getFbContent());*/
 
-        System.out.println("Test testFindByFeedbackId passed!");
-
     }
 
     @Test
@@ -57,8 +55,6 @@ public class FeedbackRepositoryTest {
         assertThat(tmp.getFirst().getArticleId()).isEqualTo(feedbackEntity.getArticleId());
         assertThat(tmp.getFirst().getRating()).isEqualTo(feedbackEntity.getRating());
         assertThat(tmp.getFirst().getFbContent()).isEqualTo(feedbackEntity.getFbContent());*/
-
-        System.out.println("Test testFindByUserId passed!");
 
     }
 
@@ -74,8 +70,6 @@ public class FeedbackRepositoryTest {
         assertThat(tmp.getFirst().getRating()).isEqualTo(feedbackEntity.getRating());
         assertThat(tmp.getFirst().getFbContent()).isEqualTo(feedbackEntity.getFbContent());*/
 
-        System.out.println("Test testFindByArticleId passed!");
-
     }
 
     @Test
@@ -89,8 +83,6 @@ public class FeedbackRepositoryTest {
         assertThat(tmp.getFirst().getArticleId()).isEqualTo(feedbackEntity.getArticleId());
         assertThat(tmp.getFirst().getRating()).isEqualTo(feedbackEntity.getRating());
         assertThat(tmp.getFirst().getFbContent()).isEqualTo(feedbackEntity.getFbContent());*/
-
-        System.out.println("Test testFindByFbContentContaining passed!");
 
     }
 
