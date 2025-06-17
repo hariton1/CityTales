@@ -98,3 +98,5 @@ services:
     build: ./funfact-ml-service  # oder image: funfact-ml-service:latest
     ports:
       - "5005:5005"
+    environment:
+      - OPENAI_API_KEY=***REMOVED***
