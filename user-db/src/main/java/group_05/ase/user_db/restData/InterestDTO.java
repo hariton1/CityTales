@@ -27,4 +27,14 @@ public class InterestDTO {
     @JsonProperty(required = true, value = "interest_name_de")
     private String interestNameDe;
 
+    @Override
+    public String toString() {
+        return "InterestDTO{" +
+                "interestId=" + interestId +
+                ", interestNameEn='" + interestNameEn + '\'' +
+                ", description='" + description + '\'' +
+                ", interestNameDe='" + interestNameDe + '\'' +
+                '}';
+    }
+
 }

@@ -35,4 +35,14 @@ public class UserInterestDTO {
     @JsonProperty(required = true, value = "interest_weight")
     private float interestWeight;
 
+    @Override
+    public String toString() {
+        return "UserInterestDTO{" +
+                "userId=" + userId.toString() +
+                ", interestId=" + interestId +
+                ", creDat=" + creDat +
+                ", interestWeight=" + interestWeight +
+                '}';
+    }
+
 }
