@@ -55,6 +55,7 @@
 
   <ng-container *ngIf="currentViewMobile === 'map'">
     <app-map-view
+      [interestFilteringEnabled]="interestEnabled"
       (populatePlacesEvent)="setHistoricalPlaces($event)"
       (selectDetailEvent)="selectDetailEvent($event)"></app-map-view>
   </ng-container>

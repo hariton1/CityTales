@@ -7,7 +7,7 @@ import {
   EventEmitter,
   NgZone,
   ElementRef,
-  HostListener
+  HostListener, Input
 } from '@angular/core';
 import {GoogleMap, GoogleMapsModule, MapInfoWindow} from '@angular/google-maps';
 import {CommonModule} from '@angular/common';
@@ -50,6 +50,13 @@ export class MapViewComponent implements OnInit{
 
   @Output() selectDetailEvent: EventEmitter<Object> = new EventEmitter<Object>();
   @Output() populatePlacesEvent = new EventEmitter<BuildingEntity[]>();
+  @Input()
+  set interestFilteringEnabled(value: boolean) {
+    console.log('Interest filtering changed:', value);
+    this.interestFiltering = value ? 'true' : 'false';
+
+    this.initLoading();
+  }
 
   private selectedMarker: google.maps.Marker | null = null;
   private selectedBuildingType: string | null = null;
@@ -187,12 +194,16 @@ export class MapViewComponent implements OnInit{
   // TODO: remove later on
   // For testing in case navigator.geolocation breaks - happened to me for some reason...
   ngOnInit(): void {
-      this.interestFiltering = localStorage.getItem("interest_filtering");
-      this.locationService.getLocationsInRadius(this.center.lat, this.center.lng, 10000, this.interestFiltering === 'true').subscribe(locations => {
-        this.locationsNearby = locations;
-        this.addMarkersToMap(locations);
-        this.populatePlacesEvent.emit(locations);
-      });
+      this.initLoading();
+  }
+
+  initLoading(): void {
+    this.interestFiltering = localStorage.getItem("interest_filtering");
+    this.locationService.getLocationsInRadius(this.center.lat, this.center.lng, 10000, this.interestFiltering === 'true').subscribe(locations => {
+      this.locationsNearby = locations;
+      this.addMarkersToMap(locations);
+      this.populatePlacesEvent.emit(locations);
+    });
   }
 
   private clusterer!: MarkerClusterer;
