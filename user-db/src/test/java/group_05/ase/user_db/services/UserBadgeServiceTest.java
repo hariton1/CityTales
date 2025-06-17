@@ -53,8 +53,6 @@ public class UserBadgeServiceTest {
         assertThat(userBadgeDTOs.getFirst().getUserId()).isEqualTo(userBadgeEntity.getUserId());
         assertThat(userBadgeDTOs.getFirst().getArticleId()).isEqualTo(userBadgeEntity.getArticleId());
 
-        System.out.println("Test testGetAllUserBadges passed!");
-
     }
 
     @Test
@@ -67,8 +65,6 @@ public class UserBadgeServiceTest {
         assertThat(userBadgeDTOs.getFirst().getUserBadgeId()).isEqualTo(userBadgeEntity.getUserBadgeId());
         assertThat(userBadgeDTOs.getFirst().getUserId()).isEqualTo(userBadgeEntity.getUserId());
         assertThat(userBadgeDTOs.getFirst().getArticleId()).isEqualTo(userBadgeEntity.getArticleId());
-
-        System.out.println("Test testGetUserBadgesByUserId passed!");
 
     }
 
@@ -83,8 +79,6 @@ public class UserBadgeServiceTest {
         assertThat(userBadgeDTOs.getFirst().getUserId()).isEqualTo(userBadgeEntity.getUserId());
         assertThat(userBadgeDTOs.getFirst().getArticleId()).isEqualTo(userBadgeEntity.getArticleId());
 
-        System.out.println("Test testGetUserBadgesByUserId passed!");
-
     }
 
     @Test
@@ -97,8 +91,6 @@ public class UserBadgeServiceTest {
         assertThat(userBadgeDTO.getUserBadgeId()).isEqualTo(this.userBadgeDTO.getUserBadgeId());
         assertThat(userBadgeDTO.getUserId()).isEqualTo(this.userBadgeDTO.getUserId());
         assertThat(userBadgeDTO.getArticleId()).isEqualTo(this.userBadgeDTO.getArticleId());
-
-        System.out.println("Test testSaveNewBadge passed.");
 
     }
 }

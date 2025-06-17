@@ -62,7 +62,6 @@ public class UserHistoryServiceTest {
         assertThat(userHistoryDTOs.getFirst().getArticleId()).isEqualTo(userHistoryEntity.getArticleId());
         assertThat(userHistoryDTOs.getFirst().getInterestId()).isEqualTo(userHistoryEntity.getInterestId());
 
-        System.out.println("Test testGetAllUserHistories passed!");
 
     }
 
@@ -78,8 +77,6 @@ public class UserHistoryServiceTest {
         assertThat(userHistoryDTO.getArticleId()).isEqualTo(userHistoryEntity.getArticleId());
         assertThat(userHistoryDTO.getInterestId()).isEqualTo(userHistoryEntity.getInterestId());
 
-        System.out.println("Test testGetUserHistoriesById passed!");
-
     }
 
     @Test
@@ -93,8 +90,6 @@ public class UserHistoryServiceTest {
         assertThat(userHistoryDTOs.getFirst().getUserId()).isEqualTo(userHistoryEntity.getUserId());
         assertThat(userHistoryDTOs.getFirst().getArticleId()).isEqualTo(userHistoryEntity.getArticleId());
         assertThat(userHistoryDTOs.getFirst().getInterestId()).isEqualTo(userHistoryEntity.getInterestId());
-
-        System.out.println("Test testGetUserHistoriesByUserId passed!");
 
     }
 
@@ -110,8 +105,6 @@ public class UserHistoryServiceTest {
         assertThat(userHistoryDTOs.getFirst().getArticleId()).isEqualTo(userHistoryEntity.getArticleId());
         assertThat(userHistoryDTOs.getFirst().getInterestId()).isEqualTo(userHistoryEntity.getInterestId());
 
-        System.out.println("Test testGetUserHistoriesByArticleId passed!");
-
     }
 
     @Test
@@ -126,15 +119,6 @@ public class UserHistoryServiceTest {
         assertThat(userHistoryDTO.getUserId()).isEqualTo(userHistoryEntity.getUserId());
         assertThat(userHistoryDTO.getArticleId()).isEqualTo(userHistoryEntity.getArticleId());
         assertThat(userHistoryDTO.getInterestId()).isEqualTo(userHistoryEntity.getInterestId());
-
-        System.out.println("Test testSaveNewUserHistory passed.");
-
-    }
-
-    @Test
-    public void testSaveChangedUserHistory() {
-
-        System.out.println("Test testSaveChangedUserHistory not provided.");
 
     }
 

@@ -22,9 +22,6 @@ public class FilteredBuildingService {
             List<UserInterestsDTO> interests,
             List<ArticleWeightDTO> articleWeights
     ) {
-        System.out.println("Input buildings: " + (buildings == null ? "null" : buildings.size()));
-        System.out.println("Input interests: " + (interests == null ? "null" : interests.size()));
-        System.out.println("Input articleWeights: " + (articleWeights == null ? "null" : articleWeights.size()));
 
         Map<Integer, Float> weightMap = articleWeights.stream()
                 .collect(Collectors.toMap(
@@ -58,7 +55,7 @@ public class FilteredBuildingService {
             float wB = weightMap.getOrDefault(b.getViennaHistoryWikiId(), 0.0f);
             return Float.compare(wB, wA);
         });
-        System.out.println("Filtered buildings: " + filtered.size());
+
         return sorted;
     }
 
@@ -71,8 +68,6 @@ public class FilteredBuildingService {
         dto.setCollectionName(collectionName);
         dto.setInterests(interestsNames);
         dto.setResultSize(100);
-
-        System.out.println(dto);
 
         HttpEntity<MatchRequest> entity = new HttpEntity<>(dto, headers);
         ResponseEntity<List> response = restTemplate.exchange(QDRANT_URL + "categorize/match", HttpMethod.POST, entity, List.class);

@@ -53,8 +53,6 @@ public class ArticleWeightControllerTest {
                 .andExpect(jsonPath("$[0].article_weight_id").value(articleWeightDTO.getArticleWeightId()))
                 .andExpect(jsonPath("$[0].article_id").value(articleWeightDTO.getArticleId()))
                 .andExpect(jsonPath("$[0].weight").value(articleWeightDTO.getWeight()));
-
-        System.out.println("Test testGetAllArticleWeights passed!");
     }
 
     @Test
@@ -67,8 +65,6 @@ public class ArticleWeightControllerTest {
                 .andExpect(jsonPath("$.article_weight_id").value(articleWeightDTO.getArticleWeightId()))
                 .andExpect(jsonPath("$.article_id").value(articleWeightDTO.getArticleId()))
                 .andExpect(jsonPath("$.weight").value(articleWeightDTO.getWeight()));
-
-        System.out.println("Test testGetArticleWeightByArticleId passed!");
     }
 
     @Test
@@ -82,8 +78,6 @@ public class ArticleWeightControllerTest {
                 .andExpect(jsonPath("$.article_weight_id").value(articleWeightDTO.getArticleWeightId()))
                 .andExpect(jsonPath("$.article_id").value(articleWeightDTO.getArticleId()))
                 .andExpect(jsonPath("$.weight").value(articleWeightDTO.getWeight()));
-
-        System.out.println("Test testCreateNewArticleWeight passed!");
     }
 
 }
