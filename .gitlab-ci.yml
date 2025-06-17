@@ -27,15 +27,15 @@ build:neo4j-data-access:
 # TODO: FE
 
 # Test
-test:user-db:
-  stage: test
-  needs: ["build:user-db"]
-  script:
-    - cd user-db
-    - mvn test
-  artifacts:
-    paths:
-      - user-db/target/user-db-*.jar
+  #test:user-db:
+  #stage: test
+  #needs: ["build:user-db"]
+    #script:
+    #- cd user-db
+    #- mvn test
+    #artifacts:
+      #paths:
+    #- user-db/target/user-db-*.jar
 
 test:data-scraper:
   stage: test

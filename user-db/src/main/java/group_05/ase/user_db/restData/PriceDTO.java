@@ -40,4 +40,16 @@ public class PriceDTO {
     @JsonProperty(required = true, value = "created_at")
     private LocalDateTime created_at;
 
+    @Override
+    public String toString() {
+        return "PriceDTO{" +
+                "priceId=" + priceId +
+                ", locationId=" + locationId +
+                ", price=" + price +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", created_at=" + created_at +
+                '}';
+    }
+
 }

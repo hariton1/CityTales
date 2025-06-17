@@ -22,4 +22,13 @@ public class ArticleWeightDTO {
     @JsonProperty(required = true, value = "weight")
     private float weight;
 
+    @Override
+    public String toString() {
+        return "ArticleWeightDTO{" +
+                "articleWeightId=" + articleWeightId +
+                ", articleId=" + articleId +
+                ", weight=" + weight +
+                '}';
+    }
+
 }

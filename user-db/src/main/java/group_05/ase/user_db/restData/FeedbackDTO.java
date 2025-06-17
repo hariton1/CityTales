@@ -46,4 +46,16 @@ public class FeedbackDTO {
     @JsonDeserialize(using = CustomTimestampDeserializer.class)
     private LocalDateTime creDat;
 
+    @Override
+    public String toString() {
+        return "FeedbackDTO{" +
+                "feedbackId=" + feedbackId +
+                ", userId=" + userId +
+                ", articleId=" + articleId +
+                ", rating=" + rating +
+                ", fbContent='" + fbContent + '\'' +
+                ", creDat=" + creDat +
+                '}';
+    }
+
 }

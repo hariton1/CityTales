@@ -7,7 +7,7 @@ import {
   EventEmitter,
   NgZone,
   ElementRef,
-  HostListener
+  HostListener, Input
 } from '@angular/core';
 import {GoogleMap, GoogleMapsModule, MapInfoWindow} from '@angular/google-maps';
 import {CommonModule} from '@angular/common';
@@ -50,13 +50,23 @@ export class MapViewComponent implements OnInit{
 
   @Output() selectDetailEvent: EventEmitter<Object> = new EventEmitter<Object>();
   @Output() populatePlacesEvent = new EventEmitter<BuildingEntity[]>();
+  @Input()
+  set interestFilteringEnabled(value: boolean) {
+    console.log('Interest filtering changed:', value);
+    this.interestFiltering = value ? 'true' : 'false';
+
+    this.markers.forEach( m => m.setMap(null));
+    this.clusterer.setMap(null);
+    this.initLoading();
+  }
 
   private selectedMarker: google.maps.Marker | null = null;
   private selectedBuildingType: string | null = null;
 
 
   @ViewChild(MapInfoWindow) infoWindow: any;
-  private nativeInfoWindow = new google.maps.InfoWindow();
+  //private nativeInfoWindow = new google.maps.InfoWindow();
+  private nativeInfoWindow!: google.maps.InfoWindow;
   @ViewChild(GoogleMap) map!: GoogleMap;
 
   locationsNearby: BuildingEntity[] = [];
@@ -79,97 +89,9 @@ export class MapViewComponent implements OnInit{
 
   polylines: google.maps.LatLngLiteral[][] = [];
 
-  options: google.maps.MapOptions = {
-    mapTypeId: google.maps.MapTypeId.ROADMAP,
-    maxZoom: 20,
-    minZoom: 4,
-    zoomControl: true,
-    clickableIcons: true,
-    streetViewControl: false,
-    fullscreenControl: false,
-    mapTypeControl: true,
-    gestureHandling: 'greedy', //allows one finger control on the map (mobile)
-    mapTypeControlOptions: {
-      style: google.maps.MapTypeControlStyle.DROPDOWN_MENU, // or .HORIZONTAL_BAR
-      position: google.maps.ControlPosition.TOP_RIGHT       // e.g., BOTTOM_LEFT, TOP_CENTER, etc.
-    },
-    styles: [
-      {
-        "featureType": "poi",
-        "elementType": "labels.text",
-        "stylers": [
-          {
-            "visibility": "off"
-          }
-        ]
-      },
-      {
-        "featureType": "poi.business",
-        "stylers": [
-          {
-            "visibility": "off"
-          }
-        ]
-      },
-      {
-        "featureType": "road",
-        "elementType": "labels.icon",
-        "stylers": [
-          {
-            "visibility": "off"
-          }
-        ]
-      },
-      {
-        "featureType": "transit",
-        "stylers": [
-          {
-            "visibility": "off"
-          }
-        ]
-      },
-      {
-        featureType: 'poi.medical',
-        stylers: [{ visibility: 'off' }]
-      },
-      {
-        featureType: 'poi.attraction',
-        stylers: [{ visibility: 'off' }]
-      },
-      {
-        featureType: 'poi.park',
-        stylers: [{ visibility: 'off' }]
-      },
-      {
-        featureType: 'poi.sports_complex',
-        stylers: [{ visibility: 'off' }]
-      },
-      {
-        featureType: 'poi.school',
-        stylers: [{ visibility: 'off' }]
-      }
-    ]
-  };
-  locationMarkerOptions: google.maps.MarkerOptions = {
-    draggable: false,
-    icon: {
-      url: 'assets/icons/live-location.svg',
-      scaledSize: new google.maps.Size(50, 50),
-      origin: new google.maps.Point(0, 0),
-      anchor: new google.maps.Point(17, 34),
-      labelOrigin: new google.maps.Point(12, 34)
-    }
-  }
-  selectedMarkerOptions: google.maps.MarkerOptions = {
-    draggable: false,
-    icon: {
-      url: 'assets/icons/selected_location_marker.svg',
-      scaledSize: new google.maps.Size(50, 50),
-      origin: new google.maps.Point(0, 0),
-      anchor: new google.maps.Point(17, 34),
-      labelOrigin: new google.maps.Point(12, 34),
-    }
-  }
+  options!: google.maps.MapOptions;
+  locationMarkerOptions!: google.maps.MarkerOptions;
+  selectedMarkerOptions!: google.maps.MarkerOptions;
 
 /*  ngOnInit(): void {
     var location = this.userLocationService.getPosition();
@@ -187,12 +109,84 @@ export class MapViewComponent implements OnInit{
   // TODO: remove later on
   // For testing in case navigator.geolocation breaks - happened to me for some reason...
   ngOnInit(): void {
-      this.interestFiltering = localStorage.getItem("interest_filtering");
-      this.locationService.getLocationsInRadius(this.center.lat, this.center.lng, 10000, this.interestFiltering === 'true').subscribe(locations => {
+    if (typeof google !== 'undefined') {
+      this.nativeInfoWindow = new google.maps.InfoWindow();
+
+      this.options = {
+        mapTypeId: google.maps.MapTypeId.ROADMAP,
+        maxZoom: 20,
+        minZoom: 4,
+        zoomControl: true,
+        clickableIcons: true,
+        streetViewControl: false,
+        fullscreenControl: false,
+        mapTypeControl: true,
+        gestureHandling: 'greedy',
+        mapTypeControlOptions: {
+          style: google.maps.MapTypeControlStyle.DROPDOWN_MENU,
+          position: google.maps.ControlPosition.TOP_RIGHT,
+        },
+        styles: [
+          { featureType: "poi", elementType: "labels.text", stylers: [{ visibility: "off" }] },
+          { featureType: "poi.business", stylers: [{ visibility: "off" }] },
+          { featureType: "road", elementType: "labels.icon", stylers: [{ visibility: "off" }] },
+          { featureType: "transit", stylers: [{ visibility: "off" }] },
+          { featureType: "poi.medical", stylers: [{ visibility: "off" }] },
+          { featureType: "poi.attraction", stylers: [{ visibility: "off" }] },
+          { featureType: "poi.park", stylers: [{ visibility: "off" }] },
+          { featureType: "poi.sports_complex", stylers: [{ visibility: "off" }] },
+          { featureType: "poi.school", stylers: [{ visibility: "off" }] },
+        ]
+      };
+
+      this.locationMarkerOptions = {
+        draggable: false,
+        icon: {
+          url: 'assets/icons/live-location.svg',
+          scaledSize: new google.maps.Size(50, 50),
+          origin: new google.maps.Point(0, 0),
+          anchor: new google.maps.Point(17, 34),
+          labelOrigin: new google.maps.Point(12, 34)
+        }
+      };
+
+      this.selectedMarkerOptions = {
+        draggable: false,
+        icon: {
+          url: 'assets/icons/selected_location_marker.svg' + Date.now(),
+          scaledSize: new google.maps.Size(100, 100),
+          origin: new google.maps.Point(0, 0),
+          anchor: new google.maps.Point(22, 44),
+          labelOrigin: new google.maps.Point(20, 48)
+        }
+      };
+    } else {
+      console.error('Google Maps API not loaded');
+    }
+
+    this.initLoading();
+  }
+
+  /*  ngOnInit(): void {
+    var location = this.userLocationService.getPosition();
+
+    location.then(position => {
+      this.center = {lat: position.lat, lng: position.lng};
+      this.locationService.getLocationsInRadius(position.lat, position.lng, 2000).subscribe(locations => {
         this.locationsNearby = locations;
         this.addMarkersToMap(locations);
         this.populatePlacesEvent.emit(locations);
-      });
+      })
+    })
+  }*/
+
+  initLoading(): void {
+    this.interestFiltering = localStorage.getItem("interest_filtering");
+    this.locationService.getLocationsInRadius(this.center.lat, this.center.lng, 10000, this.interestFiltering === 'true').subscribe(locations => {
+      this.locationsNearby = locations;
+      this.addMarkersToMap(locations);
+      this.populatePlacesEvent.emit(locations);
+    });
   }
 
   private clusterer!: MarkerClusterer;
@@ -280,10 +274,10 @@ export class MapViewComponent implements OnInit{
 
     // Set the new icon for the active marker
     marker.setIcon({
-      url: 'assets/icons/town-hall-active.svg',
-      scaledSize: new google.maps.Size(28, 28),
-      anchor: new google.maps.Point(12, 12),
-      labelOrigin: new google.maps.Point(12, 30),
+      url: 'assets/icons/town-hall-active2.svg',
+      scaledSize: new google.maps.Size(40, 40),
+      anchor: new google.maps.Point(Math.round(12 * 1.43), Math.round(12 * 1.43)),
+      labelOrigin: new google.maps.Point(Math.round(12 * 1.43), Math.round(30 * 1.43))
     });
 
     this.activeMarker = marker; // store the new active marker
