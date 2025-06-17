@@ -38,14 +38,12 @@ public class HistoricBuildingService implements IHistoricBuildingService {
                 NEO4J_URL,
                 AuthTokens.basic(NEO4J_USER, NEO4J_PASSWORD)
         );
-        System.out.println("Neo4j driver initialized.");
     }
 
     @PreDestroy
     public void close() {
         if (driver != null) {
             driver.close();
-            System.out.println("Neo4j driver closed.");
         }
     }
 
@@ -111,7 +109,6 @@ public class HistoricBuildingService implements IHistoricBuildingService {
                     tx.run(query, Values.parameters("latitude", latitude, "longitude", longitude, "radius", radius)).list()
             );
 
-            System.out.println("checking records");
             for (Record record : records) {
                 Node mainNode = record.get("p").asNode();
 

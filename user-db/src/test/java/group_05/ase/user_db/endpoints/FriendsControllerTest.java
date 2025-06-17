@@ -57,8 +57,6 @@ public class FriendsControllerTest {
                 .andExpect(jsonPath("$[0].friend_one").value(friendsDTO.getFriendOne().toString()))
                 .andExpect(jsonPath("$[0].friend_two").value(friendsDTO.getFriendTwo().toString()));
 
-        System.out.println("Test testGetAllFeedbacks passed!");
-
     }
 
     @Test
@@ -73,8 +71,6 @@ public class FriendsControllerTest {
                 .andExpect(jsonPath("$.friends_id").value(friendsDTO.getFriendsId()))
                 .andExpect(jsonPath("$.friend_one").value(friendsDTO.getFriendOne().toString()))
                 .andExpect(jsonPath("$.friend_two").value(friendsDTO.getFriendTwo().toString()));
-
-        System.out.println("Test testGetFriendsById passed!");
 
     }
 
@@ -91,8 +87,6 @@ public class FriendsControllerTest {
                 .andExpect(jsonPath("$[0].friend_one").value(friendsDTO.getFriendOne().toString()))
                 .andExpect(jsonPath("$[0].friend_two").value(friendsDTO.getFriendTwo().toString()));
 
-        System.out.println("Test testGetFriendsByFriendOne passed!");
-
     }
 
     @Test
@@ -107,22 +101,6 @@ public class FriendsControllerTest {
                 .andExpect(jsonPath("$[0].friends_id").value(friendsDTO.getFriendsId()))
                 .andExpect(jsonPath("$[0].friend_one").value(friendsDTO.getFriendOne().toString()))
                 .andExpect(jsonPath("$[0].friend_two").value(friendsDTO.getFriendTwo().toString()));
-
-        System.out.println("Test testGetFriendsByFriendTwo passed!");
-
-    }
-
-    @Test
-    public void testCreateNewFriendsPair() throws Exception {
-
-        System.out.println("Test testCreateNewFriendsPair not provided!");
-
-    }
-
-    @Test
-    public void testDeleteFriendsPair() throws Exception {
-
-        System.out.println("Test testDeleteFriendsPair not provided!");
 
     }
 

@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,6 +26,7 @@ public class UserPointController {
     @ResponseStatus(HttpStatus.OK)
     public List<UserPointDTO> getAllUserPoints() {
         try {
+            logger.info("Fetching all user points");
             return this.userPointService.getAllUserPoints();
         } catch (Exception e) {
             logger.error("Error fetching user points: {}", e.getMessage());
@@ -38,6 +38,7 @@ public class UserPointController {
     @ResponseStatus(HttpStatus.OK)
     public UserPointDTO getUserPointById(@PathVariable("userPointId") int userPointId) {
         try {
+            logger.info("Fetching user points by id: {}", userPointId);
             return this.userPointService.getUserPointById(userPointId);
         } catch (Exception e) {
             logger.error("Error fetching user points by id {}: {}", userPointId, e.getMessage());
@@ -49,6 +50,7 @@ public class UserPointController {
     @ResponseStatus(HttpStatus.OK)
     public List<UserPointDTO> getUserPointsByUserId(@PathVariable("userId") UUID userId) {
         try {
+            logger.info("Fetching user points by user_id: {}", userId.toString());
             return this.userPointService.getUserPointsByUserId(userId);
         } catch (Exception e) {
             logger.error("Error fetching user points by user_id {}: {}", userId.toString(), e.getMessage());
@@ -60,6 +62,7 @@ public class UserPointController {
     @ResponseStatus(HttpStatus.CREATED)
     public void createNewPoints(@RequestBody UserPointDTO userPointDTO) {
         try {
+            logger.info("Creating user points: {}", userPointDTO.toString());
             this.userPointService.saveNewPoints(userPointDTO);
         } catch (Exception e) {
             logger.error("Error creating user points {}: {}", userPointDTO.toString(), e.getMessage());

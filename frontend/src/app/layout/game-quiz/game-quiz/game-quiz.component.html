@@ -56,7 +56,7 @@
 
           <div class="quiz-bottom-row">
             <div> {{ quiz.questions.length }} Qs</div>
-            <div> {{ printScore(i) }} </div>
+            <div tuiHint="{{ this.friendScores()[i] }}"> {{ printScore(i) }} </div>
           </div>
 
         </div>

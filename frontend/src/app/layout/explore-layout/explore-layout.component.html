@@ -10,20 +10,32 @@
     </button>
   </div>
 
-    <div class="mobile-view-toggle">
-      <tui-segmented [size]="'m'" [style.border-radius.rem]="10" [activeItemIndex]="changeVal" (activeItemIndexChange)="onIndex($event)">
-        <button
-          (click)="currentViewMobile = 'map'"
-        >
-          <tui-icon icon="@tui.map" [style.height.rem]="1.2" />Map
-        </button>
-        <button
-          (click)="currentViewMobile = 'discover'"
-        >
-          <tui-icon icon="@tui.telescope" [style.height.rem]="1.2" /> Discover
-        </button>
-      </tui-segmented>
-    </div>
+  <div class="mobile-interest-container" *ngIf="currentViewMobile === 'map'"
+  >
+    <button
+      tuiButton
+      size="m"
+      type="button"
+      class="mobile-interest-toggle"
+      (click)="onInterestToggle()">
+      <tui-icon icon="@tui.id-card" [style.height.rem]="1.2" [style.color]="interestEnabled ? 'green' : 'red'" />
+    </button>
+  </div>
+
+  <div class="mobile-view-toggle">
+    <tui-segmented [size]="'m'" [style.border-radius.rem]="10" [activeItemIndex]="changeVal" (activeItemIndexChange)="onIndex($event)">
+      <button
+        (click)="currentViewMobile = 'map'"
+      >
+        <tui-icon icon="@tui.map" [style.height.rem]="1.2" /> Map
+      </button>
+      <button
+        (click)="currentViewMobile = 'discover'"
+      >
+        <tui-icon icon="@tui.telescope" [style.height.rem]="1.2" /> Discover
+      </button>
+    </tui-segmented>
+  </div>
 
     <div class="notification-button-container">
       <app-notification-inbox (selectPlaceEvent)="selectDetailEvent($event)"></app-notification-inbox>
@@ -43,6 +55,7 @@
 
   <ng-container *ngIf="currentViewMobile === 'map'">
     <app-map-view
+      [interestFilteringEnabled]="interestEnabled"
       (populatePlacesEvent)="setHistoricalPlaces($event)"
       (selectDetailEvent)="selectDetailEvent($event)"></app-map-view>
   </ng-container>

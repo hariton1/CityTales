@@ -193,18 +193,35 @@ export class SidebarComponent implements OnChanges{
     })
   );
 
-  onItemClick(item: any){
-    //check if item is a building
-    if(item.latitude != null && item.longitude != null){
-      this.setPlaceDetail(item)
+  onItemClick(item: any) {
+    if (item.buildingType != null) {
+      const buildingId = item.viennaHistoryWikiId;
+      this.searchService.getBuildingById(buildingId).subscribe(building => {
+        this.setPlaceDetail(building);
+      });
     } else if (item.birthDate != null) {
-      //item is person
-      this.setPersonDetail(item)
+      const personId = item.viennaHistoryWikiId;
+      this.searchService.getPersonById(personId).subscribe(person => {
+        this.setPersonDetail(person);
+      });
     } else if (item.organizer != null) {
-      //item is event
-      this.setEventDetail(item)
+      const eventId = item.viennaHistoryWikiId;
+      this.searchService.getEventById(eventId).subscribe(event => {
+        this.setEventDetail(event);
+      });
+    } else {
+      // Fallback für direkt geladene Entitäten
+      if (item.latitude != null && item.longitude != null) {
+      } else if (item.birthDate != null) {
+        this.setPersonDetail(item);
+      } else if (item.organizer != null) {
+        this.setEventDetail(item);
+      }
     }
   }
+
+
+
 
   //close the search bar when clicking outside
   @ViewChild('searchFieldRef') searchFieldRef!: ElementRef;

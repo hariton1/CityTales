@@ -56,9 +56,8 @@ public class UserInterestsControllerTest {
                 .andExpect(jsonPath("$[0].user_id").value(userInterestDTO.getUserId().toString()))
                 .andExpect(jsonPath("$[0].interest_id").value(userInterestDTO.getInterestId()))
                 .andExpect(jsonPath("$[0].interest_weight").value(userInterestDTO.getInterestWeight()));
-
-        System.out.println("Test testGetAllUserInterests passed!");
     }
+
     @Test
     @WithMockUser(username = "testuser")
     public void testGetUserInterestsByInterestId() throws Exception {
@@ -71,20 +70,6 @@ public class UserInterestsControllerTest {
                 .andExpect(jsonPath("$[0].user_id").value(userInterestDTO.getUserId().toString()))
                 .andExpect(jsonPath("$[0].interest_id").value(userInterestDTO.getInterestId()))
                 .andExpect(jsonPath("$[0].interest_weight").value(userInterestDTO.getInterestWeight()));
-
-        System.out.println("Test testGetUserInterestsByInterestId passed!");
-    }
-
-    @Test
-    @WithMockUser(username = "testuser")
-    public void testCreateNewUserInterest() throws Exception {
-        System.out.println("Test testCreateNewUserInterest not provided!");
-    }
-
-    @Test
-    @WithMockUser(username = "testuser")
-    public void testDeleteUserInterest() throws Exception {
-        System.out.println("Test testDeleteUserInterest not provided!");
     }
 
     @Test

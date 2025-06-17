@@ -4,21 +4,24 @@
     padding: 0 !important;
   }
 
-  .centered-wrapper form {
+  .introduction-text, .tour-introduction-text, .login-introduction-text {
     width: 90%;
+    margin-left: 5%;
   }
 }
 
 /* tablet: 769px-1024px */
 @media (min-width: 769px) and (max-width: 1024px) {
-  .centered-wrapper form {
+  .introduction-text, .tour-introduction-text, .login-introduction-text {
     width: 60%;
+    margin-left: 20%;
   }
 }
 
 /* desktop: >768px show only .desktop */
 @media (min-width: 1025px) {
-  .centered-wrapper form {
-    width: 25%;
+  .introduction-text, .tour-introduction-text, .login-introduction-text {
+    width: 40%;
+    margin-left: 30%;
   }
 }
