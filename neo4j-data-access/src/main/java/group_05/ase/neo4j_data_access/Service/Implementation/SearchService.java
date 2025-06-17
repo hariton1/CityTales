@@ -24,24 +24,17 @@ public class SearchService implements ISearchService {
 
     @Override
     public List<ViennaHistoryWikiPersonObject> searchPersonsWithKeyword(String query) {
-
-        //TODO: Preprocess Query
         System.out.println(historicPersonService.getPersonsByPartialName(query));
         return historicPersonService.getPersonsByPartialName(query);
     }
 
     @Override
     public List<ViennaHistoryWikiBuildingObject> searchPlacesWithKeyword(String query) {
-
-        //TODO: Preprocess Query
-
         return historicBuildingService.getBuildingByPartialName(query);
     }
 
     @Override
     public List<ViennaHistoryWikiEventObject> searchEventsWithKeyword(String query) {
-        //TODO: Preprocess Query
-
         return historicEventService.getEventByPartialName(query);
     }
 }
