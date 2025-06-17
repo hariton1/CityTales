@@ -98,3 +98,5 @@ services:
     build: ./funfact-ml-service  # oder image: funfact-ml-service:latest
     ports:
       - "5005:5005"
+    environment:
+      - OPENAI_API_KEY=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
