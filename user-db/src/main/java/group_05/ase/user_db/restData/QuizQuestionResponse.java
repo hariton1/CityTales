@@ -7,7 +7,7 @@ import lombok.*;
 @AllArgsConstructor
 @Getter
 @Setter
-public class QuizResponse {
+public class QuizQuestionResponse {
 
     private String question;
     private String answer;

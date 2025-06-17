@@ -1,6 +1,5 @@
 package group_05.ase.user_db.services;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import group_05.ase.user_db.entities.QuestionEntity;
 import group_05.ase.user_db.entities.QuestionResultsEntity;
 import group_05.ase.user_db.entities.QuizEntity;
@@ -10,8 +9,6 @@ import group_05.ase.user_db.repositories.QuestionResultsRepository;
 import group_05.ase.user_db.repositories.QuizRepository;
 import group_05.ase.user_db.repositories.QuizUserRepository;
 import group_05.ase.user_db.restData.*;
-import lombok.Getter;
-import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.util.Pair;
@@ -74,60 +71,20 @@ public class QuizService {
         List<QuizUserEntity> userQuizzes = quizUserRepository.findByPlayer(user);
 
         for (QuizUserEntity quiz : userQuizzes) {
-            QuizResultDTO result = new QuizResultDTO();
-            int quizId = quiz.getQuiz();
-            result.setQuiz(quizId);
-            List<QuestionEntity> questions = questionRepository.findByQuiz(quizId);
-            List<QuizFriendResultDTO> friendResultDTOs = new ArrayList<>();
-
-            for (QuestionEntity question : questions) {
-                int questionId = question.getId();
-                List<QuestionResultsEntity> questionResults = questionResultsRepository.findByQuestion(questionId);
-
-                List<QuestionResultsDTO> questionResultsDTOs = new ArrayList<>();
-                for (QuestionResultsEntity questionResultsEntity : questionResults) {
-                    UUID player = questionResultsEntity.getPlayer();
-                    if (user.equals(player)) {
-                        questionResultsDTOs.add(mapToQuestionResultsDTO(questionResultsEntity));
-                    } else {
-
-                        QuizFriendResultDTO friendResult = null;
-                        for (QuizFriendResultDTO friend : friendResultDTOs) {
-                            if (player.equals(friend.getFriend())) {
-                                friendResult = friend;
-                                break;
-                            }
-                        }
-
-                        if (friendResult == null) {
-                            QuizFriendResultDTO newFriend = new QuizFriendResultDTO();
-                            newFriend.setQuiz(quizId);
-                            newFriend.setFriend(player);
-                            newFriend.setCorrectnessPercentage(questionResultsEntity.getCorrect() ? 1f : 0f);
-                            newFriend.setQuestionsAnswered(1);
-                            friendResultDTOs.add(newFriend);
-                        } else {
-                            float percentage = friendResult.getCorrectnessPercentage();
-                            int questionsAnsweredSoFar = friendResult.getQuestionsAnswered();
-                            int numberOfCorrectlyAnsweredQuestionsSoFar = (int) (percentage * questionsAnsweredSoFar);
-                            int newQuestionAnsweredCorrectly = questionResultsEntity.getCorrect() ? 1 : 0;
-                            int newNumberOfQuestionsAnswered = friendResult.getQuestionsAnswered() + 1;
-                            float newPercentage = ((float) (numberOfCorrectlyAnsweredQuestionsSoFar + newQuestionAnsweredCorrectly)) / ((float) newNumberOfQuestionsAnswered);
-
-                            friendResult.setCorrectnessPercentage(newPercentage);
-                            friendResult.setQuestionsAnswered(newNumberOfQuestionsAnswered);
-                        }
-                    }
-                }
-
-                result.setQuestionResults(questionResultsDTOs);
-            }
-
-            result.setFriendResults(friendResultDTOs);
+            QuizResultDTO result = getResultsForUserForQuiz(user, quiz.getQuiz());
             results.add(result);
         }
 
         return results;
+    }
+
+    public QuizResultDTO saveQuestionResults(QuizResultDTO dto) {
+
+        List<QuestionResultsEntity> entities = mapToQuestionResultsEntity(dto);
+        for (QuestionResultsEntity entity : entities) {
+            questionResultsRepository.save(entity);
+        }
+        return getResultsForUserForQuiz(dto.getQuestionResults().getFirst().getPlayer(), dto.getQuiz());
     }
 
     public QuizDTO saveQuiz(String category, List<UUID> users) {
@@ -136,7 +93,7 @@ public class QuizService {
 
         List<Pair<String, String>> contentData = fetchGenerationDataByCategoryForUser(creator, category);
 
-        List<QuizResponse> responses = new ArrayList<>();
+        List<QuizQuestionResponse> responses = new ArrayList<>();
         List<String> questionData = getColumn(contentData, true);
         for (String questionPrompt : questionData) {
             responses.add(generateQuizByLLM(questionPrompt));
@@ -145,9 +102,11 @@ public class QuizService {
         List<String> imageData = getColumn(contentData, false);
         enrichResponseWithImageData(responses, imageData);
 
+        QuizAdditionalResponse quizAdditionalResponse = generateQuizAdditionalByLLM(responses);
+
         QuizDTO result = new QuizDTO();
-        result.setName("persisted Quiz");
-        result.setDescription("generated");
+        result.setName(quizAdditionalResponse.getName());
+        result.setDescription(quizAdditionalResponse.getDescription());
         result.setCategory(category);
         result.setCreator(creator);
         result.setCreatedAt(LocalDateTime.now());
@@ -162,6 +121,42 @@ public class QuizService {
         addUsersToQuiz(users, result.getId());
 
         return mapToQuizDTO(quizEntity, questionEntities);
+    }
+
+    public List<QuizUserDTO> saveQuizForUsers(List<QuizUserDTO> dtoList) {
+        List<QuizUserDTO> list = new ArrayList<>();
+
+        for (QuizUserDTO dto : dtoList) {
+            QuizUserEntity entity = new QuizUserEntity();
+
+            entity.setQuiz(dto.getQuiz());
+            entity.setPlayer(dto.getPlayer());
+            entity.setCreatedAt(dto.getCreatedAt());
+
+            List<QuizUserEntity> persistedEntities = quizUserRepository.findByPlayer(dto.getPlayer());
+            boolean found = false;
+            for (QuizUserEntity persistedEntity : persistedEntities) {
+                if (dto.getQuiz() == (persistedEntity.getQuiz())) {
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                QuizUserEntity result = quizUserRepository.save(entity);
+
+                QuizUserDTO persistedDTO = new QuizUserDTO();
+
+                persistedDTO.setId(result.getId());
+                persistedDTO.setQuiz(result.getQuiz());
+                persistedDTO.setPlayer(result.getPlayer());
+                persistedDTO.setCreatedAt(result.getCreatedAt());
+
+                list.add(persistedDTO);
+            }
+        }
+
+        return list;
     }
 
     private QuizDTO mapToQuizDTO(QuizEntity quiz, List<QuestionEntity> questions) {
@@ -266,12 +261,27 @@ public class QuizService {
         return result;
     }
 
-    private QuizResponse generateQuizByLLM(String prompt) {
+    private QuizQuestionResponse generateQuizByLLM(String prompt) {
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
         headers.add("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36");
         HttpEntity<String> entity = new HttpEntity<>(prompt, headers);
-        ResponseEntity<QuizResponse> response = restTemplate.exchange(OPENAI_ADDRESS + "/api/quiz/generate", HttpMethod.POST, entity, QuizResponse.class);
+        ResponseEntity<QuizQuestionResponse> response = restTemplate.exchange(OPENAI_ADDRESS + "/api/quiz/generate", HttpMethod.POST, entity, QuizQuestionResponse.class);
+        return response.getBody();
+    }
+
+    private QuizAdditionalResponse generateQuizAdditionalByLLM(List<QuizQuestionResponse> responses) {
+        StringBuilder prompt = new StringBuilder();
+        for (QuizQuestionResponse questionResponse : responses) {
+            prompt.append(questionResponse.getQuestion());
+            prompt.append("\n");
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+        headers.add("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36");
+        HttpEntity<String> entity = new HttpEntity<>(prompt.toString(), headers);
+        ResponseEntity<QuizAdditionalResponse> response = restTemplate.exchange(OPENAI_ADDRESS + "/api/quiz/generate_additional", HttpMethod.POST, entity, QuizAdditionalResponse.class);
         return response.getBody();
     }
 
@@ -473,10 +483,10 @@ public class QuizService {
         }
     }
 
-    private List<QuestionDTO> mapQuestionResponsesToQuestionDTOList(List<QuizResponse> responses, int quiz) {
+    private List<QuestionDTO> mapQuestionResponsesToQuestionDTOList(List<QuizQuestionResponse> responses, int quiz) {
         List<QuestionDTO> result = new ArrayList<>();
 
-        for (QuizResponse response : responses) {
+        for (QuizQuestionResponse response : responses) {
             QuestionDTO dto = new QuestionDTO();
 
             dto.setQuiz(quiz);
@@ -508,7 +518,7 @@ public class QuizService {
         return list;
     }
 
-    private void enrichResponseWithImageData(List<QuizResponse> responses, List<String> images) {
+    private void enrichResponseWithImageData(List<QuizQuestionResponse> responses, List<String> images) {
         for (int i = 0; i < responses.size(); i++) {
             logger.info("IMAGE: {}", images.get(i));
             responses.get(i).setImage(images.get(i));
@@ -523,5 +533,82 @@ public class QuizService {
             quizUserEntity.setCreatedAt(LocalDateTime.now());
             quizUserRepository.save(quizUserEntity);
         }
+    }
+
+    private List<QuestionResultsEntity> mapToQuestionResultsEntity (QuizResultDTO dto) {
+        List<QuestionResultsDTO> questionResultsList = dto.getQuestionResults();
+        List<QuestionResultsEntity> list = new ArrayList<>();
+
+        if (questionResultsList == null || questionResultsList.isEmpty()) {
+            return list;
+        }
+
+        for (QuestionResultsDTO questionResults : questionResultsList) {
+            QuestionResultsEntity entity = new QuestionResultsEntity();
+
+            entity.setQuestion(questionResults.getQuestion());
+            entity.setPlayer(questionResults.getPlayer());
+            entity.setCorrect(questionResults.getCorrect());
+            entity.setCreatedAt(LocalDateTime.now());
+
+            list.add(entity);
+        }
+
+        return list;
+    }
+
+    private QuizResultDTO getResultsForUserForQuiz(UUID user, int quiz) {
+        QuizResultDTO result = new QuizResultDTO();
+        result.setQuiz(quiz);
+        result.setQuestionResults(new ArrayList<>());
+        result.setFriendResults(new ArrayList<>());
+        List<QuestionEntity> questions = questionRepository.findByQuiz(quiz);
+        List<QuizFriendResultDTO> friendResultDTOs = new ArrayList<>();
+
+        for (QuestionEntity question : questions) {
+            int questionId = question.getId();
+            List<QuestionResultsEntity> questionResults = questionResultsRepository.findByQuestion(questionId);
+
+            QuestionResultsDTO questionResultsDTO = new QuestionResultsDTO();
+            for (QuestionResultsEntity questionResultsEntity : questionResults) {
+                UUID player = questionResultsEntity.getPlayer();
+                if (user.equals(player)) {
+                    questionResultsDTO = mapToQuestionResultsDTO(questionResultsEntity);
+                } else {
+
+                    QuizFriendResultDTO friendResult = null;
+                    for (QuizFriendResultDTO friend : friendResultDTOs) {
+                        if (player.equals(friend.getFriend())) {
+                            friendResult = friend;
+                            break;
+                        }
+                    }
+
+                    if (friendResult == null) {
+                        QuizFriendResultDTO newFriend = new QuizFriendResultDTO();
+                        newFriend.setQuiz(quiz);
+                        newFriend.setFriend(player);
+                        newFriend.setCorrectnessPercentage(questionResultsEntity.getCorrect() ? 1f : 0f);
+                        newFriend.setQuestionsAnswered(1);
+                        friendResultDTOs.add(newFriend);
+                    } else {
+                        float percentage = friendResult.getCorrectnessPercentage();
+                        int questionsAnsweredSoFar = friendResult.getQuestionsAnswered();
+                        int numberOfCorrectlyAnsweredQuestionsSoFar = (int) (percentage * questionsAnsweredSoFar);
+                        int newQuestionAnsweredCorrectly = questionResultsEntity.getCorrect() ? 1 : 0;
+                        int newNumberOfQuestionsAnswered = friendResult.getQuestionsAnswered() + 1;
+                        float newPercentage = ((float) (numberOfCorrectlyAnsweredQuestionsSoFar + newQuestionAnsweredCorrectly)) / ((float) newNumberOfQuestionsAnswered);
+
+                        friendResult.setCorrectnessPercentage(newPercentage);
+                        friendResult.setQuestionsAnswered(newNumberOfQuestionsAnswered);
+                    }
+                }
+            }
+
+            result.getQuestionResults().add(questionResultsDTO);
+        }
+
+        result.setFriendResults(friendResultDTOs);
+        return result;
     }
 }

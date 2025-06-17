@@ -14,7 +14,14 @@ import {QuizService} from '../../../services/quiz.service';
 import {UUID} from 'node:crypto';
 import {TuiResponsiveDialogOptions} from '@taiga-ui/addon-mobile';
 import {Quiz} from '../../../dto/quiz.dto';
-import {UserService} from '../../../services/user.service';
+import {QuizResult} from '../../../dto/quiz.result.dto';
+import {QuestionResults} from '../../../dto/question-results.dto';
+import {UserPointsService} from '../../../user_db.services/user-points.service';
+import {UserPointDto} from '../../../user_db.dto/user-point.dto';
+import {tuiRound} from '@taiga-ui/cdk';
+import {FriendsService} from '../../../user_db.services/friends.service';
+import {FriendsDto} from '../../../user_db.dto/friends.dto';
+import {QuizUserDto} from '../../../dto/quiz-user.dto';
 
 @Component({
   selector: 'app-game-quiz',
@@ -41,7 +48,8 @@ import {UserService} from '../../../services/user.service';
 export class GameQuizComponent implements OnInit {
 
   private readonly quizService = inject(QuizService);
-  private readonly userService = inject(UserService);
+  private readonly userPointsService = inject(UserPointsService);
+  private readonly friendsService = inject(FriendsService);
   private readonly alerts = inject(TuiAlertService);
   protected options: Partial<TuiResponsiveDialogOptions> = {};
   protected openQuizPlay = false;
@@ -49,10 +57,13 @@ export class GameQuizComponent implements OnInit {
   protected size: TuiSizeL | TuiSizeS = 's';
   protected openGenerateMenu = false;
   creatorId: UUID = '' as UUID;
+  friends: FriendsDto[] = [];
   users: UUID[] = [];
   quizzes = this.quizService.quizzes;
+  quizzesResults = this.quizService.quizzesResults;
+  quizCreatorNames = this.quizService.quizCreatorNames;
+  questionResults: QuestionResults[] = [];
   chosenCategory = '';
-  userName = '';
   playingQuiz: Quiz | undefined;
   numberOfQuestions = 0;
   currentQuizIndex = 0;
@@ -60,6 +71,7 @@ export class GameQuizComponent implements OnInit {
   correctAnswer = '';
   score = 0;
   toggleScoreEditable = false;
+  inviteSent = this.quizService.inviteSuccessfullySent;
 
   currentQuestionSignal = signal<string>('');
   currentAnswer1Signal = signal<string>('');
@@ -79,6 +91,7 @@ export class GameQuizComponent implements OnInit {
   ngOnInit(): void {
     this.retrieveUserID();
     this.quizService.getQuizzesByUserId(this.creatorId);
+    this.quizService.getQuizResultsByUserId(this.creatorId);
   }
 
   generateQuiz(category: string) {
@@ -94,9 +107,10 @@ export class GameQuizComponent implements OnInit {
     if (stored) {
       this.creatorId = stored;
     }
-    this.userService.getUserWithRoleById(this.creatorId).subscribe((user) => {
-      this.userName = user.email.substring(0, user.email.indexOf('@'));
-    });
+  }
+
+  saveQuizResult(result: QuizResult) {
+    this.quizService.saveQuizResult(result);
   }
 
   playQuiz(index: number): void {
@@ -104,8 +118,7 @@ export class GameQuizComponent implements OnInit {
     this.currentQuestionIndex = 0;
     this.currentQuizIndex = index;
     this.playingQuiz = this.quizzes()[index];
-    this.numberOfQuestions = this.quizzes()[this.currentQuizIndex].questions.length;
-    console.log(this.playingQuiz);
+    this.numberOfQuestions = this.playingQuiz.questions.length;
     this.options = {
       label: this.playingQuiz.name,
       size: 'l',
@@ -118,22 +131,29 @@ export class GameQuizComponent implements OnInit {
 
   loadNextQuestion(): void {
     this.toggleScoreEditable = true;
-    if (this.currentQuestionIndex < this.numberOfQuestions) {
-      this.currentQuestionIndex++;
-    } else {
+    if (this.currentQuestionIndex >= this.numberOfQuestions) {
       this.openQuizPlay = false;
       this.alerts.open(`Good job!`, {
         label: `Final score: ${this.score}`,
         appearance: 'primary',
         autoClose: 5000
       }).subscribe()
-      // todo persist score
+      let quiz = this.quizzes()[this.currentQuizIndex];
+      let oldScore = this.calcOldScore(this.playingQuiz!.id);
+      if (oldScore) {
+        let subtractedPointDTO = new UserPointDto(-1, this.creatorId, -oldScore * 5, new Date(), Number(quiz))
+        this.userPointsService.createNewPoints(subtractedPointDTO).subscribe();
+      }
+      let pointDTO = new UserPointDto(-1, this.creatorId, this.score * 5, new Date(), Number(quiz))
+      this.userPointsService.createNewPoints(pointDTO).subscribe(data => {
+        console.log("Quiz points created")
+      });
+      this.saveQuizResult({quiz: this.playingQuiz?.id, questionResults: this.questionResults, friendResults: []});
     }
 
     let question = this.quizzes()[this.currentQuizIndex].questions[this.currentQuestionIndex];
     this.correctAnswer = question.answer;
 
-    //todo mix which gets assigned where
     this.currentQuestionSignal.set(question.question);
     const shuffledAnswers = [question.answer, question.wrong_answer_a, question.wrong_answer_b, question.wrong_answer_c]
       .sort(() => Math.random() - 0.5);
@@ -143,12 +163,14 @@ export class GameQuizComponent implements OnInit {
     this.currentImageSignal.set(question.image);
 
     this.openQuizPlay = true;
+    this.currentQuestionIndex++;
   }
 
   check(answer: string) {
     if (answer === this.correctAnswer) {
       if (this.toggleScoreEditable) {
         this.score++;
+        this.questionResults.push(this.getNewQuestionResult(true));
         this.toggleScoreEditable = false;
       }
       this.alerts.open('Good Job!', {
@@ -157,12 +179,82 @@ export class GameQuizComponent implements OnInit {
         autoClose: 1000
       }).subscribe()
     } else {
-      this.toggleScoreEditable = false;
+      if (this.toggleScoreEditable) {
+        this.questionResults.push(this.getNewQuestionResult(false));
+        this.toggleScoreEditable = false;
+      }
       this.alerts.open('Too bad!', {
         label: 'Wrong!',
         appearance: 'negative',
         autoClose: 1000
       }).subscribe()
     }
+  }
+
+  getNewQuestionResult(correct: boolean): QuestionResults {
+    return {
+      id: 0,
+      question: this.quizzes()[this.currentQuizIndex].questions[this.currentQuestionIndex - 1].id,
+      player: this.creatorId,
+      correct: correct,
+      createdAt: new Date()
+    }
+  }
+
+  printScore(index: number) {
+    let quizId = this.quizzes()[index].id;
+    let numOfQuestions = this.quizzes()[index].questions.length;
+    let oldScore = this.calcOldScore(quizId)
+    if (oldScore !== null) {
+      let percentage = tuiRound(oldScore / numOfQuestions * 100, 0);
+      return 'Score: ' + percentage + '%';
+    }
+
+    return 'Not played yet!';
+  }
+
+  calcOldScore(quizId: number) {
+    let score = 0;
+    let quizResult = this.quizzesResults().find(result => result.quiz === quizId);
+    if (quizResult) {
+      quizResult?.questionResults.forEach((result) => {
+        if (result.correct) {
+          score++;
+        }
+      })
+      return score;
+    }
+    return null;
+  }
+
+  retrieveFriends() {
+    this.friendsService.getFriendsByFriendOne(this.creatorId).subscribe({
+        next: result => {
+          result.forEach(result => {
+            this.friends.push(result);
+          });
+        }
+      }
+    );
+
+    if (!this.inviteSent) {
+      let quizUsers: QuizUserDto[] = [];
+      this.friends.forEach((friend) => {
+        quizUsers.push({ id: 0, quiz: this.playingQuiz!.id, player: friend.friend_two, createdAt: new Date });
+      });
+      this.quizService.inviteFriendsToQuiz(quizUsers);
+      this.alerts.open(`Your friends can now play this quiz too!`, {
+        label: `Invite Sent!`,
+        appearance: 'success',
+        autoClose: 5000
+      }).subscribe()
+    } else {
+      this.alerts.open(`Your friends have already received this quiz!`, {
+        label: `Invite already sent!`,
+        appearance: 'neutral',
+        autoClose: 3000
+      }).subscribe()
+    }
+
   }
 }

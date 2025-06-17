@@ -43,11 +43,10 @@
               </div>
             </div>
             <h3 tuiTitle>
-              awesome quiz
-              <!--{{ quiz.name }}-->
+              {{ quiz.name }}
             </h3>
             <h6>
-              {{ userName }}
+              {{ this.quizCreatorNames()[i] }}
             </h6>
           </div>
 
@@ -57,7 +56,7 @@
 
           <div class="quiz-bottom-row">
             <div> {{ quiz.questions.length }} Qs</div>
-            <div> Score: 90%</div>
+            <div> {{ printScore(i) }} </div>
           </div>
 
         </div>
@@ -109,9 +108,15 @@
       [value]="currentQuestionIndex"
     ></progress>
 
-    <button class="next-button-style" appearance="primary" tuiButton type="button" (click)="loadNextQuestion()">
-      Next
-    </button>
+    <div class="single-quiz-footer-buttons">
+      <button class="next-button-style" appearance="secondary" tuiButton type="button" (click)="retrieveFriends()">
+        Invite friends!
+      </button>
+
+      <button class="next-button-style" appearance="primary" tuiButton type="button" (click)="loadNextQuestion()">
+        Next
+      </button>
+    </div>
   </div>
 
 </ng-template>

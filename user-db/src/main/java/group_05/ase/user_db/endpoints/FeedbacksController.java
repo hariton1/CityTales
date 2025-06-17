@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,11 +22,11 @@ public class FeedbacksController {
         this.feedbackService = feedbackService;
     }
 
-    /* TODO write tests */
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<FeedbackDTO> getAllFeedbacks() {
         try {
+            logger.info("Fetching all feedbacks");
             return this.feedbackService.getAllFeedbacks();
         } catch (Exception e) {
             logger.error("Error fetching feedbacks: {}", e.getMessage());
@@ -39,6 +38,7 @@ public class FeedbacksController {
     @ResponseStatus(HttpStatus.OK)
     public FeedbackDTO getFeedbackById(@PathVariable("feedbackId") int feedbackId) {
         try {
+            logger.info("Fetching feedback by id: {}", feedbackId);
             return this.feedbackService.getFeedbackById(feedbackId);
         } catch (Exception e) {
             logger.error("Error fetching feedback by id {}: {}", feedbackId, e.getMessage());
@@ -50,6 +50,7 @@ public class FeedbacksController {
     @ResponseStatus(HttpStatus.OK)
     public List<FeedbackDTO> getFeedbacksByUserId(@PathVariable("userId") UUID userId) {
         try {
+            logger.info("Fetching feedback by user_id: {}", userId.toString());
             return this.feedbackService.getFeedbacksByUserId(userId);
         } catch (Exception e) {
             logger.error("Error fetching feedback by user_id {}: {}", userId.toString(), e.getMessage());
@@ -61,6 +62,7 @@ public class FeedbacksController {
     @ResponseStatus(HttpStatus.OK)
     public List<FeedbackDTO> getFeedbacksByArticleId(@PathVariable("articleId") int articleId) {
         try {
+            logger.info("Fetching feedback by article_id: {}", articleId);
             return this.feedbackService.getFeedbacksByArticleId(articleId);
         } catch (Exception e) {
             logger.error("Error fetching feedback by article_id {}: {}", articleId, e.getMessage());
@@ -72,6 +74,7 @@ public class FeedbacksController {
     @ResponseStatus(HttpStatus.OK)
     public List<FeedbackDTO> getFeedbacksByFbContentLike(@PathVariable("content") String content) {
         try {
+            logger.info("Fetching feedback by content: {}", content);
             return this.feedbackService.getFeedbacksByFbContentLike(content);
         } catch (Exception e) {
             logger.error("Error fetching feedback by content {}: {}", content, e.getMessage());
@@ -83,6 +86,7 @@ public class FeedbacksController {
     @ResponseStatus(HttpStatus.CREATED)
     public void createNewFeedback(@RequestBody FeedbackDTO feedbackDTO) {
         try {
+            logger.info("Creating feedback: {}", feedbackDTO.toString());
             this.feedbackService.saveNewFeedback(feedbackDTO);
         } catch (Exception e) {
             logger.error("Error creating feedback {}: {}", feedbackDTO.toString(), e.getMessage());
@@ -94,6 +98,7 @@ public class FeedbacksController {
     @ResponseStatus(HttpStatus.OK)
     public void approveFeedback(@PathVariable("feedbackId") int feedbackId) {
         try {
+            logger.info("Approving feedback by id: {}", feedbackId);
             this.feedbackService.approveFeedback(feedbackId);
         } catch (Exception e) {
             logger.error("Error approving feedback by id {}: {}", feedbackId, e.getMessage());
@@ -105,6 +110,7 @@ public class FeedbacksController {
     @ResponseStatus(HttpStatus.OK)
     public void deleteFeedback(@PathVariable("feedbackId") int feedbackId) {
         try {
+            logger.info("Deleting feedback by id: {}", feedbackId);
             this.feedbackService.deleteFeedback(feedbackId);
         } catch (Exception e) {
             logger.error("Error deleting feedback by id {}: {}", feedbackId, e.getMessage());

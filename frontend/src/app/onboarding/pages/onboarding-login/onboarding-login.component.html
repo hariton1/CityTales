@@ -1,51 +1,195 @@
-<!-- top nav displayed for mobile only -->
-<section tuiPlatform="ios" *ngIf="isMobile">
-  <tui-app-bar>
-    <button
-      tuiAppBarBack
-      tuiSlot="left"
-      type="button"
-    >
-      Profile
-    </button>
-    John Doe
-    <a
-      iconStart="@tui.user"
-      title="User"
-      tuiIconButton
-      tuiSlot="right"
-    ></a>
-  </tui-app-bar>
-</section>
-
 <div class="centered-wrapper">
-  <form [formGroup]="form">
-    <header tuiHeader>
-      <h3 tuiTitle>Select your interests
-        <span tuiSubtitle>Tailor your interests to discover the best spots for you</span>
-      </h3>
-    </header>
-    <tui-filter
-      formControlName="filters"
-      size="l"
-      class="filters"
-      [items]="interestNames"
-    />
-
-    <footer>
-      <button
-        appearance="floating"
-        tuiButton
-        type="button"
-        class="next-button"
-        (click)="onSubmit()"
-      >
-        Next
-        <tui-icon
-          icon="@tui.arrow-right"
-          [style.height.rem]="5"
-        />
+  <tui-pulse *ngIf="step()" tuiHintAppearance="floating" class="step-2"
+             [tuiHint]="step2" [tuiHintManual]="step() === 2">
+    <ng-template #step2>
+      <button appearance="icon" iconStart="@tui.x" size="xs" tuiIconButton type="button" (click)="step.set(0)">
+        Close
       </button>
-    </footer>
-  </form>
+      <h3 tuiTitle>
+        Explore
+        <div tuiSubtitle>On this page you can find the interactive map. After selecting a building on the map, it's detailed
+        information will be displayed along with interesting facts and connected building, persons and events. Each detail also
+        includes an interesting fun fact, that you can store and share with your friends!</div>
+      </h3>
+      <footer>
+        <button appearance="secondary-grayscale" tuiButton type="button" (click)="step.set(1)">
+          Back
+        </button>
+        <button tuiButton type="button" (click)="step.set(3)">
+          Next
+        </button>
+      </footer>
+    </ng-template>
+  </tui-pulse>
+  <tui-pulse *ngIf="step()" tuiHintAppearance="floating" class="step-3"
+             [tuiHint]="step3" [tuiHintManual]="step() === 3">
+    <ng-template #step3>
+      <button appearance="icon" iconStart="@tui.x" size="xs" tuiIconButton type="button" (click)="step.set(0)">
+        Close
+      </button>
+      <h3 tuiTitle>
+        Tours
+        <div tuiSubtitle>Here you can find the preplanned tours as well as plan your on trip in detail. You can also
+        let our application generate best tour for you based on your interests as well as your time or money budget.</div>
+      </h3>
+      <footer>
+        <button appearance="secondary-grayscale" tuiButton type="button" (click)="step.set(2)">
+          Back
+        </button>
+        <button tuiButton type="button" (click)="step.set(4)">
+          Next
+        </button>
+      </footer>
+    </ng-template>
+  </tui-pulse>
+  <tui-pulse *ngIf="step()" tuiHintAppearance="floating" class="step-4"
+             [tuiHint]="step4" [tuiHintManual]="step() === 4">
+    <ng-template #step4>
+      <button appearance="icon" iconStart="@tui.x" size="xs" tuiIconButton type="button" (click)="step.set(0)">
+        Close
+      </button>
+      <h3 tuiTitle>
+        Scoreboard
+        <div tuiSubtitle>If you want to keep track of your earned XP points, badges or compare your earned points with friends
+        or the whole world, this is the page that you should visit.</div>
+      </h3>
+      <footer>
+        <button appearance="secondary-grayscale" tuiButton type="button" (click)="step.set(3)">
+          Back
+        </button>
+        <button tuiButton type="button" (click)="step.set(5)">
+          Next
+        </button>
+      </footer>
+    </ng-template>
+  </tui-pulse>
+  <tui-pulse *ngIf="step()" tuiHintAppearance="floating" class="step-5"
+             [tuiHint]="step5" [tuiHintManual]="step() === 5">
+    <ng-template #step5>
+      <button appearance="icon" iconStart="@tui.x" size="xs" tuiIconButton type="button" (click)="step.set(0)">
+        Close
+      </button>
+      <h3 tuiTitle>
+        Friends
+        <div tuiSubtitle>As the name suggest, here you can see your list of friends, but also send and accept the requests from
+        your real-world friends as well as the fellow travelers.</div>
+      </h3>
+      <footer>
+        <button appearance="secondary-grayscale" tuiButton type="button" (click)="step.set(4)">
+          Back
+        </button>
+        <button tuiButton type="button" (click)="step.set(6)">
+          Next
+        </button>
+      </footer>
+    </ng-template>
+  </tui-pulse>
+  <tui-pulse *ngIf="step()" tuiHintAppearance="floating" class="step-6"
+             [tuiHint]="step6" [tuiHintManual]="step() === 6">
+    <ng-template #step6>
+      <button appearance="icon" iconStart="@tui.x" size="xs" tuiIconButton type="button" (click)="step.set(0)">
+        Close
+      </button>
+      <h3 tuiTitle>
+        Quizzes
+        <div tuiSubtitle>What's better way to verify what have you learned during an interesting tour through the city than
+        doing a little quiz? You can even earn extra points and get an edge over your friends on the leaderboard.</div>
+      </h3>
+      <footer>
+        <button appearance="secondary-grayscale" tuiButton type="button" (click)="step.set(5)">
+          Back
+        </button>
+        <button tuiButton type="button" (click)="step.set(7)">
+          Next
+        </button>
+      </footer>
+    </ng-template>
+  </tui-pulse>
+  <tui-pulse *ngIf="step()" tuiHintAppearance="floating" class="step-7"
+             [tuiHint]="step7" [tuiHintManual]="step() === 7">
+    <ng-template #step7>
+      <button appearance="icon" iconStart="@tui.x" size="xs" tuiIconButton type="button" (click)="step.set(0)">
+        Close
+      </button>
+      <h3 tuiTitle>
+        About us
+        <div tuiSubtitle>Contact and basic information about the developers, that brought to you this amazing application.</div>
+      </h3>
+      <footer>
+        <button appearance="secondary-grayscale" tuiButton type="button" (click)="step.set(6)">
+          Back
+        </button>
+        <button tuiButton type="button" (click)="step.set(8)">
+          Next
+        </button>
+      </footer>
+    </ng-template>
+  </tui-pulse>
+  <tui-pulse *ngIf="step()" tuiHintAppearance="floating" class="step-8"
+             [tuiHint]="step8" [tuiHintManual]="step() === 8">
+    <ng-template #step8>
+      <button appearance="icon" iconStart="@tui.x" size="xs" tuiIconButton type="button" (click)="step.set(0)">
+        Close
+      </button>
+      <h3 tuiTitle>
+        Profile
+        <div tuiSubtitle>Here you can change your interests' setting, password and also display the history of your travels
+          and saved fun facts.</div>
+      </h3>
+      <footer>
+        <button appearance="secondary-grayscale" tuiButton type="button" (click)="step.set(7)">
+          Back
+        </button>
+        <button tuiButton type="button" (click)="step.set(9)">
+          Next
+        </button>
+      </footer>
+    </ng-template>
+  </tui-pulse>
+  <tui-pulse *ngIf="step()" tuiHintAppearance="floating" class="step-9"
+             [tuiHint]="step9" [tuiHintManual]="step() === 9">
+    <ng-template #step9>
+      <button appearance="icon" iconStart="@tui.x" size="xs" tuiIconButton type="button" (click)="step.set(0)">
+        Close
+      </button>
+      <h3 tuiTitle>
+        Let's begin the exploration of Vienna!
+      </h3>
+      <footer>
+        <button appearance="secondary-grayscale" tuiButton type="button" (click)="step.set(8)">
+          Back
+        </button>
+        <button tuiButton type="button" (click)="step.set(0)">
+          Got it!
+        </button>
+      </footer>
+    </ng-template>
+  </tui-pulse>
+  <button appearance="outline" size="m" tuiButton type="button" (click)="step.set(1)">
+    Start tutorial
+    <tui-pulse *ngIf="step()" tuiHintAppearance="accent" tuiHintDirection="right" tuiTheme="dark" class="step-1"
+               [tuiHint]="step1" [tuiHintManual]="step() === 1">
+      <ng-template #step1>
+        <button appearance="icon" iconStart="@tui.x" size="xs" tuiIconButton type="button" (click)="step.set(0)">
+          Close
+        </button>
+        <h3 tuiTitle>
+          Welcome to the onboarding in the CityTales Vienna!
+          <div tuiSubtitle>During this onboarding we will explain the main functionalities that will make your trip to Vienna
+          full of new interesting information.</div>
+        </h3>
+        <footer>
+          <button appearance="secondary-grayscale" tuiButton type="button" (click)="step.set(0)">
+            Close
+          </button>
+          <button tuiButton type="button" (click)="step.set(2)">
+            Next
+          </button>
+        </footer>
+      </ng-template>
+    </tui-pulse>
+  </button>
+  <button tuiButton appearance="primary" type="button" routerLink="/explore">
+    Let's begin
+  </button>
 </div>

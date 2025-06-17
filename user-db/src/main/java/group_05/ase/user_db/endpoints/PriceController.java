@@ -26,6 +26,7 @@ public class PriceController {
     @ResponseStatus(HttpStatus.OK)
     public List<PriceDTO> getPricesByLocation(@PathVariable("location_id") int location_id) {
         try {
+            logger.info("Fetching prices for location: {}", location_id);
             return this.service.getPricesByLocation(location_id);
         } catch (Exception e) {
             logger.error("Error fetching prices for location {}: {}", location_id, e.getMessage());
@@ -37,6 +38,7 @@ public class PriceController {
     @ResponseStatus(HttpStatus.OK)
     public List<List<PriceDTO>> getPricesByLocations(@RequestBody int[] location_ids) {
         try {
+            logger.info("Fetching prices for locations: {}", location_ids);
             return this.service.getPricesByLocations(location_ids);
         } catch (Exception e) {
             logger.error("Error fetching prices for locations {}: {}", location_ids, e.getMessage());
@@ -48,6 +50,7 @@ public class PriceController {
     @ResponseStatus(HttpStatus.CREATED)
     public PriceDTO createOrUpdate(@RequestBody PriceDTO dto) {
         try {
+            logger.info("Creating price: {}", dto.toString());
             return this.service.createOrUpdatePrice(dto);
         } catch (Exception e) {
             logger.error("Error creating price {}: {}", dto.toString(), e.getMessage());
@@ -59,6 +62,7 @@ public class PriceController {
     @ResponseStatus(HttpStatus.OK)
     public void deletePrice(@PathVariable("id") int id) {
         try {
+            logger.info("Deleting price by id: {}", id);
             this.service.deletePrice(id);
         } catch (Exception e) {
             logger.error("Error deleting price by id {}: {}", id, e.getMessage());
