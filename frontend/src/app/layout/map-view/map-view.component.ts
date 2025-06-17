@@ -55,6 +55,8 @@ export class MapViewComponent implements OnInit{
     console.log('Interest filtering changed:', value);
     this.interestFiltering = value ? 'true' : 'false';
 
+    this.markers.forEach( m => m.setMap(null));
+    this.clusterer.setMap(null);
     this.initLoading();
   }
 
