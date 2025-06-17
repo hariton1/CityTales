@@ -61,4 +61,19 @@ public class SavedFunFactDTO {
     @JsonDeserialize(using = CustomTimestampDeserializer.class)
     private LocalDateTime savedAt;
 
+    @Override
+    public String toString() {
+        return "SavedFunFactDTO{" +
+                "savedFunFactId=" + savedFunFactId +
+                ", userId=" + userId.toString() +
+                ", articleId=" + articleId +
+                ", headline='" + headline + '\'' +
+                ", funFact='" + funFact + '\'' +
+                ", imageUrl='" + imageUrl + '\'' +
+                ", score=" + score +
+                ", reason='" + reason + '\'' +
+                ", savedAt=" + savedAt +
+                '}';
+    }
+
 }

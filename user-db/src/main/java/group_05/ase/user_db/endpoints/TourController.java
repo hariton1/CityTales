@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -18,15 +17,16 @@ public class TourController {
     private static final Logger logger = LoggerFactory.getLogger(TourController.class);
 
     private final TourService tourService;
+
     public TourController(TourService tourService) {
         this.tourService = tourService;
-        System.out.println("TourController created");
     }
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<TourDTO> getAllTours() {
         try {
+            logger.info("Fetching all tours");
             return this.tourService.findAllTours();
         } catch (Exception e) {
             logger.error("Error fetching tours: {}", e.getMessage());
@@ -38,6 +38,7 @@ public class TourController {
     @ResponseStatus(HttpStatus.OK)
     public List<TourDTO> getToursByUserId(@PathVariable("userId") String userId) {
         try {
+            logger.info("Fetching tours by user_id: {}", userId);
             return this.tourService.findToursByUserId(userId);
         } catch (Exception e) {
             logger.error("Error fetching tours by user_id {}: {}", userId, e.getMessage());
@@ -49,6 +50,7 @@ public class TourController {
     @ResponseStatus(HttpStatus.OK)
     public TourDTO getToursByTourId(@PathVariable("tourId") Integer tourId) {
         try {
+            logger.info("Fetching tour by id: {}", tourId);
             return this.tourService.findTourByTourId(tourId);
         } catch (Exception e) {
             logger.error("Error fetching tours by id {}: {}", tourId, e.getMessage());
@@ -60,6 +62,7 @@ public class TourController {
     @ResponseStatus(HttpStatus.OK)
     public void deleteTourById(@PathVariable("tourId") Integer tourId) {
         try {
+            logger.info("Deleting tour by id: {}", tourId);
             this.tourService.deleteTourById(tourId);
         } catch (Exception e) {
             logger.error("Error deleting tour by id {}: {}", tourId, e.getMessage());
@@ -71,6 +74,7 @@ public class TourController {
     @ResponseStatus(HttpStatus.OK)
     public TourDTO updateTourById(@PathVariable("tourId") Integer tourId, @RequestBody TourDTO updatedValues) {
         try {
+            logger.info("Updating tour by id {}, with: {}", tourId, updatedValues.toString());
             return this.tourService.updateTourById(tourId, updatedValues);
         } catch (Exception e) {
             logger.error("Error updating tour by id {}, with {}: {}", tourId, updatedValues.toString(), e.getMessage());
@@ -82,6 +86,7 @@ public class TourController {
     @ResponseStatus(HttpStatus.OK)
     public void createTour(@RequestBody TourDTO tourDTO) {
         try {
+            logger.info("Creating tour: {}", tourDTO.toString());
             this.tourService.createTour(tourDTO);
         } catch (Exception e) {
             logger.error("Error creating tour {}: {}", tourDTO.toString(), e.getMessage());

@@ -32,10 +32,11 @@ public class UserInterestsController {
     @ResponseStatus(HttpStatus.OK)
     public List<UserInterestDTO> getAllUserInterests() {
         try {
+            logger.info("Fetching all users interests");
             return this.userInterestService.getAllUserInterests();
         } catch (Exception e) {
-            logger.error("Error fetching user interests: {}", e.getMessage());
-            throw new RuntimeException("Error fetching user interests", e);
+            logger.error("Error fetching users interests: {}", e.getMessage());
+            throw new RuntimeException("Error fetching users interests", e);
         }
     }
 
@@ -43,6 +44,7 @@ public class UserInterestsController {
     @ResponseStatus(HttpStatus.OK)
     public List<UserInterestDTO> getUserInterestsByInterestId(@PathVariable("interestId") int interestId) {
         try {
+            logger.info("Fetching user interests by id: {}", interestId);
             return this.userInterestService.getUserInterestsByInterestId(interestId);
         } catch (Exception e) {
             logger.error("Error fetching user interests by id {}: {}", interestId, e.getMessage());
@@ -54,9 +56,10 @@ public class UserInterestsController {
     @ResponseStatus(HttpStatus.CREATED)
     public void createNewUserInterest(@RequestBody UserInterestDTO userInterestDTO) {
         try {
+            logger.info("Creating user interest: {}", userInterestDTO.toString());
             this.userInterestService.saveNewUserInterest(userInterestDTO);
         } catch (Exception e) {
-            logger.error("Error creating user interest by id {}: {}", userInterestDTO.toString(), e.getMessage());
+            logger.error("Error creating user interest {}: {}", userInterestDTO.toString(), e.getMessage());
             throw new RuntimeException("Error creating user interest", e);
         }
     }
@@ -65,9 +68,10 @@ public class UserInterestsController {
     @ResponseStatus(HttpStatus.OK)
     public void deleteUserInterest(@RequestBody UserInterestDTO userInterestDTO) {
         try {
+            logger.info("Deleting user interest: {}", userInterestDTO.toString());
             this.userInterestService.deleteUserInterest(userInterestDTO);
         } catch (Exception e) {
-            logger.error("Error deleting user interest by id {}: {}", userInterestDTO.toString(), e.getMessage());
+            logger.error("Error deleting user interest {}: {}", userInterestDTO.toString(), e.getMessage());
             throw new RuntimeException("Error deleting user interest", e);
         }
     }
@@ -77,6 +81,7 @@ public class UserInterestsController {
     public List<UserInterestDTO> getOwnUserInterests(@AuthenticationPrincipal Jwt jwt) {
         try {
             UUID userId = UUID.fromString(jwt.getSubject());
+            logger.info("Fetching user interests by user_id: {}", jwt.getSubject());
             return this.userInterestService.getUserInterestsByUserId(userId);
         } catch (Exception e) {
             logger.error("Error fetching user interests by user_id {}: {}", jwt.getSubject(), e.getMessage());
@@ -94,9 +99,11 @@ public class UserInterestsController {
     @ResponseStatus(HttpStatus.OK)
     public List<UserInterestDTO> getUserInterestsByUserId(@PathVariable("userId") UUID userId) {
         try {
+            logger.info("Fetching user interests by user_id: {}", userId.toString());
             return this.userInterestService.getUserInterestsByUserId(userId);
         } catch (Exception e) {
-            return new ArrayList<UserInterestDTO>(); //"An internal server error occurred => " + e.getMessage();
+            logger.error("Error fetching user interests by user_id {}: {}", userId.toString(), e.getMessage());
+            throw new RuntimeException("Error fetching user interests", e);
         }
     }
 

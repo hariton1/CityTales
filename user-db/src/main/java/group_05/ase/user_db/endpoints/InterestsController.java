@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -26,6 +25,7 @@ public class InterestsController {
     @ResponseStatus(HttpStatus.OK)
     public List<InterestDTO> getAllInterests() {
         try {
+            logger.info("Fetching all interests");
             return this.interestService.getAllInterests();
         } catch (Exception e) {
             logger.error("Error fetching interests: {}", e.getMessage());
@@ -37,6 +37,7 @@ public class InterestsController {
     @ResponseStatus(HttpStatus.OK)
     public InterestDTO getInterestByInterestId(@PathVariable("interestId") int interestId) {
         try {
+            logger.info("Fetching interests by id: {}", interestId);
             return this.interestService.getInterestById(interestId);
         } catch (Exception e) {
             logger.error("Error fetching interests by id {}: {}", interestId, e.getMessage());
@@ -48,6 +49,7 @@ public class InterestsController {
     @ResponseStatus(HttpStatus.OK)
     public InterestDTO getInterestByNameEn(@PathVariable("interestNameEn") String interestNameEn) {
         try {
+            logger.info("Fetching interests by interest_name_en: {}", interestNameEn);
             return this.interestService.getInterestByNameEn(interestNameEn);
         } catch (Exception e) {
             logger.error("Error fetching interests by interest_name_en {}: {}", interestNameEn, e.getMessage());
@@ -59,6 +61,7 @@ public class InterestsController {
     @ResponseStatus(HttpStatus.OK)
     public InterestDTO getInterestByNameDe(@PathVariable("interestNameDe") String interestNameDe) {
         try {
+            logger.info("Fetching interests by interest_name_de: {}", interestNameDe);
             return this.interestService.getInterestByNameDe(interestNameDe);
         } catch (Exception e) {
             logger.error("Error fetching interests by interest_name_de {}: {}", interestNameDe, e.getMessage());
@@ -70,6 +73,7 @@ public class InterestsController {
     @ResponseStatus(HttpStatus.OK)
     public List<InterestDTO> getInterestsByDescriptionLike(@PathVariable("description") String description) {
         try {
+            logger.info("Fetching interests by description: {}", description);
             return this.interestService.getInterestsByDescriptionLike(description);
         } catch (Exception e) {
             logger.error("Error fetching interests by description {}: {}", description, e.getMessage());
@@ -81,6 +85,7 @@ public class InterestsController {
     @ResponseStatus(HttpStatus.CREATED)
     public void createNewInterest(@RequestBody InterestDTO interestDTO) {
         try {
+            logger.info("Creating interest: {}", interestDTO.toString());
             this.interestService.saveNewInterest(interestDTO);
         } catch (Exception e) {
             logger.error("Error creating interest {}: {}", interestDTO.toString(), e.getMessage());
