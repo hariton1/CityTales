@@ -98,7 +98,6 @@ public class FeedbackService {
     }
 
     public void approveFeedback(int feedbackId) {
-        System.out.println("Approving feedback: " + feedbackId);
         FeedbackEntity tmp = this.repository.findByFeedbackId(feedbackId);
 
         tmp.setApproved("Y");
@@ -107,7 +106,6 @@ public class FeedbackService {
     }
 
     public void deleteFeedback(int feedbackId) {
-        System.out.println("Deleting feedback: " + feedbackId);
         this.repository.deleteById(feedbackId);
     }
 

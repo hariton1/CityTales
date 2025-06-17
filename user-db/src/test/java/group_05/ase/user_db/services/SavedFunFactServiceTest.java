@@ -68,8 +68,6 @@ public class SavedFunFactServiceTest {
         assertThat(savedFunFactDTOs.getFirst().getScore()).isEqualTo(savedFunFactEntity.getScore());
         assertThat(savedFunFactDTOs.getFirst().getReason()).isEqualTo(savedFunFactEntity.getReason());
 
-        System.out.println("Test testGetAllByUserId passed!");
-
     }
 
     @Test
@@ -87,8 +85,6 @@ public class SavedFunFactServiceTest {
         assertThat(savedFunFactDTO.getImageUrl()).isEqualTo(this.savedFunFactDTO.getImageUrl());
         assertThat(savedFunFactDTO.getScore()).isEqualTo(this.savedFunFactDTO.getScore());
         assertThat(savedFunFactDTO.getReason()).isEqualTo(this.savedFunFactDTO.getReason());
-
-        System.out.println("Test testSaveNewSavedFunFact passed.");
 
     }
 

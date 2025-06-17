@@ -54,8 +54,6 @@ public class UserInterestServiceTest {
         assertThat(userInterestDTOs.getFirst().getInterestId()).isEqualTo(userInterestEntity.getInterestId());
         assertThat(userInterestDTOs.getFirst().getInterestWeight()).isEqualTo(userInterestEntity.getInterestWeight());
 
-        System.out.println("Test testGetAllUserInterests passed!");
-
     }
 
     @Test
@@ -69,8 +67,6 @@ public class UserInterestServiceTest {
         assertThat(userInterestDTOs.getFirst().getInterestId()).isEqualTo(userInterestEntity.getInterestId());
         assertThat(userInterestDTOs.getFirst().getInterestWeight()).isEqualTo(userInterestEntity.getInterestWeight());
 
-        System.out.println("Test testGetUserInterestsByUserId passed!");
-
     }
 
     @Test
@@ -83,22 +79,6 @@ public class UserInterestServiceTest {
         assertThat(userInterestDTOs.getFirst().getUserId()).isEqualTo(userInterestEntity.getUserId());
         assertThat(userInterestDTOs.getFirst().getInterestId()).isEqualTo(userInterestEntity.getInterestId());
         assertThat(userInterestDTOs.getFirst().getInterestWeight()).isEqualTo(userInterestEntity.getInterestWeight());
-
-        System.out.println("Test testGetUserInterestsByInterestId passed!");
-
-    }
-
-    @Test
-    public void testSaveNewUserInterest() {
-
-        System.out.println("Test testSaveNewUserInterest not provided.");
-
-    }
-
-    @Test
-    public void testDeleteUserInterest() {
-
-        System.out.println("Test testDeleteUserInterest not provided.");
 
     }
 

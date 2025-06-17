@@ -52,8 +52,6 @@ public class FeedbackServiceTest {
         assertThat(feedbackDTOs.getFirst().getRating()).isEqualTo(feedbackEntity.getRating());
         assertThat(feedbackDTOs.getFirst().getFbContent()).isEqualTo(feedbackEntity.getFbContent());
 
-        System.out.println("Test testGetAllFeedbacks passed!");
-
     }
 
     @Test
@@ -68,8 +66,6 @@ public class FeedbackServiceTest {
         assertThat(feedbackDTO.getArticleId()).isEqualTo(feedbackEntity.getArticleId());
         assertThat(feedbackDTO.getRating()).isEqualTo(feedbackEntity.getRating());
         assertThat(feedbackDTO.getFbContent()).isEqualTo(feedbackEntity.getFbContent());
-
-        System.out.println("Test testGetFeedbackById passed!");
 
     }
 
@@ -86,8 +82,6 @@ public class FeedbackServiceTest {
         assertThat(feedbackDTOs.getFirst().getRating()).isEqualTo(feedbackEntity.getRating());
         assertThat(feedbackDTOs.getFirst().getFbContent()).isEqualTo(feedbackEntity.getFbContent());
 
-        System.out.println("Test testGetFeedbacksByUserId passed!");
-
     }
 
     @Test
@@ -103,8 +97,6 @@ public class FeedbackServiceTest {
         assertThat(feedbackDTOs.getFirst().getRating()).isEqualTo(feedbackEntity.getRating());
         assertThat(feedbackDTOs.getFirst().getFbContent()).isEqualTo(feedbackEntity.getFbContent());
 
-        System.out.println("Test testGetFeedbacksByArticleId passed!");
-
     }
 
     @Test
@@ -119,15 +111,6 @@ public class FeedbackServiceTest {
         assertThat(feedbackDTOs.getFirst().getArticleId()).isEqualTo(feedbackEntity.getArticleId());
         assertThat(feedbackDTOs.getFirst().getRating()).isEqualTo(feedbackEntity.getRating());
         assertThat(feedbackDTOs.getFirst().getFbContent()).isEqualTo(feedbackEntity.getFbContent());
-
-        System.out.println("Test testGetFeedbacksByFbContentLike passed!");
-
-    }
-
-    @Test
-    public void testSaveNewFeedback() {
-
-        System.out.println("Test testSaveNewFeedback not provided.");
 
     }
 

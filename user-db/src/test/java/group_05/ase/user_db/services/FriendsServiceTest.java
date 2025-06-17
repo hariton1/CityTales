@@ -46,8 +46,6 @@ public class FriendsServiceTest {
         assertThat(friendsDTOs.getFirst().getFriendOne()).isEqualTo(friendsEntity.getFriendOne());
         assertThat(friendsDTOs.getFirst().getFriendTwo()).isEqualTo(friendsEntity.getFriendTwo());
 
-        System.out.println("Test testGetAllFriends passed!");
-
     }
 
     @Test
@@ -60,8 +58,6 @@ public class FriendsServiceTest {
         assertThat(friendsDTO.getFriendsId()).isEqualTo(friendsEntity.getFriendsId());
         assertThat(friendsDTO.getFriendOne()).isEqualTo(friendsEntity.getFriendOne());
         assertThat(friendsDTO.getFriendTwo()).isEqualTo(friendsEntity.getFriendTwo());
-
-        System.out.println("Test testGetFriendsById passed!");
 
     }
 
@@ -76,8 +72,6 @@ public class FriendsServiceTest {
         assertThat(friendsDTOs.getFirst().getFriendOne()).isEqualTo(friendsEntity.getFriendOne());
         assertThat(friendsDTOs.getFirst().getFriendTwo()).isEqualTo(friendsEntity.getFriendTwo());
 
-        System.out.println("Test testGetFriendsByFriendOne passed!");
-
     }
 
     @Test
@@ -90,22 +84,6 @@ public class FriendsServiceTest {
         assertThat(friendsDTOs.getFirst().getFriendsId()).isEqualTo(friendsEntity.getFriendsId());
         assertThat(friendsDTOs.getFirst().getFriendOne()).isEqualTo(friendsEntity.getFriendOne());
         assertThat(friendsDTOs.getFirst().getFriendTwo()).isEqualTo(friendsEntity.getFriendTwo());
-
-        System.out.println("Test testGetFriendsByFriendTwo passed!");
-
-    }
-
-    @Test
-    public void testSaveNewFriendsPair() {
-
-        System.out.println("Test testSaveNewFriendsPair not provided.");
-
-    }
-
-    @Test
-    public void testDeleteFriendsPair() {
-
-        System.out.println("Test testDeleteFriendsPair not provided.");
 
     }
 

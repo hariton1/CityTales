@@ -39,14 +39,12 @@ public class HistoricEventService implements IHistoricEventService {
                 NEO4J_URL,
                 AuthTokens.basic(NEO4J_USER, NEO4J_PASSWORD)
         );
-        System.out.println("Neo4j driver initialized.");
     }
 
     @PreDestroy
     public void close() {
         if (driver != null) {
             driver.close();
-            System.out.println("Neo4j driver closed.");
         }
     }
 
