@@ -7,7 +7,7 @@ import {
   EventEmitter,
   NgZone,
   ElementRef,
-  HostListener
+  HostListener, Input
 } from '@angular/core';
 import {GoogleMap, GoogleMapsModule, MapInfoWindow} from '@angular/google-maps';
 import {CommonModule} from '@angular/common';
@@ -50,6 +50,15 @@ export class MapViewComponent implements OnInit{
 
   @Output() selectDetailEvent: EventEmitter<Object> = new EventEmitter<Object>();
   @Output() populatePlacesEvent = new EventEmitter<BuildingEntity[]>();
+  @Input()
+  set interestFilteringEnabled(value: boolean) {
+    console.log('Interest filtering changed:', value);
+    this.interestFiltering = value ? 'true' : 'false';
+
+    this.markers.forEach( m => m.setMap(null));
+    this.clusterer.setMap(null);
+    this.initLoading();
+  }
 
   private selectedMarker: google.maps.Marker | null = null;
   private selectedBuildingType: string | null = null;
@@ -155,6 +164,23 @@ export class MapViewComponent implements OnInit{
       console.error('Google Maps API not loaded');
     }
 
+    this.initLoading();
+  }
+
+  /*  ngOnInit(): void {
+    var location = this.userLocationService.getPosition();
+
+    location.then(position => {
+      this.center = {lat: position.lat, lng: position.lng};
+      this.locationService.getLocationsInRadius(position.lat, position.lng, 2000).subscribe(locations => {
+        this.locationsNearby = locations;
+        this.addMarkersToMap(locations);
+        this.populatePlacesEvent.emit(locations);
+      })
+    })
+  }*/
+
+  initLoading(): void {
     this.interestFiltering = localStorage.getItem("interest_filtering");
     this.locationService.getLocationsInRadius(this.center.lat, this.center.lng, 10000, this.interestFiltering === 'true').subscribe(locations => {
       this.locationsNearby = locations;
