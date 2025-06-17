@@ -3,6 +3,7 @@ package group05.ase.openai.adapter.Endpoint;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import group05.ase.openai.adapter.Controller.EnrichmentController;
 import group05.ase.openai.adapter.Service.OpenAIService;
+import group05.ase.openai.adapter.dto.EnrichmentRequest;
 import group05.ase.openai.adapter.dto.EnrichmentResponse;
 import group05.ase.openai.adapter.dto.SummaryRequest;
 import group05.ase.openai.adapter.dto.SummaryResponse;
@@ -45,6 +46,18 @@ class EnrichmentControllerTest {
     }
 
     @Test
+    void generateSummary_shouldReturnBadRequestForEmptyContent() throws Exception {
+        SummaryRequest request = new SummaryRequest();
+        request.setContent("   ");
+
+        mockMvc.perform(post("/api/enrich/summary")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.summary").value("<p>Missing input for summary.</p>"));
+    }
+
+    @Test
     void generateSummary_shouldReturnSummaryResponse() throws Exception {
         String inputContent = "This monument was built in 1607.";
         String summaryHtml = "<p>Summary text</p><ul><li>Fact 1</li></ul>";
@@ -60,6 +73,30 @@ class EnrichmentControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.summary").value(summaryHtml));
+    }
+
+    @Test
+    void enrichText_shouldReturnBadRequestWhenToneIsMissing() throws Exception {
+        EnrichmentRequest request = new EnrichmentRequest();
+        request.setContent("The monument was built in 1607.");
+
+        mockMvc.perform(post("/api/enrich/full")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.enrichedContent").value("<p><em>Missing content or tone.</em></p>"));
+    }
+
+    @Test
+    void enrichText_shouldReturnBadRequestWhenContentIsMissing() throws Exception {
+        EnrichmentRequest request = new EnrichmentRequest();
+        request.setTone("tour");
+
+        mockMvc.perform(post("/api/enrich/full")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.enrichedContent").value("<p><em>Missing content or tone.</em></p>"));
     }
 
     @Test
