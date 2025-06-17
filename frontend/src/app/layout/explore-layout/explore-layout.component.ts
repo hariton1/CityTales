@@ -134,6 +134,7 @@ export class ExploreLayoutComponent  {
   onInterestToggle(): void {
     console.log('was:', this.interestEnabled)
     this.interestEnabled = !this.interestEnabled;
-    localStorage.setItem('interest_filtering', this.interestEnabled.toString());
+   localStorage.setItem('interest_filtering', this.interestEnabled.toString());
   }
+
 }
