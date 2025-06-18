@@ -53,7 +53,7 @@ public class QuizController {
 
     @PostMapping("/quiz/create/{category}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<QuizDTO> saveQuizForUsers(@PathVariable("category") String category, @RequestBody List<UUID> users) {
+    public ResponseEntity<QuizDTO> saveQuiz(@PathVariable("category") String category, @RequestBody List<UUID> users) {
         try {
             QuizDTO response = service.saveQuiz(category, users);
             return ResponseEntity.ok(response);

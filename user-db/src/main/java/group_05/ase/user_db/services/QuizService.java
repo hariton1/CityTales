@@ -47,7 +47,19 @@ public class QuizService {
 
     public List<QuizDTO> getQuizzesForUser(UUID user) {
         List<QuizDTO> result = new ArrayList<>();
-        List<QuizUserEntity> userQuizzes = quizUserRepository.findByPlayer(user);
+        List<QuizUserEntity> userQuizList = quizUserRepository.findByPlayer(user);
+
+        Set<String> seen = new HashSet<>();
+        List<QuizUserEntity> userQuizzes = new ArrayList<>();
+
+        for (QuizUserEntity entity : userQuizList) {
+            String key = entity.getQuiz() + ":" + entity.getPlayer().toString();
+
+            if (!seen.contains(key)) {
+                seen.add(key);
+                userQuizzes.add(entity);
+            }
+        }
 
         for (QuizUserEntity quizUser : userQuizzes) {
             int quizId = quizUser.getQuiz();
