@@ -1,0 +1,1 @@
+Document internal objects including schemas and JSON examples.
