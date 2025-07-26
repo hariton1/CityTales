@@ -19,6 +19,8 @@ DevOps coordinator - Simon Ripphausen, 12444081, e12444081@student.tuwien.ac.at`
 
 ### About
 
+CityTales is built to make exploring cities more meaningful. Whether you're visiting for the first time or have lived there for years, the app helps you uncover the stories hidden behind buildings, streets, and squares—turning ordinary places into memorable experiences. CityTales is all about reimagining the way we discover cities. Instead of sticking to traditional tourist routes, it offers a more personal, story-driven journey. The goal is to spark curiosity, highlight lesser-known spots, and preserve local culture by telling stories that might otherwise go untold.
+
 Just run the global docker-compose and enjoy.
 This web-app lets you create tours, consume information and interact with friends in and around vienna.
 
