@@ -14,8 +14,9 @@ UI architect - Hariton Buçka, 01529018, e1529018@student.tuwien.ac.at
 
 DevOps coordinator - Simon Ripphausen, 12444081, e12444081@student.tuwien.ac.at` 
 
+--- 
 
----
+This is a project developed during the Advanced Software Engineering Course at TU Wien.
 
 ### About
 
